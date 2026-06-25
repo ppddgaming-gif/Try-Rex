@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+  --color-warning: var(--warning);
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
+
+:root {
+  --radius: 0.75rem;
+
+  /* Deep near-black backgrounds with subtle green tint */
+  --background: oklch(0.16 0.012 150);
+  --foreground: oklch(0.97 0.005 150);
+
+  --card: oklch(0.2 0.012 155);
+  --card-foreground: oklch(0.97 0.005 150);
+
+  --muted: oklch(0.26 0.012 155);
+  --muted-foreground: oklch(0.68 0.01 150);
+
+  --border: oklch(0.3 0.012 155);
+
+  /* TRY-REX brand green */
+  --primary: oklch(0.78 0.18 145);
+  --primary-foreground: oklch(0.16 0.012 150);
+
+  --success: oklch(0.78 0.18 145);
+  --danger: oklch(0.63 0.2 25);
+  --warning: oklch(0.8 0.15 85);
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  background-color: var(--background);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Thin custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 9999px;
+}
