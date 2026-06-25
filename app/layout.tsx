@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
-import { Sidebar } from "@/components/sidebar"
 import "./globals.css"
 
 const geistSans = Geist({
@@ -30,12 +29,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} bg-background`}>
-      <body className="bg-background text-foreground">
-        <div className="flex min-h-screen">
-          <Sidebar />
-          <main className="flex-1 min-w-0 lg:ml-64">{children}</main>
-        </div>
-      </body>
+      <body className="bg-background text-foreground">{children}</body>
     </html>
   )
 }
