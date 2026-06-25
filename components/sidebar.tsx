@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation"
 import { Home, LineChart, BrainCircuit, Trophy } from "lucide-react"
 
 const navItems = [
-  { href: "/", label: "Dashboard", icon: Home },
+  { href: "/dashboard", label: "Dashboard", icon: Home },
   { href: "/trading-game", label: "Trading Game", icon: LineChart },
   { href: "/ai-evaluation", label: "AI Evaluation", icon: BrainCircuit },
 ]
@@ -16,7 +16,7 @@ export function Sidebar() {
   return (
     <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-border bg-card/40 px-4 py-6 lg:flex">
       {/* Logo */}
-      <div className="flex items-center gap-3 px-2">
+      <Link href="/" className="flex items-center gap-3 px-2">
         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/30">
           <span className="text-2xl" aria-hidden="true">
             🦖
@@ -30,7 +30,7 @@ export function Sidebar() {
             AI Trading Mentor
           </p>
         </div>
-      </div>
+      </Link>
 
       {/* Nav */}
       <nav className="mt-10 flex flex-col gap-1">
