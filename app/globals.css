@@ -31,6 +31,23 @@
 }
 
 /*
+ * Motion. Three curves and a short list of durations, used everywhere so the
+ * whole site moves with one feel. Things arriving use a long, soft ease-out
+ * (fast start, gentle landing); things leaving are short and quiet. Only
+ * transform and opacity are animated wherever possible: the GPU composites
+ * those without re-laying out the page, which is what keeps it at 60fps.
+ */
+@theme {
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-in-quick: cubic-bezier(0.4, 0, 1, 1);
+
+  /* Every bare `transition-*` utility in the codebase picks these up. */
+  --default-transition-duration: 200ms;
+  --default-transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/*
  * One system, two tones. Chart screens stay calm and high-contrast; the
  * surfaces around them can be expressive. Amber is the brand. Green and red
  * are reserved for market direction and must never carry the brand.
@@ -136,9 +153,9 @@ p {
   box-shadow: 0 4px 0 var(--btn-edge, var(--primary-dim));
   cursor: pointer;
   transition:
-    transform 0.07s ease,
-    box-shadow 0.07s ease,
-    background-color 0.12s ease;
+    transform 0.18s var(--ease-out-quart),
+    box-shadow 0.18s var(--ease-out-quart),
+    background-color 0.2s var(--ease-out-quart);
 
   @media (width < 40rem) {
     min-height: var(--btn-h, 56px);
@@ -146,9 +163,20 @@ p {
   &:hover {
     background: var(--btn-hover-bg, var(--primary-hi));
   }
+  /* Rises a pixel toward the pointer, edge growing to match. Mouse only:
+     on touch, :hover sticks after a tap and the button would stay lifted. */
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 0 var(--btn-edge, var(--primary-dim));
+    }
+  }
+  /* The press is near-instant going down; the spring back uses the slower
+     transition above, which is what makes it feel physical. */
   &:active:not(:disabled) {
     transform: translateY(3px);
     box-shadow: 0 1px 0 var(--btn-edge, var(--primary-dim));
+    transition-duration: 0.05s;
   }
   &:disabled {
     opacity: 0.32;
@@ -188,6 +216,190 @@ p {
   color: var(--primary);
 }
 
+/* ---------------------------------------------------------------------------
+ * Motion primitives
+ * ------------------------------------------------------------------------- */
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, var(--rise, 14px), 0);
+  }
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes candle-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scaleY(0.55);
+  }
+}
+
+/* Plays once when the element mounts. Stagger siblings with --enter-delay. */
+.enter {
+  animation: fade-up 0.8s var(--ease-out-expo) both;
+  animation-delay: var(--enter-delay, 0ms);
+}
+
+/*
+ * Fades up as it scrolls into view, driven by the browser's scroll timeline:
+ * it runs on the compositor with no JavaScript scroll listener, so it can't
+ * jank the page. Browsers without scroll-driven animations just show the
+ * content, which is the right fallback.
+ */
+@supports (animation-timeline: view()) {
+  .reveal {
+    --rise: 28px;
+    animation: fade-up var(--ease-out-quart) both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 100%;
+  }
+}
+
+/*
+ * Menus and drawers that must animate out as well as in. Keep the element
+ * mounted and toggle data-open: closing animates opacity and transform, then
+ * `display` flips to none at the end (allow-discrete), which also takes the
+ * content out of the tab order and the accessibility tree. @starting-style
+ * gives the opening frame to animate from.
+ */
+.presence {
+  transition:
+    opacity 0.22s var(--ease-out-quart),
+    transform 0.34s var(--ease-out-expo),
+    display 0.34s allow-discrete;
+}
+.presence[data-open="false"] {
+  display: none;
+  opacity: 0;
+  transform: translate3d(0, -8px, 0);
+}
+@starting-style {
+  .presence[data-open="true"] {
+    opacity: 0;
+    transform: translate3d(0, -8px, 0);
+  }
+}
+
+/* Menu ⇄ close icon: the incoming glyph turns in rather than popping. */
+.icon-swap {
+  transition:
+    opacity 0.2s var(--ease-out-quart),
+    rotate 0.32s var(--ease-out-expo);
+}
+@starting-style {
+  .icon-swap {
+    opacity: 0;
+    rotate: -90deg;
+  }
+}
+
+/* Dropdowns grow out of their trigger on open. */
+.pop {
+  transform-origin: top;
+  transition:
+    opacity 0.16s var(--ease-out-quart),
+    transform 0.24s var(--ease-out-expo);
+}
+@starting-style {
+  .pop {
+    opacity: 0;
+    transform: translate3d(0, -4px, 0) scale(0.97);
+  }
+}
+
+/*
+ * Height reveal for "show more" panels. Animating grid rows from 0fr to 1fr
+ * lets the panel open to its natural height, which `height: auto` can't.
+ * visibility waits for the close to finish, then hides the content from
+ * keyboard and screen readers.
+ */
+.expand {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    grid-template-rows 0.42s var(--ease-out-expo),
+    opacity 0.24s var(--ease-out-quart),
+    visibility 0s linear 0.42s;
+}
+.expand[data-open="true"] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+.expand > * {
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Future candles cascade in after an answer is submitted. */
+.candle-reveal {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: candle-in 0.5s var(--ease-out-expo) both;
+}
+
+/* ---------------------------------------------------------------------------
+ * Page transitions (React <ViewTransition>, see components/page-transition.tsx)
+ * The old page steps back quickly; the new one rises in. Headers and the
+ * sidebar are named and pinned so only the content moves.
+ * ------------------------------------------------------------------------- */
+
+::view-transition-old(.page) {
+  animation: 0.14s var(--ease-in-quick) both fade-out;
+}
+::view-transition-new(.page) {
+  --rise: 10px;
+  animation: 0.5s var(--ease-out-expo) 0.06s both fade-up;
+}
+
+::view-transition-group(site-header),
+::view-transition-group(app-header),
+::view-transition-group(app-sidebar) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(site-header),
+::view-transition-old(app-header),
+::view-transition-old(app-sidebar) {
+  display: none;
+}
+::view-transition-new(site-header),
+::view-transition-new(app-header),
+::view-transition-new(app-sidebar) {
+  animation: none;
+}
+
+/* Trading game: chart and situation morph between questions and on submit.
+   The old frame bows out fast so the two never read as a double image. */
+::view-transition-group(game-chart),
+::view-transition-group(game-situation) {
+  animation-duration: 0.45s;
+  animation-timing-function: var(--ease-out-expo);
+}
+::view-transition-old(game-chart),
+::view-transition-old(game-situation) {
+  animation-duration: 0.2s;
+}
+::view-transition-new(game-chart),
+::view-transition-new(game-situation) {
+  animation-duration: 0.45s;
+  animation-timing-function: var(--ease-out-expo);
+}
+
+/* Clicks during the brief transition reach the live page, not the overlay. */
+::view-transition {
+  pointer-events: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -198,6 +410,16 @@ p {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+  /* Scroll-driven animations ignore duration, so switch them off outright. */
+  .reveal {
+    animation: none !important;
+  }
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
   }
 }
 

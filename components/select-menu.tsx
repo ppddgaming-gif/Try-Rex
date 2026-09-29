@@ -76,7 +76,7 @@ export function SelectMenu({
         {current.prefix && <span className="flex text-muted-foreground">{current.prefix}</span>}
         {current.label}
         <ChevronDown
-          className={`ml-auto h-4 w-4 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`}
+          className={`ml-auto h-4 w-4 text-muted-foreground transition-transform duration-300 ease-out-expo ${open ? "rotate-180" : ""}`}
         />
       </button>
 
@@ -97,7 +97,7 @@ export function SelectMenu({
               pick(options[active].value)
             }
           }}
-          className="absolute right-0 z-50 mt-1 min-w-full overflow-hidden rounded-lg border border-border bg-card p-1 shadow-2xl"
+          className="pop absolute right-0 z-50 mt-1 min-w-full overflow-hidden rounded-lg border border-border bg-card p-1 shadow-2xl"
         >
           {options.map((o, i) => {
             const selected = o.value === value

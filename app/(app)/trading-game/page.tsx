@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { startTransition, useEffect, useMemo, useState, ViewTransition } from "react"
 import Link from "next/link"
 import { Card } from "@/components/card"
 import { CandlestickChart } from "@/components/candlestick-chart"
@@ -50,28 +50,36 @@ export default function TradingGamePage() {
     return () => clearInterval(id)
   }, [])
 
+  // These three run inside startTransition: <ViewTransition> only animates
+  // transitions, so plain state updates would make the chart jump.
   function submit() {
     if (!choice || submitted) return
     const { correct, xp: earned } = scoreFor(challenge, choice)
-    setSubmitted(true)
-    setXp((v) => v + earned)
-    if (correct) setCorrectCount((v) => v + 1)
+    startTransition(() => {
+      setSubmitted(true)
+      setXp((v) => v + earned)
+      if (correct) setCorrectCount((v) => v + 1)
+    })
   }
 
   function next() {
-    setIndex((i) => Math.min(i + 1, round.length - 1))
-    setChoice(null)
-    setSubmitted(false)
+    startTransition(() => {
+      setIndex((i) => Math.min(i + 1, round.length - 1))
+      setChoice(null)
+      setSubmitted(false)
+    })
   }
 
   function reset(nextLevel = level) {
-    setLevel(nextLevel)
-    setIndex(0)
-    setChoice(null)
-    setSubmitted(false)
-    setXp(0)
-    setCorrectCount(0)
-    setSeconds(0)
+    startTransition(() => {
+      setLevel(nextLevel)
+      setIndex(0)
+      setChoice(null)
+      setSubmitted(false)
+      setXp(0)
+      setCorrectCount(0)
+      setSeconds(0)
+    })
   }
 
   const evaluationHref = `/ai-evaluation?c=${challenge.id}&a=${choice ?? challenge.answer}&t=${seconds}`
@@ -137,18 +145,25 @@ export default function TradingGamePage() {
             )}
           </div>
 
-          <div className="mt-4 h-[320px] w-full sm:h-[420px]">
-            <CandlestickChart
-              candles={shown}
-              min={frame.min}
-              max={frame.max}
-              priceTicks={frame.priceTicks}
-              timeLabels={submitted ? challenge.revealTimeLabels : challenge.timeLabels}
-              zones={challenge.zones}
-              currentPrice={challenge.currentPrice}
-              digits={challenge.digits}
-            />
-          </div>
+          {/* Submitting appends the future candles and rescales the chart;
+              moving to the next question swaps it. Both happen in a transition,
+              so the chart morphs instead of jumping (CSS: game-chart), and the
+              revealed candles cascade in on top. */}
+          <ViewTransition key={challenge.id} name="game-chart" share="auto" update="auto" default="none">
+            <div className="mt-4 h-[320px] w-full sm:h-[420px]">
+              <CandlestickChart
+                candles={shown}
+                min={frame.min}
+                max={frame.max}
+                priceTicks={frame.priceTicks}
+                timeLabels={submitted ? challenge.revealTimeLabels : challenge.timeLabels}
+                zones={challenge.zones}
+                currentPrice={challenge.currentPrice}
+                digits={challenge.digits}
+                revealFrom={submitted ? challenge.candles.length : undefined}
+              />
+            </div>
+          </ViewTransition>
           {submitted && (
             <p className="mt-2 text-xs text-muted-foreground">
               Bagian setelah harga entry ({challenge.currentPrice.toFixed(challenge.digits)}) adalah{" "}
@@ -159,10 +174,12 @@ export default function TradingGamePage() {
 
         {/* Situation + actions */}
         <div className="flex flex-col gap-4">
-          <Card>
-            <h2 className="text-base font-semibold">Situasi Market</h2>
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{challenge.situation}</p>
-          </Card>
+          <ViewTransition key={challenge.id} name="game-situation" share="auto" default="none">
+            <Card>
+              <h2 className="text-base font-semibold">Situasi Market</h2>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{challenge.situation}</p>
+            </Card>
+          </ViewTransition>
 
           <DecisionButtons
             value={choice}
@@ -199,10 +216,7 @@ export default function TradingGamePage() {
                     >
                       <BrainCircuit className="h-4 w-4" /> Lihat Evaluasi AI
                     </Link>
-                    <button
-                      onClick={() => reset()}
-                      className="flex items-center justify-center gap-2 rounded-xl border border-border bg-muted/40 py-3 text-sm font-medium transition-colors hover:bg-muted"
-                    >
+                    <button onClick={() => reset()} className="btn btn-ghost w-full">
                       <RotateCcw className="h-4 w-4" /> Main dari Awal
                     </button>
                   </>
@@ -214,10 +228,7 @@ export default function TradingGamePage() {
                     >
                       Soal Berikutnya <ArrowRight className="h-4 w-4" />
                     </button>
-                    <Link
-                      href={evaluationHref}
-                      className="flex items-center justify-center gap-2 rounded-xl border border-border bg-muted/40 py-3 text-sm font-medium transition-colors hover:bg-muted"
-                    >
+                    <Link href={evaluationHref} className="btn btn-ghost w-full">
                       <BrainCircuit className="h-4 w-4" /> Bedah soal ini dulu
                     </Link>
                   </>

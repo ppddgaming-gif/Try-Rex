@@ -27,20 +27,25 @@ export function Disclosure({
 
   return (
     <>
-      {open && (
-        <div id={panelId} className={className}>
-          {children}
+      {/* Always mounted so it can grow open and shrink closed (`.expand` in
+          globals.css). Closed, it is visibility: hidden, so its content is out
+          of the tab order and the accessibility tree. */}
+      <div id={panelId} data-open={open} className="expand">
+        <div>
+          <div className={className}>{children}</div>
         </div>
-      )}
+      </div>
       <button
         type="button"
         aria-expanded={open}
-        aria-controls={open ? panelId : undefined}
+        aria-controls={panelId}
         onClick={() => setOpen((v) => !v)}
         className={`flex items-center justify-center gap-1 rounded-lg border border-border bg-muted/40 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground ${triggerClassName}`}
       >
         {open ? closeLabel : label}
-        <ChevronDown className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
+        <ChevronDown
+          className={`h-4 w-4 transition-transform duration-300 ease-out-expo ${open ? "rotate-180" : ""}`}
+        />
       </button>
     </>
   )

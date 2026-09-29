@@ -44,7 +44,12 @@ export function QuestionProgress({
         aria-valuemax={100}
         aria-label="Progres challenge"
       >
-        <div className="h-full rounded-full bg-primary transition-all duration-500" style={{ width: `${pct}%` }} />
+        {/* scaleX rather than width: transforms animate on the GPU without
+            re-laying out the bar on every frame. */}
+        <div
+          className="h-full origin-left rounded-full bg-primary transition-transform duration-700 ease-out-expo"
+          style={{ transform: `scaleX(${pct / 100})` }}
+        />
       </div>
 
       <div className="mt-3 flex items-center justify-between text-xs">

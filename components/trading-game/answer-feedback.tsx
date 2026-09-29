@@ -16,7 +16,7 @@ export function AnswerFeedback({
       role="status"
       aria-live="polite"
       className={[
-        "rounded-xl border p-4",
+        "enter rounded-xl border p-4",
         correct ? "border-success/40 bg-success/10" : "border-danger/40 bg-danger/10",
       ].join(" ")}
     >

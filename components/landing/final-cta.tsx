@@ -6,7 +6,7 @@ export function FinalCta() {
   return (
     <section className="mx-auto max-w-7xl px-5 pb-24 lg:px-8">
       <div
-        className="relative overflow-hidden rounded-3xl border border-border/60 px-6 py-20 text-center sm:py-28"
+        className="reveal relative overflow-hidden rounded-3xl border border-border/60 px-6 py-20 text-center sm:py-28"
         style={{
           backgroundImage:
             "radial-gradient(100% 120% at 50% 120%, color-mix(in srgb, var(--primary) 32%, transparent) 0%, color-mix(in srgb, var(--primary-dim) 22%, transparent) 40%, color-mix(in srgb, var(--card) 95%, transparent) 80%)",

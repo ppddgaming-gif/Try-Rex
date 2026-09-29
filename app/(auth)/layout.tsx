@@ -1,5 +1,6 @@
 import { BrandMark } from "@/components/brand-mark"
 import { Card } from "@/components/card"
+import { PageTransition } from "@/components/page-transition"
 
 // Login, signup and password reset: one centred card, no app sidebar.
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
@@ -8,7 +9,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div className="mb-8">
         <BrandMark size="lg" />
       </div>
-      <Card className="w-full max-w-md sm:p-8">{children}</Card>
+      <Card className="w-full max-w-md sm:p-8">
+        <PageTransition>{children}</PageTransition>
+      </Card>
     </main>
   )
 }

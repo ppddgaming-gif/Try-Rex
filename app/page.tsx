@@ -7,6 +7,7 @@ import { HowItWorks } from "@/components/landing/how-it-works"
 import { Testimonials } from "@/components/landing/testimonials"
 import { FinalCta } from "@/components/landing/final-cta"
 import { SiteFooter } from "@/components/landing/site-footer"
+import { PageTransition } from "@/components/page-transition"
 import { isSignedIn } from "@/lib/auth"
 
 // Reads the session cookie to choose "Masuk" or "Dashboard", so this page is
@@ -17,15 +18,17 @@ export default async function LandingPage() {
   return (
     <div className="min-h-screen">
       <MarketingNav signedIn={signedIn} />
-      <main>
-        <Hero />
-        <StatsBanner />
-        <Surfaces />
-        <FeatureRows />
-        <HowItWorks />
-        <Testimonials />
-        <FinalCta />
-      </main>
+      <PageTransition>
+        <main>
+          <Hero />
+          <StatsBanner />
+          <Surfaces />
+          <FeatureRows />
+          <HowItWorks />
+          <Testimonials />
+          <FinalCta />
+        </main>
+      </PageTransition>
       <SiteFooter />
     </div>
   )

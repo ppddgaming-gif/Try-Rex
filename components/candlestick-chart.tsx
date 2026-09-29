@@ -12,7 +12,12 @@ type Props = {
   currentPrice?: number
   /** Price decimals for this quote convention: 5 for majors, 3 for JPY crosses. */
   digits?: number
+  /** Candles from this index on cascade in, one after another (the reveal). */
+  revealFrom?: number
 }
+
+// Delay between consecutive revealed candles.
+const REVEAL_STAGGER_MS = 45
 
 const W = 1000
 const H = 460
@@ -39,6 +44,7 @@ export function CandlestickChart({
   markers = [],
   currentPrice,
   digits = 5,
+  revealFrom,
 }: Props) {
   const y = (p: number) => PAD_TOP + ((max - p) / (max - min)) * plotH
   // Axis ticks read one decimal shorter than quoted prices, as FX platforms show them.
@@ -114,8 +120,13 @@ export function CandlestickChart({
         const yc = y(c.c)
         const bodyTop = Math.min(yo, yc)
         const bodyH = Math.max(1.5, Math.abs(yc - yo))
+        const revealing = revealFrom !== undefined && i >= revealFrom
         return (
-          <g key={`candle-${i}`}>
+          <g
+            key={`candle-${i}`}
+            className={revealing ? "candle-reveal" : undefined}
+            style={revealing ? { animationDelay: `${(i - revealFrom) * REVEAL_STAGGER_MS}ms` } : undefined}
+          >
             <line x1={cx} x2={cx} y1={y(c.h)} y2={y(c.l)} stroke={color} strokeWidth={1} />
             <rect x={cx - cw / 2} y={bodyTop} width={cw} height={bodyH} fill={color} rx={0.5} />
           </g>

@@ -37,7 +37,7 @@ export function FeatureRows() {
         {features.map((f) => (
           <div
             key={f.title}
-            className="grid items-center gap-8 lg:grid-cols-2 lg:gap-16"
+            className="reveal grid items-center gap-8 lg:grid-cols-2 lg:gap-16"
           >
             <div className={f.reverse ? "lg:order-2" : ""}>
               <p className="text-sm font-semibold text-primary">{f.eyebrow}</p>

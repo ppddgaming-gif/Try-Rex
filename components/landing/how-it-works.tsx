@@ -25,7 +25,7 @@ export function HowItWorks() {
   return (
     <section id="how" className="border-y border-border/60 bg-card/30">
       <div className="mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-24">
-        <div className="mx-auto max-w-2xl text-center">
+        <div className="reveal mx-auto max-w-2xl text-center">
           <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
             Belajar lewat siklus latihan yang terbukti
           </h2>
@@ -38,7 +38,10 @@ export function HowItWorks() {
           {steps.map((s) => {
             const Icon = s.icon
             return (
-              <div key={s.step} className="rounded-2xl border border-border bg-card p-6">
+              <div
+                key={s.step}
+                className="reveal rounded-2xl border border-border bg-card p-6 transition-[translate,border-color] duration-300 ease-out-expo hover:-translate-y-1 hover:border-primary/40"
+              >
                 <div className="flex items-center justify-between">
                   <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/30">
                     <Icon className="h-5 w-5 text-primary" />

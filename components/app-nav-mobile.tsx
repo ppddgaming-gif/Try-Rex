@@ -13,7 +13,10 @@ export function AppNavMobile({ userName }: { userName: string | null }) {
   const close = () => setOpen(false)
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-xl lg:hidden">
+    <header
+      className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-xl lg:hidden"
+      style={{ viewTransitionName: "app-header" }}
+    >
       <div className="flex h-16 items-center justify-between px-5">
         <BrandMark onNavigate={close} />
         <button
@@ -23,16 +26,18 @@ export function AppNavMobile({ userName }: { userName: string | null }) {
           aria-controls="app-nav-menu"
           className="flex h-11 w-11 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:text-foreground"
         >
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          {/* Keyed so the new icon mounts and turns in, instead of popping. */}
+          <span key={open ? "close" : "open"} className="icon-swap flex">
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </span>
         </button>
       </div>
 
-      {open && (
-        <div id="app-nav-menu" className="border-t border-border bg-background px-5 py-4">
-          <NavLinks onNavigate={close} />
-          <ProfileCard name={userName} className="mt-4" />
-        </div>
-      )}
+      {/* Stays mounted so the drawer animates closed as well as open. */}
+      <div id="app-nav-menu" data-open={open} className="presence border-t border-border bg-background px-5 py-4">
+        <NavLinks onNavigate={close} />
+        <ProfileCard name={userName} className="mt-4" />
+      </div>
     </header>
   )
 }

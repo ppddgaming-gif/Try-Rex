@@ -151,7 +151,9 @@ export default async function AiEvaluationPage({
         <Card className="flex flex-col">
           <h2 className="text-base font-semibold">Langkah Selanjutnya</h2>
           <p className="mt-2 text-sm text-muted-foreground">Terus latihan dan perbaiki keputusanmu!</p>
-          <div className="mt-4 flex flex-col gap-3">
+          {/* Margins rather than gap: the Disclosure panel stays mounted at zero
+              height when closed, and a gap would still reserve space for it. */}
+          <div className="mt-4 flex flex-col">
             <Link
               href="/trading-game"
               className="btn w-full"
@@ -161,8 +163,8 @@ export default async function AiEvaluationPage({
             <Disclosure
               label="Lihat Riwayat"
               closeLabel="Sembunyikan Riwayat"
-              className="rounded-lg border border-border bg-muted/20 p-3"
-              triggerClassName=""
+              className="mt-3 rounded-lg border border-border bg-muted/20 p-3"
+              triggerClassName="mt-3"
             >
               <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
                 <History className="h-3.5 w-3.5" /> 5 challenge terakhir

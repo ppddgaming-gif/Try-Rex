@@ -105,9 +105,31 @@ Radii: 8, 12 for controls (`rounded-xl` / `rounded-lg`), and 18 for cards (`roun
 
 **No emoji anywhere in the UI.** The mascot is `components/rex-mascot.tsx`: `<Rex>` is the SVG (colored from `--primary` and the `--rex-*` tokens), and `<RexMascot>` is the large decorative corner figure. Rex has four moods and should react to results rather than sit there as a static logo: `neutral` for chrome and idle screens, `happy` for a good score, `grimace` for a risky or wrong call, and `thinking` while an answer or an evaluation is pending.
 
+### Motion
+
+All motion is CSS plus React's built-in `<ViewTransition>`, with no animation library. It lives in `app/globals.css`, so extend that rather than adding one-off keyframes.
+
+- **Curves:** `ease-out-expo` (arrivals), `ease-out-quart` (hovers, small moves), `ease-in-quick` (exits). Bare `transition-*` utilities default to 200ms on the quart curve via `--default-transition-*`. Animate `transform`/`translate` and `opacity`; avoid animating `width`, `height` or `top` (the progress bar uses `scaleX`, not `width`).
+- **Classes:**
+  - `enter`: fade-up on mount, staggered with `--enter-delay`
+  - `reveal`: scroll-driven fade-up on the compositor, behind `@supports`
+  - `presence` + `data-open`: menus that animate out as well as in. Keep them mounted; closing flips `display` at the end.
+  - `pop`: dropdown grow-in
+  - `expand` + `data-open`: the "show more" height reveal used by `Disclosure`
+  - `icon-swap`: a keyed icon that turns in
+  - `candle-reveal`: the chart's staggered reveal, via `CandlestickChart`'s `revealFrom`
+- **Always-mounted panels take up zero height, not zero space.** A parent with `gap` still reserves a slot for a closed `Disclosure`, so use margins around one (see `ai-evaluation`).
+- **Page transitions:** `<PageTransition>` (`components/page-transition.tsx`) wraps `{children}` in each group layout and on the landing page. It is keyed by pathname, so a query-string change (dashboard filters) doesn't animate. The sidebar and headers carry `viewTransitionName` (`app-sidebar`, `app-header`, `site-header`) and stay pinned.
+- **Game transitions:**
+  - `<ViewTransition>` only animates React transitions, which is why the game's `submit`/`next`/`reset` run inside `startTransition`. Without it, the chart jumps.
+  - `ViewTransition` types come from `react/canary`, referenced in `react-canary.d.ts`.
+  - A dev-console `InvalidStateError: Transition was aborted … Document hidden` just means a transition fired while the tab was in the background, which is harmless.
+- **Reduced motion:** the `prefers-reduced-motion` block switches all of this off, including scroll-driven and view-transition animations. Keep new motion inside it.
+- **Hover lifts** only apply on devices with a real hover. Tailwind v4's `hover:` already does this, and `btn` does it by hand. On touch, `:hover` sticks after a tap.
+
 ### Conventions
 
-- **Server components by default.** These files carry `"use client"`: the four forms in `components/auth/` (they need `useActionState`), `components/nav-links.tsx` (uses `usePathname`), `components/app-nav-mobile.tsx` (drawer state), `components/landing/marketing-nav.tsx`, `components/disclosure.tsx` and `components/select-menu.tsx` (the two shared interactive primitives), `components/dashboard/dashboard-filters.tsx` (pushes filter state into the URL), and `app/(app)/trading-game/page.tsx` (the whole game loop). Note `components/sidebar.tsx` is a *server* component — it delegates the only hook it needs to `NavLinks`. The `components/trading-game/*` parts carry no directive: they are pure and land in the client bundle only because the game page imports them. Add the directive only when a component genuinely needs hooks or handlers.
+- **Server components by default.** These files carry `"use client"`: the four forms in `components/auth/` (they need `useActionState`), `components/page-transition.tsx` (reads the pathname), `components/nav-links.tsx` (uses `usePathname`), `components/app-nav-mobile.tsx` (drawer state), `components/landing/marketing-nav.tsx`, `components/disclosure.tsx` and `components/select-menu.tsx` (the two shared interactive primitives), `components/dashboard/dashboard-filters.tsx` (pushes filter state into the URL), and `app/(app)/trading-game/page.tsx` (the whole game loop). Note `components/sidebar.tsx` is a *server* component — it delegates the only hook it needs to `NavLinks`. The `components/trading-game/*` parts carry no directive: they are pure and land in the client bundle only because the game page imports them. Add the directive only when a component genuinely needs hooks or handlers.
 - **No dead controls.** Every `<button>` either does something or is not a button. Decorative product shots in `components/landing/showcase.tsx` use `<div>` for what look like buttons, and "show more" affordances use the shared `Disclosure` rather than linking nowhere.
 - **Focus rings are global.** `app/globals.css` defines one `:focus-visible` outline for the whole app, so individual controls should *not* re-declare `focus-visible:outline-*` — only override it where the ring sits on a tinted surface (see the decision buttons' `outline-success` / `outline-danger` / `outline-wait`).
 - **Icons** come from `lucide-react` exclusively. Never use an emoji as an icon; `SelectMenu`'s `prefix` takes a lucide element.

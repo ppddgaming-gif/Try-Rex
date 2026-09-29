@@ -1,4 +1,5 @@
 import { AppNavMobile } from "@/components/app-nav-mobile"
+import { PageTransition } from "@/components/page-transition"
 import { Sidebar } from "@/components/sidebar"
 import { getCurrentUser } from "@/lib/auth"
 
@@ -17,7 +18,7 @@ export default async function AppLayout({
       <Sidebar userName={userName} />
       <main className="flex-1 min-w-0 lg:ml-64">
         <AppNavMobile userName={userName} />
-        {children}
+        <PageTransition>{children}</PageTransition>
       </main>
     </div>
   )

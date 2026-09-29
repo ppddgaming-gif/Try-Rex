@@ -34,7 +34,7 @@ const quotes = [
 export function Testimonials() {
   return (
     <section id="testimonials" className="mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-24">
-      <div className="mx-auto max-w-2xl text-center">
+      <div className="reveal mx-auto max-w-2xl text-center">
         <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
           Apa kata para trader
         </h2>
@@ -45,7 +45,10 @@ export function Testimonials() {
 
       <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {quotes.map((q) => (
-          <figure key={q.name} className="flex flex-col rounded-2xl border border-border bg-card p-6">
+          <figure
+            key={q.name}
+            className="reveal flex flex-col rounded-2xl border border-border bg-card p-6 transition-[translate,border-color] duration-300 ease-out-expo hover:-translate-y-1 hover:border-primary/40"
+          >
             <blockquote className="flex-1 text-sm leading-relaxed text-pretty">{`"${q.body}"`}</blockquote>
             <figcaption className="mt-6 flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/15 text-sm font-bold text-primary ring-1 ring-primary/30">
