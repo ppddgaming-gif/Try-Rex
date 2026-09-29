@@ -74,7 +74,7 @@ export function AspectMockup() {
   )
 }
 
-/** Mockup: Trading Game decision buttons */
+/** Mockup: Trading Game decision buttons — decorative, not interactive */
 export function TradingMockup() {
   return (
     <div className="w-full max-w-md rounded-2xl border border-border bg-card/95 p-5 shadow-2xl backdrop-blur">
@@ -88,27 +88,27 @@ export function TradingMockup() {
         </span>
       </div>
       <div className="flex flex-col gap-2.5">
-        <button className="flex items-center gap-3 rounded-xl border border-success/40 bg-success/10 px-4 py-3 text-left transition-colors hover:bg-success/15">
+        <div className="flex items-center gap-3 rounded-xl border border-success/40 bg-success/10 px-4 py-3 text-left">
           <ArrowUpRight className="h-5 w-5 text-success" />
           <div>
             <p className="text-sm font-bold text-success">BUY</p>
             <p className="text-[11px] text-muted-foreground">Harga akan naik</p>
           </div>
-        </button>
-        <button className="flex items-center gap-3 rounded-xl border border-danger/40 bg-danger/10 px-4 py-3 text-left transition-colors hover:bg-danger/15">
+        </div>
+        <div className="flex items-center gap-3 rounded-xl border border-danger/40 bg-danger/10 px-4 py-3 text-left">
           <ArrowDownRight className="h-5 w-5 text-danger" />
           <div>
             <p className="text-sm font-bold text-danger">SELL</p>
             <p className="text-[11px] text-muted-foreground">Harga akan turun</p>
           </div>
-        </button>
-        <button className="flex items-center gap-3 rounded-xl border border-warning/40 bg-warning/10 px-4 py-3 text-left transition-colors hover:bg-warning/15">
+        </div>
+        <div className="flex items-center gap-3 rounded-xl border border-warning/40 bg-warning/10 px-4 py-3 text-left">
           <Pause className="h-5 w-5 text-warning" />
           <div>
             <p className="text-sm font-bold text-warning">WAIT</p>
             <p className="text-[11px] text-muted-foreground">Tunggu konfirmasi</p>
           </div>
-        </button>
+        </div>
       </div>
     </div>
   )

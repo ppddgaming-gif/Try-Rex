@@ -52,6 +52,9 @@
 
 html {
   background-color: var(--background);
+  /* In-page anchors (#product, #how...) must clear the sticky nav bars. */
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
 }
 
 body {
@@ -59,6 +62,26 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+}
+
+/* One keyboard focus treatment for the whole app. Individual controls override
+   the color where the ring sits on a tinted surface. */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Thin custom scrollbar */

@@ -1,42 +1,80 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
+import Link from "next/link"
 import { Card } from "@/components/card"
 import { CandlestickChart } from "@/components/candlestick-chart"
-import { tradingGameCandles } from "@/lib/mock-data"
-import { ChevronDown, ArrowUpRight, ArrowDown, Pause } from "lucide-react"
+import { SelectMenu } from "@/components/select-menu"
+import { AnswerFeedback } from "@/components/trading-game/answer-feedback"
+import { DecisionButtons } from "@/components/trading-game/decision-buttons"
+import { QuestionProgress } from "@/components/trading-game/question-progress"
+import type { GameLevel } from "@/lib/game-data"
+import { FUTURE } from "@/lib/game-logic"
+import {
+  decisionLabels,
+  frameOf,
+  gameLevels,
+  roundFor,
+  scoreFor,
+  type Decision,
+} from "@/lib/mock-data"
+import { ArrowRight, BrainCircuit, RotateCcw } from "lucide-react"
 
-type Choice = "buy" | "sell" | "wait" | null
-
-const actions = [
-  {
-    id: "buy" as const,
-    label: "BUY",
-    sub: "Harga akan naik",
-    Icon: ArrowUpRight,
-    classes: "border-success/40 bg-success/10 hover:bg-success/20 text-success",
-    ring: "ring-2 ring-success",
-  },
-  {
-    id: "sell" as const,
-    label: "SELL",
-    sub: "Harga akan turun",
-    Icon: ArrowDown,
-    classes: "border-danger/40 bg-danger/10 hover:bg-danger/20 text-danger",
-    ring: "ring-2 ring-danger",
-  },
-  {
-    id: "wait" as const,
-    label: "WAIT",
-    sub: "Tunggu konfirmasi",
-    Icon: Pause,
-    classes: "border-warning/40 bg-warning/10 hover:bg-warning/20 text-warning",
-    ring: "ring-2 ring-warning",
-  },
-]
+const ROUND_SIZE = 5
 
 export default function TradingGamePage() {
-  const [choice, setChoice] = useState<Choice>(null)
+  const [level, setLevel] = useState<GameLevel>("easy")
+  const [index, setIndex] = useState(0)
+  const [choice, setChoice] = useState<Decision | null>(null)
+  const [submitted, setSubmitted] = useState(false)
+  const [xp, setXp] = useState(0)
+  const [correctCount, setCorrectCount] = useState(0)
+  const [seconds, setSeconds] = useState(0)
+
+  const round = useMemo(() => roundFor(level, ROUND_SIZE), [level])
+  const challenge = round[index]
+
+  // After answering, the 15 future candles are appended so you see what happened.
+  const shown = useMemo(
+    () => (submitted ? [...challenge.candles, ...challenge.future] : challenge.candles),
+    [submitted, challenge]
+  )
+  const frame = useMemo(() => frameOf(shown), [shown])
+
+  const last = index === round.length - 1
+  const result = submitted && choice ? scoreFor(challenge, choice) : null
+
+  // Starts at 0 on the server and on first paint, so there is no hydration gap.
+  useEffect(() => {
+    const id = setInterval(() => setSeconds((s) => s + 1), 1000)
+    return () => clearInterval(id)
+  }, [])
+
+  function submit() {
+    if (!choice || submitted) return
+    const { correct, xp: earned } = scoreFor(challenge, choice)
+    setSubmitted(true)
+    setXp((v) => v + earned)
+    if (correct) setCorrectCount((v) => v + 1)
+  }
+
+  function next() {
+    setIndex((i) => Math.min(i + 1, round.length - 1))
+    setChoice(null)
+    setSubmitted(false)
+  }
+
+  function reset(nextLevel = level) {
+    setLevel(nextLevel)
+    setIndex(0)
+    setChoice(null)
+    setSubmitted(false)
+    setXp(0)
+    setCorrectCount(0)
+    setSeconds(0)
+  }
+
+  const evaluationHref = `/ai-evaluation?c=${challenge.id}&a=${choice ?? challenge.answer}&t=${seconds}`
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-6 lg:px-8">
@@ -44,81 +82,148 @@ export default function TradingGamePage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Trading Game Simulator</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Pilih keputusan terbaikmu berdasarkan situasi market!
+            Data harga asli. Pilih keputusanmu, lalu lihat apa yang sebenarnya terjadi.
           </p>
         </div>
-        <div className="rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium">
-          Soal <span className="font-bold text-primary">15</span>{" "}
-          <span className="text-muted-foreground">/ 20</span>
+        <div className="flex w-full flex-col gap-3 sm:w-72">
+          <SelectMenu
+            label="Tingkat kesulitan"
+            value={level}
+            onChange={(v) => reset(v as GameLevel)}
+            options={gameLevels.map((l) => ({
+              value: l.id,
+              label: `${l.label} · ${l.xp} XP`,
+              prefix: "🎯",
+            }))}
+          />
+          <QuestionProgress
+            index={index}
+            answered={index + (submitted ? 1 : 0)}
+            total={round.length}
+            xp={xp}
+            correctCount={correctCount}
+            seconds={seconds}
+          />
         </div>
       </header>
 
-      <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[1fr_320px]">
+      <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[1fr_340px]">
         {/* Chart */}
         <Card className="flex flex-col">
-          <div className="flex items-center gap-2">
-            <button className="flex items-center gap-2 rounded-lg border border-border bg-muted/40 px-3 py-1.5 text-sm font-semibold">
-              EURUSD <ChevronDown className="h-4 w-4 text-muted-foreground" />
-            </button>
+          <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-lg border border-border bg-muted/40 px-3 py-1.5 text-sm font-semibold">
-              H1
+              {challenge.pair}
             </span>
+            <span className="rounded-lg border border-border bg-muted/40 px-3 py-1.5 text-sm font-semibold">
+              {challenge.timeframe}
+            </span>
+            <span className="rounded-lg border border-border bg-muted/40 px-3 py-1.5 text-xs text-muted-foreground">
+              {challenge.period}
+            </span>
+            {submitted && (
+              <span
+                className={[
+                  "ml-auto rounded-lg px-3 py-1.5 text-xs font-bold",
+                  challenge.changePercent > 0
+                    ? "bg-success/15 text-success"
+                    : challenge.changePercent < 0
+                      ? "bg-danger/15 text-danger"
+                      : "bg-muted text-muted-foreground",
+                ].join(" ")}
+              >
+                {FUTURE} candle berikutnya: {challenge.changePercent > 0 ? "+" : ""}
+                {challenge.changePercent.toFixed(2)}%
+              </span>
+            )}
           </div>
 
-          <div className="mt-4 h-[420px] w-full">
+          <div className="mt-4 h-[320px] w-full sm:h-[420px]">
             <CandlestickChart
-              candles={tradingGameCandles}
-              min={1.076}
-              max={1.096}
-              priceTicks={[1.076, 1.078, 1.08, 1.082, 1.084, 1.086, 1.088, 1.09, 1.092, 1.094, 1.096]}
-              timeLabels={["16 May 12:00", "17 May 12:00", "20 May 12:00", "21 May 12:00", "22 May 12:00"]}
-              zones={[
-                { from: 1.0905, to: 1.092, variant: "resistance" },
-                { from: 1.0795, to: 1.08, variant: "support", label: "1.08000" },
-              ]}
-              currentPrice={1.08621}
+              candles={shown}
+              min={frame.min}
+              max={frame.max}
+              priceTicks={frame.priceTicks}
+              timeLabels={submitted ? challenge.revealTimeLabels : challenge.timeLabels}
+              zones={challenge.zones}
+              currentPrice={challenge.currentPrice}
+              digits={challenge.digits}
             />
           </div>
+          {submitted && (
+            <p className="mt-2 text-xs text-muted-foreground">
+              Bagian setelah harga entry ({challenge.currentPrice.toFixed(challenge.digits)}) adalah{" "}
+              {FUTURE} candle yang tadi disembunyikan.
+            </p>
+          )}
         </Card>
 
         {/* Situation + actions */}
         <div className="flex flex-col gap-4">
           <Card>
             <h2 className="text-base font-semibold">Situasi Market</h2>
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              Price sedang berada di area resistance kuat setelah trend turun.
-            </p>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{challenge.situation}</p>
           </Card>
 
-          <div className="flex flex-col gap-3">
-            {actions.map((a) => {
-              const selected = choice === a.id
-              const Icon = a.Icon
-              return (
-                <button
-                  key={a.id}
-                  onClick={() => setChoice(a.id)}
-                  className={[
-                    "flex items-center gap-4 rounded-xl border px-5 py-4 text-left transition-all",
-                    a.classes,
-                    selected ? a.ring : "",
-                  ].join(" ")}
-                >
-                  <Icon className="h-7 w-7 shrink-0" />
-                  <div>
-                    <p className="text-lg font-extrabold leading-none">{a.label}</p>
-                    <p className="mt-1 text-xs opacity-80">{a.sub}</p>
-                  </div>
-                </button>
-              )
-            })}
-          </div>
+          <DecisionButtons
+            value={choice}
+            onChange={setChoice}
+            disabled={submitted}
+            answer={submitted ? challenge.answer : undefined}
+          />
 
-          {choice && (
-            <p className="text-center text-xs text-muted-foreground">
-              Kamu memilih <span className="font-semibold uppercase text-foreground">{choice}</span>.
-              Lanjut ke evaluasi untuk melihat hasilnya.
-            </p>
+          {!submitted && (
+            <button
+              onClick={submit}
+              disabled={!choice}
+              className="rounded-xl bg-primary py-3.5 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {choice ? `Kirim Jawaban: ${decisionLabels[choice]}` : "Pilih salah satu dulu"}
+            </button>
+          )}
+
+          {submitted && choice && result && (
+            <>
+              <AnswerFeedback
+                correct={result.correct}
+                xp={result.xp}
+                message={challenge.feedback[choice]}
+                answerLabel={decisionLabels[challenge.answer]}
+              />
+
+              <div className="flex flex-col gap-3">
+                {last ? (
+                  <>
+                    <Link
+                      href={evaluationHref}
+                      className="flex items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90"
+                    >
+                      <BrainCircuit className="h-4 w-4" /> Lihat Evaluasi AI
+                    </Link>
+                    <button
+                      onClick={() => reset()}
+                      className="flex items-center justify-center gap-2 rounded-xl border border-border bg-muted/40 py-3 text-sm font-medium transition-colors hover:bg-muted"
+                    >
+                      <RotateCcw className="h-4 w-4" /> Main dari Awal
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={next}
+                      className="flex items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90"
+                    >
+                      Soal Berikutnya <ArrowRight className="h-4 w-4" />
+                    </button>
+                    <Link
+                      href={evaluationHref}
+                      className="flex items-center justify-center gap-2 rounded-xl border border-border bg-muted/40 py-3 text-sm font-medium transition-colors hover:bg-muted"
+                    >
+                      <BrainCircuit className="h-4 w-4" /> Bedah soal ini dulu
+                    </Link>
+                  </>
+                )}
+              </div>
+            </>
           )}
         </div>
       </div>

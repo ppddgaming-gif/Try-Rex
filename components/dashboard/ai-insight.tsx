@@ -1,6 +1,8 @@
 import { Card } from "@/components/card"
+import { Disclosure } from "@/components/disclosure"
 import { RexMascot } from "@/components/rex-mascot"
-import { Sparkles, ChevronRight } from "lucide-react"
+import { recommendations } from "@/lib/mock-data"
+import { Sparkles } from "lucide-react"
 
 export function AiInsight() {
   return (
@@ -10,7 +12,7 @@ export function AiInsight() {
         AI Insight dari TRY-REX
       </h2>
 
-      <div className="mt-4 max-w-[62%]">
+      <div className="mt-4 flex max-w-[62%] flex-col">
         <div className="rounded-xl border border-border bg-muted/40 p-4">
           <p className="text-sm leading-relaxed text-foreground/90">
             <span className="mr-1 text-2xl leading-none text-primary">&ldquo;</span>
@@ -19,9 +21,23 @@ export function AiInsight() {
           </p>
         </div>
 
-        <button className="mt-4 flex items-center gap-1 rounded-lg border border-primary/40 bg-primary/10 px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/20">
-          Lihat Rekomendasi <ChevronRight className="h-4 w-4" />
-        </button>
+        <Disclosure
+          label="Lihat Rekomendasi"
+          closeLabel="Sembunyikan Rekomendasi"
+          className="mt-4 flex flex-col gap-3"
+        >
+          {recommendations.map((r) => (
+            <div key={r.title} className="rounded-xl border border-primary/30 bg-primary/10 p-3">
+              <div className="flex items-baseline justify-between gap-2">
+                <p className="text-sm font-semibold text-primary">{r.title}</p>
+                <span className="shrink-0 rounded-md bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                  {r.aspect}
+                </span>
+              </div>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{r.body}</p>
+            </div>
+          ))}
+        </Disclosure>
       </div>
 
       <RexMascot className="absolute -bottom-2 right-2 opacity-90" />

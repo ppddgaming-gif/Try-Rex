@@ -1,18 +1,4 @@
-import type { Candle } from "@/lib/mock-data"
-
-type Zone = {
-  from: number
-  to: number
-  variant: "resistance" | "support"
-  label?: string
-}
-
-type Marker = {
-  price: number
-  label: string
-  variant: "neutral" | "danger" | "success"
-  align?: "left" | "right"
-}
+import type { Candle, Marker, Zone } from "@/lib/mock-data"
 
 type Props = {
   candles: Candle[]
@@ -24,6 +10,8 @@ type Props = {
   zones?: Zone[]
   markers?: Marker[]
   currentPrice?: number
+  /** Price decimals for this quote convention: 5 for majors, 3 for JPY crosses. */
+  digits?: number
 }
 
 const W = 1000
@@ -50,8 +38,11 @@ export function CandlestickChart({
   zones = [],
   markers = [],
   currentPrice,
+  digits = 5,
 }: Props) {
   const y = (p: number) => PAD_TOP + ((max - p) / (max - min)) * plotH
+  // Axis ticks read one decimal shorter than quoted prices, as FX platforms show them.
+  const tickDigits = Math.max(0, digits - 1)
   const slot = plotW / candles.length
   const cw = Math.max(2, slot * 0.55)
 
@@ -82,7 +73,7 @@ export function CandlestickChart({
             fontSize={11}
             fontFamily="var(--font-mono)"
           >
-            {p.toFixed(4)}
+            {p.toFixed(tickDigits)}
           </text>
         </g>
       ))}
@@ -154,7 +145,7 @@ export function CandlestickChart({
                 {m.label}
               </text>
               <text x={right ? -8 : 112} y={3} fill={color} fontSize={10} fontWeight={700} textAnchor="end" fontFamily="var(--font-mono)">
-                {m.price.toFixed(5)}
+                {m.price.toFixed(digits)}
               </text>
             </g>
           </g>
@@ -166,7 +157,7 @@ export function CandlestickChart({
         <g transform={`translate(${plotW}, ${y(currentPrice)})`}>
           <rect x={0} y={-10} width={PAD_RIGHT} height={20} rx={3} fill="var(--danger)" />
           <text x={PAD_RIGHT / 2} y={4} fill="var(--primary-foreground)" fontSize={11} fontWeight={700} textAnchor="middle" fontFamily="var(--font-mono)">
-            {currentPrice.toFixed(5)}
+            {currentPrice.toFixed(digits)}
           </text>
         </g>
       )}

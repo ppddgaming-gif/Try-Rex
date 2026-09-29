@@ -1,10 +1,15 @@
 import Link from "next/link"
 import { Card } from "@/components/card"
 import { CandlestickChart } from "@/components/candlestick-chart"
-import { tradingGameCandles } from "@/lib/mock-data"
-import { Target, Star, ChevronRight } from "lucide-react"
+import { ChevronRight, Star, Target } from "lucide-react"
+import { frameOf, type Challenge } from "@/lib/mock-data"
 
-export function DailyChallenge() {
+const levelLabels: Record<string, string> = { easy: "Mudah", medium: "Menengah", hard: "Sulit" }
+
+export function DailyChallenge({ challenge }: { challenge: Challenge }) {
+  const preview = challenge.candles.slice(-24)
+  const frame = frameOf(preview)
+
   return (
     <Card className="flex flex-col">
       <h2 className="flex items-center gap-2 text-base font-semibold">
@@ -17,19 +22,21 @@ export function DailyChallenge() {
           <span className="inline-block rounded-md bg-success/15 px-2 py-0.5 text-xs font-semibold text-success">
             Daily Challenge
           </span>
-          <h3 className="mt-2 text-lg font-bold">EURUSD &ndash; Resistance Rejection</h3>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Analisis situasi market dan tentukan keputusan terbaikmu!
-          </p>
+          <h3 className="mt-2 text-lg font-bold">
+            {challenge.pair} &ndash; {challenge.timeframe}
+          </h3>
+          <p className="text-xs text-muted-foreground">{challenge.period}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{challenge.situation}</p>
         </div>
         <div className="hidden h-20 w-40 shrink-0 overflow-hidden rounded-lg border border-border sm:block">
           <CandlestickChart
-            candles={tradingGameCandles.slice(-24)}
-            min={1.078}
-            max={1.094}
+            candles={preview}
+            min={frame.min}
+            max={frame.max}
             priceTicks={[]}
             timeLabels={[]}
-            zones={[{ from: 1.091, to: 1.0935, variant: "resistance" }]}
+            zones={challenge.zones}
+            digits={challenge.digits}
           />
         </div>
       </div>
@@ -38,28 +45,30 @@ export function DailyChallenge() {
         <div>
           <p className="text-xs text-muted-foreground">Reward</p>
           <p className="mt-1 flex items-center gap-1 text-sm font-bold text-warning">
-            <Star className="h-4 w-4 fill-warning text-warning" /> +50 XP
+            <Star className="h-4 w-4 fill-warning text-warning" /> +{challenge.xp} XP
           </p>
         </div>
         <div>
           <p className="text-xs text-muted-foreground">Difficulty</p>
           <div className="mt-1 flex items-center gap-2">
-            <div className="flex gap-1">
-              {[0, 1, 2, 3, 4].map((i) => (
+            <div className="flex gap-1" aria-hidden="true">
+              {[1, 2, 3, 4, 5].map((i) => (
                 <span
                   key={i}
-                  className={`h-2 w-3 rounded-sm ${i < 3 ? "bg-warning" : "bg-muted"}`}
+                  className={`h-2 w-3 rounded-sm ${i <= challenge.difficulty ? "bg-warning" : "bg-muted"}`}
                 />
               ))}
             </div>
-            <span className="text-xs text-muted-foreground">Medium</span>
+            <span className="text-xs text-muted-foreground">
+              {levelLabels[challenge.level] ?? challenge.level}
+            </span>
           </div>
         </div>
       </div>
 
       <Link
         href="/trading-game"
-        className="mt-5 flex items-center justify-center gap-1 rounded-lg bg-primary py-3 text-sm font-bold text-primary-foreground transition-colors hover:opacity-90"
+        className="mt-5 flex items-center justify-center gap-1 rounded-lg bg-primary py-3 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90"
       >
         Mulai Tantangan <ChevronRight className="h-4 w-4" />
       </Link>

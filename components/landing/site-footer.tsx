@@ -17,21 +17,13 @@ const cols = [
       { label: "Testimoni", href: "#testimonials" },
     ],
   },
-  {
-    title: "Perusahaan",
-    links: [
-      { label: "Tentang", href: "#" },
-      { label: "Blog", href: "#" },
-      { label: "Kontak", href: "#" },
-    ],
-  },
 ]
 
 export function SiteFooter() {
   return (
     <footer className="border-t border-border/60">
       <div className="mx-auto max-w-7xl px-5 py-12 lg:px-8">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2.5">
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/30">
@@ -56,7 +48,7 @@ export function SiteFooter() {
                   <li key={l.label}>
                     <Link
                       href={l.href}
-                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                      className="rounded text-sm text-muted-foreground transition-colors hover:text-foreground"
                     >
                       {l.label}
                     </Link>

@@ -1,3 +1,17 @@
+import { gameDatasets, type GameDataset, type GameLevel } from "@/lib/game-data"
+import {
+  detectSupportResistance,
+  difficultyForLevel,
+  outcomeOf,
+  pipSize,
+  sliceGame,
+  timeLabelsFor,
+  toChartCandles,
+  trendSlope,
+  xpForLevel,
+  zonesFromLevels,
+} from "@/lib/game-logic"
+
 export type Candle = {
   o: number
   h: number
@@ -5,31 +19,56 @@ export type Candle = {
   c: number
 }
 
-// Deterministic mock OHLC series for EURUSD H1 (price ~1.08 - 1.092)
-function buildSeries(seed: number, count: number): Candle[] {
-  const candles: Candle[] = []
-  let price = 1.0805
-  let s = seed
-  const rand = () => {
-    s = (s * 9301 + 49297) % 233280
-    return s / 233280
-  }
-  for (let i = 0; i < count; i++) {
-    const drift = Math.sin(i / 6) * 0.0009 + (rand() - 0.45) * 0.0012
-    const o = price
-    const c = Math.max(1.0795, Math.min(1.0925, o + drift))
-    const h = Math.max(o, c) + rand() * 0.0009
-    const l = Math.min(o, c) - rand() * 0.0009
-    candles.push({ o, h, l, c })
-    price = c
-  }
-  return candles
+export type Zone = {
+  from: number
+  to: number
+  variant: "resistance" | "support"
+  label?: string
 }
 
-export const tradingGameCandles = buildSeries(42, 60)
+export type Marker = {
+  price: number
+  label: string
+  variant: "neutral" | "danger" | "success"
+  align?: "left" | "right"
+}
 
-// Evaluation chart: a rise into resistance then a drop (so SELL near top looks early)
-export const evaluationCandles = buildSeries(7, 48)
+export type Decision = "buy" | "sell" | "wait"
+
+export type AspectKey = "trend" | "entry" | "risk" | "structure"
+
+/** Fixed "now" for the dashboard's mock activity feed. */
+export const dataAsOf = "25 Mei 2025"
+
+const round = (v: number, digits: number) => Number(v.toFixed(digits))
+
+/**
+ * CandlestickChart does no autoscaling, so derive a frame guaranteed to contain
+ * the data instead of hand-tuning min / max / priceTicks at every call site.
+ * Step selection is scale-free, so it works for both 1.08 majors and 105 JPY.
+ */
+export function frameOf(candles: Candle[]): { min: number; max: number; priceTicks: number[] } {
+  const lo = Math.min(...candles.map((c) => c.l))
+  const hi = Math.max(...candles.map((c) => c.h))
+  const pad = (hi - lo) * 0.12 || Math.abs(hi) * 0.001 || 0.001
+  const span = hi - lo + pad * 2
+
+  const rough = span / 8
+  const magnitude = Math.pow(10, Math.floor(Math.log10(rough)))
+  const step =
+    [1, 2, 2.5, 5, 10].map((m) => m * magnitude).find((s) => span / s <= 10) ?? 10 * magnitude
+
+  // Enough decimals to describe the step exactly, so ticks never drift.
+  const dp = Math.max(0, Math.min(8, Math.ceil(-Math.log10(step)) + 1))
+  const min = round(Math.floor((lo - pad) / step) * step, dp)
+  const max = round(Math.ceil((hi + pad) / step) * step, dp)
+
+  const priceTicks: number[] = []
+  const steps = Math.round((max - min) / step)
+  for (let i = 0; i <= steps; i++) priceTicks.push(round(min + i * step, dp))
+
+  return { min, max, priceTicks }
+}
 
 export const aspectMetrics = [
   { key: "trend", label: "Trend Reading", value: 72, desc: "Kemampuan membaca arah dan kekuatan trend" },
@@ -38,8 +77,343 @@ export const aspectMetrics = [
   { key: "structure", label: "Market Structure", value: 78, desc: "Memahami struktur market (Support / Resistance)" },
 ]
 
+export type Challenge = {
+  /** Dataset id, e.g. "eurusd-1". */
+  id: string
+  pair: string
+  level: GameLevel
+  timeframe: string
+  period: string
+  digits: number
+  difficulty: number
+  xp: number
+  /** The 30 candles shown as the question. */
+  candles: Candle[]
+  /** The 15 candles that decide the answer, revealed after submitting. */
+  future: Candle[]
+  zones: Zone[]
+  currentPrice: number
+  timeLabels: string[]
+  revealTimeLabels: string[]
+  situation: string
+  answer: Decision
+  changePercent: number
+  focus: AspectKey
+  reasons: string[]
+  suggestion: string
+  feedback: Record<Decision, string>
+}
+
+const pct = (v: number) => `${v > 0 ? "+" : ""}${v.toFixed(2)}%`
+
+/**
+ * Everything a challenge says about a setup is computed from its candles — the
+ * trend slope, the detected levels, and what price actually did next. Nothing
+ * here is hand-written per dataset, so the prose can never contradict the chart.
+ */
+function buildChallenge(dataset: GameDataset): Challenge {
+  const { history, future } = sliceGame(dataset.candles)
+  const { answer, changePercent } = outcomeOf(future)
+
+  const levels = detectSupportResistance(history)
+  const zones = zonesFromLevels(levels, history)
+  const chartCandles = toChartCandles(history)
+  const last = history[history.length - 1].c
+  const digits = dataset.digits
+  const pip = pipSize(digits)
+
+  const hi = Math.max(...history.map((c) => c.h))
+  const lo = Math.min(...history.map((c) => c.l))
+  const rangePos = hi === lo ? 50 : Math.round(((last - lo) / (hi - lo)) * 100)
+
+  const slopePips = trendSlope(history) / pip
+  const trendWord = slopePips > 0.5 ? "naik" : slopePips < -0.5 ? "turun" : "menyamping"
+
+  const resistance = levels
+    .filter((l) => l.type === "resistance" && l.price > last)
+    .sort((a, b) => a.price - b.price)[0]
+  const support = levels
+    .filter((l) => l.type === "support" && l.price < last)
+    .sort((a, b) => b.price - a.price)[0]
+
+  const toResistance = resistance ? Math.round((resistance.price - last) / pip) : null
+  const toSupport = support ? Math.round((last - support.price) / pip) : null
+
+  // Which aspect the challenge leans on, from the shape of the setup.
+  const focus: AspectKey =
+    answer === "wait"
+      ? "risk"
+      : rangePos >= 80 || rangePos <= 20
+        ? "structure"
+        : trendWord === "menyamping"
+          ? "entry"
+          : "trend"
+
+  const reasons = [
+    `Trend 30 candle terakhir cenderung ${trendWord} (kemiringan ${slopePips > 0 ? "+" : ""}${slopePips.toFixed(1)} pip per candle).`,
+    resistance && toResistance !== null
+      ? `Resistance terdekat di ${resistance.price.toFixed(digits)}, sekitar ${toResistance} pip di atas harga sekarang (${resistance.touches}x tersentuh).`
+      : "Tidak ada resistance jelas di atas harga sekarang dalam 30 candle terakhir.",
+    support && toSupport !== null
+      ? `Support terdekat di ${support.price.toFixed(digits)}, sekitar ${toSupport} pip di bawah harga sekarang (${support.touches}x tersentuh).`
+      : "Tidak ada support jelas di bawah harga sekarang dalam 30 candle terakhir.",
+    `Harga berada di ${rangePos}% dari rentang 30 candle terakhir (${lo.toFixed(digits)} – ${hi.toFixed(digits)}).`,
+    `Hasilnya: 15 candle berikutnya bergerak ${pct(changePercent)} dari harga entry.`,
+  ]
+
+  const suggestionByAnswer: Record<Decision, string> = {
+    buy: `Harga naik ${pct(changePercent)} setelah titik ini, jadi BUY adalah jawabannya. Cari konfirmasi searah trend lebih dulu, dan taruh stop loss di bawah support terdekat${toSupport !== null ? ` (sekitar ${toSupport} pip)` : ""}.`,
+    sell: `Harga turun ${pct(changePercent)} setelah titik ini, jadi SELL adalah jawabannya. Tunggu penolakan di area resistance, dan taruh stop loss di atas resistance terdekat${toResistance !== null ? ` (sekitar ${toResistance} pip)` : ""}.`,
+    wait: `Harga hanya bergerak ${pct(changePercent)} — di bawah ambang ±0,1% — jadi WAIT adalah jawabannya. Saat market tidak memberi keunggulan arah, tidak mengambil posisi juga sebuah keputusan.`,
+  }
+
+  const moved = Math.abs(changePercent).toFixed(2)
+  const feedback: Record<Decision, string> = {
+    buy:
+      answer === "buy"
+        ? `Tepat. Harga naik ${moved}% dalam 15 candle berikutnya.`
+        : answer === "sell"
+          ? `Kurang tepat. Harga justru turun ${moved}% setelah titik ini.`
+          : `Kurang tepat. Harga hampir tidak bergerak (${pct(changePercent)}), jadi posisi beli tidak menghasilkan apa-apa.`,
+    sell:
+      answer === "sell"
+        ? `Tepat. Harga turun ${moved}% dalam 15 candle berikutnya.`
+        : answer === "buy"
+          ? `Kurang tepat. Harga justru naik ${moved}% setelah titik ini.`
+          : `Kurang tepat. Harga hampir tidak bergerak (${pct(changePercent)}), jadi posisi jual tidak menghasilkan apa-apa.`,
+    wait:
+      answer === "wait"
+        ? `Tepat. Harga hanya bergerak ${pct(changePercent)}, masih di dalam ambang ±0,1%.`
+        : `Kurang tepat. Harga bergerak ${pct(changePercent)} — cukup besar untuk diambil, bukan dilewatkan.`,
+  }
+
+  const situation =
+    `${dataset.pair} ${dataset.timeframe}, ${dataset.period}. Trend cenderung ${trendWord} dan harga kini di ${rangePos}% dari rentang 30 candle terakhir. ` +
+    (toResistance !== null && toSupport !== null
+      ? `Resistance ${toResistance} pip di atas, support ${toSupport} pip di bawah.`
+      : toResistance !== null
+        ? `Resistance ${toResistance} pip di atas harga sekarang.`
+        : toSupport !== null
+          ? `Support ${toSupport} pip di bawah harga sekarang.`
+          : "Tidak ada level kuat di dekat harga sekarang.")
+
+  return {
+    id: dataset.id,
+    pair: dataset.pair,
+    level: dataset.level,
+    timeframe: dataset.timeframe,
+    period: dataset.period,
+    digits,
+    difficulty: difficultyForLevel(dataset.level),
+    xp: xpForLevel(dataset.level),
+    candles: chartCandles,
+    future: toChartCandles(future),
+    zones,
+    currentPrice: last,
+    timeLabels: timeLabelsFor(history),
+    revealTimeLabels: timeLabelsFor([...history, ...future]),
+    situation,
+    answer,
+    changePercent,
+    focus,
+    reasons,
+    suggestion: suggestionByAnswer[answer],
+    feedback,
+  }
+}
+
+export const challenges: Challenge[] = gameDatasets.map(buildChallenge)
+
+export const challengeById = (id: string | undefined) =>
+  id ? challenges.find((c) => c.id === id) : undefined
+
+export const challengesForPair = (symbol: string) => challenges.filter((c) => c.pair === symbol)
+
+export const challengesForLevel = (level: GameLevel) => challenges.filter((c) => c.level === level)
+
+const ANSWER_ORDER: Decision[] = ["buy", "sell", "wait"]
+
+/**
+ * The source data leans heavily bullish (27 buy / 9 sell / 3 wait across all 39
+ * datasets), so drawing a round in file order would hand you five BUYs in a row
+ * and the game would reduce to always pressing BUY. Rotate through answers
+ * first, then prefer a pair different from the previous question.
+ *
+ * Answer variety is guaranteed; pair variety is best effort. On `hard` a pair can
+ * repeat, because the empty gbpnzd_*.js files leave only two usable hard pairs and
+ * GBPCAD is buy in all five of its datasets — so sell and wait can only come from
+ * EURAUD. Deterministic: the same level always yields the same round.
+ */
+export function roundFor(level: GameLevel, size = 5): Challenge[] {
+  const queues = new Map<Decision, Challenge[]>(ANSWER_ORDER.map((a) => [a, []]))
+  for (const c of challengesForLevel(level)) queues.get(c.answer)?.push(c)
+
+  const round: Challenge[] = []
+  for (let turn = 0; round.length < size; turn++) {
+    let picked: Challenge | undefined
+    for (let k = 0; k < ANSWER_ORDER.length && !picked; k++) {
+      const answer = ANSWER_ORDER[(turn + k) % ANSWER_ORDER.length]
+      const queue = queues.get(answer)
+      if (!queue || queue.length === 0) continue
+
+      // How many still-unplayed questions of the *other* answers each pair owns.
+      // Spending an in-demand pair now can strand a scarce answer later, so rank
+      // it lower — that is what keeps `hard` from stacking three EURAUDs.
+      const demand = new Map<string, number>()
+      for (const [a, q] of queues) {
+        if (a === answer) continue
+        for (const c of q) demand.set(c.pair, (demand.get(c.pair) ?? 0) + 1)
+      }
+
+      const prev = round[round.length - 1]
+      let bestIndex = 0
+      let bestCost = Number.POSITIVE_INFINITY
+      queue.forEach((c, i) => {
+        const cost = (prev && c.pair === prev.pair ? 100 : 0) + (demand.get(c.pair) ?? 0)
+        if (cost < bestCost) {
+          bestCost = cost
+          bestIndex = i
+        }
+      })
+      picked = queue.splice(bestIndex, 1)[0]
+    }
+    if (!picked) break
+    round.push(picked)
+  }
+  return round
+}
+
+const FLAGS: Record<string, string> = {
+  EURUSD: "🇪🇺",
+  GBPUSD: "🇬🇧",
+  AUDUSD: "🇦🇺",
+  USDJPY: "🇯🇵",
+  EURJPY: "🇪🇺",
+  USDCAD: "🇨🇦",
+  EURAUD: "🇪🇺",
+  GBPCAD: "🇬🇧",
+  GBPNZD: "🇬🇧",
+}
+
+/** Pairs are whatever the datasets actually contain, in first-seen order. */
+export const pairs = [...new Set(gameDatasets.map((d) => d.pair))].map((symbol) => ({
+  symbol,
+  flag: FLAGS[symbol] ?? "🏳",
+}))
+
+export type Pair = (typeof pairs)[number]
+
+export const gameLevels: { id: GameLevel; label: string; xp: number }[] = [
+  { id: "easy", label: "Mudah", xp: xpForLevel("easy") },
+  { id: "medium", label: "Menengah", xp: xpForLevel("medium") },
+  { id: "hard", label: "Sulit", xp: xpForLevel("hard") },
+]
+
+export const decisionLabels: Record<Decision, string> = {
+  buy: "BUY",
+  sell: "SELL",
+  wait: "WAIT",
+}
+
+export function isDecision(value: unknown): value is Decision {
+  return value === "buy" || value === "sell" || value === "wait"
+}
+
+export function isGameLevel(value: unknown): value is GameLevel {
+  return value === "easy" || value === "medium" || value === "hard"
+}
+
+/** Outcome of one answer. XP comes from the dataset's level (their EXP_TABLE). */
+export function scoreFor(challenge: Challenge, decision: Decision) {
+  const correct = decision === challenge.answer
+  return {
+    correct,
+    xp: correct ? challenge.xp : 0,
+    /** How decisively the move favoured the right call, as a 0–100 read. */
+    accuracy: correct
+      ? Math.min(100, 70 + Math.round(Math.abs(challenge.changePercent) * 8))
+      : Math.max(10, 50 - Math.round(Math.abs(challenge.changePercent) * 8)),
+  }
+}
+
+/** Aspect breakdown for one evaluation: the focus aspect moves, the rest hold. */
+export function aspectScoresFor(focus: AspectKey, correct: boolean) {
+  return aspectMetrics.map((m) => {
+    const delta = m.key === focus ? (correct ? 12 : -18) : 0
+    return { key: m.key, label: m.label, value: Math.max(0, Math.min(100, m.value + delta)) }
+  })
+}
+
+/** Entry / stop / target lines implied by a decision on a given setup. */
+export function tradePlanFor(challenge: Challenge, decision: Decision): Marker[] {
+  const resistance = challenge.zones.find((z) => z.variant === "resistance")
+  const support = challenge.zones.find((z) => z.variant === "support")
+  const entry: Marker = {
+    price: challenge.currentPrice,
+    label: decision === "wait" ? "Harga Sekarang" : "Entry-mu",
+    variant: "neutral",
+    align: "left",
+  }
+  if (decision === "wait" || !resistance || !support) return [entry]
+  const buying = decision === "buy"
+  return [
+    {
+      price: resistance.to,
+      label: buying ? "Take Profit" : "Stop Loss",
+      variant: buying ? "success" : "danger",
+    },
+    entry,
+    {
+      price: support.from,
+      label: buying ? "Stop Loss" : "Take Profit",
+      variant: buying ? "danger" : "success",
+    },
+  ]
+}
+
 export const recentActivities = [
-  { id: 48, aspect: "Trend Reading", result: "Benar", xp: 50, time: "2 jam lalu" },
-  { id: 47, aspect: "Entry Timing", result: "Salah", xp: 0, time: "4 jam lalu" },
-  { id: 46, aspect: "Market Structure", result: "Benar", xp: 50, time: "1 hari lalu" },
+  { id: 53, pair: "AUDUSD", aspect: "Entry Timing", result: "Benar", xp: 25, hoursAgo: 2 },
+  { id: 52, pair: "AUDUSD", aspect: "Trend Reading", result: "Salah", xp: 0, hoursAgo: 4 },
+  { id: 51, pair: "GBPUSD", aspect: "Risk Management", result: "Benar", xp: 75, hoursAgo: 9 },
+  { id: 50, pair: "GBPUSD", aspect: "Market Structure", result: "Benar", xp: 75, hoursAgo: 26 },
+  { id: 49, pair: "EURUSD", aspect: "Market Structure", result: "Salah", xp: 0, hoursAgo: 31 },
+  { id: 48, pair: "EURUSD", aspect: "Entry Timing", result: "Benar", xp: 25, hoursAgo: 52 },
+  { id: 47, pair: "USDJPY", aspect: "Trend Reading", result: "Benar", xp: 25, hoursAgo: 96 },
+  { id: 46, pair: "EURJPY", aspect: "Entry Timing", result: "Salah", xp: 0, hoursAgo: 150 },
+  { id: 45, pair: "GBPCAD", aspect: "Risk Management", result: "Benar", xp: 150, hoursAgo: 220 },
+  { id: 44, pair: "USDCAD", aspect: "Market Structure", result: "Benar", xp: 75, hoursAgo: 400 },
+]
+
+export type Activity = (typeof recentActivities)[number]
+
+/** Relative time against the fixed dataAsOf, so it never depends on the clock. */
+export function relativeTime(hoursAgo: number) {
+  if (hoursAgo < 24) return `${hoursAgo} jam lalu`
+  return `${Math.round(hoursAgo / 24)} hari lalu`
+}
+
+export const activityRanges = [
+  { id: "24h", label: "24 jam terakhir", hours: 24 },
+  { id: "7d", label: "7 hari terakhir", hours: 24 * 7 },
+  { id: "30d", label: "30 hari terakhir", hours: 24 * 30 },
+]
+
+export type ActivityRange = (typeof activityRanges)[number]
+
+export const recommendations = [
+  {
+    title: "Latih konfirmasi entry",
+    body: "Sebelum entry, wajibkan dirimu menemukan satu candle konfirmasi. Ini kelemahan terbesarmu saat ini.",
+    aspect: "Entry Timing",
+  },
+  {
+    title: "Kerjakan ulang challenge resistance",
+    body: "Tiga kesalahan terakhirmu terjadi di area resistance. Ulangi tipe soal ini sampai polanya terasa otomatis.",
+    aspect: "Market Structure",
+  },
+  {
+    title: "Tetapkan stop loss lebih dulu",
+    body: "Tentukan stop loss sebelum memilih arah. Kalau jaraknya tidak masuk akal, jawabannya kemungkinan WAIT.",
+    aspect: "Risk Management",
+  },
 ]

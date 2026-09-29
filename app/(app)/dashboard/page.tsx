@@ -1,11 +1,26 @@
-import { TopCards } from "@/components/dashboard/top-cards"
-import { AspectPanel } from "@/components/dashboard/aspect-panel"
 import { AiInsight } from "@/components/dashboard/ai-insight"
-import { RecentActivity } from "@/components/dashboard/recent-activity"
+import { AspectPanel } from "@/components/dashboard/aspect-panel"
 import { DailyChallenge } from "@/components/dashboard/daily-challenge"
-import { ChevronDown, Calendar } from "lucide-react"
+import { DashboardFilters } from "@/components/dashboard/dashboard-filters"
+import { RecentActivity } from "@/components/dashboard/recent-activity"
+import { TopCards } from "@/components/dashboard/top-cards"
+import { activityRanges, challengesForPair, dataAsOf, pairs, recentActivities } from "@/lib/mock-data"
 
-export default function DashboardPage() {
+type Search = { pair?: string; range?: string }
+
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<Search>
+}) {
+  const sp = await searchParams
+
+  const pair = pairs.find((p) => p.symbol === sp.pair) ?? pairs[0]
+  const range = activityRanges.find((r) => r.id === sp.range) ?? activityRanges[1]
+
+  const challenge = challengesForPair(pair.symbol)[0]
+  const activities = recentActivities.filter((a) => a.pair === pair.symbol && a.hoursAgo <= range.hours)
+
   return (
     <div className="mx-auto max-w-7xl px-5 py-6 lg:px-8">
       {/* Header */}
@@ -15,26 +30,20 @@ export default function DashboardPage() {
           <p className="mt-1 text-sm text-muted-foreground">
             Terus belajar, terus berkembang, jadi trader yang konsisten!
           </p>
+          <p className="mt-1 text-xs text-muted-foreground">Data per {dataAsOf}</p>
         </div>
-        <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium">
-            <span className="text-base">🇪🇺</span> EURUSD <ChevronDown className="h-4 w-4 text-muted-foreground" />
-          </button>
-          <button className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-muted-foreground">
-            <Calendar className="h-4 w-4" /> 25 Mei 2025
-          </button>
-        </div>
+        <DashboardFilters pair={pair.symbol} range={range.id} />
       </header>
 
       <div className="mt-6">
         <TopCards />
       </div>
 
-      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="mt-4 grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
         <AspectPanel />
         <AiInsight />
-        <RecentActivity />
-        <DailyChallenge />
+        <RecentActivity activities={activities} range={range} pair={pair.symbol} />
+        <DailyChallenge challenge={challenge} />
       </div>
     </div>
   )

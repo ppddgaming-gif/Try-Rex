@@ -12,6 +12,7 @@ npx tsc --noEmit # typecheck (strict mode)
 ```
 
 - **No test suite exists** — no test runner, config, or test files. If asked to add tests, pick a framework and say so explicitly.
+- `node scripts/generate-game-data.mjs` regenerates `lib/game-data.ts` from `Game-data-main/`. It is plain Node with no dependencies and prints a report of what it skipped and repaired.
 - **`npm run lint` does not work.** `package.json` declares `"lint": "next lint"`, but neither `eslint` nor `eslint-config-next` is installed and there is no eslint config file. Use `npx tsc --noEmit` as the real static check.
 
 ### Windows path bug: this checkout lives under a path containing `&`
@@ -38,15 +39,29 @@ Next.js 16 App Router + React 19, TypeScript strict, Tailwind CSS v4. The `@/*` 
 Routing splits into a marketing surface and an app surface:
 
 - **`app/page.tsx`** — public landing page. Composes ~8 section components from `components/landing/` (hero, stats banner, feature rows, testimonials, footer…) in top-to-bottom order. No sidebar.
-- **`app/(app)/`** — the authenticated-style product shell. Its `layout.tsx` wraps children in a fixed 64-unit `Sidebar` plus `lg:ml-64` main area. Contains `dashboard`, `trading-game`, and `ai-evaluation` routes.
+- **`app/(app)/`** — the authenticated-style product shell. Its `layout.tsx` wraps children in a fixed 64-unit `Sidebar` plus `lg:ml-64` main area, with `AppNavMobile` (a `lg:hidden` sticky bar + drawer) covering navigation below the `lg` breakpoint where the sidebar is hidden. Contains `dashboard`, `trading-game`, and `ai-evaluation` routes.
 
-Adding a product page means creating it under `app/(app)/` (it inherits the sidebar automatically) and registering it in the `navItems` array in `components/sidebar.tsx`.
+Both `/dashboard` and `/ai-evaluation` read `searchParams` (so they are **dynamic**, server-rendered on demand, while `/` and `/trading-game` stay static). `/dashboard` takes `?pair=&range=`, driven by the `DashboardFilters` client island so the page itself stays a server component and the view stays shareable. `/ai-evaluation` takes `?c=<dataset id, e.g. eurusd-1>&a=<decision>&t=<seconds>` — the Trading Game handoff — and falls back to a representative example when the params are absent or invalid, so the page still stands alone.
 
-### Everything is static mock data
+Adding a product page means creating it under `app/(app)/` (it inherits the shell automatically) and registering it in the `navItems` array in `components/nav-items.ts` — the single source both nav surfaces read.
 
-`lib/mock-data.ts` is the single data source for the entire app. It contains a seeded LCG (`buildSeries`) that generates **deterministic** OHLC candle series at module load, plus hardcoded `aspectMetrics` and `recentActivities` arrays. There is no backend, no API routes, no database, and no auth.
+The shell's chrome is split into small shared pieces so the desktop and mobile surfaces cannot drift: `components/brand-mark.tsx` (logo lockup, `size="lg"` for the sidebar), `components/nav-links.tsx` (the link list; it owns the `usePathname` active-route highlight), and `components/profile-card.tsx` (the level/XP block). `Sidebar` and `AppNavMobile` are thin compositions of those three.
 
-The candle series are deterministic by design so charts render identically across server and client — do not replace the seeded `rand()` with `Math.random()`, and do not introduce `Date.now()` into render paths, or you'll cause hydration mismatches.
+### Game data is real historical price data
+
+The Trading Game runs on **real H4 forex candles**, not generated series. Three layers:
+
+1. **`lib/game-data.ts` — GENERATED, do not hand-edit.** 39 datasets (8 pairs across `easy`/`medium`/`hard`), each `{ id, pair, level, timeframe, period, digits, candles }` with candles as `{t,o,h,l,c,v}` (`t` = unix seconds UTC). Regenerate with `node scripts/generate-game-data.mjs`, which reads `Game-data-main/src/data/pairs/**/*.js`.
+2. **`lib/game-logic.ts`** — the game rules, ported to typed TS from `Game-data-main/src/utils/*`: `sliceGame` (30 history + 15 future), `outcomeOf` (their ±0.1% threshold), `detectSupportResistance` (swing points clustered, top 3 by touches), `trendSlope`, `xpForLevel` (their `EXP_TABLE`: 25/75/150), plus `timeLabelsFor` and `pipSize`.
+3. **`lib/mock-data.ts`** — assembles `challenges` from the datasets via `buildChallenge`, and still owns the dashboard's mock content (`aspectMetrics`, `recentActivities`, `activityRanges`, `recommendations`) plus `frameOf`, `scoreFor`, `aspectScoresFor`, `tradePlanFor`.
+
+**The correct answer is derived, never authored.** It is whatever price actually did over the 15 hidden candles. Every explanation string (`situation`, `reasons`, `suggestion`, `feedback`) is likewise computed from the candles — trend slope in pips, detected level distances, position in range, real change % — so the prose can never contradict the chart. Do not hand-write per-dataset narrative.
+
+`roundFor(level)` builds a 5-question round. It rotates through answers rather than reading file order, because the source data is 27 buy / 9 sell / 3 wait and a naive round would be five BUYs in a row.
+
+Everything is deterministic so server and client agree — no `Math.random()` (their `GameChart` picked a random start index; we fix it at 30) and no `Date.now()` in render paths. `dataAsOf` is the fixed "now" for the mock activity feed, whose `relativeTime` works off an `hoursAgo` field. The one live clock is the game's elapsed timer, which starts at `0` in `useState` and only advances in a `useEffect`.
+
+**Known gaps in the source data** (the generator skips these and prints why): `hard/gbpnzd_1–5.js` are 0 bytes, and `hard/euraud_5.js` has only 30 candles (needs 45). It also drops 8 rows with malformed dates (e.g. `"2000:01:17"`) and clamps 9 candles whose wicks did not contain their bodies. Because gbpnzd is missing, `hard` has only 2 usable pairs, so a hard round can repeat a pair.
 
 **The README is aspirational, not descriptive.** It documents Firebase Auth, Firestore collections, a `.env.local` with `NEXT_PUBLIC_FIREBASE_*` keys, and a `src/` directory structure. None of that exists in the code. Trust the code over the README.
 
@@ -54,7 +69,9 @@ The candle series are deterministic by design so charts render identically acros
 
 There is no charting library. `components/candlestick-chart.tsx`, `components/donut.tsx`, and `components/sparkline.tsx` emit raw SVG.
 
-`CandlestickChart` is a pure, fully prop-driven server component with a fixed `1000×460` viewBox and `preserveAspectRatio="none"` (it stretches to its container). It performs **no autoscaling** — the caller must supply `min`, `max`, `priceTicks`, and `timeLabels` that agree with the data, or candles will clip. Optional overlays: `zones` (support/resistance bands), `markers` (labeled horizontal price lines for entry/SL/TP), and `currentPrice` (right-edge badge). See `app/(app)/ai-evaluation/page.tsx` for the fullest usage.
+`CandlestickChart` is a pure, fully prop-driven server component with a fixed `1000×460` viewBox and `preserveAspectRatio="none"` (it stretches to its container). It performs **no autoscaling** — the caller must supply `min`, `max`, `priceTicks`, and `timeLabels` that agree with the data, or candles will clip. **Do not hand-tune those three:** call `frameOf(candles)` from `lib/mock-data.ts`, which derives a frame guaranteed to contain the highs, lows and zones, and snaps ticks to a round step. Its step selection is scale-free, so it works for both 1.08-scale majors and 85-scale JPY crosses. Pass `digits` too (5 for majors, 3 for JPY crosses — each dataset carries its own); the chart renders axis ticks one decimal shorter than markers, per FX convention. Optional overlays: `zones` (support/resistance bands), `markers` (labeled horizontal price lines for entry/SL/TP — build these with `tradePlanFor`), and `currentPrice` (right-edge badge). See `app/(app)/ai-evaluation/page.tsx` for the fullest usage.
+
+The `Zone` and `Marker` types live in `lib/mock-data.ts`, not in the chart, so data helpers can construct them.
 
 SVG fills and strokes reference CSS custom properties directly (`fill="var(--danger)"`), so charts inherit the theme rather than hardcoding hex values. Keep this pattern.
 
@@ -68,7 +85,9 @@ To change a color globally, edit the token in `:root`, not the call sites.
 
 ### Conventions
 
-- **Server components by default.** Only three files carry `"use client"`: `components/sidebar.tsx` (uses `usePathname`), `components/landing/marketing-nav.tsx`, and `app/(app)/trading-game/page.tsx` (holds buy/sell/wait selection state). Add the directive only when a component genuinely needs hooks or handlers.
+- **Server components by default.** Seven files carry `"use client"`: `components/nav-links.tsx` (uses `usePathname`), `components/app-nav-mobile.tsx` (drawer state), `components/landing/marketing-nav.tsx`, `components/disclosure.tsx` and `components/select-menu.tsx` (the two shared interactive primitives), `components/dashboard/dashboard-filters.tsx` (pushes filter state into the URL), and `app/(app)/trading-game/page.tsx` (the whole game loop). Note `components/sidebar.tsx` is a *server* component — it delegates the only hook it needs to `NavLinks`. The `components/trading-game/*` parts carry no directive: they are pure and land in the client bundle only because the game page imports them. Add the directive only when a component genuinely needs hooks or handlers.
+- **No dead controls.** Every `<button>` either does something or is not a button. Decorative product shots in `components/landing/showcase.tsx` use `<div>` for what look like buttons, and "show more" affordances use the shared `Disclosure` rather than linking nowhere.
+- **Focus rings are global.** `app/globals.css` defines one `:focus-visible` outline for the whole app, so individual controls should *not* re-declare `focus-visible:outline-*` — only override it where the ring sits on a tinted surface (see the decision buttons' `outline-success` / `outline-danger` / `outline-warning`).
 - **Icons** come from `lucide-react` exclusively.
 - **UI copy is Indonesian** (headings, descriptions, button labels), while code identifiers and types are English. Match this when adding user-facing strings.
 - Conditional class names are composed with array `.join(" ")` — there is no `clsx`/`cn` helper.
@@ -79,3 +98,13 @@ To change a color globally, edit the token in `:root`, not the call sites.
 ### Images
 
 `next.config.mjs` whitelists exactly one remote host for `next/image`: `hebbkx1anhila5yf.public.blob.vercel-storage.com` (Vercel Blob). Any new remote image domain must be added to `images.remotePatterns` or the build will reject it. There is no `public/` directory.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
