@@ -14,7 +14,7 @@ export function ResetProgress() {
         onClick={() => setConfirming(true)}
         className="inline-flex min-h-11 items-center text-xs text-muted-foreground underline-offset-2 transition-colors hover:text-foreground hover:underline"
       >
-        Hapus progres di perangkat ini
+        Hapus semua progres
       </button>
     )
   }
@@ -22,7 +22,7 @@ export function ResetProgress() {
   return (
     <div role="alert" className="flex flex-wrap items-center gap-3 text-xs">
       <span className="text-muted-foreground">
-        Hapus semua XP, streak dan riwayat di perangkat ini? Ini tidak bisa dibatalkan.
+        Hapus semua XP, streak dan riwayat latihanmu? Ini tidak bisa dibatalkan.
       </span>
       <button
         type="button"

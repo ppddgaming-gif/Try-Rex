@@ -39,7 +39,9 @@ export function ProfileCard({ name, className = "" }: { name: string | null; cla
         </form>
       ) : (
         <div className="mt-4 flex flex-col gap-2">
-          <p className="text-xs leading-relaxed text-muted-foreground">Progres tersimpan di perangkat ini.</p>
+          <p className="text-xs leading-relaxed text-muted-foreground">
+            Progres tersimpan di perangkat ini. Masuk untuk menyimpannya ke akunmu.
+          </p>
           <Link href="/login" className="btn btn-sm w-full">
             Masuk
           </Link>

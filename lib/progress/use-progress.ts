@@ -9,7 +9,7 @@ const subscribe = (onChange: () => void) => progressStore().subscribe(onChange)
 const getSnapshot = () => progressStore().loadProgress()
 // Storage only exists in the browser. The server render and the first client
 // render both see null and show skeletons, so hydration always matches; the
-// real progress arrives right after.
+// real progress arrives right after (for an account, once Supabase answers).
 const getServerSnapshot = () => null
 
 /** Progress, or null while it hasn't loaded yet (render a skeleton). */

@@ -1,4 +1,4 @@
-import type { Attempt, Progress, Streak } from "@/lib/progress/types"
+import { emptyProgress, type Attempt, type Progress, type Streak } from "@/lib/progress/types"
 
 // Every number the UI shows is derived here from the stored attempts. No
 // component holds a literal statistic.
@@ -64,6 +64,22 @@ export function nextStreak(streak: Streak, today: string): Streak {
   const continues = streak.lastPlayedDate !== null && daysBetween(streak.lastPlayedDate, today) === 1
   const current = continues ? streak.current + 1 : 1
   return { current, best: Math.max(streak.best, current), lastPlayedDate: today }
+}
+
+/**
+ * Progress rebuilt from attempts alone (oldest first): XP is their sum and
+ * the streak is replayed day by day. The account store keeps only attempts,
+ * so these totals can never drift from the history.
+ */
+export function progressFromAttempts(attempts: Attempt[]): Progress {
+  const base = emptyProgress()
+  let xp = 0
+  let streak = base.streak
+  for (const a of attempts) {
+    xp += a.xpEarned
+    streak = nextStreak(streak, localDateKey(new Date(a.createdAt)))
+  }
+  return { ...base, xp, attempts, streak }
 }
 
 /**

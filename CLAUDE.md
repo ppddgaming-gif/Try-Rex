@@ -73,19 +73,22 @@ Everything is deterministic so server and client agree — no `Math.random()` (t
   - `nextStreak` / `liveStreak`, on the player's local day
   - `attemptsPerDay`
   - `insightLine`: counted facts only, no advice
-- `store.ts`: the `ProgressStore` interface (`loadProgress`, `recordAttempt`, `resetProgress`, `subscribe`) and its localStorage implementation.
-  - The key is `tryrex:progress:v1`.
-  - Every read and write is in try/catch, and unreadable data means empty progress.
-  - The Supabase ticket swaps the implementation, not the interface.
+- `store.ts`: the `ProgressStore` interface (`loadProgress`, `recordAttempt`, `resetProgress`, `subscribe`) with two implementations, picked by `setAccount(userId)`.
+  - **Guests:** localStorage under `tryrex:progress:v1`. Every read and write is in try/catch, and unreadable data means empty progress.
+  - **Signed in:** Supabase `practice_attempts`. Only attempts are stored; XP and streak are rebuilt with `progressFromAttempts`. Attempts appear at once and save in the background; a failed save waits in `tryrex:outbox:<userId>` and is resent on the next load. On load, any guest attempts on the device are imported into the account (idempotent) and cleared locally.
+  - `loadProgress()` returns null until the account has loaded, and before `setAccount` has run.
+  - `<ProgressAccount>` in `app/(app)/layout.tsx` calls `setAccount` with the **server-rendered** user id. Don't drive it from the browser's `onAuthStateChange`: sign-out is a server action, so the browser client never hears about it.
 - `use-progress.ts`: the only thing components use.
   - `useProgress()` (`useSyncExternalStore`) returns null until the browser has loaded, so render a skeleton for null.
   - `useProgressEvents()` delivers the XP-gain / level-up events.
   - `recordAttempt()` is called by the game on submit.
-- Progress is **per device, not per account** until the Supabase ticket.
+- Progress follows the **account** when signed in, and the device for guests.
+- `practice_attempts` rows are self-reported (the game grades in the browser), which is why they are separate from the graded `attempts` table. RLS lets a player read, insert and delete only their own rows; table checks keep the values in the game's shape.
+- The landing `StatsBanner` shows real counts from the `public_stats()` RPC (confirmed accounts, answered questions) via `lib/public-stats.ts`, and falls back to plain copy when there is nothing to count or Supabase is unreachable.
 - UI pieces live in `components/progress/`:
   - `EmptyState` is the one empty layout; use it for every empty card.
   - `Skeleton` must be sized exactly like the content it stands in for.
-  - The rest: `LevelXp`, `Streak`, `LevelUpToast` (mounted in the app layout), `PracticeCalendar`, `CompetencyMeter`, `ActivityRows`, `StatRow`, `FirstSessionHero`, `AiInsight`, `ResetProgress`.
+  - The rest: `LevelXp`, `Streak`, `LevelUpToast` (mounted in the app layout), `PracticeCalendar`, `CompetencyMeter`, `ActivityRows`, `StatRow`, `FirstSessionHero`, `AiInsight`, `ResetProgress`, `ProgressAccount` (renders nothing; see `store.ts`).
 
 **Known gaps in the source data** (the generator skips these and prints why): `hard/gbpnzd_1–5.js` are 0 bytes, and `hard/euraud_5.js` has only 30 candles (needs 45). It also drops 8 rows with malformed dates (e.g. `"2000:01:17"`) and clamps 9 candles whose wicks did not contain their bodies. Because gbpnzd is missing, `hard` has only 2 usable pairs, so a hard round can repeat a pair.
 
@@ -99,8 +102,10 @@ Cookie sessions via `@supabase/ssr`, email + password only. Env: `NEXT_PUBLIC_SU
 - `proxy.ts` (Next 16's name for middleware) calls `lib/supabase/middleware.ts`, which refreshes the session and holds the route rules: `/dashboard` needs an account (guests go to `/login?next=…`), signed-in users are bounced off `/login` and `/signup`, and `/trading-game` and `/ai-evaluation` stay open to guests.
 - `lib/auth-actions.ts` holds the server actions (login, signup, reset request, new password, sign-out). `app/auth/callback/route.ts` turns email links into a session.
 - `lib/auth-rules.ts` is pure and client-safe: `safeNext()` (only same-site paths starting with a single "/"; always run `next` through it), the Indonesian error messages, `MIN_PASSWORD`. `lib/auth.ts` is server-only (`getCurrentUser()`, `isSignedIn()`); never import it from a client component.
-- **Profiles are created by the `handle_new_user` trigger, never by the client.** It also seeds the four competencies at 50. SQL: `docs/schema.sql`, then `supabase/migrations/*_accounts.sql`. The build spec lives in `docs/build-spec.md`.
+- **Profiles are created by the `handle_new_user` trigger, never by the client.** It also seeds the four competencies at 50. SQL: `docs/schema.sql`, then `supabase/migrations/*.sql` in filename order (`_accounts`, `_progress_sync`, `_lock_down_functions`). The build spec lives in `docs/build-spec.md`.
+- **Revoke EXECUTE on every server-only function.** Postgres grants it to PUBLIC by default, and Supabase exposes each `public` function at `/rest/v1/rpc/<name>`. `apply_competency` and `touch_streak` were callable by anyone for any user until `_lock_down_functions`.
 - `ProfileCard` shows the player's real level, XP and streak from `lib/progress` (guests included, as "Tamu"), so it is a client component.
+- The Supabase MCP server is configured at user scope (plain `https://mcp.supabase.com/mcp`). A project-scoped URL with `?project_ref=…&features=…` failed OAuth with "Resource must be a valid MCP endpoint", so pass the project id (`dfcnpbnnmgaspjodxete`) per call instead.
 
 ### Charts are hand-rolled SVG
 

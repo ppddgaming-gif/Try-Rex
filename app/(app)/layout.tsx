@@ -1,6 +1,7 @@
 import { AppNavMobile } from "@/components/app-nav-mobile"
 import { PageTransition } from "@/components/page-transition"
 import { LevelUpToast } from "@/components/progress/level-up-toast"
+import { ProgressAccount } from "@/components/progress/progress-account"
 import { Sidebar } from "@/components/sidebar"
 import { getCurrentUser } from "@/lib/auth"
 
@@ -22,6 +23,7 @@ export default async function AppLayout({
         <PageTransition>{children}</PageTransition>
       </main>
       <LevelUpToast />
+      <ProgressAccount userId={user?.id ?? null} />
     </div>
   )
 }
