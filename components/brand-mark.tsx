@@ -14,7 +14,11 @@ export function BrandMark({
   const lg = size === "lg"
 
   return (
-    <Link href="/" onClick={onNavigate} className={lg ? "flex items-center gap-3 px-2" : "flex items-center gap-2.5"}>
+    <Link
+      href="/"
+      onClick={onNavigate}
+      className={lg ? "flex min-h-11 items-center gap-3 px-2" : "flex min-h-11 items-center gap-2.5"}
+    >
       <Rex size={lg ? 38 : 30} />
       <div className="leading-tight">
         <p

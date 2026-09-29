@@ -47,7 +47,7 @@ export function AspectMockup() {
       <div className="mb-4 flex items-center justify-between">
         <p className="text-sm font-semibold">Pemahaman Berdasarkan Aspek</p>
         <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary">
-          Live
+          Contoh
         </span>
       </div>
       <div className="flex flex-col gap-4">

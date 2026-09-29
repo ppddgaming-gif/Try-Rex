@@ -8,6 +8,11 @@ function clock(seconds: number) {
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`
 }
 
+/**
+ * The four numbers for one evaluated answer. Nothing here compares against
+ * other players (there is no real average to compare with), and a zero shows
+ * as "—" with a hint rather than as a big 0.
+ */
 export function EvalStatCards({
   decision,
   correct,
@@ -19,7 +24,8 @@ export function EvalStatCards({
   correct: boolean
   accuracy: number
   xp: number
-  seconds: number
+  /** null when the time wasn't passed from the game. */
+  seconds: number | null
 }) {
   const tone = correct ? "text-success" : "text-danger"
 
@@ -43,24 +49,42 @@ export function EvalStatCards({
 
       <Card>
         <p className="text-sm text-muted-foreground">Akurasi Keputusan</p>
-        <p className={`mt-2 text-3xl font-extrabold ${accuracy >= 70 ? "text-success" : "text-warning"}`}>
+        <p
+          className={`mt-2 font-mono text-3xl font-extrabold tabular-nums ${accuracy >= 70 ? "text-success" : "text-warning"}`}
+        >
           {accuracy}%
         </p>
-        <p className="mt-2 text-xs text-muted-foreground">
-          {accuracy >= 70 ? "Di atas rata-rata" : "Di bawah rata-rata"}
-        </p>
+        <p className="mt-2 text-xs text-muted-foreground">Dari besarnya gerak harga sesudahnya</p>
       </Card>
 
       <Card>
-        <p className="text-sm text-muted-foreground">Score</p>
-        <p className="mt-2 text-3xl font-extrabold text-primary">+{xp} XP</p>
-        <p className="mt-2 text-xs text-muted-foreground">Total XP didapat</p>
+        <p className="text-sm text-muted-foreground">XP</p>
+        {xp > 0 ? (
+          <>
+            <p className="mt-2 font-mono text-3xl font-extrabold tabular-nums text-primary">+{xp}</p>
+            <p className="mt-2 text-xs text-muted-foreground">Didapat dari soal ini</p>
+          </>
+        ) : (
+          <>
+            <p className="mt-2 font-mono text-3xl font-extrabold text-muted-foreground">—</p>
+            <p className="mt-2 text-xs text-muted-foreground">Jawaban kurang tepat tidak memberi XP</p>
+          </>
+        )}
       </Card>
 
       <Card>
         <p className="text-sm text-muted-foreground">Waktu Penyelesaian</p>
-        <p className="mt-2 font-mono text-3xl font-extrabold">{clock(seconds)}</p>
-        <p className="mt-2 text-xs text-muted-foreground">Menit : Detik</p>
+        {seconds !== null ? (
+          <>
+            <p className="mt-2 font-mono text-3xl font-extrabold tabular-nums">{clock(seconds)}</p>
+            <p className="mt-2 text-xs text-muted-foreground">Menit : Detik</p>
+          </>
+        ) : (
+          <>
+            <p className="mt-2 font-mono text-3xl font-extrabold text-muted-foreground">—</p>
+            <p className="mt-2 text-xs text-muted-foreground">Mainkan soal untuk mencatat waktumu</p>
+          </>
+        )}
       </Card>
     </div>
   )

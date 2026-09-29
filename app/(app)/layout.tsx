@@ -1,5 +1,6 @@
 import { AppNavMobile } from "@/components/app-nav-mobile"
 import { PageTransition } from "@/components/page-transition"
+import { LevelUpToast } from "@/components/progress/level-up-toast"
 import { Sidebar } from "@/components/sidebar"
 import { getCurrentUser } from "@/lib/auth"
 
@@ -9,7 +10,7 @@ export default async function AppLayout({
   children: React.ReactNode
 }) {
   // Null for guests: /trading-game and /ai-evaluation are open without an
-  // account, and the sidebar then offers sign-in instead of a profile.
+  // account, and the profile card then shows "Tamu" with sign-in buttons.
   const user = await getCurrentUser()
   const userName = user?.displayName ?? null
 
@@ -20,6 +21,7 @@ export default async function AppLayout({
         <AppNavMobile userName={userName} />
         <PageTransition>{children}</PageTransition>
       </main>
+      <LevelUpToast />
     </div>
   )
 }

@@ -340,6 +340,61 @@ p {
   overflow: hidden;
 }
 
+/* Loading placeholder: sized like the content it stands in for, so nothing
+   shifts when the real data arrives. */
+@keyframes skeleton-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+.skeleton {
+  display: block;
+  border-radius: 6px;
+  background: var(--muted);
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+/* "+25 XP": rises 12px and fades out. Removed from the DOM on a timer, so it
+   also works when reduced motion strips the animation. */
+@keyframes xp-float {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 4px, 0);
+  }
+  18% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, -12px, 0);
+  }
+}
+.xp-chip {
+  animation: xp-float 0.7s var(--ease-out-quart) both;
+}
+
+/* Level-up toast: drops in, holds, lifts out over its 3s life. */
+@keyframes toast-life {
+  0% {
+    opacity: 0;
+    transform: translate3d(-50%, -16px, 0);
+  }
+  10%,
+  88% {
+    opacity: 1;
+    transform: translate3d(-50%, 0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(-50%, -8px, 0);
+  }
+}
+.toast-life {
+  transform: translate3d(-50%, 0, 0);
+  animation: toast-life 3s var(--ease-out-expo) both;
+}
+
 /* Future candles cascade in after an answer is submitted. */
 .candle-reveal {
   transform-box: fill-box;
@@ -411,8 +466,13 @@ p {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  /* Scroll-driven animations ignore duration, so switch them off outright. */
-  .reveal {
+  /* Scroll-driven animations ignore duration, so switch them off outright.
+     The rest just sit still: no pulse, no floating chip, a toast that
+     appears and disappears without moving. */
+  .reveal,
+  .skeleton,
+  .xp-chip,
+  .toast-life {
     animation: none !important;
   }
   ::view-transition-old(*),

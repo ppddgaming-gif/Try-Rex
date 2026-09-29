@@ -18,7 +18,7 @@ const features: Feature[] = [
   {
     eyebrow: "Trading Game",
     title: "Latih insting lewat simulasi market nyata",
-    body: "Hadapi situasi market sungguhan tanpa risiko uang. Pilih BUY, SELL, atau WAIT, lalu lihat seberapa akurat keputusanmu lewat 20 soal bertingkat.",
+    body: "Hadapi situasi market sungguhan tanpa risiko uang. Pilih BUY, SELL, atau WAIT, lalu lihat seberapa akurat keputusanmu lewat 5 soal per sesi.",
     mockup: <TradingMockup />,
     reverse: true,
   },

@@ -37,9 +37,6 @@ export type Decision = "buy" | "sell" | "wait"
 
 export type AspectKey = "trend" | "entry" | "risk" | "structure"
 
-/** Fixed "now" for the dashboard's mock activity feed. */
-export const dataAsOf = "25 Mei 2025"
-
 const round = (v: number, digits: number) => Number(v.toFixed(digits))
 
 /**
@@ -69,13 +66,6 @@ export function frameOf(candles: Candle[]): { min: number; max: number; priceTic
 
   return { min, max, priceTicks }
 }
-
-export const aspectMetrics = [
-  { key: "trend", label: "Trend Reading", value: 72, desc: "Kemampuan membaca arah dan kekuatan trend" },
-  { key: "entry", label: "Entry Timing", value: 64, desc: "Ketepatan memilih waktu entry" },
-  { key: "risk", label: "Risk Management", value: 58, desc: "Manajemen risiko dan money management" },
-  { key: "structure", label: "Market Structure", value: 78, desc: "Memahami struktur market (Support / Resistance)" },
-]
 
 export type Challenge = {
   /** Dataset id, e.g. "eurusd-1". */
@@ -283,11 +273,6 @@ export function roundFor(level: GameLevel, size = 5): Challenge[] {
   return round
 }
 
-/** Pairs are whatever the datasets actually contain, in first-seen order. */
-export const pairs = [...new Set(gameDatasets.map((d) => d.pair))].map((symbol) => ({ symbol }))
-
-export type Pair = (typeof pairs)[number]
-
 export const gameLevels: { id: GameLevel; label: string; xp: number }[] = [
   { id: "easy", label: "Mudah", xp: xpForLevel("easy") },
   { id: "medium", label: "Menengah", xp: xpForLevel("medium") },
@@ -321,14 +306,6 @@ export function scoreFor(challenge: Challenge, decision: Decision) {
   }
 }
 
-/** Aspect breakdown for one evaluation: the focus aspect moves, the rest hold. */
-export function aspectScoresFor(focus: AspectKey, correct: boolean) {
-  return aspectMetrics.map((m) => {
-    const delta = m.key === focus ? (correct ? 12 : -18) : 0
-    return { key: m.key, label: m.label, value: Math.max(0, Math.min(100, m.value + delta)) }
-  })
-}
-
 /** Entry / stop / target lines implied by a decision on a given setup. */
 export function tradePlanFor(challenge: Challenge, decision: Decision): Marker[] {
   const resistance = challenge.zones.find((z) => z.variant === "resistance")
@@ -355,50 +332,3 @@ export function tradePlanFor(challenge: Challenge, decision: Decision): Marker[]
     },
   ]
 }
-
-export const recentActivities = [
-  { id: 53, pair: "AUDUSD", aspect: "Entry Timing", result: "Benar", xp: 25, hoursAgo: 2 },
-  { id: 52, pair: "AUDUSD", aspect: "Trend Reading", result: "Salah", xp: 0, hoursAgo: 4 },
-  { id: 51, pair: "GBPUSD", aspect: "Risk Management", result: "Benar", xp: 75, hoursAgo: 9 },
-  { id: 50, pair: "GBPUSD", aspect: "Market Structure", result: "Benar", xp: 75, hoursAgo: 26 },
-  { id: 49, pair: "EURUSD", aspect: "Market Structure", result: "Salah", xp: 0, hoursAgo: 31 },
-  { id: 48, pair: "EURUSD", aspect: "Entry Timing", result: "Benar", xp: 25, hoursAgo: 52 },
-  { id: 47, pair: "USDJPY", aspect: "Trend Reading", result: "Benar", xp: 25, hoursAgo: 96 },
-  { id: 46, pair: "EURJPY", aspect: "Entry Timing", result: "Salah", xp: 0, hoursAgo: 150 },
-  { id: 45, pair: "GBPCAD", aspect: "Risk Management", result: "Benar", xp: 150, hoursAgo: 220 },
-  { id: 44, pair: "USDCAD", aspect: "Market Structure", result: "Benar", xp: 75, hoursAgo: 400 },
-]
-
-export type Activity = (typeof recentActivities)[number]
-
-/** Relative time against the fixed dataAsOf, so it never depends on the clock. */
-export function relativeTime(hoursAgo: number) {
-  if (hoursAgo < 24) return `${hoursAgo} jam lalu`
-  return `${Math.round(hoursAgo / 24)} hari lalu`
-}
-
-export const activityRanges = [
-  { id: "24h", label: "24 jam terakhir", hours: 24 },
-  { id: "7d", label: "7 hari terakhir", hours: 24 * 7 },
-  { id: "30d", label: "30 hari terakhir", hours: 24 * 30 },
-]
-
-export type ActivityRange = (typeof activityRanges)[number]
-
-export const recommendations = [
-  {
-    title: "Latih konfirmasi entry",
-    body: "Sebelum entry, wajibkan dirimu menemukan satu candle konfirmasi. Ini kelemahan terbesarmu saat ini.",
-    aspect: "Entry Timing",
-  },
-  {
-    title: "Kerjakan ulang challenge resistance",
-    body: "Tiga kesalahan terakhirmu terjadi di area resistance. Ulangi tipe soal ini sampai polanya terasa otomatis.",
-    aspect: "Market Structure",
-  },
-  {
-    title: "Tetapkan stop loss lebih dulu",
-    body: "Tentukan stop loss sebelum memilih arah. Kalau jaraknya tidak masuk akal, jawabannya kemungkinan WAIT.",
-    aspect: "Risk Management",
-  },
-]

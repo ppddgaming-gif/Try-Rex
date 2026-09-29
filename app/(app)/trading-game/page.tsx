@@ -6,6 +6,7 @@ import { Card } from "@/components/card"
 import { CandlestickChart } from "@/components/candlestick-chart"
 import { SelectMenu } from "@/components/select-menu"
 import { AnswerFeedback } from "@/components/trading-game/answer-feedback"
+import { recordAttempt } from "@/lib/progress/use-progress"
 import { DecisionButtons } from "@/components/trading-game/decision-buttons"
 import { QuestionProgress } from "@/components/trading-game/question-progress"
 import type { GameLevel } from "@/lib/game-data"
@@ -55,6 +56,17 @@ export default function TradingGamePage() {
   function submit() {
     if (!choice || submitted) return
     const { correct, xp: earned } = scoreFor(challenge, choice)
+    // Saved to the player's progress right away, outside the transition, so
+    // the sidebar's XP bar and the streak update with the answer.
+    recordAttempt({
+      scenarioId: challenge.id,
+      pair: challenge.pair,
+      timeframe: challenge.timeframe,
+      difficulty: challenge.difficulty,
+      decision: choice,
+      correct,
+      xpEarned: earned,
+    })
     startTransition(() => {
       setSubmitted(true)
       setXp((v) => v + earned)

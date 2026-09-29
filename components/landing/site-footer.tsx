@@ -15,7 +15,6 @@ const cols = [
     links: [
       { label: "Cara Kerja", href: "/#how" },
       { label: "Fitur", href: "/#features" },
-      { label: "Testimoni", href: "/#testimonials" },
     ],
   },
   {

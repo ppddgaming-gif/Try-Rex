@@ -1,19 +1,14 @@
 import Link from "next/link"
-import { ActivityList } from "@/components/activity-list"
 import { Card } from "@/components/card"
 import { CandlestickChart } from "@/components/candlestick-chart"
-import { Disclosure } from "@/components/disclosure"
-import { AspectPerformance } from "@/components/evaluation/aspect-performance"
 import { EvalStatCards } from "@/components/evaluation/stat-cards"
 import { Explanation } from "@/components/evaluation/explanation"
 import {
-  aspectScoresFor,
   challengeById,
   challenges,
   decisionLabels,
   frameOf,
   isDecision,
-  recentActivities,
   scoreFor,
   tradePlanFor,
   type Decision,
@@ -25,7 +20,6 @@ import {
   Calendar,
   Clock,
   GitCommitHorizontal,
-  History,
   Pause,
   RotateCcw,
 } from "lucide-react"
@@ -49,8 +43,9 @@ export default async function AiEvaluationPage({
   // representative fallback so the page still stands alone.
   const challenge = challengeById(sp.c) ?? challenges[0]
   const decision: Decision = isDecision(sp.a) ? sp.a : "sell"
-  const parsedTime = Number(sp.t)
-  const seconds = Number.isFinite(parsedTime) && parsedTime >= 0 ? Math.floor(parsedTime) : 28
+  // No time in the URL means no real time was recorded: show "—", not a made-up number.
+  const parsedTime = sp.t === undefined ? NaN : Number(sp.t)
+  const seconds = Number.isFinite(parsedTime) && parsedTime >= 0 ? Math.floor(parsedTime) : null
 
   const { correct, xp, accuracy } = scoreFor(challenge, decision)
   // The review chart shows what the question hid: history plus the 15 future candles.
@@ -136,43 +131,24 @@ export default async function AiEvaluationPage({
           </div>
         </Card>
 
-        <Explanation
-          decision={decision}
-          correct={correct}
-          reasons={challenge.reasons}
-          suggestion={challenge.suggestion}
-        />
-      </div>
+        <div className="flex flex-col gap-4">
+          <div className="flex-1">
+            <Explanation
+              decision={decision}
+              correct={correct}
+              reasons={challenge.reasons}
+              suggestion={challenge.suggestion}
+            />
+          </div>
 
-      {/* Bottom row */}
-      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[1fr_360px]">
-        <AspectPerformance aspects={aspectScoresFor(challenge.focus, correct)} focus={challenge.focus} />
-
-        <Card className="flex flex-col">
-          <h2 className="text-base font-semibold">Langkah Selanjutnya</h2>
-          <p className="mt-2 text-sm text-muted-foreground">Terus latihan dan perbaiki keputusanmu!</p>
-          {/* Margins rather than gap: the Disclosure panel stays mounted at zero
-              height when closed, and a gap would still reserve space for it. */}
-          <div className="mt-4 flex flex-col">
-            <Link
-              href="/trading-game"
-              className="btn w-full"
-            >
+          <Card>
+            <h2 className="text-base font-semibold">Langkah Selanjutnya</h2>
+            <p className="mt-2 text-sm text-muted-foreground">Terus latihan dan perbaiki keputusanmu!</p>
+            <Link href="/trading-game" className="btn mt-4 w-full">
               <RotateCcw className="h-4 w-4" /> Ulangi Challenge
             </Link>
-            <Disclosure
-              label="Lihat Riwayat"
-              closeLabel="Sembunyikan Riwayat"
-              className="mt-3 rounded-lg border border-border bg-muted/20 p-3"
-              triggerClassName="mt-3"
-            >
-              <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
-                <History className="h-3.5 w-3.5" /> 5 challenge terakhir
-              </p>
-              <ActivityList activities={recentActivities.slice(0, 5)} />
-            </Disclosure>
-          </div>
-        </Card>
+          </Card>
+        </div>
       </div>
     </div>
   )

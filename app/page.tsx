@@ -4,7 +4,6 @@ import { StatsBanner } from "@/components/landing/stats-banner"
 import { Surfaces } from "@/components/landing/surfaces"
 import { FeatureRows } from "@/components/landing/feature-rows"
 import { HowItWorks } from "@/components/landing/how-it-works"
-import { Testimonials } from "@/components/landing/testimonials"
 import { FinalCta } from "@/components/landing/final-cta"
 import { SiteFooter } from "@/components/landing/site-footer"
 import { PageTransition } from "@/components/page-transition"
@@ -25,7 +24,6 @@ export default async function LandingPage() {
           <Surfaces />
           <FeatureRows />
           <HowItWorks />
-          <Testimonials />
           <FinalCta />
         </main>
       </PageTransition>
