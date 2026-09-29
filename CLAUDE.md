@@ -13,22 +13,20 @@ npx tsc --noEmit # typecheck (strict mode)
 
 - **No test suite exists** — no test runner, config, or test files. If asked to add tests, pick a framework and say so explicitly.
 - `node scripts/generate-game-data.mjs` regenerates `lib/game-data.ts` from `Game-data-main/`. It is plain Node with no dependencies and prints a report of what it skipped and repaired.
-- **`npm run lint` does not work.** `package.json` declares `"lint": "next lint"`, but neither `eslint` nor `eslint-config-next` is installed and there is no eslint config file. Use `npx tsc --noEmit` as the real static check.
+- **`npm run lint` does not work.** `package.json` declares `"lint": "next lint"`, but `next lint` was **removed in Next.js 16**, so `next` parses `lint` as a directory argument and fails with `Invalid project directory provided, no such directory: C:\Try-Rex\lint`. Installing eslint would not fix it — the script itself is obsolete and needs to become `eslint .` (eslint and eslint-config-next are also absent, and there is no eslint config file). Use `npx tsc --noEmit` as the real static check.
 
-### Windows path bug: this checkout lives under a path containing `&`
+### Note on `&` in the checkout path
 
-This machine's checkout path is `C:\Users\A&J\...`. The unescaped `&` breaks every Windows `.cmd` shim npm generates, so **`npm run dev`/`build`/`start` and any `npx <bin>` command fail** with a mangled-path `MODULE_NOT_FOUND` error, in both PowerShell and Git Bash (confirmed by reproduction). This hits any terminal, including VS Code's integrated terminal — it is not a shell-specific issue.
+This repo is checked out at `C:\Try-Rex`, so **the normal `npm run` and `npx` commands above work.** No workaround is needed.
 
-Workaround: invoke the local binary's JS entry point through `node` directly, which bypasses the broken shim entirely:
+Earlier revisions of this file documented a breakage, and it is real but conditional: if the checkout is ever moved under a path containing `&` (for example `C:\Users\A&J\...`), the unescaped `&` breaks the Windows `.cmd` shims npm generates, and `npm run dev`/`build`/`start` plus any `npx <bin>` fail with a mangled-path `MODULE_NOT_FOUND` or `'...' is not recognized as an internal or external command`. That hits every terminal, including VS Code's integrated one.
+
+If you see those errors, check `git rev-parse --show-toplevel` for special characters first, then bypass the shim by calling the binary's JS entry point through `node`:
 
 ```bash
 node node_modules/next/dist/bin/next dev
-node node_modules/next/dist/bin/next build
-node node_modules/next/dist/bin/next start
 node node_modules/typescript/bin/tsc --noEmit
 ```
-
-Use these instead of the `npm run`/`npx` forms above whenever a command mysteriously fails with `'...' is not recognized as an internal or external command` or `Cannot find module`. This is a property of the checkout path on this machine, not the code — if the project is ever moved to a path without special characters, the normal `npm run`/`npx` commands will work again.
 
 ## Architecture
 
