@@ -22,7 +22,7 @@ export function Hero() {
 
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Link
-            href="/dashboard"
+            href="/trading-game"
             className="btn btn-lg w-full sm:w-auto"
           >
             Mulai latihan gratis

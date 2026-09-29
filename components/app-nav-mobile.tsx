@@ -8,7 +8,7 @@ import { ProfileCard } from "@/components/profile-card"
 
 // The sidebar is desktop-only, so this is the sole way to move between app
 // routes below the lg breakpoint.
-export function AppNavMobile() {
+export function AppNavMobile({ userName }: { userName: string | null }) {
   const [open, setOpen] = useState(false)
   const close = () => setOpen(false)
 
@@ -21,7 +21,7 @@ export function AppNavMobile() {
           aria-label={open ? "Tutup menu" : "Buka menu"}
           aria-expanded={open}
           aria-controls="app-nav-menu"
-          className="flex h-9 w-9 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:text-foreground"
+          className="flex h-11 w-11 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:text-foreground"
         >
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
@@ -30,7 +30,7 @@ export function AppNavMobile() {
       {open && (
         <div id="app-nav-menu" className="border-t border-border bg-background px-5 py-4">
           <NavLinks onNavigate={close} />
-          <ProfileCard className="mt-4" />
+          <ProfileCard name={userName} className="mt-4" />
         </div>
       )}
     </header>

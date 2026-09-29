@@ -7,11 +7,16 @@ import { HowItWorks } from "@/components/landing/how-it-works"
 import { Testimonials } from "@/components/landing/testimonials"
 import { FinalCta } from "@/components/landing/final-cta"
 import { SiteFooter } from "@/components/landing/site-footer"
+import { isSignedIn } from "@/lib/auth"
 
-export default function LandingPage() {
+// Reads the session cookie to choose "Masuk" or "Dashboard", so this page is
+// rendered per request rather than prebuilt.
+export default async function LandingPage() {
+  const signedIn = await isSignedIn()
+
   return (
     <div className="min-h-screen">
-      <MarketingNav />
+      <MarketingNav signedIn={signedIn} />
       <main>
         <Hero />
         <StatsBanner />

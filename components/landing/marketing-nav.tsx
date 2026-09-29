@@ -6,14 +6,19 @@ import { Menu, X, ArrowUpRight } from "lucide-react"
 import { Rex } from "@/components/rex-mascot"
 
 const links = [
-  { label: "Product", href: "#product" },
-  { label: "Cara Kerja", href: "#how" },
-  { label: "Fitur", href: "#features" },
-  { label: "Testimoni", href: "#testimonials" },
+  { label: "Product", href: "/#product" },
+  { label: "Cara Kerja", href: "/#how" },
+  { label: "Fitur", href: "/#features" },
+  { label: "Testimoni", href: "/#testimonials" },
 ]
 
-export function MarketingNav() {
+/**
+ * `signedIn` comes from the server (app/page.tsx), so the right button is in
+ * the first paint instead of flashing "Masuk" and swapping.
+ */
+export function MarketingNav({ signedIn }: { signedIn: boolean }) {
   const [open, setOpen] = useState(false)
+  const account = signedIn ? { href: "/dashboard", label: "Dashboard" } : { href: "/login", label: "Masuk" }
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl">
@@ -40,15 +45,12 @@ export function MarketingNav() {
         {/* Actions */}
         <div className="hidden items-center gap-3 md:flex">
           <Link
-            href="/dashboard"
-            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            href={account.href}
+            className="inline-flex min-h-11 items-center px-2 text-sm font-semibold text-foreground transition-colors hover:text-primary"
           >
-            Masuk
+            {account.label}
           </Link>
-          <Link
-            href="/dashboard"
-            className="btn btn-sm"
-          >
+          <Link href="/trading-game" className="btn btn-sm">
             Mulai Sekarang
             <ArrowUpRight className="h-4 w-4" />
           </Link>
@@ -56,9 +58,10 @@ export function MarketingNav() {
 
         {/* Mobile toggle */}
         <button
-          className="flex h-9 w-9 items-center justify-center rounded-lg border border-border md:hidden"
+          className="flex h-11 w-11 items-center justify-center rounded-lg border border-border md:hidden"
           onClick={() => setOpen((v) => !v)}
-          aria-label="Toggle menu"
+          aria-label={open ? "Tutup menu" : "Buka menu"}
+          aria-expanded={open}
         >
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
@@ -79,9 +82,13 @@ export function MarketingNav() {
               </a>
             ))}
             <Link
-              href="/dashboard"
-              className="btn btn-sm mt-2"
+              href={account.href}
+              onClick={() => setOpen(false)}
+              className="rounded-lg px-3 py-3 text-sm font-semibold text-foreground hover:bg-muted"
             >
+              {account.label}
+            </Link>
+            <Link href="/trading-game" className="btn btn-sm mt-2">
               Mulai Sekarang
               <ArrowUpRight className="h-4 w-4" />
             </Link>

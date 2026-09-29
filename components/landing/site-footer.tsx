@@ -13,9 +13,17 @@ const cols = [
   {
     title: "Sumber",
     links: [
-      { label: "Cara Kerja", href: "#how" },
-      { label: "Fitur", href: "#features" },
-      { label: "Testimoni", href: "#testimonials" },
+      { label: "Cara Kerja", href: "/#how" },
+      { label: "Fitur", href: "/#features" },
+      { label: "Testimoni", href: "/#testimonials" },
+    ],
+  },
+  {
+    title: "Legal",
+    links: [
+      { label: "Kebijakan Privasi", href: "/privacy" },
+      { label: "Syarat & Ketentuan", href: "/terms" },
+      { label: "Disclaimer", href: "/disclaimer" },
     ],
   },
 ]
@@ -24,7 +32,7 @@ export function SiteFooter() {
   return (
     <footer className="border-t border-border/60">
       <div className="mx-auto max-w-7xl px-5 py-12 lg:px-8">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2.5">
               <Rex size={30} />
@@ -38,12 +46,12 @@ export function SiteFooter() {
           {cols.map((c) => (
             <div key={c.title}>
               <p className="text-sm font-semibold">{c.title}</p>
-              <ul className="mt-4 flex flex-col gap-2.5">
+              <ul className="mt-2 flex flex-col">
                 {c.links.map((l) => (
                   <li key={l.label}>
                     <Link
                       href={l.href}
-                      className="rounded text-sm text-muted-foreground transition-colors hover:text-foreground"
+                      className="inline-flex min-h-11 items-center rounded text-sm text-muted-foreground transition-colors hover:text-foreground"
                     >
                       {l.label}
                     </Link>

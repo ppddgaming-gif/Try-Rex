@@ -4,6 +4,8 @@ import { DailyChallenge } from "@/components/dashboard/daily-challenge"
 import { DashboardFilters } from "@/components/dashboard/dashboard-filters"
 import { RecentActivity } from "@/components/dashboard/recent-activity"
 import { TopCards } from "@/components/dashboard/top-cards"
+import { redirect } from "next/navigation"
+import { getCurrentUser } from "@/lib/auth"
 import { activityRanges, challengesForPair, dataAsOf, pairs, recentActivities } from "@/lib/mock-data"
 
 type Search = { pair?: string; range?: string }
@@ -13,6 +15,11 @@ export default async function DashboardPage({
 }: {
   searchParams: Promise<Search>
 }) {
+  // proxy.ts already sends guests to /login; this is the backstop in case the
+  // proxy matcher ever stops covering this route.
+  const user = await getCurrentUser()
+  if (!user) redirect("/login?next=/dashboard")
+
   const sp = await searchParams
 
   const pair = pairs.find((p) => p.symbol === sp.pair) ?? pairs[0]
@@ -26,7 +33,7 @@ export default async function DashboardPage({
       {/* Header */}
       <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Welcome back, RexTrader!</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Selamat datang kembali, {user.displayName}!</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Terus belajar, terus berkembang, jadi trader yang konsisten!
           </p>

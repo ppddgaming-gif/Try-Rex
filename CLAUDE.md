@@ -8,12 +8,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 npm run dev      # dev server on http://localhost:3000
 npm run build    # production build
 npm start        # serve the production build
-npx tsc --noEmit # typecheck (strict mode)
+npm run typecheck # tsc --noEmit, strict mode
+npm run lint      # eslint . (flat config in eslint.config.mjs)
 ```
 
 - **No test suite exists** — no test runner, config, or test files. If asked to add tests, pick a framework and say so explicitly.
 - `node scripts/generate-game-data.mjs` regenerates `lib/game-data.ts` from `Game-data-main/`. It is plain Node with no dependencies and prints a report of what it skipped and repaired.
-- **`npm run lint` does not work.** `package.json` declares `"lint": "next lint"`, but `next lint` was **removed in Next.js 16**, so `next` parses `lint` as a directory argument and fails with `Invalid project directory provided, no such directory: C:\Try-Rex\lint`. Installing eslint would not fix it — the script itself is obsolete and needs to become `eslint .` (eslint and eslint-config-next are also absent, and there is no eslint config file). Use `npx tsc --noEmit` as the real static check.
+- Lint is the ESLint CLI with `eslint-config-next` (core-web-vitals + typescript). `next lint` no longer exists in Next 16. `Game-data-main/` and the generated `lib/game-data.ts` are ignored.
 
 ### Note on `&` in the checkout path
 
@@ -32,14 +33,16 @@ node node_modules/typescript/bin/tsc --noEmit
 
 Next.js 16 App Router + React 19, TypeScript strict, Tailwind CSS v4. The `@/*` path alias maps to the repo root (so `@/components/card` → `components/card.tsx`).
 
-### Two distinct UI shells
+### UI shells
 
-Routing splits into a marketing surface and an app surface:
+Routing splits into four surfaces:
 
 - **`app/page.tsx`** — public landing page. Composes ~8 section components from `components/landing/` (hero, stats banner, feature rows, testimonials, footer…) in top-to-bottom order. No sidebar.
-- **`app/(app)/`** — the authenticated-style product shell. Its `layout.tsx` wraps children in a fixed 64-unit `Sidebar` plus `lg:ml-64` main area, with `AppNavMobile` (a `lg:hidden` sticky bar + drawer) covering navigation below the `lg` breakpoint where the sidebar is hidden. Contains `dashboard`, `trading-game`, and `ai-evaluation` routes.
+- **`app/(app)/`** — the authenticated-style product shell. Its `layout.tsx` wraps children in a fixed 64-unit `Sidebar` plus `lg:ml-64` main area, with `AppNavMobile` (a `lg:hidden` sticky bar + drawer) covering navigation below the `lg` breakpoint where the sidebar is hidden. Contains `dashboard`, `trading-game`, and `ai-evaluation` routes. The layout loads the signed-in user once (`getCurrentUser()`) and passes the name down; guests see a sign-in prompt in `ProfileCard` instead.
+- **`app/(auth)/`**: `/login`, `/signup`, `/lupa-password` (request a reset email) and `/reset-password` (set the new password), as one centred card with no sidebar.
+- **`app/(legal)/`**: `/privacy`, `/terms` and `/disclaimer`, using the landing nav and footer. They are **drafts**: `<Isi>` and `<Tinjau>` from `components/legal-doc.tsx` render the `[PERLU DIISI]` / `[PERLU DITINJAU]` markers that must be resolved (and the text legally reviewed) before launch.
 
-Both `/dashboard` and `/ai-evaluation` read `searchParams` (so they are **dynamic**, server-rendered on demand, while `/` and `/trading-game` stay static). `/dashboard` takes `?pair=&range=`, driven by the `DashboardFilters` client island so the page itself stays a server component and the view stays shareable. `/ai-evaluation` takes `?c=<dataset id, e.g. eurusd-1>&a=<decision>&t=<seconds>` — the Trading Game handoff — and falls back to a representative example when the params are absent or invalid, so the page still stands alone.
+Every page that reads the session is **dynamic** (server-rendered per request), which now includes `/` and everything under `app/(app)/`. `/dashboard` takes `?pair=&range=`, driven by the `DashboardFilters` client island so the page itself stays a server component and the view stays shareable. `/ai-evaluation` takes `?c=<dataset id, e.g. eurusd-1>&a=<decision>&t=<seconds>` — the Trading Game handoff — and falls back to a representative example when the params are absent or invalid, so the page still stands alone.
 
 Adding a product page means creating it under `app/(app)/` (it inherits the shell automatically) and registering it in the `navItems` array in `components/nav-items.ts` — the single source both nav surfaces read.
 
@@ -61,7 +64,18 @@ Everything is deterministic so server and client agree — no `Math.random()` (t
 
 **Known gaps in the source data** (the generator skips these and prints why): `hard/gbpnzd_1–5.js` are 0 bytes, and `hard/euraud_5.js` has only 30 candles (needs 45). It also drops 8 rows with malformed dates (e.g. `"2000:01:17"`) and clamps 9 candles whose wicks did not contain their bodies. Because gbpnzd is missing, `hard` has only 2 usable pairs, so a hard round can repeat a pair.
 
-**The README is aspirational, not descriptive.** It documents Firebase Auth, Firestore collections, a `.env.local` with `NEXT_PUBLIC_FIREBASE_*` keys, and a `src/` directory structure. None of that exists in the code. Trust the code over the README.
+**The README is aspirational, not descriptive.** It documents Firebase Auth, Firestore and a `src/` layout. None of that exists: auth is Supabase (below). Trust the code over the README.
+
+### Accounts: Supabase Auth
+
+Cookie sessions via `@supabase/ssr`, email + password only. Env: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (see `.env.example`). **No service-role key exists anywhere in the app yet**; the grading route in the spec will be the first user.
+
+- `lib/supabase/client.ts` (browser) and `lib/supabase/server.ts` (Server Components, Route Handlers, Server Actions) both use the anon key.
+- `proxy.ts` (Next 16's name for middleware) calls `lib/supabase/middleware.ts`, which refreshes the session and holds the route rules: `/dashboard` needs an account (guests go to `/login?next=…`), signed-in users are bounced off `/login` and `/signup`, and `/trading-game` and `/ai-evaluation` stay open to guests.
+- `lib/auth-actions.ts` holds the server actions (login, signup, reset request, new password, sign-out). `app/auth/callback/route.ts` turns email links into a session.
+- `lib/auth-rules.ts` is pure and client-safe: `safeNext()` (only same-site paths starting with a single "/"; always run `next` through it), the Indonesian error messages, `MIN_PASSWORD`. `lib/auth.ts` is server-only (`getCurrentUser()`, `isSignedIn()`); never import it from a client component.
+- **Profiles are created by the `handle_new_user` trigger, never by the client.** It also seeds the four competencies at 50. SQL: `docs/schema.sql`, then `supabase/migrations/*_accounts.sql`. The build spec lives in `docs/build-spec.md`.
+- Level and XP in `ProfileCard` are fixed at Level 1 / 0 XP until progress is saved to the account. Don't reintroduce invented numbers.
 
 ### Charts are hand-rolled SVG
 
@@ -93,7 +107,7 @@ Radii: 8, 12 for controls (`rounded-xl` / `rounded-lg`), and 18 for cards (`roun
 
 ### Conventions
 
-- **Server components by default.** Seven files carry `"use client"`: `components/nav-links.tsx` (uses `usePathname`), `components/app-nav-mobile.tsx` (drawer state), `components/landing/marketing-nav.tsx`, `components/disclosure.tsx` and `components/select-menu.tsx` (the two shared interactive primitives), `components/dashboard/dashboard-filters.tsx` (pushes filter state into the URL), and `app/(app)/trading-game/page.tsx` (the whole game loop). Note `components/sidebar.tsx` is a *server* component — it delegates the only hook it needs to `NavLinks`. The `components/trading-game/*` parts carry no directive: they are pure and land in the client bundle only because the game page imports them. Add the directive only when a component genuinely needs hooks or handlers.
+- **Server components by default.** These files carry `"use client"`: the four forms in `components/auth/` (they need `useActionState`), `components/nav-links.tsx` (uses `usePathname`), `components/app-nav-mobile.tsx` (drawer state), `components/landing/marketing-nav.tsx`, `components/disclosure.tsx` and `components/select-menu.tsx` (the two shared interactive primitives), `components/dashboard/dashboard-filters.tsx` (pushes filter state into the URL), and `app/(app)/trading-game/page.tsx` (the whole game loop). Note `components/sidebar.tsx` is a *server* component — it delegates the only hook it needs to `NavLinks`. The `components/trading-game/*` parts carry no directive: they are pure and land in the client bundle only because the game page imports them. Add the directive only when a component genuinely needs hooks or handlers.
 - **No dead controls.** Every `<button>` either does something or is not a button. Decorative product shots in `components/landing/showcase.tsx` use `<div>` for what look like buttons, and "show more" affordances use the shared `Disclosure` rather than linking nowhere.
 - **Focus rings are global.** `app/globals.css` defines one `:focus-visible` outline for the whole app, so individual controls should *not* re-declare `focus-visible:outline-*` — only override it where the ring sits on a tinted surface (see the decision buttons' `outline-success` / `outline-danger` / `outline-wait`).
 - **Icons** come from `lucide-react` exclusively. Never use an emoji as an icon; `SelectMenu`'s `prefix` takes a lucide element.
