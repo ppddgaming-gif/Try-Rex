@@ -68,7 +68,7 @@ export function DailyChallenge({ challenge }: { challenge: Challenge }) {
 
       <Link
         href="/trading-game"
-        className="mt-5 flex items-center justify-center gap-1 rounded-lg bg-primary py-3 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90"
+        className="btn mt-5 w-full"
       >
         Mulai Tantangan <ChevronRight className="h-4 w-4" />
       </Link>

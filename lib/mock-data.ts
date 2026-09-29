@@ -283,23 +283,8 @@ export function roundFor(level: GameLevel, size = 5): Challenge[] {
   return round
 }
 
-const FLAGS: Record<string, string> = {
-  EURUSD: "🇪🇺",
-  GBPUSD: "🇬🇧",
-  AUDUSD: "🇦🇺",
-  USDJPY: "🇯🇵",
-  EURJPY: "🇪🇺",
-  USDCAD: "🇨🇦",
-  EURAUD: "🇪🇺",
-  GBPCAD: "🇬🇧",
-  GBPNZD: "🇬🇧",
-}
-
 /** Pairs are whatever the datasets actually contain, in first-seen order. */
-export const pairs = [...new Set(gameDatasets.map((d) => d.pair))].map((symbol) => ({
-  symbol,
-  flag: FLAGS[symbol] ?? "🏳",
-}))
+export const pairs = [...new Set(gameDatasets.map((d) => d.pair))].map((symbol) => ({ symbol }))
 
 export type Pair = (typeof pairs)[number]
 

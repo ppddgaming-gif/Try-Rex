@@ -18,7 +18,7 @@ import {
   scoreFor,
   type Decision,
 } from "@/lib/mock-data"
-import { ArrowRight, BrainCircuit, RotateCcw } from "lucide-react"
+import { ArrowRight, BrainCircuit, RotateCcw, Target } from "lucide-react"
 
 const ROUND_SIZE = 5
 
@@ -93,7 +93,7 @@ export default function TradingGamePage() {
             options={gameLevels.map((l) => ({
               value: l.id,
               label: `${l.label} · ${l.xp} XP`,
-              prefix: "🎯",
+              prefix: <Target className="h-4 w-4" />,
             }))}
           />
           <QuestionProgress
@@ -175,7 +175,7 @@ export default function TradingGamePage() {
             <button
               onClick={submit}
               disabled={!choice}
-              className="rounded-xl bg-primary py-3.5 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+              className="btn w-full"
             >
               {choice ? `Kirim Jawaban: ${decisionLabels[choice]}` : "Pilih salah satu dulu"}
             </button>
@@ -195,7 +195,7 @@ export default function TradingGamePage() {
                   <>
                     <Link
                       href={evaluationHref}
-                      className="flex items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90"
+                      className="btn w-full"
                     >
                       <BrainCircuit className="h-4 w-4" /> Lihat Evaluasi AI
                     </Link>
@@ -210,7 +210,7 @@ export default function TradingGamePage() {
                   <>
                     <button
                       onClick={next}
-                      className="flex items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90"
+                      className="btn w-full"
                     >
                       Soal Berikutnya <ArrowRight className="h-4 w-4" />
                     </button>

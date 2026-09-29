@@ -1,7 +1,9 @@
 import Link from "next/link"
+import { Rex } from "@/components/rex-mascot"
 
 // Brand lockup shared by the app shell's sidebar and mobile bar. `size` picks
-// between the roomier sidebar treatment and the compact mobile bar one.
+// between the roomier sidebar treatment and the compact mobile bar one. The
+// wordmark stays one colour: Rex already carries the amber.
 export function BrandMark({
   size = "sm",
   onNavigate,
@@ -13,24 +15,18 @@ export function BrandMark({
 
   return (
     <Link href="/" onClick={onNavigate} className={lg ? "flex items-center gap-3 px-2" : "flex items-center gap-2.5"}>
-      <div
-        className={[
-          "flex items-center justify-center bg-primary/15 ring-1 ring-primary/30",
-          lg ? "h-11 w-11 rounded-xl" : "h-9 w-9 rounded-lg",
-        ].join(" ")}
-      >
-        <span className={lg ? "text-2xl" : "text-lg"} aria-hidden="true">
-          🦖
-        </span>
-      </div>
+      <Rex size={lg ? 38 : 30} />
       <div className="leading-tight">
-        <p className={lg ? "text-lg font-extrabold tracking-tight" : "text-base font-extrabold tracking-tight"}>
-          TRY<span className="text-primary">-REX</span>
+        <p
+          className={[
+            "font-display font-extrabold tracking-[-0.02em]",
+            lg ? "text-[20px]" : "text-[17px]",
+          ].join(" ")}
+        >
+          TRY-REX
         </p>
         {lg && (
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-            AI Trading Mentor
-          </p>
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-faint">AI Trading Mentor</p>
         )}
       </div>
     </Link>

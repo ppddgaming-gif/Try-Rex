@@ -34,7 +34,7 @@ export function TopCards() {
           </div>
           <div className="flex flex-col items-end gap-1">
             <Sparkline data={[20, 22, 19, 26, 24, 30, 28, 36, 40]} />
-            <span className="text-xs font-semibold text-primary">↑ 12% dari minggu lalu</span>
+            <span className="font-mono text-xs font-bold text-success">↑ 12% dari minggu lalu</span>
           </div>
         </div>
       </Card>

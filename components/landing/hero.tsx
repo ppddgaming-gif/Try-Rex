@@ -23,14 +23,14 @@ export function Hero() {
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Link
             href="/dashboard"
-            className="inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 sm:w-auto"
+            className="btn btn-lg w-full sm:w-auto"
           >
             Mulai latihan gratis
             <ArrowUpRight className="h-4 w-4" />
           </Link>
           <Link
             href="/trading-game"
-            className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-border bg-card px-6 py-3 text-sm font-semibold transition-colors hover:bg-muted sm:w-auto"
+            className="btn btn-ghost btn-lg w-full sm:w-auto"
           >
             <Play className="h-4 w-4 text-primary" />
             Coba Trading Game

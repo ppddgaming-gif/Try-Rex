@@ -154,7 +154,7 @@ export default async function AiEvaluationPage({
           <div className="mt-4 flex flex-col gap-3">
             <Link
               href="/trading-game"
-              className="flex items-center justify-center gap-2 rounded-lg bg-primary py-3 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90"
+              className="btn w-full"
             >
               <RotateCcw className="h-4 w-4" /> Ulangi Challenge
             </Link>

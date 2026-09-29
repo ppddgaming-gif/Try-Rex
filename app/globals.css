@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-bricolage), var(--font-jakarta), ui-sans-serif, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -10,40 +11,65 @@
   --color-card-foreground: var(--card-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
+  --color-faint: var(--faint);
+  --color-inset: var(--inset);
   --color-border: var(--border);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hi: var(--primary-hi);
+  --color-primary-dim: var(--primary-dim);
   --color-success: var(--success);
   --color-danger: var(--danger);
   --color-warning: var(--warning);
+  --color-wait: var(--wait);
 
+  /* 8 · 12 for controls · 18 for cards · full */
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
+  --radius-2xl: 18px;
 }
 
+/*
+ * One system, two tones. Chart screens stay calm and high-contrast; the
+ * surfaces around them can be expressive. Amber is the brand. Green and red
+ * are reserved for market direction and must never carry the brand.
+ */
 :root {
   --radius: 0.75rem;
 
-  /* Deep near-black backgrounds with subtle green tint */
-  --background: oklch(0.16 0.012 150);
-  --foreground: oklch(0.97 0.005 150);
+  --background: #0a0e0b; /* ground */
+  --foreground: #eaf2e6; /* ink */
 
-  --card: oklch(0.2 0.012 155);
-  --card-foreground: oklch(0.97 0.005 150);
+  --card: #111710; /* surface */
+  --card-foreground: #eaf2e6;
 
-  --muted: oklch(0.26 0.012 155);
-  --muted-foreground: oklch(0.68 0.01 150);
+  --muted: #161e17; /* raised */
+  --muted-foreground: #93a38c;
+  --faint: #6a7a65;
+  --inset: #0d120c; /* chart wells, meter tracks, popovers */
 
-  --border: oklch(0.3 0.012 155);
+  --border: #25301f; /* line */
 
-  /* TRY-REX brand green */
-  --primary: oklch(0.78 0.18 145);
-  --primary-foreground: oklch(0.16 0.012 150);
+  --primary: #f2a03d; /* amber: brand and CTAs */
+  --primary-foreground: #12180f;
+  --primary-hi: #ffc06b;
+  --primary-dim: #7a5220; /* the solid bottom edge under buttons */
 
-  --success: oklch(0.78 0.18 145);
-  --danger: oklch(0.63 0.2 25);
-  --warning: oklch(0.8 0.15 85);
+  /* Market direction, data only */
+  --success: #35d48a; /* buy */
+  --danger: #ff5f5f; /* sell */
+  /* WAIT is blue-grey rather than neutral grey so it reads as an equal
+     choice, not as "didn't answer". */
+  --wait: #8aa0b4;
+  /* Mid-tier scores and XP. The design paints these amber. */
+  --warning: #f2a03d;
+
+  /* Rex, the mascot. The body follows --primary. */
+  --rex-shade: #c77c21;
+  --rex-mouth: #5c3b12;
+  --rex-tooth: #fff3e0;
+  --rex-eye: #12180f;
 }
 
 * {
@@ -64,11 +90,102 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+/* Numbers are set in mono and must line up in columns. */
+.font-mono {
+  font-variant-numeric: tabular-nums;
+}
+
 /* One keyboard focus treatment for the whole app. Individual controls override
    the color where the ring sits on a tinted surface. */
 :focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
+}
+
+/*
+ * Every button has a solid 4px bottom edge that sinks when pressed. Size and
+ * colour come from custom properties so the modifiers below only set
+ * variables and never compete with `btn` over the same property.
+ */
+@utility btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: var(--btn-h, 52px);
+  padding: var(--btn-py, 15px) var(--btn-px, 26px);
+  border: 1px solid var(--btn-border, transparent);
+  border-radius: 12px;
+  font-size: var(--btn-fs, 16px);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--btn-fg, var(--primary-foreground));
+  background: var(--btn-bg, var(--primary));
+  box-shadow: 0 4px 0 var(--btn-edge, var(--primary-dim));
+  cursor: pointer;
+  transition:
+    transform 0.07s ease,
+    box-shadow 0.07s ease,
+    background-color 0.12s ease;
+
+  @media (width < 40rem) {
+    min-height: var(--btn-h, 56px);
+  }
+  &:hover {
+    background: var(--btn-hover-bg, var(--primary-hi));
+  }
+  &:active:not(:disabled) {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 var(--btn-edge, var(--primary-dim));
+  }
+  &:disabled {
+    opacity: 0.32;
+    cursor: not-allowed;
+    background: var(--btn-bg, var(--primary));
+  }
+}
+
+@utility btn-ghost {
+  --btn-bg: transparent;
+  --btn-fg: var(--foreground);
+  --btn-edge: var(--inset);
+  --btn-border: var(--border);
+  --btn-hover-bg: var(--muted);
+}
+
+@utility btn-sm {
+  --btn-h: 44px;
+  --btn-py: 12px;
+  --btn-px: 20px;
+  --btn-fs: 15px;
+}
+
+@utility btn-lg {
+  --btn-h: 56px;
+  --btn-py: 17px;
+  --btn-px: 30px;
+  --btn-fs: 17px;
+}
+
+/* Amber uppercase label that heads a section or a panel. */
+@utility eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--primary);
 }
 
 @media (prefers-reduced-motion: reduce) {

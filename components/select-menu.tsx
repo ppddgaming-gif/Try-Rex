@@ -1,13 +1,13 @@
 "use client"
 
-import { useEffect, useId, useRef, useState } from "react"
+import { useEffect, useId, useRef, useState, type ReactNode } from "react"
 import { Check, ChevronDown } from "lucide-react"
 
 export type SelectOption = {
   value: string
   label: string
-  /** Optional leading glyph, e.g. a flag emoji. */
-  prefix?: string
+  /** Optional leading icon. Use a lucide icon, never an emoji. */
+  prefix?: ReactNode
 }
 
 /**
@@ -73,7 +73,7 @@ export function SelectMenu({
         }}
         className="flex w-full items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium transition-colors hover:bg-muted"
       >
-        {current.prefix && <span className="text-base">{current.prefix}</span>}
+        {current.prefix && <span className="flex text-muted-foreground">{current.prefix}</span>}
         {current.label}
         <ChevronDown
           className={`ml-auto h-4 w-4 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`}
@@ -115,7 +115,7 @@ export function SelectMenu({
                     selected ? "font-semibold text-primary" : "text-foreground",
                   ].join(" ")}
                 >
-                  {o.prefix && <span className="text-base">{o.prefix}</span>}
+                  {o.prefix && <span className="flex text-muted-foreground">{o.prefix}</span>}
                   {o.label}
                   {selected && <Check className="ml-auto h-4 w-4" />}
                 </button>

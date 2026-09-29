@@ -1,38 +1,38 @@
-import { ArrowDown, ArrowUpRight, Check, Pause, X } from "lucide-react"
+import { Check, X } from "lucide-react"
 import { type Decision } from "@/lib/mock-data"
 
+// Idle options sit on a neutral line so none of them looks pre-selected.
+// Picking one tints it in its own market colour and gives it a matching
+// bottom edge. WAIT uses the blue-grey `wait` tone so it reads as a real
+// answer rather than an absence of one.
 const actions = [
   {
     id: "buy" as const,
     label: "BUY",
     sub: "Harga akan naik",
-    Icon: ArrowUpRight,
-    tone: "border-success/40 bg-success/10 text-success",
-    hover: "hover:bg-success/20",
-    ring: "ring-2 ring-success",
+    text: "text-success",
+    selected: "border-success bg-success/13 shadow-[0_4px_0_color-mix(in_srgb,var(--success)_20%,transparent)]",
     outline: "focus-visible:outline-success",
   },
   {
     id: "sell" as const,
     label: "SELL",
     sub: "Harga akan turun",
-    Icon: ArrowDown,
-    tone: "border-danger/40 bg-danger/10 text-danger",
-    hover: "hover:bg-danger/20",
-    ring: "ring-2 ring-danger",
+    text: "text-danger",
+    selected: "border-danger bg-danger/13 shadow-[0_4px_0_color-mix(in_srgb,var(--danger)_20%,transparent)]",
     outline: "focus-visible:outline-danger",
   },
   {
     id: "wait" as const,
     label: "WAIT",
     sub: "Tunggu konfirmasi",
-    Icon: Pause,
-    tone: "border-warning/40 bg-warning/10 text-warning",
-    hover: "hover:bg-warning/20",
-    ring: "ring-2 ring-warning",
-    outline: "focus-visible:outline-warning",
+    text: "text-wait",
+    selected: "border-wait bg-wait/13 shadow-[0_4px_0_color-mix(in_srgb,var(--wait)_20%,transparent)]",
+    outline: "focus-visible:outline-wait",
   },
 ]
+
+const idle = "border-border bg-white/[0.02] shadow-[0_4px_0_var(--inset)]"
 
 /**
  * A radiogroup rather than three buttons: arrow keys move between options and
@@ -54,12 +54,11 @@ export function DecisionButtons({
   const revealed = answer !== undefined
 
   return (
-    <div role="radiogroup" aria-label="Keputusan trading" className="flex flex-col gap-3">
+    <div role="radiogroup" aria-label="Keputusan trading" className="grid grid-cols-3 gap-2.5">
       {actions.map((a) => {
         const selected = value === a.id
         const isAnswer = answer === a.id
         const wrongPick = revealed && selected && !isAnswer
-        const Icon = a.Icon
 
         return (
           <button
@@ -79,22 +78,24 @@ export function DecisionButtons({
               onChange(actions[(from + step + actions.length) % actions.length].id)
             }}
             className={[
-              "flex items-center gap-4 rounded-xl border px-5 py-4 text-left transition-all",
+              "relative rounded-[13px] border-[1.5px] py-[18px] text-center font-display text-[19px] font-extrabold tracking-[0.02em]",
+              "transition-[transform,box-shadow,background-color,border-color] duration-75",
               "focus-visible:outline-2 focus-visible:outline-offset-2",
-              a.tone,
+              a.text,
               a.outline,
-              disabled ? "cursor-default" : a.hover,
-              selected ? a.ring : "",
+              selected ? a.selected : idle,
+              disabled ? "cursor-default" : "active:translate-y-[3px] active:shadow-[0_1px_0_var(--inset)]",
               revealed && !isAnswer && !selected ? "opacity-40" : "",
             ].join(" ")}
           >
-            <Icon className="h-7 w-7 shrink-0" />
-            <div className="min-w-0 flex-1">
-              <p className="text-lg font-extrabold leading-none">{a.label}</p>
-              <p className="mt-1 text-xs opacity-80">{a.sub}</p>
-            </div>
-            {isAnswer && <Check className="h-5 w-5 shrink-0" aria-label="Jawaban benar" />}
-            {wrongPick && <X className="h-5 w-5 shrink-0" aria-label="Pilihanmu salah" />}
+            {a.label}
+            <span className="sr-only">, {a.sub}</span>
+            {isAnswer && (
+              <Check className="absolute right-1.5 top-1.5 h-4 w-4" strokeWidth={2.2} aria-label="Jawaban benar" />
+            )}
+            {wrongPick && (
+              <X className="absolute right-1.5 top-1.5 h-4 w-4" strokeWidth={2.2} aria-label="Pilihanmu salah" />
+            )}
           </button>
         )
       })}

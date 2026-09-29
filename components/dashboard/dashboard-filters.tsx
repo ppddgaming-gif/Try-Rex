@@ -1,6 +1,7 @@
 "use client"
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { ArrowLeftRight, CalendarDays } from "lucide-react"
 import { SelectMenu } from "@/components/select-menu"
 import { activityRanges, pairs } from "@/lib/mock-data"
 
@@ -26,14 +27,22 @@ export function DashboardFilters({ pair, range }: { pair: string; range: string 
         className="min-w-[9.5rem]"
         value={pair}
         onChange={(v) => set("pair", v)}
-        options={pairs.map((p) => ({ value: p.symbol, label: p.symbol, prefix: p.flag }))}
+        options={pairs.map((p) => ({
+          value: p.symbol,
+          label: p.symbol,
+          prefix: <ArrowLeftRight className="h-4 w-4" />,
+        }))}
       />
       <SelectMenu
         label="Rentang waktu"
         className="min-w-[11rem]"
         value={range}
         onChange={(v) => set("range", v)}
-        options={activityRanges.map((r) => ({ value: r.id, label: r.label, prefix: "🗓" }))}
+        options={activityRanges.map((r) => ({
+          value: r.id,
+          label: r.label,
+          prefix: <CalendarDays className="h-4 w-4" />,
+        }))}
       />
     </div>
   )

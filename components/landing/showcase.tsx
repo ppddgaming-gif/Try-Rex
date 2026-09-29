@@ -9,8 +9,12 @@ import {
   Pause,
   Sparkles,
 } from "lucide-react"
+import { Rex } from "@/components/rex-mascot"
 
-/** Soft green→teal gradient panel that hosts app UI mockups */
+/**
+ * Soft amber glow panel that hosts app UI mockups. Built from the brand
+ * tokens: green would read as a market signal, which the brand never is.
+ */
 export function GlowPanel({
   children,
   className = "",
@@ -23,7 +27,7 @@ export function GlowPanel({
       className={`relative overflow-hidden rounded-3xl border border-border/60 p-6 sm:p-10 ${className}`}
       style={{
         backgroundImage:
-          "radial-gradient(120% 120% at 20% 10%, oklch(0.7 0.16 160 / 0.45) 0%, oklch(0.55 0.13 175 / 0.28) 38%, oklch(0.2 0.012 155 / 0.9) 78%)",
+          "radial-gradient(120% 120% at 20% 10%, color-mix(in srgb, var(--primary) 34%, transparent) 0%, color-mix(in srgb, var(--primary-dim) 26%, transparent) 38%, color-mix(in srgb, var(--card) 90%, transparent) 78%)",
       }}
     >
       <div className="relative flex items-center justify-center">{children}</div>
@@ -102,10 +106,10 @@ export function TradingMockup() {
             <p className="text-[11px] text-muted-foreground">Harga akan turun</p>
           </div>
         </div>
-        <div className="flex items-center gap-3 rounded-xl border border-warning/40 bg-warning/10 px-4 py-3 text-left">
-          <Pause className="h-5 w-5 text-warning" />
+        <div className="flex items-center gap-3 rounded-xl border border-wait/40 bg-wait/10 px-4 py-3 text-left">
+          <Pause className="h-5 w-5 text-wait" />
           <div>
-            <p className="text-sm font-bold text-warning">WAIT</p>
+            <p className="text-sm font-bold text-wait">WAIT</p>
             <p className="text-[11px] text-muted-foreground">Tunggu konfirmasi</p>
           </div>
         </div>
@@ -126,11 +130,7 @@ export function ChatMockup() {
       </div>
       {/* assistant */}
       <div className="flex items-start gap-2.5">
-        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/15 ring-1 ring-primary/30">
-          <span className="text-sm" aria-hidden="true">
-            🦖
-          </span>
-        </div>
+        <Rex size={28} />
         <div className="min-w-0 flex-1">
           <p className="text-xs leading-relaxed text-muted-foreground">
             Aku cek chart kamu dulu, lalu jelasin alasannya.

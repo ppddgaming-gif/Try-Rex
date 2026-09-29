@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { Rex } from "@/components/rex-mascot"
 
 const cols = [
   {
@@ -26,14 +27,8 @@ export function SiteFooter() {
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/30">
-                <span className="text-lg" aria-hidden="true">
-                  🦖
-                </span>
-              </div>
-              <span className="text-base font-extrabold tracking-tight">
-                TRY<span className="text-primary">-REX</span>
-              </span>
+              <Rex size={30} />
+              <span className="font-display text-[17px] font-extrabold tracking-[-0.02em]">TRY-REX</span>
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
               AI Trading Mentor yang membantumu belajar trading dengan cara yang aman, terukur, dan menyenangkan.

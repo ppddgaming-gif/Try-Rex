@@ -50,7 +50,7 @@ export function Explanation({
         <p className="mt-2 max-w-[78%] text-sm leading-relaxed text-foreground/90">{suggestion}</p>
       </div>
 
-      <RexMascot className="absolute -bottom-2 right-0 opacity-90" />
+      <RexMascot mood={correct ? "happy" : "grimace"} className="absolute -bottom-2 right-0 opacity-90" />
     </Card>
   )
 }

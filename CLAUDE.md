@@ -77,19 +77,29 @@ SVG fills and strokes reference CSS custom properties directly (`fill="var(--dan
 
 **There is no `tailwind.config.js`** — v4 configuration lives entirely in `app/globals.css` via an `@theme inline` block. PostCSS uses only `@tailwindcss/postcss`.
 
-The palette is defined as semantic OKLCH tokens on `:root` and exposed to Tailwind as utility colors: `background`, `foreground`, `card`, `muted`, `muted-foreground`, `border`, `primary`, `success`, `danger`, `warning`. Use these utilities (`bg-card`, `text-muted-foreground`, `border-border`) rather than raw Tailwind palette colors like `bg-gray-800` — the design is a single dark theme with a green brand tint, and hardcoded colors break it. There is no light mode.
+The palette is defined as semantic hex tokens on `:root`, taken 1:1 from the "Try-Rex Screens" design artifact, and exposed to Tailwind as utility colors: `background`, `foreground`, `card`, `muted`, `muted-foreground`, `faint`, `inset`, `border`, `primary` (plus `primary-hi` / `primary-dim`), `success`, `danger`, `warning`, `wait`. Use these utilities (`bg-card`, `text-muted-foreground`, `border-border`) rather than raw Tailwind palette colors like `bg-gray-800`, since hardcoded colors break the theme. There is no light mode.
 
-To change a color globally, edit the token in `:root`, not the call sites.
+**Amber is the brand; green and red mean market direction and nothing else.** `primary` is amber. `success` (buy) and `danger` (sell) are reserved for market data and outcomes: never paint a brand element green, and never paint a price move with `primary`. A positive delta or a correct answer is `success`. **WAIT has its own blue-grey `wait` token**, deliberately not a neutral grey, so it reads as a real answer rather than "didn't answer". `warning` is also amber and marks mid-tier scores and XP. `inset` is the deep well behind charts, meter tracks and popovers.
+
+To change a color globally, edit the token in `:root`, not the call sites. Even gradients must go through the tokens (`color-mix(in srgb, var(--primary) 32%, transparent)`), never through raw `oklch()` or hex.
+
+Type is three families loaded via `next/font` in `app/layout.tsx`: **Bricolage Grotesque** for headings (`font-display`, and `h1`–`h3` by default), **Plus Jakarta Sans** for body text (`font-sans`), and **JetBrains Mono** for numbers (`font-mono`, which also turns on `tabular-nums` so prices and percentages line up).
+
+Buttons use the `btn` utility defined in `globals.css`. It draws a solid 4px bottom edge that sinks on press; the minimum height is 52px, or 56px on mobile. Modifiers are `btn-ghost` (secondary), `btn-sm` (nav, 44px) and `btn-lg` (hero). They work on both `<button>` and `<Link>`. The modifiers only set custom properties, so they never fight `btn` over utility order. Don't hand-roll `bg-primary text-primary-foreground` CTAs. `eyebrow` is the amber uppercase section label.
+
+Radii: 8, 12 for controls (`rounded-xl` / `rounded-lg`), and 18 for cards (`rounded-2xl` is overridden to 18px), plus full.
+
+**No emoji anywhere in the UI.** The mascot is `components/rex-mascot.tsx`: `<Rex>` is the SVG (colored from `--primary` and the `--rex-*` tokens), and `<RexMascot>` is the large decorative corner figure. Rex has four moods and should react to results rather than sit there as a static logo: `neutral` for chrome and idle screens, `happy` for a good score, `grimace` for a risky or wrong call, and `thinking` while an answer or an evaluation is pending.
 
 ### Conventions
 
 - **Server components by default.** Seven files carry `"use client"`: `components/nav-links.tsx` (uses `usePathname`), `components/app-nav-mobile.tsx` (drawer state), `components/landing/marketing-nav.tsx`, `components/disclosure.tsx` and `components/select-menu.tsx` (the two shared interactive primitives), `components/dashboard/dashboard-filters.tsx` (pushes filter state into the URL), and `app/(app)/trading-game/page.tsx` (the whole game loop). Note `components/sidebar.tsx` is a *server* component — it delegates the only hook it needs to `NavLinks`. The `components/trading-game/*` parts carry no directive: they are pure and land in the client bundle only because the game page imports them. Add the directive only when a component genuinely needs hooks or handlers.
 - **No dead controls.** Every `<button>` either does something or is not a button. Decorative product shots in `components/landing/showcase.tsx` use `<div>` for what look like buttons, and "show more" affordances use the shared `Disclosure` rather than linking nowhere.
-- **Focus rings are global.** `app/globals.css` defines one `:focus-visible` outline for the whole app, so individual controls should *not* re-declare `focus-visible:outline-*` — only override it where the ring sits on a tinted surface (see the decision buttons' `outline-success` / `outline-danger` / `outline-warning`).
-- **Icons** come from `lucide-react` exclusively.
+- **Focus rings are global.** `app/globals.css` defines one `:focus-visible` outline for the whole app, so individual controls should *not* re-declare `focus-visible:outline-*` — only override it where the ring sits on a tinted surface (see the decision buttons' `outline-success` / `outline-danger` / `outline-wait`).
+- **Icons** come from `lucide-react` exclusively. Never use an emoji as an icon; `SelectMenu`'s `prefix` takes a lucide element.
 - **UI copy is Indonesian** (headings, descriptions, button labels), while code identifiers and types are English. Match this when adding user-facing strings.
 - Conditional class names are composed with array `.join(" ")` — there is no `clsx`/`cn` helper.
-- `components/card.tsx` is the shared surface primitive (`rounded-xl border border-border bg-card p-5`); prefer it over re-declaring that class string.
+- `components/card.tsx` is the shared surface primitive (`rounded-2xl border border-border bg-card p-[22px]`); prefer it over re-declaring that class string.
 - Files use kebab-case; components are named exports (pages are default exports per App Router).
 - No semicolons, double quotes.
 

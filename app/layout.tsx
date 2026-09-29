@@ -1,15 +1,25 @@
 import type { Metadata, Viewport } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import { Bricolage_Grotesque, JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google"
 import "./globals.css"
 
-const geistSans = Geist({
+// Headings. The optical-size axis keeps large display type tight and small
+// titles open, as the design specifies.
+const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
-  variable: "--font-geist-sans",
+  axes: ["opsz"],
+  variable: "--font-bricolage",
 })
 
-const geistMono = Geist_Mono({
+// Body text.
+const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-geist-mono",
+  variable: "--font-jakarta",
+})
+
+// Prices, percentages, XP: anything that has to line up.
+const jetbrains = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-jetbrains",
 })
 
 export const metadata: Metadata = {
@@ -19,7 +29,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#0d130f",
+  themeColor: "#0a0e0b",
 }
 
 export default function RootLayout({
@@ -28,7 +38,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} bg-background`}>
+    <html
+      lang="en"
+      className={`${bricolage.variable} ${jakarta.variable} ${jetbrains.variable} bg-background`}
+    >
       <body className="bg-background text-foreground">{children}</body>
     </html>
   )
