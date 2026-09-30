@@ -40,7 +40,8 @@ create unique index if not exists demo_accounts_one_active on public.demo_accoun
 -- balance must always equal its last ledger row.
 create table if not exists public.demo_ledger (
   id            uuid primary key default gen_random_uuid(),
-  account_id    uuid not null references public.demo_accounts on delete cascade,
+  -- Foreign key together with user_id, below.
+  account_id    uuid not null,
   user_id       uuid not null references auth.users on delete cascade,
   kind          text not null check (kind in ('deposit', 'trade', 'swap', 'commission')),
   label         text not null check (char_length(label) between 1 and 80),
@@ -51,6 +52,26 @@ create table if not exists public.demo_ledger (
   created_at    timestamptz not null default now()
 );
 create index if not exists demo_ledger_account_time on public.demo_ledger (account_id, created_at);
+
+-- A row can only point at an account owned by the same player: the ledger's
+-- foreign key is (account_id, user_id) → demo_accounts (id, user_id), which
+-- needs that pair to be unique. Service-role writes skip RLS, so this is the
+-- database's own guarantee. Added under guards, not inline, so a re-run also
+-- upgrades tables made by an earlier draft of this file, which had a foreign
+-- key on account_id alone.
+do $$
+begin
+  if not exists (select 1 from pg_constraint
+                 where conrelid = 'public.demo_accounts'::regclass and conname = 'demo_accounts_id_user_key') then
+    alter table public.demo_accounts add constraint demo_accounts_id_user_key unique (id, user_id);
+  end if;
+  if not exists (select 1 from pg_constraint
+                 where conrelid = 'public.demo_ledger'::regclass and conname = 'demo_ledger_account_owner_fkey') then
+    alter table public.demo_ledger add constraint demo_ledger_account_owner_fkey
+      foreign key (account_id, user_id) references public.demo_accounts (id, user_id) on delete cascade;
+  end if;
+end $$;
+alter table public.demo_ledger drop constraint if exists demo_ledger_account_id_fkey;
 
 -- Rex tips a player has already seen (each shows once; the list rereads them).
 create table if not exists public.demo_tips_seen (
