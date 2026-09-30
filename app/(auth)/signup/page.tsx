@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { SignupForm } from "@/components/auth/signup-form"
 
-export const metadata: Metadata = { title: "Daftar | TRY-REX" }
+export const metadata: Metadata = { title: "Daftar" }
 
 export default function SignupPage() {
   return (

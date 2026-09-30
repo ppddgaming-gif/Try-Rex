@@ -9,7 +9,9 @@ import {
   Pause,
   Sparkles,
 } from "lucide-react"
+import { CandlestickChart } from "@/components/candlestick-chart"
 import { Rex } from "@/components/rex-mascot"
+import { challenges, decisionLabels, frameOf, type Challenge } from "@/lib/mock-data"
 
 /**
  * Soft amber glow panel that hosts app UI mockups. Built from the brand
@@ -78,41 +80,118 @@ export function AspectMockup() {
   )
 }
 
-/** Mockup: Trading Game decision buttons — decorative, not interactive */
-export function TradingMockup() {
+/** Pair, timeframe and period pills, as the game shows them. */
+function ChallengeTags({ challenge }: { challenge: Challenge }) {
   return (
-    <div className="w-full max-w-md rounded-2xl border border-border bg-card/95 p-5 shadow-2xl backdrop-blur">
-      <div className="mb-4 flex items-center justify-between">
-        <div>
-          <p className="text-sm font-semibold">EURUSD · H1</p>
-          <p className="text-xs text-muted-foreground">Price di area resistance kuat</p>
+    <>
+      <span className="rounded-md border border-border bg-muted/40 px-2 py-1 text-xs font-semibold">{challenge.pair}</span>
+      <span className="rounded-md border border-border bg-muted/40 px-2 py-1 text-xs font-semibold">
+        {challenge.timeframe}
+      </span>
+      <span className="hidden rounded-md border border-border bg-muted/40 px-2 py-1 text-[11px] text-muted-foreground sm:inline">
+        {challenge.period}
+      </span>
+    </>
+  )
+}
+
+const decisionTiles = [
+  { label: "BUY", sub: "Harga naik", icon: ArrowUpRight, tone: "text-success" },
+  { label: "SELL", sub: "Harga turun", icon: ArrowDownRight, tone: "text-danger" },
+  { label: "WAIT", sub: "Tunggu dulu", icon: Pause, tone: "text-wait" },
+]
+
+/**
+ * Hero product shot: a real question from the game, with Rex quoting that
+ * question's own computed situation, so the picture and the words agree.
+ * Decorative: the "buttons" are divs.
+ */
+export function HeroShowcase() {
+  const challenge = challenges[0]
+  const frame = frameOf(challenge.candles)
+
+  return (
+    <div className="flex w-full max-w-5xl flex-col gap-3 lg:flex-row lg:items-start lg:gap-5">
+      <div className="min-w-0 rounded-2xl border border-border bg-card/95 p-4 shadow-2xl backdrop-blur sm:p-5 lg:flex-1">
+        <div className="flex items-center gap-2">
+          <ChallengeTags challenge={challenge} />
+          <span className="ml-auto font-mono text-xs text-muted-foreground">Soal 1 / 5</span>
         </div>
-        <span className="rounded-md border border-border px-2 py-1 text-[10px] font-semibold text-muted-foreground">
-          Soal 15 / 20
+        <div className="mt-3 h-[190px] sm:h-[300px]">
+          <CandlestickChart
+            candles={challenge.candles}
+            min={frame.min}
+            max={frame.max}
+            priceTicks={frame.priceTicks}
+            timeLabels={challenge.timeLabels}
+            zones={challenge.zones}
+            currentPrice={challenge.currentPrice}
+            digits={challenge.digits}
+          />
+        </div>
+        <div className="mt-3 grid grid-cols-3 gap-2">
+          {decisionTiles.map((d) => (
+            <div
+              key={d.label}
+              className={`flex flex-col items-center rounded-xl border border-border bg-inset py-2.5 font-display text-base font-extrabold ${d.tone}`}
+            >
+              {d.label}
+              <span className="font-sans text-[10px] font-medium text-muted-foreground">{d.sub}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Rex reads the chart out loud: under it on phones, beside it from lg. */}
+      <div className="flex items-start gap-3 rounded-2xl border border-border bg-card p-4 text-left shadow-2xl lg:mt-12 lg:w-64 lg:flex-col">
+        <Rex size={36} mood="thinking" />
+        <p className="text-xs leading-relaxed text-muted-foreground">
+          <span className="font-semibold text-foreground">Situasinya begini: </span>
+          {challenge.situation} Kamu pilih apa?
+        </p>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Mockup: the reveal after answering. A real question with its hidden candles
+ * shown, and the answer they decided.
+ */
+export function RevealMockup() {
+  const challenge = challenges.find((c) => c.answer === "sell") ?? challenges[1]
+  const candles = [...challenge.candles, ...challenge.future]
+  const frame = frameOf(candles)
+  const up = challenge.changePercent > 0
+
+  return (
+    <div className="w-full max-w-md rounded-2xl border border-border bg-card/95 p-4 shadow-2xl backdrop-blur sm:p-5">
+      <div className="flex items-center gap-2">
+        <ChallengeTags challenge={challenge} />
+        <span
+          className={`ml-auto rounded-md px-2 py-1 font-mono text-[11px] font-bold ${up ? "bg-success/15 text-success" : "bg-danger/15 text-danger"}`}
+        >
+          {up ? "+" : ""}
+          {challenge.changePercent.toFixed(2)}%
         </span>
       </div>
-      <div className="flex flex-col gap-2.5">
-        <div className="flex items-center gap-3 rounded-xl border border-success/40 bg-success/10 px-4 py-3 text-left">
-          <ArrowUpRight className="h-5 w-5 text-success" />
-          <div>
-            <p className="text-sm font-bold text-success">BUY</p>
-            <p className="text-[11px] text-muted-foreground">Harga akan naik</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3 rounded-xl border border-danger/40 bg-danger/10 px-4 py-3 text-left">
-          <ArrowDownRight className="h-5 w-5 text-danger" />
-          <div>
-            <p className="text-sm font-bold text-danger">SELL</p>
-            <p className="text-[11px] text-muted-foreground">Harga akan turun</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3 rounded-xl border border-wait/40 bg-wait/10 px-4 py-3 text-left">
-          <Pause className="h-5 w-5 text-wait" />
-          <div>
-            <p className="text-sm font-bold text-wait">WAIT</p>
-            <p className="text-[11px] text-muted-foreground">Tunggu konfirmasi</p>
-          </div>
-        </div>
+      <div className="mt-3 h-[180px]">
+        <CandlestickChart
+          candles={candles}
+          min={frame.min}
+          max={frame.max}
+          priceTicks={[]}
+          timeLabels={[]}
+          zones={challenge.zones}
+          digits={challenge.digits}
+          dividerAt={challenge.candles.length}
+        />
+      </div>
+      <div className="mt-3 flex items-center gap-2 rounded-xl border border-border bg-muted/40 px-3 py-2.5 text-xs">
+        <CheckCircle2 className="h-4 w-4 shrink-0 text-success" aria-hidden="true" />
+        <span className="text-muted-foreground">
+          Jawaban yang tepat: <span className="font-bold text-foreground">{decisionLabels[challenge.answer]}</span>
+        </span>
       </div>
     </div>
   )

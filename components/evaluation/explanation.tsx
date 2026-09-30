@@ -33,7 +33,7 @@ export function Explanation({
             {correct ? "tepat karena:" : "kurang tepat karena:"}
           </span>
         </p>
-        <ul className="mt-3 flex max-w-[78%] flex-col gap-2.5">
+        <ul className="mt-3 flex flex-col gap-2.5">
           {reasons.map((r) => (
             <li key={r} className="flex gap-2 text-sm leading-relaxed text-muted-foreground">
               <span className={`mt-2 h-1.5 w-1.5 shrink-0 rounded-full ${dot}`} />
@@ -47,7 +47,8 @@ export function Explanation({
         <p className="flex items-center gap-2 text-sm font-semibold text-primary">
           <Lightbulb className="h-4 w-4" /> Saran TRY-REX
         </p>
-        <p className="mt-2 max-w-[78%] text-sm leading-relaxed text-foreground/90">{suggestion}</p>
+        {/* Right padding keeps the text clear of Rex in the corner. */}
+        <p className="mt-2 pr-16 text-sm leading-relaxed text-foreground/90 sm:pr-20">{suggestion}</p>
       </div>
 
       <RexMascot mood={correct ? "happy" : "grimace"} className="absolute -bottom-2 right-0 opacity-90" />

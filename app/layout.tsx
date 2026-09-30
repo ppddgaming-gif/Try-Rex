@@ -23,9 +23,10 @@ const jetbrains = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "TRY-REX | AI Trading Mentor",
+  // Pages set a short `title`; the template adds the brand once.
+  title: { default: "TRY-REX | AI Trading Mentor", template: "%s | TRY-REX" },
   description:
-    "Learn trading through gamified challenges, AI evaluation, and real-time market simulations with TRY-REX, your AI trading mentor.",
+    "Belajar trading lewat latihan harian dengan data harga asli, evaluasi AI, dan progres yang terukur bersama TRY-REX, mentor trading AI-mu.",
 }
 
 export const viewport: Viewport = {
@@ -39,7 +40,7 @@ export default function RootLayout({
 }) {
   return (
     <html
-      lang="en"
+      lang="id"
       className={`${bricolage.variable} ${jakarta.variable} ${jetbrains.variable} bg-background`}
     >
       <body className="bg-background text-foreground">{children}</body>

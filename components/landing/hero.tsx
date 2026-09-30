@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react"
 import Link from "next/link"
-import { ArrowUpRight, Play } from "lucide-react"
-import { GlowPanel, ChatMockup } from "./showcase"
+import { ArrowDown, ArrowUpRight } from "lucide-react"
+import { GlowPanel, HeroShowcase } from "./showcase"
 
 // The hero builds in on load, top to bottom, each line a beat after the last.
 const delay = (ms: number) => ({ "--enter-delay": `${ms}ms` }) as CSSProperties
@@ -38,17 +38,20 @@ export function Hero() {
             Mulai latihan gratis
             <ArrowUpRight className="h-4 w-4" />
           </Link>
-          <Link href="/trading-game" className="btn btn-ghost btn-lg w-full sm:w-auto">
-            <Play className="h-4 w-4 text-primary" />
-            Coba Trading Game
-          </Link>
+          <a href="#how" className="btn btn-ghost btn-lg w-full sm:w-auto">
+            Lihat cara kerjanya
+            <ArrowDown className="h-4 w-4 text-primary" />
+          </a>
         </div>
+        <p className="enter mt-4 text-xs text-faint" style={delay(300)}>
+          Tanpa daftar, tanpa uang sungguhan. Langsung main.
+        </p>
       </div>
 
-      {/* Hero showcase */}
-      <div className="enter mt-14" style={delay(360)}>
-        <GlowPanel className="py-12 sm:py-16">
-          <ChatMockup />
+      {/* Hero showcase: a real question from the game */}
+      <div className="enter mt-12" style={delay(360)}>
+        <GlowPanel className="sm:py-12 lg:px-16">
+          <HeroShowcase />
         </GlowPanel>
       </div>
     </section>

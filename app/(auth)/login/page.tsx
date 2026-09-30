@@ -3,7 +3,7 @@ import Link from "next/link"
 import { LoginForm } from "@/components/auth/login-form"
 import { safeNext } from "@/lib/auth-rules"
 
-export const metadata: Metadata = { title: "Masuk | TRY-REX" }
+export const metadata: Metadata = { title: "Masuk" }
 
 const LINK_ERROR = "Link konfirmasi atau reset tidak valid, sudah dipakai, atau kedaluwarsa. Coba lagi."
 
@@ -23,6 +23,15 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           Daftar gratis
         </Link>
       </p>
+      {/* The game is open to guests, so an account is never a wall. */}
+      <div className="flex items-center gap-3 text-xs text-faint">
+        <span className="h-px flex-1 bg-border" />
+        atau
+        <span className="h-px flex-1 bg-border" />
+      </div>
+      <Link href="/trading-game" className="btn btn-ghost w-full">
+        Main dulu tanpa akun
+      </Link>
     </div>
   )
 }

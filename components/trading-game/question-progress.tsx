@@ -6,58 +6,66 @@ function clock(seconds: number) {
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`
 }
 
+/**
+ * One segment per question: answered ones show right or wrong, the current
+ * one is amber, the rest wait on the track. The round reads at a glance.
+ */
 export function QuestionProgress({
   index,
-  answered,
+  results,
   total,
   xp,
-  correctCount,
   seconds,
 }: {
   index: number
-  /** Questions submitted so far, so the bar reaches 100% on the last answer. */
-  answered: number
+  /** Right/wrong for each submitted question, in order. */
+  results: boolean[]
   total: number
   xp: number
-  correctCount: number
   seconds: number
 }) {
-  const pct = Math.round((answered / total) * 100)
+  const correct = results.filter(Boolean).length
 
   return (
-    <div className="w-full rounded-xl border border-border bg-card p-4 sm:w-72">
+    <div className="w-full rounded-2xl border border-border bg-card p-4">
       <div className="flex items-baseline justify-between text-sm">
         <span className="font-medium">
-          Soal <span className="font-bold text-primary">{index + 1}</span>{" "}
-          <span className="text-muted-foreground">/ {total}</span>
+          Soal{" "}
+          <span className="font-mono">
+            <span className="font-bold text-primary">{index + 1}</span>
+            <span className="text-muted-foreground">/{total}</span>
+          </span>
         </span>
         <span className="flex items-center gap-1 font-mono text-xs text-muted-foreground">
-          <Clock className="h-3.5 w-3.5" /> {clock(seconds)}
+          <Clock className="h-3.5 w-3.5" aria-hidden="true" />
+          <span className="sr-only">Waktu</span> {clock(seconds)}
         </span>
       </div>
 
-      <div
-        className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-muted"
-        role="progressbar"
-        aria-valuenow={pct}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-label="Progres challenge"
+      <ol
+        className="mt-3 grid gap-1.5"
+        style={{ gridTemplateColumns: `repeat(${total}, minmax(0, 1fr))` }}
+        aria-label={`${results.length} dari ${total} soal dijawab, ${correct} benar`}
       >
-        {/* scaleX rather than width: transforms animate on the GPU without
-            re-laying out the bar on every frame. */}
-        <div
-          className="h-full origin-left rounded-full bg-primary transition-transform duration-700 ease-out-expo"
-          style={{ transform: `scaleX(${pct / 100})` }}
-        />
-      </div>
+        {Array.from({ length: total }, (_, i) => {
+          const done = i < results.length
+          const tone = done ? (results[i] ? "bg-success" : "bg-danger") : i === index ? "bg-primary" : "bg-muted"
+          return (
+            <li
+              key={i}
+              aria-hidden="true"
+              className={`h-1.5 rounded-full transition-colors duration-500 ${tone} ${!done && i === index ? "opacity-70" : ""}`}
+            />
+          )
+        })}
+      </ol>
 
       <div className="mt-3 flex items-center justify-between text-xs">
         <span className="flex items-center gap-1.5 font-semibold text-warning">
-          <Star className="h-3.5 w-3.5 fill-warning" /> {xp} XP
+          <Star className="h-3.5 w-3.5 fill-warning" aria-hidden="true" /> <span className="font-mono">{xp}</span> XP
         </span>
         <span className="flex items-center gap-1.5 text-muted-foreground">
-          <Target className="h-3.5 w-3.5" /> {correctCount} benar
+          <Target className="h-3.5 w-3.5" aria-hidden="true" /> <span className="font-mono">{correct}</span> benar
         </span>
       </div>
     </div>

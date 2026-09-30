@@ -3,7 +3,7 @@ import Link from "next/link"
 import { ResetPasswordForm } from "@/components/auth/reset-password-form"
 import { getCurrentUser } from "@/lib/auth"
 
-export const metadata: Metadata = { title: "Password baru | TRY-REX" }
+export const metadata: Metadata = { title: "Password baru" }
 
 // Reached from the reset email via /auth/callback, which signs the user in
 // with a recovery session. Without that session there is nothing to update.

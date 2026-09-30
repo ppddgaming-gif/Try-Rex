@@ -6,7 +6,6 @@ type Props = {
   max: number
   priceTicks: number[]
   timeLabels: string[]
-  highlightTimeIndex?: number
   zones?: Zone[]
   markers?: Marker[]
   currentPrice?: number
@@ -14,6 +13,12 @@ type Props = {
   digits?: number
   /** Candles from this index on cascade in, one after another (the reveal). */
   revealFrom?: number
+  /**
+   * Marks the entry before this candle index: a dashed vertical line labelled
+   * ENTRY, with the candles after it on a faintly lifted backdrop, so "what you
+   * saw" and "what happened next" read as two parts.
+   */
+  dividerAt?: number
 }
 
 // Delay between consecutive revealed candles.
@@ -39,12 +44,12 @@ export function CandlestickChart({
   max,
   priceTicks,
   timeLabels,
-  highlightTimeIndex,
   zones = [],
   markers = [],
   currentPrice,
   digits = 5,
   revealFrom,
+  dividerAt,
 }: Props) {
   const y = (p: number) => PAD_TOP + ((max - p) / (max - min)) * plotH
   // Axis ticks read one decimal shorter than quoted prices, as FX platforms show them.
@@ -83,6 +88,40 @@ export function CandlestickChart({
           </text>
         </g>
       ))}
+
+      {/* Entry divider */}
+      {dividerAt !== undefined && dividerAt > 0 && dividerAt < candles.length && (
+        <g>
+          <rect
+            x={dividerAt * slot}
+            y={PAD_TOP}
+            width={plotW - dividerAt * slot}
+            height={plotH}
+            fill="var(--foreground)"
+            opacity={0.035}
+          />
+          <line
+            x1={dividerAt * slot}
+            x2={dividerAt * slot}
+            y1={PAD_TOP}
+            y2={PAD_TOP + plotH}
+            stroke="var(--muted-foreground)"
+            strokeWidth={1}
+            strokeDasharray="4 4"
+            opacity={0.7}
+          />
+          <text
+            x={dividerAt * slot + 6}
+            y={PAD_TOP + 12}
+            fill="var(--muted-foreground)"
+            fontSize={10}
+            fontWeight={700}
+            letterSpacing={1}
+          >
+            ENTRY
+          </text>
+        </g>
+      )}
 
       {/* Zones */}
       {zones.map((z, i) => {
@@ -177,17 +216,8 @@ export function CandlestickChart({
       {timeLabels.map((t, i) => {
         const x = (plotW / (timeLabels.length - 1)) * i
         const tx = Math.min(Math.max(x, 30), plotW - 30)
-        const highlighted = i === highlightTimeIndex
         return (
-          <text
-            key={`time-${i}`}
-            x={tx}
-            y={H - 8}
-            fill={highlighted ? "var(--foreground)" : "var(--muted-foreground)"}
-            fontSize={11}
-            fontWeight={highlighted ? 700 : 400}
-            textAnchor="middle"
-          >
+          <text key={`time-${i}`} x={tx} y={H - 8} fill="var(--muted-foreground)" fontSize={11} textAnchor="middle">
             {t}
           </text>
         )

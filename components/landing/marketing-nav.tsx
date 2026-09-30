@@ -97,7 +97,7 @@ export function MarketingNav({ signedIn }: { signedIn: boolean }) {
             >
               {account.label}
             </Link>
-            <Link href="/trading-game" className="btn btn-sm mt-2">
+            <Link href="/trading-game" onClick={() => setOpen(false)} className="btn btn-sm mt-2">
               Mulai Sekarang
               <ArrowUpRight className="h-4 w-4" />
             </Link>

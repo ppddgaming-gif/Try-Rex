@@ -34,7 +34,7 @@ export function DashboardView({ name, dailyChallenge }: { name: string; dailyCha
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div className="min-w-0">
           {progress ? (
-            <h1 className="text-2xl font-bold tracking-tight">{started ? `Halo lagi, ${name}!` : "Selamat datang!"}</h1>
+            <h1 className="text-2xl font-bold tracking-tight">{started ? `Halo lagi, ${name}!` : `Selamat datang, ${name}!`}</h1>
           ) : (
             <Skeleton className="h-8 w-56" />
           )}

@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { Isi, LegalDoc, Section, Tinjau } from "@/components/legal-doc"
 
-export const metadata: Metadata = { title: "Kebijakan Privasi | TRY-REX" }
+export const metadata: Metadata = { title: "Kebijakan Privasi" }
 
 export default function PrivacyPage() {
   return (

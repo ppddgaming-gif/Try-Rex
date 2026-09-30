@@ -2,7 +2,11 @@ import Link from "next/link"
 import { ArrowUpRight } from "lucide-react"
 import { Rex } from "@/components/rex-mascot"
 
-export function FinalCta() {
+// Primary is always "play now"; the second button saves progress for guests
+// and goes back to the dashboard for players who already have an account.
+export function FinalCta({ signedIn }: { signedIn: boolean }) {
+  const second = signedIn ? { href: "/dashboard", label: "Buka Dashboard" } : { href: "/signup", label: "Buat akun gratis" }
+
   return (
     <section className="mx-auto max-w-7xl px-5 pb-24 lg:px-8">
       <div
@@ -28,11 +32,8 @@ export function FinalCta() {
               Mulai latihan gratis
               <ArrowUpRight className="h-4 w-4" />
             </Link>
-            <Link
-              href="/trading-game"
-              className="btn btn-ghost btn-lg w-full sm:w-auto"
-            >
-              Coba Trading Game
+            <Link href={second.href} className="btn btn-ghost btn-lg w-full sm:w-auto">
+              {second.label}
             </Link>
           </div>
         </div>

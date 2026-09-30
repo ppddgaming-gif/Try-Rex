@@ -1,4 +1,4 @@
-import { GlowPanel, AspectMockup, TradingMockup, ChatMockup } from "./showcase"
+import { GlowPanel, AspectMockup, RevealMockup, ChatMockup } from "./showcase"
 
 type Feature = {
   eyebrow: string
@@ -18,8 +18,8 @@ const features: Feature[] = [
   {
     eyebrow: "Trading Game",
     title: "Latih insting lewat simulasi market nyata",
-    body: "Hadapi situasi market sungguhan tanpa risiko uang. Pilih BUY, SELL, atau WAIT, lalu lihat seberapa akurat keputusanmu lewat 5 soal per sesi.",
-    mockup: <TradingMockup />,
+    body: "Setiap soal adalah chart forex historis asli dengan 15 candle berikutnya disembunyikan. Pilih BUY, SELL, atau WAIT, lalu lihat apa yang benar-benar terjadi. 5 soal per sesi, tanpa risiko uang.",
+    mockup: <RevealMockup />,
     reverse: true,
   },
   {
@@ -32,7 +32,7 @@ const features: Feature[] = [
 
 export function FeatureRows() {
   return (
-    <section id="features" className="mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-24">
+    <section id="features" className="mx-auto max-w-7xl px-5 pb-16 pt-4 lg:px-8 lg:pb-24 lg:pt-8">
       <div className="flex flex-col gap-16 lg:gap-28">
         {features.map((f) => (
           <div
@@ -40,7 +40,7 @@ export function FeatureRows() {
             className="reveal grid items-center gap-8 lg:grid-cols-2 lg:gap-16"
           >
             <div className={f.reverse ? "lg:order-2" : ""}>
-              <p className="text-sm font-semibold text-primary">{f.eyebrow}</p>
+              <p className="eyebrow">{f.eyebrow}</p>
               <h2 className="mt-3 text-balance text-3xl font-bold tracking-tight sm:text-4xl">
                 {f.title}
               </h2>

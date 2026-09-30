@@ -9,7 +9,7 @@ const actions = [
   {
     id: "buy" as const,
     label: "BUY",
-    sub: "Harga akan naik",
+    sub: "Harga naik",
     text: "text-success",
     selected: "border-success bg-success/13 shadow-[0_4px_0_color-mix(in_srgb,var(--success)_20%,transparent)]",
     outline: "focus-visible:outline-success",
@@ -17,7 +17,7 @@ const actions = [
   {
     id: "sell" as const,
     label: "SELL",
-    sub: "Harga akan turun",
+    sub: "Harga turun",
     text: "text-danger",
     selected: "border-danger bg-danger/13 shadow-[0_4px_0_color-mix(in_srgb,var(--danger)_20%,transparent)]",
     outline: "focus-visible:outline-danger",
@@ -25,7 +25,7 @@ const actions = [
   {
     id: "wait" as const,
     label: "WAIT",
-    sub: "Tunggu konfirmasi",
+    sub: "Tunggu dulu",
     text: "text-wait",
     selected: "border-wait bg-wait/13 shadow-[0_4px_0_color-mix(in_srgb,var(--wait)_20%,transparent)]",
     outline: "focus-visible:outline-wait",
@@ -78,7 +78,7 @@ export function DecisionButtons({
               onChange(actions[(from + step + actions.length) % actions.length].id)
             }}
             className={[
-              "relative rounded-[13px] border-[1.5px] py-[18px] text-center font-display text-[19px] font-extrabold tracking-[0.02em]",
+              "relative flex flex-col items-center rounded-[13px] border-[1.5px] py-3.5 text-center font-display text-[19px] font-extrabold tracking-[0.02em]",
               "transition-[transform,box-shadow,background-color,border-color] duration-75",
               "focus-visible:outline-2 focus-visible:outline-offset-2",
               a.text,
@@ -89,7 +89,10 @@ export function DecisionButtons({
             ].join(" ")}
           >
             {a.label}
-            <span className="sr-only">, {a.sub}</span>
+            <span className="mt-0.5 font-sans text-[11px] font-medium tracking-normal text-muted-foreground">
+              <span className="sr-only">, </span>
+              {a.sub}
+            </span>
             {isAnswer && (
               <Check className="absolute right-1.5 top-1.5 h-4 w-4" strokeWidth={2.2} aria-label="Jawaban benar" />
             )}

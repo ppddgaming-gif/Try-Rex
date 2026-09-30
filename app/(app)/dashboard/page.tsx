@@ -1,8 +1,11 @@
+import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 import { DailyChallenge } from "@/components/dashboard/daily-challenge"
 import { DashboardView } from "@/components/dashboard/dashboard-view"
 import { getCurrentUser } from "@/lib/auth"
 import { challenges } from "@/lib/mock-data"
+
+export const metadata: Metadata = { title: "Dashboard" }
 
 /**
  * Today's challenge rotates through the real datasets once a day, on Jakarta

@@ -29,7 +29,8 @@ export function Surfaces() {
   return (
     <section id="product" className="mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-24">
       <div className="reveal mx-auto max-w-2xl text-center">
-        <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
+        <p className="eyebrow">Produk</p>
+        <h2 className="mt-3 text-balance text-3xl font-bold tracking-tight sm:text-4xl">
           Satu mentor, di setiap langkah belajarmu
         </h2>
         <p className="mt-4 text-pretty leading-relaxed text-muted-foreground">

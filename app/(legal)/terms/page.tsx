@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { Isi, LegalDoc, Section, Tinjau } from "@/components/legal-doc"
 
-export const metadata: Metadata = { title: "Syarat & Ketentuan | TRY-REX" }
+export const metadata: Metadata = { title: "Syarat & Ketentuan" }
 
 export default function TermsPage() {
   return (

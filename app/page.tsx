@@ -24,7 +24,7 @@ export default async function LandingPage() {
           <Surfaces />
           <FeatureRows />
           <HowItWorks />
-          <FinalCta />
+          <FinalCta signedIn={signedIn} />
         </main>
       </PageTransition>
       <SiteFooter />

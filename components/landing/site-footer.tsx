@@ -31,8 +31,9 @@ export function SiteFooter() {
   return (
     <footer className="border-t border-border/60">
       <div className="mx-auto max-w-7xl px-5 py-12 lg:px-8">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-5">
-          <div className="lg:col-span-2">
+        {/* Three short link columns fit side by side even on a phone. */}
+        <div className="grid grid-cols-3 gap-x-6 gap-y-10 lg:grid-cols-5">
+          <div className="col-span-3 lg:col-span-2">
             <Link href="/" className="flex items-center gap-2.5">
               <Rex size={30} />
               <span className="font-display text-[17px] font-extrabold tracking-[-0.02em]">TRY-REX</span>

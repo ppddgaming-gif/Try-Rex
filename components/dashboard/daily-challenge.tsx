@@ -19,7 +19,8 @@ export function DailyChallenge({ challenge }: { challenge: Challenge }) {
 
       <div className="mt-4 flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
-          <span className="inline-block rounded-md bg-success/15 px-2 py-0.5 text-xs font-semibold text-success">
+          {/* Amber, not green: green only ever means price going up. */}
+          <span className="inline-block rounded-md bg-primary/15 px-2 py-0.5 text-xs font-semibold text-primary">
             Daily Challenge
           </span>
           <h3 className="mt-2 text-lg font-bold">
@@ -28,7 +29,7 @@ export function DailyChallenge({ challenge }: { challenge: Challenge }) {
           <p className="text-xs text-muted-foreground">{challenge.period}</p>
           <p className="mt-1 text-sm text-muted-foreground">{challenge.situation}</p>
         </div>
-        <div className="hidden h-20 w-40 shrink-0 overflow-hidden rounded-lg border border-border sm:block">
+        <div className="hidden h-24 w-48 shrink-0 overflow-hidden rounded-lg border border-border bg-inset sm:block lg:h-32 lg:w-80">
           <CandlestickChart
             candles={preview}
             min={frame.min}
@@ -43,13 +44,13 @@ export function DailyChallenge({ challenge }: { challenge: Challenge }) {
 
       <div className="mt-4 flex items-center gap-8">
         <div>
-          <p className="text-xs text-muted-foreground">Reward</p>
+          <p className="text-xs text-muted-foreground">Hadiah</p>
           <p className="mt-1 flex items-center gap-1 text-sm font-bold text-warning">
             <Star className="h-4 w-4 fill-warning text-warning" /> +{challenge.xp} XP
           </p>
         </div>
         <div>
-          <p className="text-xs text-muted-foreground">Difficulty</p>
+          <p className="text-xs text-muted-foreground">Kesulitan</p>
           <div className="mt-1 flex items-center gap-2">
             <div className="flex gap-1" aria-hidden="true">
               {[1, 2, 3, 4, 5].map((i) => (
@@ -66,10 +67,8 @@ export function DailyChallenge({ challenge }: { challenge: Challenge }) {
         </div>
       </div>
 
-      <Link
-        href="/trading-game"
-        className="btn mt-5 w-full"
-      >
+      {/* Opens the round on this exact question. */}
+      <Link href={`/trading-game?c=${challenge.id}`} className="btn mt-5 w-full sm:w-auto sm:self-start">
         Mulai Tantangan <ChevronRight className="h-4 w-4" />
       </Link>
     </Card>

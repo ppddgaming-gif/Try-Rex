@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { Isi, LegalDoc, Section, Tinjau } from "@/components/legal-doc"
 
-export const metadata: Metadata = { title: "Disclaimer | TRY-REX" }
+export const metadata: Metadata = { title: "Disclaimer" }
 
 export default function DisclaimerPage() {
   return (
