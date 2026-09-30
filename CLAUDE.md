@@ -35,6 +35,15 @@ node node_modules/typescript/bin/tsc --noEmit
 - For every new task, create a branch from dev named feat/<short-name> and push it. Vercel gives it its own private preview link; tell me that link so I can check it.
 - Only merge a feat branch into dev after I've said it looks good, because merging into dev publishes it.
 
+## Non-negotiables
+1. Answer keys and future candles never reach the browser. Anything that decides a score, or shows what price does next, stays on the server until the player has committed.
+2. Scores, XP and money are calculated on the server. Players can read their own rows; only server code writes them.
+3. Scores come from process, never outcome. What price did next is shown afterwards, labelled as one sample, and never adds XP.
+4. Chart overlays use the same priceToY() as the candles. Never position a line with hand-picked pixels.
+5. Green and red mean market direction (BUY/SELL, profit/loss). The brand accent is amber. A green button that isn't BUY is wrong.
+6. Never invent statistics, testimonials or user counts. If a real number isn't available, leave [ISI SUMBER + ANGKA RESMI] or wire it to a real query.
+Known exception to rules 1–2: the Trading Game still grades in the browser and ships its candles there. A separate ticket moves it to the server.
+
 ## Architecture
 
 Next.js 16 App Router + React 19, TypeScript strict, Tailwind CSS v4. The `@/*` path alias maps to the repo root (so `@/components/card` → `components/card.tsx`).
