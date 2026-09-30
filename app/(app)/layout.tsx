@@ -21,7 +21,7 @@ export default async function AppLayout({
   return (
     <div className="flex min-h-screen">
       <Sidebar profile={profile} />
-      <main className="flex-1 min-w-0 lg:ml-64">
+      <main className="app-main flex-1 min-w-0">
         <AppNavMobile profile={profile} />
         <PageTransition>{children}</PageTransition>
       </main>

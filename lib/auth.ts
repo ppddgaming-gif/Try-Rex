@@ -6,7 +6,7 @@ export type CurrentUser = {
   id: string
   email: string | undefined
   displayName: string
-  /** null until the player picks one on /start or /akun. */
+  /** null until the player picks one on /start or /pengaturan. */
   username: string | null
   /** Public URL of the uploaded photo, or null (the UI shows initials). */
   avatarUrl: string | null

@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Home, LineChart, BrainCircuit, ArrowUpRight } from "lucide-react"
+import { Home, LineChart, BrainCircuit, ArrowUpRight, BookOpen } from "lucide-react"
 
 const surfaces = [
   {
@@ -23,6 +23,13 @@ const surfaces = [
     cta: "Lihat evaluasi",
     href: "/ai-evaluation",
   },
+  {
+    icon: BookOpen,
+    title: "Belajar 101",
+    body: "Materi singkat dari dasar sampai crypto, dengan kamus istilah yang bisa diketuk langsung dari soal.",
+    cta: "Mulai belajar",
+    href: "/belajar",
+  },
 ]
 
 export function Surfaces() {
@@ -34,17 +41,17 @@ export function Surfaces() {
           Satu mentor, di setiap langkah belajarmu
         </h2>
         <p className="mt-4 text-pretty leading-relaxed text-muted-foreground">
-          Tiga ruang yang saling terhubung untuk membentuk kebiasaan trading yang sehat.
+          Empat ruang yang saling terhubung untuk membentuk kebiasaan trading yang sehat.
         </p>
       </div>
 
-      <div className="mt-12 grid gap-5 md:grid-cols-3">
+      <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
         {surfaces.map((s) => {
           const Icon = s.icon
           return (
             <div
               key={s.title}
-              className="reveal lift flex flex-col rounded-2xl border border-border bg-card p-6 hover:border-primary/40"
+              className="reveal lift spotlight flex flex-col rounded-2xl border border-border bg-card p-6 hover:border-primary/40"
             >
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/30">
                 <Icon className="h-5 w-5 text-primary" />

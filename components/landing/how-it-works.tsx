@@ -41,7 +41,7 @@ export function HowItWorks() {
             return (
               <div
                 key={s.step}
-                className="reveal lift rounded-2xl border border-border bg-card p-6 hover:border-primary/40"
+                className="reveal lift spotlight rounded-2xl border border-border bg-card p-6 hover:border-primary/40"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/30">

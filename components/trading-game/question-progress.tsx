@@ -1,4 +1,4 @@
-import { Clock, Star, Target } from "lucide-react"
+import { Clock, Flame, Star, Target } from "lucide-react"
 
 function clock(seconds: number) {
   const m = Math.floor(seconds / 60)
@@ -25,6 +25,9 @@ export function QuestionProgress({
   seconds: number
 }) {
   const correct = results.filter(Boolean).length
+  // Right answers in a row, counted back from the latest.
+  let combo = 0
+  for (let i = results.length - 1; i >= 0 && results[i]; i--) combo++
 
   return (
     <div className="w-full rounded-2xl border border-border bg-card p-4">
@@ -64,9 +67,20 @@ export function QuestionProgress({
         <span className="flex items-center gap-1.5 font-semibold text-warning">
           <Star className="h-3.5 w-3.5 fill-warning" aria-hidden="true" /> <span className="font-mono">{xp}</span> XP
         </span>
-        <span className="flex items-center gap-1.5 text-muted-foreground">
-          <Target className="h-3.5 w-3.5" aria-hidden="true" /> <span className="font-mono">{correct}</span> benar
-        </span>
+        {combo >= 2 ? (
+          // Keyed by the count so each new link in the chain pops again.
+          <span
+            key={combo}
+            className="pop-in shimmer flex items-center gap-1 rounded-full bg-primary/15 px-2 py-0.5 font-semibold text-primary"
+          >
+            <Flame className="flicker h-3.5 w-3.5 fill-primary" aria-hidden="true" />
+            <span className="font-mono">{combo}x</span> beruntun
+          </span>
+        ) : (
+          <span className="flex items-center gap-1.5 text-muted-foreground">
+            <Target className="h-3.5 w-3.5" aria-hidden="true" /> <span className="font-mono">{correct}</span> benar
+          </span>
+        )}
       </div>
     </div>
   )

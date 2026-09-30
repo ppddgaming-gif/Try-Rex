@@ -128,7 +128,7 @@ export async function changeEmail(_: ProfileFormState, fd: FormData): Promise<Pr
 
   const { error } = await supabase.auth.updateUser(
     { email },
-    { emailRedirectTo: `${await origin()}/auth/callback?next=/akun` },
+    { emailRedirectTo: `${await origin()}/auth/callback?next=/pengaturan%23keamanan` },
   )
   if (error) return { error: authErrorMessage(error), email }
   return { sent: true, email }

@@ -1,4 +1,5 @@
 import { Clock, Star, Target } from "lucide-react"
+import { Confetti } from "@/components/confetti"
 import { Rex } from "@/components/rex-mascot"
 
 function clock(seconds: number) {
@@ -26,9 +27,13 @@ export function RoundSummary({
   const good = correct * 2 > total
 
   return (
-    <div className="enter rounded-2xl border border-primary/30 bg-primary/8 p-4" style={{ "--enter-delay": "120ms" } as React.CSSProperties}>
+    <div
+      className="enter glow-card relative rounded-2xl border border-primary/30 p-4"
+      style={{ "--enter-delay": "120ms" } as React.CSSProperties}
+    >
+      {good && <Confetti />}
       <div className="flex items-center gap-3">
-        <Rex size={44} mood={good ? "happy" : "thinking"} />
+        <Rex size={44} mood={good ? "happy" : "thinking"} className={good ? "pop-in" : "float"} />
         <div className="min-w-0 leading-tight">
           <p className="eyebrow">Ronde selesai</p>
           <p className="mt-1 text-sm font-semibold">
