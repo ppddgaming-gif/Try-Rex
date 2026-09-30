@@ -2,6 +2,8 @@ import { gameDatasets, type GameDataset, type GameLevel } from "@/lib/game-data"
 import {
   detectSupportResistance,
   difficultyForLevel,
+  FUTURE,
+  HISTORY,
   outcomeOf,
   pipSize,
   sliceGame,
@@ -68,8 +70,13 @@ export function frameOf(candles: Candle[]): { min: number; max: number; priceTic
 }
 
 export type Challenge = {
-  /** Dataset id, e.g. "eurusd-1". */
+  /**
+   * "eurusd-1" for a dataset's first window (the original question, so older
+   * attempts and links still resolve), "eurusd-1@35" for later windows.
+   */
   id: string
+  /** The dataset this window was cut from. A round never uses one twice. */
+  datasetId: string
   pair: string
   level: GameLevel
   timeframe: string
@@ -101,8 +108,8 @@ const pct = (v: number) => `${v > 0 ? "+" : ""}${v.toFixed(2)}%`
  * trend slope, the detected levels, and what price actually did next. Nothing
  * here is hand-written per dataset, so the prose can never contradict the chart.
  */
-function buildChallenge(dataset: GameDataset): Challenge {
-  const { history, future } = sliceGame(dataset.candles)
+function buildChallenge(dataset: GameDataset, start: number): Challenge {
+  const { history, future } = sliceGame(dataset.candles, start)
   const { answer, changePercent } = outcomeOf(future)
 
   const levels = detectSupportResistance(history)
@@ -177,8 +184,12 @@ function buildChallenge(dataset: GameDataset): Challenge {
         : `Kurang tepat. Harga bergerak ${pct(changePercent)} — cukup besar untuk diambil, bukan dilewatkan.`,
   }
 
+  // The window's own month, not the dataset's: later windows can cross into
+  // the next month. UTC, so server and browser print the same thing.
+  const period = periodFmt.format(new Date(history[0].t * 1000))
+
   const situation =
-    `${dataset.pair} ${dataset.timeframe}, ${dataset.period}. Trend cenderung ${trendWord} dan harga kini di ${rangePos}% dari rentang 30 candle terakhir. ` +
+    `${dataset.pair} ${dataset.timeframe}, ${period}. Trend cenderung ${trendWord} dan harga kini di ${rangePos}% dari rentang 30 candle terakhir. ` +
     (toResistance !== null && toSupport !== null
       ? `Resistance ${toResistance} pip di atas, support ${toSupport} pip di bawah.`
       : toResistance !== null
@@ -188,11 +199,12 @@ function buildChallenge(dataset: GameDataset): Challenge {
           : "Tidak ada level kuat di dekat harga sekarang.")
 
   return {
-    id: dataset.id,
+    id: start === HISTORY ? dataset.id : `${dataset.id}@${start}`,
+    datasetId: dataset.id,
     pair: dataset.pair,
     level: dataset.level,
     timeframe: dataset.timeframe,
-    period: dataset.period,
+    period,
     digits,
     difficulty: difficultyForLevel(dataset.level),
     xp: xpForLevel(dataset.level),
@@ -212,7 +224,25 @@ function buildChallenge(dataset: GameDataset): Challenge {
   }
 }
 
-export const challenges: Challenge[] = gameDatasets.map(buildChallenge)
+const periodFmt = new Intl.DateTimeFormat("id-ID", { month: "short", year: "numeric", timeZone: "UTC" })
+
+/** Candles between the starts of two windows cut from the same dataset. */
+export const WINDOW_STRIDE = 5
+
+/**
+ * Every question the real data can honestly produce. Each dataset holds about
+ * 65 candles; a question needs 45 (30 shown, 15 hidden), so the window slides
+ * along in steps of WINDOW_STRIDE: starts 30, 35, 40, 45, 50. That turns 39
+ * datasets into 188 questions, every one real price action with a real answer.
+ * Overlapping windows from one dataset never share a round (see lib/round.ts).
+ */
+export const challenges: Challenge[] = gameDatasets.flatMap((dataset) => {
+  const out: Challenge[] = []
+  for (let start = HISTORY; start + FUTURE <= dataset.candles.length; start += WINDOW_STRIDE) {
+    out.push(buildChallenge(dataset, start))
+  }
+  return out
+})
 
 export const challengeById = (id: string | undefined) =>
   id ? challenges.find((c) => c.id === id) : undefined
@@ -220,58 +250,6 @@ export const challengeById = (id: string | undefined) =>
 export const challengesForPair = (symbol: string) => challenges.filter((c) => c.pair === symbol)
 
 export const challengesForLevel = (level: GameLevel) => challenges.filter((c) => c.level === level)
-
-const ANSWER_ORDER: Decision[] = ["buy", "sell", "wait"]
-
-/**
- * The source data leans heavily bullish (27 buy / 9 sell / 3 wait across all 39
- * datasets), so drawing a round in file order would hand you five BUYs in a row
- * and the game would reduce to always pressing BUY. Rotate through answers
- * first, then prefer a pair different from the previous question.
- *
- * Answer variety is guaranteed; pair variety is best effort. On `hard` a pair can
- * repeat, because the empty gbpnzd_*.js files leave only two usable hard pairs and
- * GBPCAD is buy in all five of its datasets — so sell and wait can only come from
- * EURAUD. Deterministic: the same level always yields the same round.
- */
-export function roundFor(level: GameLevel, size = 5): Challenge[] {
-  const queues = new Map<Decision, Challenge[]>(ANSWER_ORDER.map((a) => [a, []]))
-  for (const c of challengesForLevel(level)) queues.get(c.answer)?.push(c)
-
-  const round: Challenge[] = []
-  for (let turn = 0; round.length < size; turn++) {
-    let picked: Challenge | undefined
-    for (let k = 0; k < ANSWER_ORDER.length && !picked; k++) {
-      const answer = ANSWER_ORDER[(turn + k) % ANSWER_ORDER.length]
-      const queue = queues.get(answer)
-      if (!queue || queue.length === 0) continue
-
-      // How many still-unplayed questions of the *other* answers each pair owns.
-      // Spending an in-demand pair now can strand a scarce answer later, so rank
-      // it lower — that is what keeps `hard` from stacking three EURAUDs.
-      const demand = new Map<string, number>()
-      for (const [a, q] of queues) {
-        if (a === answer) continue
-        for (const c of q) demand.set(c.pair, (demand.get(c.pair) ?? 0) + 1)
-      }
-
-      const prev = round[round.length - 1]
-      let bestIndex = 0
-      let bestCost = Number.POSITIVE_INFINITY
-      queue.forEach((c, i) => {
-        const cost = (prev && c.pair === prev.pair ? 100 : 0) + (demand.get(c.pair) ?? 0)
-        if (cost < bestCost) {
-          bestCost = cost
-          bestIndex = i
-        }
-      })
-      picked = queue.splice(bestIndex, 1)[0]
-    }
-    if (!picked) break
-    round.push(picked)
-  }
-  return round
-}
 
 export const gameLevels: { id: GameLevel; label: string; xp: number }[] = [
   { id: "easy", label: "Mudah", xp: xpForLevel("easy") },

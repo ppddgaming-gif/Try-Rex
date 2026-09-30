@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 
 /** Routes that need an account. Guests are sent to /login?next=… */
-const PROTECTED = ["/dashboard"]
+const PROTECTED = ["/dashboard", "/akun"]
 /** Auth screens a signed-in user has no reason to see. */
 const GUEST_ONLY = ["/login", "/signup"]
 
@@ -10,8 +10,8 @@ const matches = (path: string, list: string[]) => list.some((p) => path === p ||
 
 /**
  * Runs from the root proxy.ts on every page request. Refreshes the Supabase
- * session cookie and applies the route rules above. /trading-game and
- * /ai-evaluation are deliberately open to guests.
+ * session cookie and applies the route rules above. /trading-game,
+ * /ai-evaluation and /start are deliberately open to guests.
  */
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })

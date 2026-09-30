@@ -44,7 +44,7 @@ export function Surfaces() {
           return (
             <div
               key={s.title}
-              className="reveal flex flex-col rounded-2xl border border-border bg-card p-6 transition-[translate,border-color] duration-300 ease-out-expo hover:-translate-y-1 hover:border-primary/40"
+              className="reveal lift flex flex-col rounded-2xl border border-border bg-card p-6 hover:border-primary/40"
             >
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/30">
                 <Icon className="h-5 w-5 text-primary" />
@@ -53,10 +53,10 @@ export function Surfaces() {
               <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">{s.body}</p>
               <Link
                 href={s.href}
-                className="mt-6 inline-flex items-center justify-center gap-1.5 rounded-full border border-border bg-background px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-muted"
+                className="group mt-6 inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full border border-border bg-background px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-muted"
               >
                 {s.cta}
-                <ArrowUpRight className="h-4 w-4 text-primary" />
+                <ArrowUpRight className="h-4 w-4 text-primary transition-transform duration-300 ease-spring group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
               </Link>
             </div>
           )

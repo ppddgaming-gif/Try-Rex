@@ -45,7 +45,7 @@ export function AspectMockup() {
     { icon: ShieldCheck, label: "Risk Management", val: 58, tone: "text-warning" },
   ]
   return (
-    <div className="w-full max-w-md rounded-2xl border border-border bg-card/95 p-5 shadow-2xl backdrop-blur">
+    <div className="glass-card w-full max-w-md rounded-2xl p-5">
       <div className="mb-4 flex items-center justify-between">
         <p className="text-sm font-semibold">Pemahaman Berdasarkan Aspek</p>
         <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary">
@@ -112,7 +112,7 @@ export function HeroShowcase() {
 
   return (
     <div className="flex w-full max-w-5xl flex-col gap-3 lg:flex-row lg:items-start lg:gap-5">
-      <div className="min-w-0 rounded-2xl border border-border bg-card/95 p-4 shadow-2xl backdrop-blur sm:p-5 lg:flex-1">
+      <div className="glass-card min-w-0 rounded-2xl p-4 sm:p-5 lg:flex-1">
         <div className="flex items-center gap-2">
           <ChallengeTags challenge={challenge} />
           <span className="ml-auto font-mono text-xs text-muted-foreground">Soal 1 / 5</span>
@@ -143,7 +143,7 @@ export function HeroShowcase() {
       </div>
 
       {/* Rex reads the chart out loud: under it on phones, beside it from lg. */}
-      <div className="flex items-start gap-3 rounded-2xl border border-border bg-card p-4 text-left shadow-2xl lg:mt-12 lg:w-64 lg:flex-col">
+      <div className="glass-card flex items-start gap-3 rounded-2xl p-4 text-left lg:mt-12 lg:w-64 lg:flex-col">
         <Rex size={36} mood="thinking" />
         <p className="text-xs leading-relaxed text-muted-foreground">
           <span className="font-semibold text-foreground">Situasinya begini: </span>
@@ -165,7 +165,7 @@ export function RevealMockup() {
   const up = challenge.changePercent > 0
 
   return (
-    <div className="w-full max-w-md rounded-2xl border border-border bg-card/95 p-4 shadow-2xl backdrop-blur sm:p-5">
+    <div className="glass-card w-full max-w-md rounded-2xl p-4 sm:p-5">
       <div className="flex items-center gap-2">
         <ChallengeTags challenge={challenge} />
         <span
@@ -200,7 +200,7 @@ export function RevealMockup() {
 /** Mockup: TRY-REX AI chat feedback */
 export function ChatMockup() {
   return (
-    <div className="w-full max-w-md rounded-2xl border border-border bg-card/95 p-4 shadow-2xl backdrop-blur">
+    <div className="glass-card w-full max-w-md rounded-2xl p-4">
       {/* user bubble */}
       <div className="mb-3 flex justify-end">
         <div className="max-w-[80%] rounded-2xl rounded-br-sm bg-muted px-3.5 py-2 text-xs">

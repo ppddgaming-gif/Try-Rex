@@ -4,6 +4,7 @@ import { DailyChallenge } from "@/components/dashboard/daily-challenge"
 import { DashboardView } from "@/components/dashboard/dashboard-view"
 import { getCurrentUser } from "@/lib/auth"
 import { challenges } from "@/lib/mock-data"
+import { planFrom } from "@/lib/onboarding"
 
 export const metadata: Metadata = { title: "Dashboard" }
 
@@ -26,8 +27,20 @@ export default async function DashboardPage() {
   // proxy matcher ever stops covering this route.
   const user = await getCurrentUser()
   if (!user) redirect("/login?next=/dashboard")
+  // New accounts answer the /start quiz first; it sets their level and target.
+  if (!user.onboarding) redirect("/start?next=/dashboard")
+
+  const plan = planFrom(user.onboarding)
 
   // Progress lives in the browser, so the view is a client component. The
   // daily challenge (a server-rendered chart) is handed in as a slot.
-  return <DashboardView name={user.displayName} dailyChallenge={<DailyChallenge challenge={dailyChallenge()} />} />
+  return (
+    <DashboardView
+      name={user.displayName}
+      avatarUrl={user.avatarUrl}
+      dailyGoal={plan.dailyGoal}
+      motivation={plan.motivation}
+      dailyChallenge={<DailyChallenge challenge={dailyChallenge()} />}
+    />
+  )
 }

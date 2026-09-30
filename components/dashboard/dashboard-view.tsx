@@ -6,8 +6,10 @@ import { ArrowRight, Inbox } from "lucide-react"
 import { recentAttempts, totalChallenges } from "@/lib/progress/derive"
 import { COMPETENCIES, COMPETENCY_LABELS } from "@/lib/progress/types"
 import { useProgress } from "@/lib/progress/use-progress"
+import { Avatar } from "@/components/avatar"
 import { Card } from "@/components/card"
 import { ActivityRows } from "@/components/progress/activity-rows"
+import { DailyGoal } from "@/components/progress/daily-goal"
 import { AiInsight } from "@/components/progress/ai-insight"
 import { CompetencyMeter } from "@/components/progress/competency-meter"
 import { EmptyState } from "@/components/progress/empty-state"
@@ -25,20 +27,40 @@ import { Streak } from "@/components/progress/streak"
  * activity, insight, daily challenge); from lg the cards pair up in two
  * columns and level + streak move to the sidebar.
  */
-export function DashboardView({ name, dailyChallenge }: { name: string; dailyChallenge: ReactNode }) {
+export function DashboardView({
+  name,
+  avatarUrl,
+  dailyGoal,
+  motivation,
+  dailyChallenge,
+}: {
+  name: string
+  avatarUrl: string | null
+  /** From the /start quiz; null when the player chose no target. */
+  dailyGoal: number | null
+  motivation: string | null
+  dailyChallenge: ReactNode
+}) {
   const progress = useProgress()
   const started = progress !== null && totalChallenges(progress) > 0
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-6 lg:px-8">
-      <header className="flex flex-wrap items-center justify-between gap-4">
-        <div className="min-w-0">
-          {progress ? (
-            <h1 className="text-2xl font-bold tracking-tight">{started ? `Halo lagi, ${name}!` : `Selamat datang, ${name}!`}</h1>
-          ) : (
-            <Skeleton className="h-8 w-56" />
-          )}
-          <p className="mt-1 text-sm text-muted-foreground">Latihan sedikit tiap hari lebih berguna daripada banyak sekali.</p>
+      <header className="enter flex flex-wrap items-center justify-between gap-4">
+        <div className="flex min-w-0 items-center gap-4">
+          <Link href="/akun" aria-label="Pengaturan akun" className="rounded-full transition-transform duration-300 ease-spring hover:scale-105">
+            <Avatar src={avatarUrl} name={name} size={52} />
+          </Link>
+          <div className="min-w-0">
+            {progress ? (
+              <h1 className="text-2xl font-bold tracking-tight">
+                {started ? `Halo lagi, ${name}!` : `Selamat datang, ${name}!`}
+              </h1>
+            ) : (
+              <Skeleton className="h-8 w-56" />
+            )}
+            <p className="mt-1 text-sm text-muted-foreground">Latihan sedikit tiap hari lebih berguna daripada banyak sekali.</p>
+          </div>
         </div>
         <div className="flex items-center gap-3">
           <div className="hidden lg:block">
@@ -53,7 +75,14 @@ export function DashboardView({ name, dailyChallenge }: { name: string; dailyCha
       </header>
 
       {/* 1. The next action: the first-session hero, then the stat row. */}
-      <div className="mt-6">{progress && !started ? <FirstSessionHero /> : <StatRow progress={progress} />}</div>
+      <div className="enter mt-6" style={{ "--enter-delay": "60ms" } as React.CSSProperties}>
+        {progress && !started ? <FirstSessionHero motivation={motivation} /> : <StatRow progress={progress} />}
+      </div>
+
+      {/* 1b. Today's target from the /start quiz. */}
+      <div className="enter mt-4" style={{ "--enter-delay": "120ms" } as React.CSSProperties}>
+        <DailyGoal goal={dailyGoal} />
+      </div>
 
       {/* 2. Level + streak. The sidebar carries these from lg. */}
       <Card className="mt-4 flex flex-col gap-5 lg:hidden">

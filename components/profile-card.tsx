@@ -1,28 +1,59 @@
 "use client"
 
 import Link from "next/link"
-import { LogOut } from "lucide-react"
+import { ChevronRight, LogOut } from "lucide-react"
 import { signOut } from "@/lib/auth-actions"
+import { Avatar } from "@/components/avatar"
 import { LevelXp } from "@/components/progress/level-xp"
 import { Streak } from "@/components/progress/streak"
 import { Rex } from "@/components/rex-mascot"
 
+export type ProfileSummary = { name: string; username: string | null; avatarUrl: string | null }
+
 /**
- * Account block at the foot of the sidebar and the mobile menu. `name` is the
- * signed-in display name, or null for a guest. Level, XP and streak come from
+ * Account block at the foot of the sidebar and the mobile menu. `profile` is
+ * the signed-in player, or null for a guest. Level, XP and streak come from
  * the player's real progress (lib/progress), guests included, and update the
  * moment an answer is recorded.
  */
-export function ProfileCard({ name, className = "" }: { name: string | null; className?: string }) {
+export function ProfileCard({
+  profile,
+  className = "",
+  onNavigate,
+}: {
+  profile: ProfileSummary | null
+  className?: string
+  onNavigate?: () => void
+}) {
   return (
-    <div className={`rounded-xl border border-border bg-card p-4 ${className}`}>
-      <div className="flex items-center gap-3">
-        <Rex size={36} />
-        <div className="min-w-0 leading-tight">
-          <p className="truncate text-sm font-semibold">{name ?? "Tamu"}</p>
-          <p className="text-xs text-muted-foreground">{name ? "Trader" : "Belum masuk"}</p>
+    <div className={`glass-card rounded-2xl p-4 ${className}`}>
+      {profile ? (
+        <Link
+          href="/akun"
+          onClick={onNavigate}
+          className="group -m-2 flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-foreground/5"
+        >
+          <Avatar src={profile.avatarUrl} name={profile.name} size={40} />
+          <div className="min-w-0 flex-1 leading-tight">
+            <p className="truncate text-sm font-semibold">{profile.name}</p>
+            <p className="truncate text-xs text-muted-foreground">
+              {profile.username ? `@${profile.username}` : "Atur profil"}
+            </p>
+          </div>
+          <ChevronRight
+            className="h-4 w-4 text-faint transition-transform duration-300 ease-spring group-hover:translate-x-0.5"
+            aria-hidden="true"
+          />
+        </Link>
+      ) : (
+        <div className="flex items-center gap-3">
+          <Avatar src={null} name="Tamu" size={40} fallback={<Rex size={30} />} />
+          <div className="min-w-0 leading-tight">
+            <p className="truncate text-sm font-semibold">Tamu</p>
+            <p className="text-xs text-muted-foreground">Belum masuk</p>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="mt-4">
         <LevelXp />
@@ -31,7 +62,7 @@ export function ProfileCard({ name, className = "" }: { name: string | null; cla
         <Streak />
       </div>
 
-      {name ? (
+      {profile ? (
         <form action={signOut} className="mt-4">
           <button type="submit" className="btn btn-ghost btn-sm w-full">
             <LogOut className="h-4 w-4" /> Keluar
@@ -42,10 +73,10 @@ export function ProfileCard({ name, className = "" }: { name: string | null; cla
           <p className="text-xs leading-relaxed text-muted-foreground">
             Progres tersimpan di perangkat ini. Masuk untuk menyimpannya ke akunmu.
           </p>
-          <Link href="/login" className="btn btn-sm w-full">
+          <Link href="/login" onClick={onNavigate} className="btn btn-sm w-full">
             Masuk
           </Link>
-          <Link href="/signup" className="btn btn-ghost btn-sm w-full">
+          <Link href="/signup" onClick={onNavigate} className="btn btn-ghost btn-sm w-full">
             Daftar gratis
           </Link>
         </div>

@@ -21,7 +21,7 @@ export function MarketingNav({ signedIn }: { signedIn: boolean }) {
 
   return (
     <header
-      className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl"
+      className="glass-bar sticky top-0 z-50 border-b border-border/60"
       style={{ viewTransitionName: "site-header" }}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 lg:px-8">
@@ -77,7 +77,7 @@ export function MarketingNav({ signedIn }: { signedIn: boolean }) {
       <div
         id="marketing-menu"
         data-open={open}
-        className="presence border-t border-border/60 bg-background px-5 py-4 md:hidden"
+        className="presence border-t border-border/60 px-5 py-4 md:hidden"
       >
           <nav className="flex flex-col gap-1">
             {links.map((l) => (

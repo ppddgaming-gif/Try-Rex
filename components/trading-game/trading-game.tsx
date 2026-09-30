@@ -2,39 +2,120 @@
 
 import { startTransition, useEffect, useEffectEvent, useMemo, useState, ViewTransition } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Card } from "@/components/card"
 import { CandlestickChart } from "@/components/candlestick-chart"
+import { Skeleton } from "@/components/progress/skeleton"
 import { SelectMenu } from "@/components/select-menu"
 import { AnswerFeedback } from "@/components/trading-game/answer-feedback"
 import { DecisionButtons } from "@/components/trading-game/decision-buttons"
 import { QuestionProgress } from "@/components/trading-game/question-progress"
 import { RoundSummary } from "@/components/trading-game/round-summary"
-import { recordAttempt } from "@/lib/progress/use-progress"
+import { recordAttempt, useProgress } from "@/lib/progress/use-progress"
 import type { GameLevel } from "@/lib/game-data"
 import { FUTURE } from "@/lib/game-logic"
 import {
   challengeById,
+  challenges,
   decisionLabels,
   frameOf,
   gameLevels,
-  roundFor,
   scoreFor,
+  type Challenge,
   type Decision,
 } from "@/lib/mock-data"
-import { ArrowRight, BrainCircuit, CalendarCheck, RotateCcw, Target } from "lucide-react"
+import { answerLabel, planFrom, type OnboardingRecord } from "@/lib/onboarding"
+import { buildRound, newSeed } from "@/lib/round"
+import { useOnboarding } from "@/lib/use-onboarding"
+import { ArrowRight, BrainCircuit, CalendarCheck, RotateCcw, Sparkles, Target } from "lucide-react"
 
 const ROUND_SIZE = 5
+/** How many recent answers count as "seen" when picking fresh questions. */
+const SEEN_WINDOW = 150
+/** Stop waiting for account progress after this long and play anyway. */
+const PROGRESS_WAIT_MS = 2500
 
 const shortcutKeys: Record<string, Decision> = { b: "buy", s: "sell", w: "wait" }
 
+type Game = { seed: number; level: GameLevel; round: Challenge[] }
+
 /**
- * The whole game loop. `featuredId` is the dashboard's daily challenge: when
- * given, the round opens on that question at its level, so "Mulai Tantangan"
- * starts the challenge it advertised.
+ * Sets up each round: waits for the player's onboarding answers and history,
+ * then asks lib/round.ts for five fresh questions. The round is built in the
+ * browser after mount (the seed is random), so the server renders a skeleton
+ * and nothing can mismatch on hydration.
+ *
+ * `featuredId` is the dashboard's daily challenge: the first round opens on it.
+ * `serverOnboarding` is the account's record; undefined for guests, who are
+ * read from the device and sent to /start if they haven't done the quiz.
  */
-export function TradingGame({ featuredId }: { featuredId?: string }) {
+export function TradingGame({
+  featuredId,
+  serverOnboarding,
+}: {
+  featuredId?: string
+  serverOnboarding?: OnboardingRecord | null
+}) {
+  const router = useRouter()
+  const record = useOnboarding(serverOnboarding)
+  const progress = useProgress()
+  const [waited, setWaited] = useState(false)
+  const [game, setGame] = useState<Game | null>(null)
   const featured = challengeById(featuredId)
-  const [level, setLevel] = useState<GameLevel>(featured?.level ?? "easy")
+  const plan = planFrom(record ?? null)
+
+  useEffect(() => {
+    if (record !== null) return
+    const back = featuredId ? `/trading-game?c=${encodeURIComponent(featuredId)}` : "/trading-game"
+    router.replace(`/start?next=${encodeURIComponent(back)}`)
+  }, [record, featuredId, router])
+
+  useEffect(() => {
+    const id = setTimeout(() => setWaited(true), PROGRESS_WAIT_MS)
+    return () => clearTimeout(id)
+  }, [])
+
+  // Deals a round. Reads the latest history, so questions answered a moment
+  // ago count as seen for the next round.
+  function deal(level: GameLevel, first?: Challenge) {
+    const seen = new Set(progress?.attempts.slice(-SEEN_WINDOW).map((a) => a.scenarioId))
+    const seed = newSeed()
+    const round = buildRound({ level, seed, seen, focusPairs: plan.focusPairs, first, size: ROUND_SIZE })
+    startTransition(() => setGame({ seed, level, round }))
+  }
+
+  // The first round, once onboarding and history are in.
+  const dealFirst = useEffectEvent(() => deal(featured?.level ?? plan.level, featured))
+  const ready = Boolean(record) && (progress !== null || waited)
+  useEffect(() => {
+    if (ready && !game) dealFirst()
+  }, [ready, game])
+
+  if (!game) return <GameSkeleton />
+
+  return (
+    <GameRound
+      key={game.seed}
+      game={game}
+      featuredId={featured?.id}
+      focusLabel={record && !record.skipped ? answerLabel("focus", record.answers.focus) : null}
+      onNewRound={(level) => deal(level)}
+    />
+  )
+}
+
+function GameRound({
+  game,
+  featuredId,
+  focusLabel,
+  onNewRound,
+}: {
+  game: Game
+  featuredId?: string
+  focusLabel: string | null
+  onNewRound: (level: GameLevel) => void
+}) {
+  const { round, level } = game
   const [index, setIndex] = useState(0)
   const [choice, setChoice] = useState<Decision | null>(null)
   const [submitted, setSubmitted] = useState(false)
@@ -42,11 +123,6 @@ export function TradingGame({ featuredId }: { featuredId?: string }) {
   const [results, setResults] = useState<boolean[]>([])
   const [seconds, setSeconds] = useState(0)
 
-  const round = useMemo(() => {
-    const base = roundFor(level, ROUND_SIZE)
-    if (!featured || featured.level !== level) return base
-    return [featured, ...base.filter((c) => c.id !== featured.id)].slice(0, ROUND_SIZE)
-  }, [level, featured])
   const challenge = round[index]
 
   // After answering, the 15 future candles are appended so you see what happened.
@@ -60,7 +136,6 @@ export function TradingGame({ featuredId }: { featuredId?: string }) {
   const finished = last && submitted
   const result = submitted && choice ? scoreFor(challenge, choice) : null
 
-  // Starts at 0 on the server and on first paint, so there is no hydration gap.
   // Stops once the last answer is in: the round is over.
   useEffect(() => {
     if (finished) return
@@ -68,7 +143,7 @@ export function TradingGame({ featuredId }: { featuredId?: string }) {
     return () => clearInterval(id)
   }, [finished])
 
-  // These three run inside startTransition: <ViewTransition> only animates
+  // These run inside startTransition: <ViewTransition> only animates
   // transitions, so plain state updates would make the chart jump.
   function submit() {
     if (!choice || submitted) return
@@ -100,18 +175,6 @@ export function TradingGame({ featuredId }: { featuredId?: string }) {
     })
   }
 
-  function reset(nextLevel = level) {
-    startTransition(() => {
-      setLevel(nextLevel)
-      setIndex(0)
-      setChoice(null)
-      setSubmitted(false)
-      setXp(0)
-      setResults([])
-      setSeconds(0)
-    })
-  }
-
   // Keyboard play: B / S / W pick, Enter submits, N moves on. Enter is left
   // alone on buttons and links so it never fires twice.
   const onKey = useEffectEvent((e: KeyboardEvent) => {
@@ -124,9 +187,11 @@ export function TradingGame({ featuredId }: { featuredId?: string }) {
       setChoice(shortcutKeys[key])
     } else if (key === "enter" && !target.closest("button, a")) {
       if (!submitted) submit()
+      else if (last) onNewRound(level)
       else next()
     } else if (key === "n") {
-      next()
+      if (finished) onNewRound(level)
+      else next()
     }
   })
   useEffect(() => {
@@ -135,47 +200,27 @@ export function TradingGame({ featuredId }: { featuredId?: string }) {
     return () => window.removeEventListener("keydown", listener)
   }, [])
 
-  const evaluationHref = `/ai-evaluation?c=${challenge.id}&a=${choice ?? challenge.answer}&t=${seconds}`
-  const isFeatured = featured?.id === challenge.id
+  const evaluationHref = `/ai-evaluation?c=${encodeURIComponent(challenge.id)}&a=${choice ?? challenge.answer}&t=${seconds}`
+  const isFeatured = featuredId === challenge.id
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-6 lg:px-8">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div className="min-w-0">
-          <h1 className="text-2xl font-bold tracking-tight">Trading Game</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Data harga asli. Pilih keputusanmu, lalu lihat apa yang sebenarnya terjadi.
-          </p>
-        </div>
-        <SelectMenu
-          label="Tingkat kesulitan"
-          className="w-full sm:w-60"
-          value={level}
-          onChange={(v) => reset(v as GameLevel)}
-          options={gameLevels.map((l) => ({
-            value: l.id,
-            label: `${l.label} · ${l.xp} XP`,
-            prefix: <Target className="h-4 w-4" />,
-          }))}
-        />
-      </header>
+      <GameHeader
+        level={level}
+        onLevel={(v) => onNewRound(v)}
+        focusLabel={focusLabel}
+      />
 
       {/* One grid, two orders. Phones read top to bottom: progress, chart,
           then the decision. From lg the chart spans both rows on the left and
           progress sits above the decision on the right. */}
       <div className="mt-6 grid grid-cols-1 items-start gap-4 lg:grid-cols-[1fr_340px] lg:grid-rows-[auto_1fr]">
-        <div className="lg:col-start-2 lg:row-start-1">
-          <QuestionProgress
-            index={index}
-            results={results}
-            total={round.length}
-            xp={xp}
-            seconds={seconds}
-          />
+        <div className="enter lg:col-start-2 lg:row-start-1">
+          <QuestionProgress index={index} results={results} total={round.length} xp={xp} seconds={seconds} />
         </div>
 
         {/* Chart */}
-        <Card className="flex flex-col self-start p-4 sm:p-[22px] lg:col-start-1 lg:row-span-2 lg:row-start-1">
+        <Card className="enter flex flex-col self-start p-4 sm:p-[22px] lg:col-start-1 lg:row-span-2 lg:row-start-1">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-lg border border-border bg-muted/40 px-3 py-1.5 text-sm font-semibold">
               {challenge.pair}
@@ -194,7 +239,7 @@ export function TradingGame({ featuredId }: { featuredId?: string }) {
             {submitted && (
               <span
                 className={[
-                  "enter ml-auto rounded-lg px-3 py-1.5 font-mono text-xs font-bold",
+                  "pop-in ml-auto rounded-lg px-3 py-1.5 font-mono text-xs font-bold",
                   challenge.changePercent > 0
                     ? "bg-success/15 text-success"
                     : challenge.changePercent < 0
@@ -247,7 +292,7 @@ export function TradingGame({ featuredId }: { featuredId?: string }) {
         {/* Situation + actions */}
         <div className="flex flex-col gap-4 lg:col-start-2 lg:row-start-2">
           <ViewTransition key={challenge.id} name="game-situation" share="auto" default="none">
-            <Card>
+            <Card className="enter" style={{ "--enter-delay": "80ms" } as React.CSSProperties}>
               <h2 className="text-base font-semibold">Situasi Market</h2>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{challenge.situation}</p>
             </Card>
@@ -282,18 +327,13 @@ export function TradingGame({ featuredId }: { featuredId?: string }) {
               />
 
               {finished && (
-                <RoundSummary
-                  correct={results.filter(Boolean).length}
-                  total={round.length}
-                  xp={xp}
-                  seconds={seconds}
-                />
+                <RoundSummary correct={results.filter(Boolean).length} total={round.length} xp={xp} seconds={seconds} />
               )}
 
               <div className="flex flex-col gap-3">
                 {last ? (
                   <>
-                    <button onClick={() => reset()} className="btn w-full">
+                    <button onClick={() => onNewRound(level)} className="btn w-full">
                       <RotateCcw className="h-4 w-4" /> Main ronde baru
                     </button>
                     <Link href={evaluationHref} className="btn btn-ghost w-full">
@@ -313,6 +353,89 @@ export function TradingGame({ featuredId }: { featuredId?: string }) {
               </div>
             </>
           )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function GameHeader({
+  level,
+  onLevel,
+  focusLabel,
+}: {
+  level: GameLevel | null
+  onLevel?: (level: GameLevel) => void
+  focusLabel?: string | null
+}) {
+  const pool = level ? challenges.filter((c) => c.level === level).length : null
+  return (
+    <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="min-w-0">
+        <h1 className="text-2xl font-bold tracking-tight">Trading Game</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Data harga asli. Pilih keputusanmu, lalu lihat apa yang sebenarnya terjadi.
+        </p>
+        {(focusLabel || pool) && (
+          <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-faint">
+            {pool && (
+              <span>
+                <span className="font-mono text-muted-foreground">{pool}</span> soal di tingkat ini, diacak tiap ronde
+              </span>
+            )}
+            {focusLabel && (
+              <span className="flex items-center gap-1">
+                <Sparkles className="h-3 w-3 text-primary" aria-hidden="true" /> Fokus: {focusLabel}
+              </span>
+            )}
+          </p>
+        )}
+      </div>
+      {level && onLevel ? (
+        <SelectMenu
+          label="Tingkat kesulitan"
+          className="w-full sm:w-60"
+          value={level}
+          onChange={(v) => onLevel(v as GameLevel)}
+          options={gameLevels.map((l) => ({
+            value: l.id,
+            label: `${l.label} · ${l.xp} XP`,
+            prefix: <Target className="h-4 w-4" />,
+          }))}
+        />
+      ) : (
+        <Skeleton className="h-10 w-full rounded-lg sm:w-60" />
+      )}
+    </header>
+  )
+}
+
+/** Same footprint as the game, shown while the round is being dealt. */
+function GameSkeleton() {
+  return (
+    <div className="mx-auto max-w-7xl px-5 py-6 lg:px-8" aria-busy="true" aria-label="Menyiapkan ronde">
+      <GameHeader level={null} />
+      <div className="mt-6 grid grid-cols-1 items-start gap-4 lg:grid-cols-[1fr_340px] lg:grid-rows-[auto_1fr]">
+        <div className="lg:col-start-2 lg:row-start-1">
+          <Skeleton className="h-[98px] w-full rounded-2xl" />
+        </div>
+        <Card className="flex flex-col p-4 sm:p-[22px] lg:col-start-1 lg:row-span-2 lg:row-start-1">
+          <div className="flex gap-2">
+            <Skeleton className="h-8 w-20 rounded-lg" />
+            <Skeleton className="h-8 w-12 rounded-lg" />
+            <Skeleton className="h-8 w-20 rounded-lg" />
+          </div>
+          <Skeleton className="mt-4 h-[280px] w-full rounded-xl sm:h-[400px] lg:h-[440px]" />
+          <Skeleton className="mt-2 h-4 w-64" />
+        </Card>
+        <div className="flex flex-col gap-4 lg:col-start-2 lg:row-start-2">
+          <Skeleton className="h-[150px] w-full rounded-2xl" />
+          <div className="grid grid-cols-3 gap-2.5">
+            {[0, 1, 2].map((i) => (
+              <Skeleton key={i} className="h-[74px] rounded-[13px]" />
+            ))}
+          </div>
+          <Skeleton className="h-[52px] w-full rounded-xl" />
         </div>
       </div>
     </div>

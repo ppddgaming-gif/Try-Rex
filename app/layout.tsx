@@ -43,7 +43,7 @@ export default function RootLayout({
       lang="id"
       className={`${bricolage.variable} ${jakarta.variable} ${jetbrains.variable} bg-background`}
     >
-      <body className="bg-background text-foreground">{children}</body>
+      <body className="text-foreground">{children}</body>
     </html>
   )
 }

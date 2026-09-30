@@ -71,7 +71,7 @@ export function SelectMenu({
             setOpen(true)
           }
         }}
-        className="flex w-full items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium transition-colors hover:bg-muted"
+        className="flex min-h-11 w-full items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm font-medium transition-colors hover:bg-muted"
       >
         {current.prefix && <span className="flex text-muted-foreground">{current.prefix}</span>}
         {current.label}
@@ -97,7 +97,7 @@ export function SelectMenu({
               pick(options[active].value)
             }
           }}
-          className="pop absolute right-0 z-50 mt-1 min-w-full overflow-hidden rounded-lg border border-border bg-card p-1 shadow-2xl"
+          className="pop glass-card absolute right-0 z-50 mt-1.5 min-w-full overflow-hidden rounded-xl p-1"
         >
           {options.map((o, i) => {
             const selected = o.value === value

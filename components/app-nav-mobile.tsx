@@ -4,19 +4,16 @@ import { useState } from "react"
 import { Menu, X } from "lucide-react"
 import { BrandMark } from "@/components/brand-mark"
 import { NavLinks } from "@/components/nav-links"
-import { ProfileCard } from "@/components/profile-card"
+import { ProfileCard, type ProfileSummary } from "@/components/profile-card"
 
 // The sidebar is desktop-only, so this is the sole way to move between app
 // routes below the lg breakpoint.
-export function AppNavMobile({ userName }: { userName: string | null }) {
+export function AppNavMobile({ profile }: { profile: ProfileSummary | null }) {
   const [open, setOpen] = useState(false)
   const close = () => setOpen(false)
 
   return (
-    <header
-      className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-xl lg:hidden"
-      style={{ viewTransitionName: "app-header" }}
-    >
+    <header className="glass-bar sticky top-0 z-40 border-b border-border lg:hidden" style={{ viewTransitionName: "app-header" }}>
       <div className="flex h-16 items-center justify-between px-5">
         <BrandMark onNavigate={close} />
         <button
@@ -24,7 +21,7 @@ export function AppNavMobile({ userName }: { userName: string | null }) {
           aria-label={open ? "Tutup menu" : "Buka menu"}
           aria-expanded={open}
           aria-controls="app-nav-menu"
-          className="flex h-11 w-11 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:text-foreground"
+          className="flex h-11 w-11 items-center justify-center rounded-xl border border-border text-muted-foreground transition-colors hover:text-foreground"
         >
           {/* Keyed so the new icon mounts and turns in, instead of popping. */}
           <span key={open ? "close" : "open"} className="icon-swap flex">
@@ -34,9 +31,9 @@ export function AppNavMobile({ userName }: { userName: string | null }) {
       </div>
 
       {/* Stays mounted so the drawer animates closed as well as open. */}
-      <div id="app-nav-menu" data-open={open} className="presence border-t border-border bg-background px-5 py-4">
+      <div id="app-nav-menu" data-open={open} className="presence border-t border-border px-5 py-4">
         <NavLinks onNavigate={close} />
-        <ProfileCard name={userName} className="mt-4" />
+        <ProfileCard profile={profile} onNavigate={close} className="mt-4" />
       </div>
     </header>
   )

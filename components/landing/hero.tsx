@@ -8,18 +8,23 @@ const delay = (ms: number) => ({ "--enter-delay": `${ms}ms` }) as CSSProperties
 
 export function Hero() {
   return (
-    <section className="relative mx-auto max-w-7xl px-5 pt-20 pb-10 lg:px-8 lg:pt-28">
+    <section className="relative isolate mx-auto max-w-7xl px-5 pt-20 pb-10 lg:px-8 lg:pt-28">
+      {/* Slow-drifting warm light behind the headline. */}
+      <div className="aurora" aria-hidden="true" />
       <div className="mx-auto max-w-3xl text-center">
         <span
-          className="enter inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground"
+          className="enter glass-card inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium text-muted-foreground"
           style={delay(0)}
         >
-          <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60 motion-reduce:hidden" />
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
+          </span>
           AI Trading Mentor untuk trader pemula
         </span>
 
         <h1
-          className="enter mt-6 text-balance text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl"
+          className="enter-focus mt-6 text-balance text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl"
           style={delay(80)}
         >
           Belajar trading dengan mentor AI yang tak pernah tidur
@@ -49,7 +54,7 @@ export function Hero() {
       </div>
 
       {/* Hero showcase: a real question from the game */}
-      <div className="enter mt-12" style={delay(360)}>
+      <div className="enter-focus mt-12" style={delay(360)}>
         <GlowPanel className="sm:py-12 lg:px-16">
           <HeroShowcase />
         </GlowPanel>

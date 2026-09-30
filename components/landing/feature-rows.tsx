@@ -49,7 +49,7 @@ export function FeatureRows() {
               </p>
             </div>
             <div className={f.reverse ? "lg:order-1" : ""}>
-              <GlowPanel>{f.mockup}</GlowPanel>
+              <GlowPanel className="reveal-tilt">{f.mockup}</GlowPanel>
             </div>
           </div>
         ))}

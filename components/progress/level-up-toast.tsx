@@ -29,7 +29,7 @@ export function LevelUpToast() {
       {toast && (
         <div
           key={toast.id}
-          className="toast-life fixed left-1/2 top-4 z-[60] flex items-center gap-2.5 rounded-2xl border border-primary/40 bg-card px-5 py-3 text-sm font-bold shadow-2xl"
+          className="toast-life glass-card fixed left-1/2 top-4 z-[60] flex items-center gap-2.5 rounded-full px-5 py-3 text-sm font-bold"
         >
           <PartyPopper className="h-5 w-5 text-primary" aria-hidden="true" />
           Naik ke Level <span className="font-mono tabular-nums">{toast.level}</span>!

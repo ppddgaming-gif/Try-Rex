@@ -17,7 +17,7 @@ export function FinalCta({ signedIn }: { signedIn: boolean }) {
         }}
       >
         <div className="relative mx-auto max-w-2xl">
-          <Rex size={60} className="mx-auto" />
+          <Rex size={60} mood="happy" className="float mx-auto" />
           <h2 className="mt-4 text-balance text-3xl font-extrabold tracking-tight sm:text-5xl">
             Mulai jadi trader yang konsisten hari ini
           </h2>
