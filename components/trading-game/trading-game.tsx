@@ -4,6 +4,7 @@ import { startTransition, useEffect, useEffectEvent, useMemo, useState, ViewTran
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Card } from "@/components/card"
+import { GlossaryText } from "@/components/glossary/glossary-text"
 import { CandlestickChart } from "@/components/candlestick-chart"
 import { Skeleton } from "@/components/progress/skeleton"
 import { SelectMenu } from "@/components/select-menu"
@@ -294,7 +295,10 @@ function GameRound({
           <ViewTransition key={challenge.id} name="game-situation" share="auto" default="none">
             <Card className="enter" style={{ "--enter-delay": "80ms" } as React.CSSProperties}>
               <h2 className="text-base font-semibold">Situasi Market</h2>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{challenge.situation}</p>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                <GlossaryText text={challenge.situation} />
+              </p>
+              <p className="mt-3 text-[11px] text-faint">Ketuk kata bergaris untuk lihat artinya.</p>
             </Card>
           </ViewTransition>
 

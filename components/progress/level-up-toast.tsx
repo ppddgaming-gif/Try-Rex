@@ -3,6 +3,7 @@
 import { useRef, useState } from "react"
 import { PartyPopper } from "lucide-react"
 import { useProgressEvents } from "@/lib/progress/use-progress"
+import { Confetti } from "@/components/confetti"
 
 const TOAST_MS = 3000
 
@@ -29,8 +30,9 @@ export function LevelUpToast() {
       {toast && (
         <div
           key={toast.id}
-          className="toast-life glass-card fixed left-1/2 top-4 z-[60] flex items-center gap-2.5 rounded-full px-5 py-3 text-sm font-bold"
+          className="toast-life glass-card glass-strong fixed left-1/2 top-4 z-[60] flex items-center gap-2.5 rounded-full px-5 py-3 text-sm font-bold"
         >
+          <Confetti pieces={22} />
           <PartyPopper className="h-5 w-5 text-primary" aria-hidden="true" />
           Naik ke Level <span className="font-mono tabular-nums">{toast.level}</span>!
         </div>

@@ -13,6 +13,8 @@ const cols = [
   {
     title: "Sumber",
     links: [
+      { label: "Belajar 101", href: "/belajar" },
+      { label: "Kamus Trading", href: "/belajar/kamus" },
       { label: "Cara Kerja", href: "/#how" },
       { label: "Fitur", href: "/#features" },
     ],

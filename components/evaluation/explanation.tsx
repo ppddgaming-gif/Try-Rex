@@ -1,4 +1,5 @@
 import { Card } from "@/components/card"
+import { GlossaryText } from "@/components/glossary/glossary-text"
 import { RexMascot } from "@/components/rex-mascot"
 import { CheckCircle2, Lightbulb, XCircle } from "lucide-react"
 import { decisionLabels, type Decision } from "@/lib/mock-data"
@@ -37,7 +38,9 @@ export function Explanation({
           {reasons.map((r) => (
             <li key={r} className="flex gap-2 text-sm leading-relaxed text-muted-foreground">
               <span className={`mt-2 h-1.5 w-1.5 shrink-0 rounded-full ${dot}`} />
-              {r}
+              <span>
+                <GlossaryText text={r} />
+              </span>
             </li>
           ))}
         </ul>
@@ -48,7 +51,9 @@ export function Explanation({
           <Lightbulb className="h-4 w-4" /> Saran TRY-REX
         </p>
         {/* Right padding keeps the text clear of Rex in the corner. */}
-        <p className="mt-2 pr-16 text-sm leading-relaxed text-foreground/90 sm:pr-20">{suggestion}</p>
+        <p className="mt-2 pr-16 text-sm leading-relaxed text-foreground/90 sm:pr-20">
+          <GlossaryText text={suggestion} />
+        </p>
       </div>
 
       <RexMascot mood={correct ? "happy" : "grimace"} className="absolute -bottom-2 right-0 opacity-90" />

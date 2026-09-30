@@ -10,6 +10,7 @@ import { Avatar } from "@/components/avatar"
 import { Card } from "@/components/card"
 import { ActivityRows } from "@/components/progress/activity-rows"
 import { DailyGoal } from "@/components/progress/daily-goal"
+import { NextLesson } from "@/components/learn/next-lesson"
 import { AiInsight } from "@/components/progress/ai-insight"
 import { CompetencyMeter } from "@/components/progress/competency-meter"
 import { EmptyState } from "@/components/progress/empty-state"
@@ -48,7 +49,7 @@ export function DashboardView({
     <div className="mx-auto max-w-7xl px-5 py-6 lg:px-8">
       <header className="enter flex flex-wrap items-center justify-between gap-4">
         <div className="flex min-w-0 items-center gap-4">
-          <Link href="/akun" aria-label="Pengaturan akun" className="rounded-full transition-transform duration-300 ease-spring hover:scale-105">
+          <Link href="/pengaturan#profil" aria-label="Pengaturan akun" className="rounded-full transition-transform duration-300 ease-spring hover:scale-105">
             <Avatar src={avatarUrl} name={name} size={52} />
           </Link>
           <div className="min-w-0">
@@ -143,6 +144,9 @@ export function DashboardView({
 
         {/* 6. */}
         <AiInsight />
+
+        {/* 6b. Belajar 101 */}
+        <NextLesson />
 
         {/* 7. */}
         <div className="lg:col-span-2">{dailyChallenge}</div>

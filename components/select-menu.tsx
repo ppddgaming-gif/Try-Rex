@@ -97,7 +97,7 @@ export function SelectMenu({
               pick(options[active].value)
             }
           }}
-          className="pop glass-card absolute right-0 z-50 mt-1.5 min-w-full overflow-hidden rounded-xl p-1"
+          className="pop glass-card glass-strong absolute right-0 z-50 mt-1.5 min-w-full overflow-hidden rounded-xl p-1"
         >
           {options.map((o, i) => {
             const selected = o.value === value

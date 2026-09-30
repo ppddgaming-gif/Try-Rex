@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 
 /** Routes that need an account. Guests are sent to /login?next=… */
-const PROTECTED = ["/dashboard", "/akun"]
+const PROTECTED = ["/dashboard"]
 /** Auth screens a signed-in user has no reason to see. */
 const GUEST_ONLY = ["/login", "/signup"]
 

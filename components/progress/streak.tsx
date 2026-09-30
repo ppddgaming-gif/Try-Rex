@@ -30,7 +30,7 @@ export function Streak({ compact = false }: { compact?: boolean }) {
   const current = liveStreak(progress.streak, today)
   const lit = playedToday(progress.streak, today)
   const hint = current === 0 ? "Mulai streak-mu hari ini" : lit ? "Hari ini sudah latihan" : "Main 1 soal hari ini"
-  const flame = lit ? "fill-warning text-warning" : "text-muted-foreground"
+  const flame = lit ? "flicker fill-warning text-warning" : "text-muted-foreground"
 
   if (compact) {
     return (

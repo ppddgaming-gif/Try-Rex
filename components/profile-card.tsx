@@ -26,10 +26,27 @@ export function ProfileCard({
   onNavigate?: () => void
 }) {
   return (
-    <div className={`glass-card rounded-2xl p-4 ${className}`}>
+    <div className={`profile-card glass-card rounded-2xl p-4 ${className}`}>
+      {/* Collapsed sidebar: just the face, linking to Settings (or sign-in). */}
+      <Link
+        href={profile ? "/pengaturan#profil" : "/login"}
+        onClick={onNavigate}
+        aria-label={profile ? `Pengaturan akun ${profile.name}` : "Masuk"}
+        data-tip={profile ? profile.name : "Masuk"}
+        className="sb-mini justify-center"
+      >
+        <Avatar
+          src={profile?.avatarUrl ?? null}
+          name={profile?.name ?? "Tamu"}
+          size={40}
+          fallback={profile ? undefined : <Rex size={30} />}
+        />
+      </Link>
+
+      <div className="sb-full">
       {profile ? (
         <Link
-          href="/akun"
+          href="/pengaturan#profil"
           onClick={onNavigate}
           className="group -m-2 flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-foreground/5"
         >
@@ -81,6 +98,7 @@ export function ProfileCard({
           </Link>
         </div>
       )}
+      </div>
     </div>
   )
 }
