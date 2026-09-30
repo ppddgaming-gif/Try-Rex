@@ -29,6 +29,13 @@ node node_modules/next/dist/bin/next dev
 node node_modules/typescript/bin/tsc --noEmit
 ```
 
+## Branches and deploys
+- main = the live site (tryrex-iota.vercel.app). Never commit, merge or push to main unless I explicitly say "merge dev into main".
+- dev = the shared test site (tryrex-dev.vercel.app). Finished work goes here first.
+- For every new task, create a branch from dev named feat/<short-name> and push it. Vercel gives it its own private preview link.
+- When a task is done, merge it into dev (not main) and tell me to check the dev site.
+- Only after I've checked the dev site do we merge dev into main.
+
 ## Architecture
 
 Next.js 16 App Router + React 19, TypeScript strict, Tailwind CSS v4. The `@/*` path alias maps to the repo root (so `@/components/card` → `components/card.tsx`).
