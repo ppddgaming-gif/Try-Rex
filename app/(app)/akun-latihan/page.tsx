@@ -9,6 +9,8 @@ import { ACCOUNT } from "@/lib/demo/config"
 import { usd } from "@/lib/demo/format"
 import { publicLesson } from "@/lib/demo/lessons"
 import { getAccess, loadDemoState, loadLedger } from "@/lib/demo/server"
+import { loadTrading } from "@/lib/demo/trading"
+import { buildView } from "@/lib/demo/view"
 
 /**
  * One route, in order: sign in → finish 3 game sessions → create Akun #1 →
@@ -25,11 +27,12 @@ export default async function AkunLatihanPage() {
   if (!state.account) return <CreateAccount startingBalance={usd(ACCOUNT.STARTING_BALANCE)} leverage={ACCOUNT.LEVERAGE} />
   if (!state.introLessonPassed) return <RequiredLesson lesson={publicLesson("intro")} />
 
-  const ledger = await loadLedger(state.account.id)
+  const [ledger, trading] = await Promise.all([loadLedger(state.account.id), loadTrading(user.id)])
+  if (!trading) return <NotReadyCard />
   return (
     <div className="flex flex-col gap-5">
       <DemoTabs />
-      <AccountOverview account={state.account} ledger={ledger} />
+      <AccountOverview view={buildView(trading.state)} ledger={ledger} />
     </div>
   )
 }

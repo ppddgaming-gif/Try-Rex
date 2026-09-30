@@ -2,12 +2,13 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Lightbulb, Wallet } from "lucide-react"
+import { CandlestickChart, Lightbulb, Wallet } from "lucide-react"
 
-// Akun Latihan's sections. Phase B and C add Trading, Jurnal, Dashboard,
-// Riwayat and the calculator here.
+// Akun Latihan's sections. Jurnal, Dashboard, Riwayat and the calculator
+// join these later.
 const TABS = [
   { href: "/akun-latihan", label: "Akun", icon: Wallet },
+  { href: "/akun-latihan/trading", label: "Trading", icon: CandlestickChart },
   { href: "/akun-latihan/tips", label: "Tips Rex", icon: Lightbulb },
 ]
 

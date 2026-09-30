@@ -41,7 +41,7 @@ export function pipValue(pair: string, lot: number, price: number) {
   return pipSize * units(lot) * quoteToUsd(pair, price).rate
 }
 
-/** USD margin the broker holds for this position. 0.10 lot EURUSD at 1.1700 = $117. */
+/** USD margin set aside for this position. 0.10 lot EURUSD at 1.1700 = $117. */
 export function marginFor(pair: string, lot: number, price: number) {
   return roundMoney((units(lot) * baseToUsd(pair, price).rate) / ACCOUNT.LEVERAGE)
 }
@@ -57,7 +57,7 @@ export function pipsBetween(pair: string, side: Side, entry: number, exit: numbe
 
 /**
  * Gross profit or loss of closing at `exit`, before costs, in USD. The pip
- * value is converted at the exit price, as a broker would at settlement.
+ * value is converted at the exit price, as it would be at settlement.
  * 0.10 lot BUY 1.1700 → 1.1750 = $50.00.
  */
 export function grossPnl(pair: string, side: Side, lot: number, entry: number, exit: number) {

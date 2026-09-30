@@ -26,7 +26,10 @@ export const ACCOUNT = {
  * spread only, no commission; the calculator still shows the commission row.
  */
 export const COSTS = {
-  /** Spread in pips, charged when a trade opens. */
+  /**
+   * Spread in pips, fixed when a trade opens: the trade starts this far behind
+   * (Open P/L shows it at once) and it is booked with the trade's result.
+   */
   SPREAD_PIPS: {
     EURUSD: 1.0,
     GBPUSD: 1.5,
@@ -49,6 +52,8 @@ export const REPLAY = {
   HISTORY_CANDLES: 30,
   /** Most candles a segment can play forward (the data allows about 35). */
   MAX_FORWARD_CANDLES: 35,
+  /** A window with fewer candles than this to play forward isn't offered as a segment. */
+  MIN_FORWARD_CANDLES: 10,
   /** Opening a trade with fewer candles left than this shows a warning. */
   LOW_CANDLES_WARNING: 10,
   /** Milliseconds per candle at 1×; 2× and 4× divide it. */
@@ -70,6 +75,21 @@ export const DISIPLIN = {
   /** The account's Disiplin score averages this many most recent counted trades. */
   ROLLING_TRADES: 20,
 } as const
+
+/** The plan before every trade. */
+export const PLAN = {
+  /** Reasons picked from the shared list (lib/reasons.ts). */
+  MIN_REASONS: 1,
+  MAX_REASONS: 3,
+  /** Largest SL or TP distance the order panel accepts, in pips. */
+  MAX_DISTANCE_PIPS: 1000,
+} as const
+
+/** The horizontal-line tool. Lines are saved per segment and never scored. */
+export const LINES = { MAX_PER_SEGMENT: 10 } as const
+
+/** "Apakah kamu mengikuti rencanamu?" Self-reported, never scored. */
+export const REVIEW = { NOTE_MAX_CHARS: 120 } as const
 
 /** Stages belong to the player and survive a new account. */
 export const STAGES = {

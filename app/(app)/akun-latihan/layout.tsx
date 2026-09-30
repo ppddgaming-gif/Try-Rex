@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: "Akun Latihan" }
 // Every Akun Latihan screen: the same header and the virtual-balance line.
 export default function AkunLatihanLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mx-auto max-w-5xl px-5 py-6 lg:px-8">
+    <div className="mx-auto max-w-6xl px-4 py-6 sm:px-5 lg:px-8">
       <header className="enter">
         <p className="eyebrow">Akun Latihan</p>
         <h1 className="mt-2 text-2xl font-bold tracking-tight">Trading dengan rencana, bukan tebakan</h1>

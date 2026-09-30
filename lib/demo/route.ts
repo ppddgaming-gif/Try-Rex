@@ -6,6 +6,24 @@ import { createClient } from "@/lib/supabase/server"
 export const json = (body: unknown, status = 200) => Response.json(body, { status })
 
 /**
+ * A trading action's outcome as a response: the new view, or the refusal in
+ * words (with the current view, when there is one, so the screen catches up).
+ */
+export const respond = (result: { view: unknown } | { error: string; status: number; view?: unknown }) =>
+  "error" in result
+    ? json({ error: result.error, view: result.view ?? null }, result.status)
+    : json({ view: result.view })
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+export const isUuid = (v: unknown): v is string => typeof v === "string" && UUID.test(v)
+
+/** A finite number, null, or undefined when the value is neither (invalid input). */
+export function numberOrNull(v: unknown): number | null | undefined {
+  if (v === null) return null
+  return typeof v === "number" && Number.isFinite(v) ? v : undefined
+}
+
+/**
  * The signed-in user and the parsed JSON body, or an error response.
  * Only JSON is accepted: a cross-site HTML form can't send it, so the
  * session cookie alone can't be used to post here from another site.

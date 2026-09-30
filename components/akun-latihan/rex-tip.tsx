@@ -12,22 +12,26 @@ export function markTipSeen(tip: TipId) {
 }
 
 /**
- * Shows tip `id` once. `seen` is the set the server already has; when the
- * trigger fires and the tip is new, call `show()`. Dismissing marks it seen.
- * Wired to its moment in phase B (order panel, risk, revenge, stop out…).
+ * Each tip once, at its moment. Call `trigger(id)` from the handler where the
+ * moment happens (the order panel opens, a stop out comes back…); a tip the
+ * player has already seen is ignored. Several moments can land together, so
+ * they queue and show one at a time. Dismissing marks the tip seen.
  */
-export function useRexTip(id: TipId, seen: ReadonlySet<TipId>) {
-  const [open, setOpen] = useState(false)
-  const [done, setDone] = useState(seen.has(id))
+export function useTipQueue(initialSeen: TipId[]) {
+  const [seen, setSeen] = useState(() => new Set(initialSeen))
+  const [queue, setQueue] = useState<TipId[]>([])
   return {
-    open,
-    show: () => {
-      if (!done) setOpen(true)
+    current: queue[0] ?? null,
+    trigger(id: TipId) {
+      if (seen.has(id)) return
+      setQueue((q) => (q.includes(id) ? q : [...q, id]))
     },
-    dismiss: () => {
-      setOpen(false)
-      setDone(true)
+    dismiss() {
+      const id = queue[0]
+      if (!id) return
       markTipSeen(id)
+      setSeen((s) => new Set(s).add(id))
+      setQueue((q) => q.slice(1))
     },
   }
 }

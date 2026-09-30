@@ -14,60 +14,15 @@ import {
   zonesFromLevels,
 } from "@/lib/game-logic"
 
-export type Candle = {
-  o: number
-  h: number
-  l: number
-  c: number
-}
-
-export type Zone = {
-  from: number
-  to: number
-  variant: "resistance" | "support"
-  label?: string
-}
-
-export type Marker = {
-  price: number
-  label: string
-  variant: "neutral" | "danger" | "success"
-  align?: "left" | "right"
-}
+// The chart's types and frameOf live in lib/chart-geometry (it carries no
+// data, so Akun Latihan's client code can use it without this file's candles).
+import type { Candle, Marker, Zone } from "@/lib/chart-geometry"
+export { frameOf } from "@/lib/chart-geometry"
+export type { Candle, Marker, Zone }
 
 export type Decision = "buy" | "sell" | "wait"
 
 export type AspectKey = "trend" | "entry" | "risk" | "structure"
-
-const round = (v: number, digits: number) => Number(v.toFixed(digits))
-
-/**
- * CandlestickChart does no autoscaling, so derive a frame guaranteed to contain
- * the data instead of hand-tuning min / max / priceTicks at every call site.
- * Step selection is scale-free, so it works for both 1.08 majors and 105 JPY.
- */
-export function frameOf(candles: Candle[]): { min: number; max: number; priceTicks: number[] } {
-  const lo = Math.min(...candles.map((c) => c.l))
-  const hi = Math.max(...candles.map((c) => c.h))
-  const pad = (hi - lo) * 0.12 || Math.abs(hi) * 0.001 || 0.001
-  const span = hi - lo + pad * 2
-
-  const rough = span / 8
-  const magnitude = Math.pow(10, Math.floor(Math.log10(rough)))
-  const step =
-    [1, 2, 2.5, 5, 10].map((m) => m * magnitude).find((s) => span / s <= 10) ?? 10 * magnitude
-
-  // Enough decimals to describe the step exactly, so ticks never drift.
-  const dp = Math.max(0, Math.min(8, Math.ceil(-Math.log10(step)) + 1))
-  const min = round(Math.floor((lo - pad) / step) * step, dp)
-  const max = round(Math.ceil((hi + pad) / step) * step, dp)
-
-  const priceTicks: number[] = []
-  const steps = Math.round((max - min) / step)
-  for (let i = 0; i <= steps; i++) priceTicks.push(round(min + i * step, dp))
-
-  return { min, max, priceTicks }
-}
 
 export type Challenge = {
   /**

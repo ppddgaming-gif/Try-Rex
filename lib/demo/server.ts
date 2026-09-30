@@ -26,7 +26,7 @@ export type DemoState = {
   /** How many accounts this player has ever opened (Akun #n). */
   accountCount: number
   tipsSeen: { id: TipId; seenAt: string }[]
-  /** False when the Akun Latihan tables don't exist yet (migration not run). */
+  /** False when the Akun Latihan tables don't exist yet (a migration not run). */
   ready: boolean
 }
 
@@ -55,7 +55,7 @@ export const loadDemoState = cache(async (userId: string): Promise<DemoState> =>
   const supabase = await createClient()
   const unlock = await getUnlock(userId)
 
-  const [profile, active, count, tips] = await Promise.all([
+  const [profile, active, count, tips, trades] = await Promise.all([
     supabase.from("demo_profile").select("intro_lesson_passed_at").eq("user_id", userId).maybeSingle(),
     supabase
       .from("demo_accounts")
@@ -65,9 +65,11 @@ export const loadDemoState = cache(async (userId: string): Promise<DemoState> =>
       .maybeSingle(),
     supabase.from("demo_accounts").select("id", { count: "exact", head: true }).eq("user_id", userId),
     supabase.from("demo_tips_seen").select("tip_id, seen_at").eq("user_id", userId),
+    // Phase B's tables: trading needs them too.
+    supabase.from("demo_trades").select("id", { count: "exact", head: true }).eq("user_id", userId),
   ])
 
-  const ready = !profile.error && !active.error && !count.error && !tips.error
+  const ready = !profile.error && !active.error && !count.error && !tips.error && !trades.error
 
   return {
     unlock,
@@ -87,7 +89,7 @@ export async function loadLedger(accountId: string): Promise<LedgerRow[]> {
     .from("demo_ledger")
     .select("id, kind, label, amount, balance_after, created_at")
     .eq("account_id", accountId)
-    .order("created_at", { ascending: false })
+    .order("seq", { ascending: false })
     .limit(50)
   return (data ?? []).map((r) => ({
     id: String(r.id),
