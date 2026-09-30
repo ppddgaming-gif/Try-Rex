@@ -3,12 +3,12 @@
 import { useState } from "react"
 import { Menu, X } from "lucide-react"
 import { BrandMark } from "@/components/brand-mark"
-import { NavLinks } from "@/components/nav-links"
+import { NavLinks, type NavLocks } from "@/components/nav-links"
 import { ProfileCard, type ProfileSummary } from "@/components/profile-card"
 
 // The sidebar is desktop-only, so this is the sole way to move between app
 // routes below the lg breakpoint.
-export function AppNavMobile({ profile }: { profile: ProfileSummary | null }) {
+export function AppNavMobile({ profile, locks }: { profile: ProfileSummary | null; locks: NavLocks }) {
   const [open, setOpen] = useState(false)
   const close = () => setOpen(false)
 
@@ -32,7 +32,7 @@ export function AppNavMobile({ profile }: { profile: ProfileSummary | null }) {
 
       {/* Stays mounted so the drawer animates closed as well as open. */}
       <div id="app-nav-menu" data-open={open} className="presence border-t border-border px-5 py-4">
-        <NavLinks onNavigate={close} />
+        <NavLinks onNavigate={close} locks={locks} />
         <ProfileCard profile={profile} onNavigate={close} className="mt-4" />
       </div>
     </header>

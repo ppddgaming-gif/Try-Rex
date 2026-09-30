@@ -10,9 +10,11 @@ npm run build    # production build
 npm start        # serve the production build
 npm run typecheck # tsc --noEmit, strict mode
 npm run lint      # eslint . (flat config in eslint.config.mjs)
+npm test          # vitest run: table-driven unit tests for pure logic (lib/**/*.test.ts)
 ```
 
-- **No test suite exists** — no test runner, config, or test files. If asked to add tests, pick a framework and say so explicitly.
+- **Tests are vitest**, for pure logic only (`vitest.config.mts`, `@/` alias included). Components aren't tested. Money, Disiplin, fills and stage logic in `lib/demo/` must have table-driven tests. A module that imports `server-only` can't be imported by a test, so keep testable logic in plain files and the server-only parts thin.
+- If `tsc` complains about `.next/dev/types/validator.ts` after adding a route or layout, the generated types are stale: run `npx next typegen`.
 - `node scripts/generate-game-data.mjs` regenerates `lib/game-data.ts` from `Game-data-main/`. It is plain Node with no dependencies and prints a report of what it skipped and repaired.
 - Lint is the ESLint CLI with `eslint-config-next` (core-web-vitals + typescript). `next lint` no longer exists in Next 16. `Game-data-main/` and the generated `lib/game-data.ts` are ignored.
 
@@ -159,6 +161,24 @@ Theme (`dark` default, `light`, `system`), reading font (`default`, `dyslexic` =
 - `chart` blocks show **real game charts** picked by what they show (`chartFor(pick)` in `lib/learn/charts.ts`: uptrend, downtrend, sideways, levels), with fixed-height boxes. `diagram` blocks are aspect-ratio-safe SVGs in `components/learn/diagrams.tsx` (candle anatomy, trend shapes, risk-reward, leverage), coloured from tokens.
 - Lesson completion is per device (`lib/learn/progress.ts`, localStorage `tryrex:learn:v1`). The counts on `/belajar` and the dashboard's `NextLesson` card are exactly those marks. Quizzes record nothing.
 - Callouts: `tip` is blue-grey (`wait`) and `warning` is amber. Red and green stay reserved for price direction.
+
+### Akun Latihan (`/akun-latihan`): virtual trading on historical data
+
+Signed-in players only. It opens after 3 Trading Game sessions. Virtual money, historical candles, no live prices, no payments, and **no broker names, links, referral codes or "buka akun real" prompts, ever**. Every screen carries `DISCLAIMER` (the section layout renders it). It is built in phases on `feat/akun-latihan`; phase A is accounts, the required lesson and Rex tips.
+
+- **Every number lives in `lib/demo/config.ts`**: balance, leverage, lots, costs ("perkiraan"), margin call and stop out, replay lengths, Disiplin limits, stages, graduation, unlock and XP. Change values there, never at call sites.
+- **Money is pure and tested** in `lib/demo/`:
+  - `money.ts` covers pip value, margin, pips, gross P/L, opening costs, swap, account figures and the "akun habis" level. It rounds to cents with `roundMoney`, so the order panel's prediction equals what gets booked.
+  - `instruments.ts` covers pair specs and USD conversion (exact when USD is a side, `APPROX_USD_RATE` for crosses).
+  - `access.ts` covers the unlock: sessions = `practice_attempts` ÷ 5, counted on the server.
+  - `lesson-math.ts` holds the lesson's numbers.
+  - Each has a `*.test.ts`.
+- **Server-only**: `lib/supabase/admin.ts` (the service-role client, `SUPABASE_SERVICE_ROLE_KEY`, the only writer), `lib/demo/server.ts` (reads through the player's own session, so RLS applies), `lib/demo/lessons.ts` (lesson text plus the answer key; `publicLesson()` lists the browser-safe fields one by one) and `lib/demo/route.ts` (`authed()`: session plus JSON-only bodies).
+- **Tables** (`supabase/migrations/*_akun_latihan_*.sql`): `demo_profile`, `demo_accounts` (one active per player), `demo_ledger` (every balance change, with `balance_after`) and `demo_tips_seen`. RLS gives SELECT on own rows only; there are no write policies. `demo_open_account()` creates an account and its "Setoran awal" row atomically, and is EXECUTE-able by `service_role` only.
+- **Routes** (`app/api/akun-latihan/*`, POST, JSON): `account`, `lesson` and `tips`. Each re-checks access on the server; money never comes from the request.
+- **Gate order** on `/akun-latihan`: signed in → tables exist → access (sessions done, **or** an account already exists, so resetting game progress never locks anyone out) → account → intro lesson → the account. The sidebar item shows the lock and "(n/3)" through `NavLinks`' `locks`, computed in `app/(app)/layout.tsx`.
+- **Rex tips** (`lib/demo/tips.ts`): each tip shows once at its moment (`useRexTip(id, seen)` and `RexTipCard` in `components/akun-latihan/rex-tip.tsx`) and is recorded in `demo_tips_seen`. `/akun-latihan/tips` rereads seen tips and names unseen ones by when they'll appear.
+- The Trading Game ships its candles to the browser (the known exception to rules 1–2). Akun Latihan code must never import `lib/game-data.ts` or `lib/mock-data.ts` into a client component.
 
 ### Onboarding: `/start`
 

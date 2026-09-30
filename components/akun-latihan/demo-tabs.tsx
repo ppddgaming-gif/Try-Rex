@@ -1,0 +1,40 @@
+"use client"
+
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { Lightbulb, Wallet } from "lucide-react"
+
+// Akun Latihan's sections. Phase B and C add Trading, Jurnal, Dashboard,
+// Riwayat and the calculator here.
+const TABS = [
+  { href: "/akun-latihan", label: "Akun", icon: Wallet },
+  { href: "/akun-latihan/tips", label: "Tips Rex", icon: Lightbulb },
+]
+
+export function DemoTabs() {
+  const pathname = usePathname()
+  return (
+    <nav aria-label="Bagian Akun Latihan" className="glass-card glass-strong flex gap-1 overflow-x-auto rounded-2xl p-1.5">
+      {TABS.map((t) => {
+        const active = pathname === t.href
+        return (
+          <Link
+            key={t.href}
+            href={t.href}
+            aria-current={active ? "page" : undefined}
+            className={[
+              "relative isolate flex min-h-11 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-xl px-4 text-sm font-semibold transition-colors",
+              active ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground",
+            ].join(" ")}
+          >
+            {active && (
+              <span aria-hidden="true" className="pop-in absolute inset-0 -z-10 rounded-xl bg-primary shadow-[0_3px_0_var(--primary-dim)]" />
+            )}
+            <t.icon className="h-4 w-4" aria-hidden="true" />
+            {t.label}
+          </Link>
+        )
+      })}
+    </nav>
+  )
+}
