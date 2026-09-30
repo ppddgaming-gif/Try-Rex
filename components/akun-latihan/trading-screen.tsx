@@ -38,6 +38,9 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
   const [draft, setDraft] = useState<Draft>({ lot: ACCOUNT.MIN_LOT, slPips: null, tpPips: null, reasons: [] })
   const [revealFrom, setRevealFrom] = useState<number | undefined>()
   const [drawing, setDrawing] = useState(false)
+  // A chart change is in flight: the screen still shows the old chart, so the
+  // line tool is held until the new one arrives (lines belong to a chart).
+  const [switching, setSwitching] = useState(false)
   const [drawn, setDrawn] = useState<{ session: string; prices: number[] } | null>(null)
   const [stageUp, setStageUp] = useState<number | null>(null)
   const tips = useTipQueue(initial.tipsSeen)
@@ -93,6 +96,12 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
   }
 
   const next = () => void call("step")
+
+  async function changeChart() {
+    setSwitching(true)
+    await call("session")
+    setSwitching(false)
+  }
 
   function changeDraft(d: Draft) {
     setDraft(d)
@@ -176,7 +185,7 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
           candle demi candle.
         </p>
         {error && <p className="mt-3 text-sm text-primary">{error}</p>}
-        <button type="button" onClick={() => void call("session")} disabled={busy} className="btn mt-6">
+        <button type="button" onClick={() => void changeChart()} disabled={busy} className="btn mt-6">
           Mulai chart
         </button>
       </div>
@@ -200,8 +209,9 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
                 type="button"
                 aria-pressed={drawing}
                 onClick={() => setDrawing((d) => !d)}
+                disabled={switching}
                 className={[
-                  "flex min-h-10 items-center gap-1.5 rounded-lg border px-3 text-xs font-semibold transition-colors",
+                  "flex min-h-10 items-center gap-1.5 rounded-lg border px-3 text-xs font-semibold transition-colors disabled:opacity-40",
                   drawing ? "border-primary bg-primary/15 text-primary" : "border-border text-muted-foreground hover:text-foreground",
                 ].join(" ")}
               >
@@ -209,7 +219,7 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
               </button>
               <button
                 type="button"
-                onClick={() => void call("session")}
+                onClick={() => void changeChart()}
                 disabled={busy || hasOpen}
                 title={hasOpen ? "Tutup trade yang terbuka dulu" : undefined}
                 className="flex min-h-10 items-center gap-1.5 rounded-lg border border-border px-3 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
@@ -225,7 +235,7 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
             closed={view.closed}
             draft={quote ? { sl: quote.sl, tp: quote.tp } : null}
             lines={lines}
-            drawing={drawing}
+            drawing={drawing && !switching}
             onLinesChange={saveLines}
             revealFrom={revealFrom}
           />
@@ -240,6 +250,7 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
                   <button
                     type="button"
                     onClick={() => saveLines(lines.filter((_, j) => j !== i))}
+                    disabled={switching}
                     aria-label={`Hapus garis ${price(session.pair, p)}`}
                     className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-primary/20"
                   >
@@ -336,7 +347,7 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
                 <p className="font-semibold">Segmen selesai</p>
                 <p className="text-sm text-muted-foreground">Semua candle chart ini sudah diputar. Lanjut ke chart lain.</p>
               </div>
-              <button type="button" onClick={() => void call("session")} disabled={busy} className="btn btn-sm">
+              <button type="button" onClick={() => void changeChart()} disabled={busy} className="btn btn-sm">
                 Chart baru
               </button>
             </div>
