@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 import { planClose, planModify, planOrder, planStart, planStep, type NewTrade, type SettlePlan } from "@/lib/demo/actions"
 import type { Bar } from "@/lib/demo/fills"
+import { roundMoney } from "@/lib/demo/money"
 import type { OrderInput } from "@/lib/demo/orders"
 import type { Segment } from "@/lib/demo/segments"
 import type { ClosedSummary, TradeRow, TradingState } from "@/lib/demo/state"
@@ -197,6 +198,52 @@ describe("planStep", () => {
     const p = settled(planStep({ ...s0, open: [open(s0)] }))
     expect(p.stage).toBe(2)
     expect(p.events).toContainEqual({ kind: "stage_up", stage: 2 })
+  })
+})
+
+describe("the ledger adds up (the rule demo_settle enforces)", () => {
+  // Starting from the account's balance, each row's balance_after is the
+  // previous balance plus its amount, and the new balance is the last one.
+  function expectChained(start: number, p: SettlePlan) {
+    let running = start
+    for (const row of p.ledger) {
+      expect(row.balance_after).toBe(roundMoney(running + row.amount))
+      running = row.balance_after
+    }
+    expect(p.balance).toBe(running)
+  }
+
+  const midnight = T0 + 30 * H4 + (86_400 - ((T0 + 30 * H4) % 86_400))
+  const cases: [string, () => SettlePlan][] = [
+    ["an SL hit", () => {
+      const s = state({}, { 30: { o: 1.1699, h: 1.17, l: 1.1665, c: 1.1668 } })
+      return settled(planStep({ ...s, open: [open(s)] }))
+    }],
+    ["a close with swap: trade row, then swap row", () => {
+      const s = state({}, { 30: { t: midnight, o: 1.1699, h: 1.17, l: 1.1665, c: 1.1668 } })
+      return settled(planStep({ ...s, open: [open(s)] }))
+    }],
+    ["a manual close", () => {
+      const s = state()
+      return settled(planClose(state({ open: [open(s)] }), "trade-1"))
+    }],
+    ["a candle with nothing to book", () => settled(planStep(state()))],
+    ["a gap past the stop-out level: trade row, then negative balance protection", () => {
+      const s = state({ stage: 2 }, { 30: { o: 1.145, h: 1.146, l: 1.144, c: 1.145 } })
+      return settled(planStep({ ...s, open: [open(s, { ...plan, lot: 0.15, slPips: null, tpPips: null })] }))
+    }],
+  ]
+
+  it.each(cases)("%s", (_name, run) => {
+    const p = run()
+    expectChained(200, p)
+  })
+
+  it("books swap as its own row and protects the balance at zero", () => {
+    expect(cases[1][1]().ledger.map((r) => r.kind)).toEqual(["trade", "swap"])
+    const gap = cases[4][1]()
+    expect(gap.ledger.map((r) => r.kind)).toEqual(["trade", "adjustment"])
+    expect(gap.balance).toBe(0)
   })
 })
 

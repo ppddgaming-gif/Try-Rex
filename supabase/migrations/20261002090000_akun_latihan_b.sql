@@ -297,7 +297,9 @@ end $$;
 
 -- A candle played (p_advance) or a manual close: trade exits and swap, the
 -- ledger rows, the new balance, the end of the segment and the stage. The
--- balance must equal the last ledger row booked.
+-- ledger arithmetic is checked here too: starting from the account's current
+-- balance, every new row's balance_after must be the previous balance plus
+-- its amount, and the new balance must be the last of them.
 create or replace function public.demo_settle(
   p_user uuid, p_account uuid, p_version bigint, p_session uuid, p_advance boolean,
   p_updates jsonb, p_ledger jsonb, p_balance numeric, p_end_session boolean, p_stage smallint)
@@ -307,6 +309,7 @@ set search_path = ''
 as $$
 declare
   v_account public.demo_accounts;
+  v_running numeric;
   u jsonb;
   c jsonb;
   l record;
@@ -351,19 +354,22 @@ begin
     end if;
   end loop;
 
-  -- In order: seq follows insertion.
+  -- In order: seq follows insertion. Each row must add up from the one before.
+  v_running := v_account.balance;
   for l in select value, ordinality from jsonb_array_elements(coalesce(p_ledger, '[]'::jsonb)) with ordinality
            order by ordinality loop
-    insert into public.demo_ledger (account_id, user_id, kind, label, amount, balance_after, trade_id)
-      values (p_account, p_user, l.value ->> 'kind', l.value ->> 'label', (l.value ->> 'amount')::numeric,
-              (l.value ->> 'balance_after')::numeric, (l.value ->> 'trade_id')::uuid);
-  end loop;
-
-  if jsonb_array_length(coalesce(p_ledger, '[]'::jsonb)) = 0 then
-    if p_balance <> v_account.balance then
+    if (l.value ->> 'amount') is null or (l.value ->> 'balance_after') is null
+       or (l.value ->> 'balance_after')::numeric <> v_running + (l.value ->> 'amount')::numeric then
       raise exception 'demo_ledger_mismatch';
     end if;
-  elsif (p_ledger -> -1 ->> 'balance_after')::numeric <> p_balance then
+    v_running := (l.value ->> 'balance_after')::numeric;
+    insert into public.demo_ledger (account_id, user_id, kind, label, amount, balance_after, trade_id)
+      values (p_account, p_user, l.value ->> 'kind', l.value ->> 'label', (l.value ->> 'amount')::numeric,
+              v_running, (l.value ->> 'trade_id')::uuid);
+  end loop;
+
+  -- The new balance is where the ledger ends (the current one when no row was booked).
+  if p_balance is null or p_balance <> v_running then
     raise exception 'demo_ledger_mismatch';
   end if;
   update public.demo_accounts set balance = p_balance where id = p_account;
