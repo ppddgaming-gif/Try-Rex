@@ -47,28 +47,31 @@ function Figure({ label, value, tone = "" }: { label: string; value: string; ton
   )
 }
 
-/** The player's stage and the way to the next one: "7/10 trade · Disiplin 76% (butuh 80%)". */
+/**
+ * The player's stage and the way to the next one, or in Stage 3 to
+ * graduation: "7/10 trade · Disiplin 76% (butuh 80%)".
+ */
 export function StageCard({ view }: { view: DemoView }) {
   const { stage } = view
   const p = stage.progress
-  const share = p.needed ? Math.min(1, p.trades / p.needed) : 1
+  const share = Math.min(1, p.trades / p.needed)
   return (
     <section aria-labelledby="stage-title" className="glass-card rounded-2xl p-4 sm:p-5">
       <div className="flex items-center justify-between gap-2">
         <h2 id="stage-title" className="flex items-center gap-2 text-sm font-semibold">
           <Layers className="h-4 w-4 text-primary" aria-hidden="true" /> Stage {stage.current}
         </h2>
-        {p.next && <span className="text-[11px] text-muted-foreground">menuju Stage {p.next}</span>}
+        <span className="text-[11px] text-muted-foreground">
+          {view.graduated ? "Lulus" : p.next ? `menuju Stage ${p.next}` : "menuju kelulusan"}
+        </span>
       </div>
       <p className="mt-2 font-mono text-xs font-semibold">{stage.label}</p>
-      {p.needed !== null && (
-        <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-inset" aria-hidden="true">
-          <div
-            className="h-full origin-left rounded-full bg-primary transition-transform duration-500 ease-out-expo"
-            style={{ transform: `scaleX(${share})` }}
-          />
-        </div>
-      )}
+      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-inset" aria-hidden="true">
+        <div
+          className="h-full origin-left rounded-full bg-primary transition-transform duration-500 ease-out-expo"
+          style={{ transform: `scaleX(${share})` }}
+        />
+      </div>
       <ul className="mt-3 flex flex-col gap-1 text-xs text-muted-foreground">
         <li>Pair: {stage.pairs.join(", ")}</li>
         <li>Lot: {stage.fixedLot !== null ? `tetap ${lot(stage.fixedLot)}` : "bebas dipilih"}</li>

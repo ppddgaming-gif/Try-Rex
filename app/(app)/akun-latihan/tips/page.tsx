@@ -4,15 +4,15 @@ import { Card } from "@/components/card"
 import { DemoTabs } from "@/components/akun-latihan/demo-tabs"
 import { TipsList } from "@/components/akun-latihan/tips-list"
 import { getCurrentUser } from "@/lib/auth"
-import { getAccess, loadDemoState } from "@/lib/demo/server"
+import { sectionState } from "@/lib/demo/server"
 
 export const metadata: Metadata = { title: "Tips Rex · Akun Latihan" }
 
 export default async function TipsPage() {
   const user = await getCurrentUser()
   if (!user) redirect("/akun-latihan")
-  const [access, state] = await Promise.all([getAccess(user.id), loadDemoState(user.id)])
-  if (!state.ready || !access.open || !state.account) redirect("/akun-latihan")
+  const state = await sectionState(user.id)
+  if (!state) redirect("/akun-latihan")
 
   return (
     <div className="flex flex-col gap-5">

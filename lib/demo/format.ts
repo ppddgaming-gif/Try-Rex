@@ -20,3 +20,6 @@ export function pct(value: number, { signed = false } = {}) {
 export const lot = (value: number) => value.toFixed(2)
 
 export const price = (pair: string, value: number) => value.toFixed(instrument(pair).digits)
+
+/** An account's status, as the journal and Riwayat akun name it. */
+export const ACCOUNT_STATUS: Record<"active" | "habis" | "reset", string> = { active: "aktif", habis: "habis", reset: "direset" }

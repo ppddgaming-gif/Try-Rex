@@ -1,10 +1,12 @@
 import { DISIPLIN, STAGES, type StageNumber } from "@/lib/demo/config"
-import { rollingDisiplin, type Checks } from "@/lib/demo/disiplin"
+import type { Checks } from "@/lib/demo/disiplin"
 import { figuresAt, openPnl, type ExitReason } from "@/lib/demo/fills"
-import { accountFigures, roundMoney, type AccountFigures, type Side } from "@/lib/demo/money"
+import { accountFigures, bustLevel, roundMoney, type AccountFigures, type Side } from "@/lib/demo/money"
 import { levelPips } from "@/lib/demo/orders"
+import { commentsFor } from "@/lib/demo/journal"
+import type { RexComment } from "@/lib/demo/rex-comments"
 import { progressLabel, stageProgress, type StageProgress } from "@/lib/demo/stages"
-import { toOpenTrade, type ReviewAnswer, type TradeRow, type TradingState } from "@/lib/demo/state"
+import { accountBust, toOpenTrade, type ReviewAnswer, type TradeRow, type TradingState } from "@/lib/demo/state"
 import type { TipId } from "@/lib/demo/tips"
 import type { ReasonId } from "@/lib/reasons"
 
@@ -44,6 +46,10 @@ export type TradeView = {
   exit: { price: number; index: number; reason: ExitReason; pips: number; net: number } | null
   disiplin: { checks: Checks; score: number; xp: number; counted: boolean } | null
   review: { answer: ReviewAnswer; note: string | null } | null
+  /** The journal note (also written with the review); never scored. */
+  note: string | null
+  /** Rex's comments once closed (lib/demo/rex-comments.ts). */
+  rex: RexComment[] | null
 }
 
 export type DemoEvent =
@@ -52,10 +58,19 @@ export type DemoEvent =
   | { kind: "stop_out"; price: number }
   | { kind: "segment_end" }
   | { kind: "stage_up"; stage: StageNumber }
+  | { kind: "graduated" }
   | { kind: "xp"; amount: number }
 
 export type DemoView = {
-  account: { number: number; startingBalance: number; figures: AccountFigures }
+  account: {
+    number: number
+    startingBalance: number
+    figures: AccountFigures
+    /** "Akun habis" (lib/demo/state.ts accountBust): trading has stopped. */
+    bust: boolean
+    /** Margin of the smallest trade on this chart, the "akun habis" line; null without a chart. */
+    bustLevel: number | null
+  }
   stage: {
     current: StageNumber
     pairs: string[]
@@ -85,8 +100,6 @@ export type DemoView = {
    * revenge trade. For the order panel's warning.
    */
   lossWindow: { lot: number; candlesAgo: number } | null
-  /** This account's closed trades. */
-  stats: { trades: number; wins: number; net: number; disiplin: number | null }
   lines: number[]
   tipsSeen: TipId[]
   /**
@@ -94,6 +107,8 @@ export type DemoView = {
    * trade (on any account) has closed and been reviewed.
    */
   guide: boolean
+  /** The player has graduated (lib/demo/stages.ts graduationReached, recorded once). */
+  graduated: boolean
   events: DemoEvent[]
 }
 
@@ -132,6 +147,8 @@ function tradeView(t: TradeRow, price: number | null): TradeView {
         ? { checks: t.checks, score: t.disiplin, xp: t.xp, counted: Boolean(t.counted) }
         : null,
     review: t.review ? { answer: t.review, note: t.reviewNote } : null,
+    note: t.reviewNote,
+    rex: closed ? commentsFor(t) : null,
   }
 }
 
@@ -162,7 +179,13 @@ export function buildView(state: TradingState, events: DemoEvent[] = []): DemoVi
   )
 
   return {
-    account: { number: account.number, startingBalance: account.startingBalance, figures },
+    account: {
+      number: account.number,
+      startingBalance: account.startingBalance,
+      figures,
+      bust: accountBust(state),
+      bustLevel: session && price !== null ? bustLevel(session.pair, price) : null,
+    },
     stage: {
       current: state.stage,
       pairs: [...stageCfg.pairs],
@@ -194,15 +217,10 @@ export function buildView(state: TradingState, events: DemoEvent[] = []): DemoVi
             lot: Math.min(...windowLosses.map((h) => h.lot)),
             candlesAgo: account.candlesPlayed - Math.max(...windowLosses.map((h) => h.closedClock)),
           },
-    stats: {
-      trades: mine.length,
-      wins: mine.filter((h) => h.net + h.swap > 0).length,
-      net: roundMoney(account.balance - account.startingBalance),
-      disiplin: rollingDisiplin(mine.filter((h) => h.counted).map((h) => h.disiplin)),
-    },
     lines: state.lines,
     tipsSeen: state.tipsSeen,
     guide: guided(state),
+    graduated: state.graduated,
     events,
   }
 }

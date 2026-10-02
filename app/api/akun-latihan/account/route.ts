@@ -1,12 +1,15 @@
-import { ACCOUNT } from "@/lib/demo/config"
+import { closeAccount, openAccount } from "@/lib/demo/accounts"
 import { authed, json } from "@/lib/demo/route"
 import { getAccess } from "@/lib/demo/server"
-import { createAdminClient } from "@/lib/supabase/admin"
 
 /**
- * POST: open Akun #1 (phase C adds later accounts). The server checks the
- * unlock itself and takes the starting balance from its own config: nothing
- * about money comes from the request.
+ * POST { action }:
+ * - "open" (the default): Akun #1, or the next account once the last one is
+ *   closed (and, after running out, the risk lesson is passed);
+ * - "close": end an account that has run out ("habis"), checked here;
+ * - "reset": end the active account by choice.
+ * The server checks the unlock itself and takes the starting balance from its
+ * own config: nothing about money comes from the request.
  */
 export async function POST(request: Request) {
   const auth = await authed(request)
@@ -15,21 +18,15 @@ export async function POST(request: Request) {
   const access = await getAccess(auth.userId)
   if (!access.open) return json({ error: access.unlock.hint }, 403)
 
-  const admin = createAdminClient()
-  const existing = await admin
-    .from("demo_accounts")
-    .select("id", { count: "exact", head: true })
-    .eq("user_id", auth.userId)
-  if (existing.error) return json({ error: "Akun Latihan belum siap di server." }, 503)
-  // Phase A opens the first account only. Starting again after running out
-  // (phase C) will come with its review and lesson.
-  if ((existing.count ?? 0) > 0) return json({ error: "Kamu sudah punya Akun Latihan." }, 409)
-
-  const { data, error } = await admin.rpc("demo_open_account", {
-    p_user: auth.userId,
-    p_balance: ACCOUNT.STARTING_BALANCE,
-  })
-  if (error) return json({ error: "Gagal membuat akun. Coba lagi sebentar lagi." }, 500)
-
-  return json({ ok: true, number: (data as { number: number }).number })
+  const action = auth.body.action ?? "open"
+  const result =
+    action === "open"
+      ? await openAccount(auth.userId)
+      : action === "close"
+        ? await closeAccount(auth.userId, "habis")
+        : action === "reset"
+          ? await closeAccount(auth.userId, "reset")
+          : null
+  if (!result) return json({ error: "Permintaan tidak valid." }, 400)
+  return "error" in result ? json({ error: result.error }, result.status) : json(result)
 }

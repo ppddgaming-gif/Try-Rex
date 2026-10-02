@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import type { StageNumber } from "@/lib/demo/config"
-import { progressLabel, stageAfter, stageProgress, type ScoredTrade } from "@/lib/demo/stages"
+import { graduationReached, progressLabel, stageAfter, stageProgress, type ScoredTrade } from "@/lib/demo/stages"
 
 const run = (stage: StageNumber, scores: number[]): ScoredTrade[] => scores.map((score) => ({ stage, score }))
 const times = (n: number, score: number) => Array<number>(n).fill(score)
@@ -26,8 +26,21 @@ describe("progressLabel", () => {
     ["the ticket's example", 1, run(1, [...times(6, 80), 36]), "7/10 trade · Disiplin 74% (butuh 80%)"],
     ["past the count", 1, run(1, times(12, 70)), "10/10 trade · Disiplin 70% (butuh 80%)"],
     ["Stage 2", 2, run(2, times(3, 100)), "3/20 trade · Disiplin 100% (butuh 80%)"],
-    ["Stage 3", 3, run(3, times(4, 90)), "Stage tertinggi · 4 trade · Disiplin 90%"],
+    ["Stage 3 counts toward graduation", 3, run(3, times(4, 90)), "4/30 trade · Disiplin 90% (butuh 80%)"],
   ] as [string, StageNumber, ScoredTrade[], string][])("%s", (_name, stage, trades, label) => {
     expect(progressLabel(stageProgress(stage, trades))).toBe(label)
+  })
+})
+
+describe("graduation: 30 counted trades in Stage 3, averaging 80% or better", () => {
+  it.each([
+    ["30 Stage 3 trades at 80%", 3, run(3, times(30, 80)), true],
+    ["29 Stage 3 trades at 100%", 3, run(3, times(29, 100)), false],
+    ["30 trades, one short of the average", 3, run(3, [...times(29, 80), 60]), false],
+    ["averages the last 30 only", 3, run(3, [...times(10, 0), ...times(30, 80)]), true],
+    ["Stage 1 and 2 trades don't count", 3, [...run(1, times(10, 100)), ...run(2, times(20, 100)), ...run(3, times(29, 100))], false],
+    ["not in Stage 3 yet", 2, run(3, times(30, 100)), false],
+  ] as [string, StageNumber, ScoredTrade[], boolean][])("%s", (_name, stage, trades, graduated) => {
+    expect(graduationReached(stage, trades)).toBe(graduated)
   })
 })

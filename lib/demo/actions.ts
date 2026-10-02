@@ -5,8 +5,8 @@ import { instrument } from "@/lib/demo/instruments"
 import { roundMoney } from "@/lib/demo/money"
 import { levelPrice, orderProblems, quoteOrder, type OrderInput } from "@/lib/demo/orders"
 import { pickSegment, type Segment } from "@/lib/demo/segments"
-import { stageAfter } from "@/lib/demo/stages"
-import { toOpenTrade, type TradingState } from "@/lib/demo/state"
+import { graduationReached, stageAfter } from "@/lib/demo/stages"
+import { accountBust, toOpenTrade, type TradingState } from "@/lib/demo/state"
 import type { DemoEvent } from "@/lib/demo/view"
 import type { ReasonId } from "@/lib/reasons"
 
@@ -51,6 +51,8 @@ export type SettlePlan = {
   balance: number
   endSession: boolean
   stage: StageNumber
+  /** Graduation reached with this settle, for the first time: the server records it. */
+  graduated: boolean
   events: DemoEvent[]
 }
 
@@ -144,10 +146,15 @@ function settle(
   if (at.endSession) events.push({ kind: "segment_end" })
   const stage = stageAfter(state.stage, scored)
   if (stage > state.stage) events.push({ kind: "stage_up", stage })
+  const graduated = !state.graduated && graduationReached(state.stage, scored)
+  if (graduated) events.push({ kind: "graduated" })
   if (xp > 0) events.push({ kind: "xp", amount: xp })
 
-  return { advance: at.advance, updates, ledger, balance, endSession: at.endSession, stage, events }
+  return { advance: at.advance, updates, ledger, balance, endSession: at.endSession, stage, graduated, events }
 }
+
+/** Refusal once the account is "habis": no candle, order or new chart. */
+export const BUST_REFUSAL: Refusal = { error: "Akun ini sudah habis. Lihat review Rex di tab Akun." }
 
 function activeSession(state: TradingState): Refusal | { cursor: number; lastIndex: number } {
   const s = state.session
@@ -158,6 +165,7 @@ function activeSession(state: TradingState): Refusal | { cursor: number; lastInd
 
 /** Next candle (also WAIT): fills, swap, stop out, and the end of the segment. */
 export function planStep(state: TradingState): SettlePlan | Refusal {
+  if (accountBust(state)) return BUST_REFUSAL
   const s = activeSession(state)
   if ("error" in s) return s
   if (s.cursor >= s.lastIndex) return { error: "Segmen ini sudah habis. Ganti chart." }
@@ -228,6 +236,7 @@ export function averageRange(candles: { h: number; l: number }[], n: number = DI
 
 /** A market order at the current candle's close, after every rule in lib/demo/orders. */
 export function planOrder(state: TradingState, input: OrderInput): { trade: NewTrade; events: DemoEvent[] } | Refusal {
+  if (accountBust(state)) return BUST_REFUSAL
   const s = activeSession(state)
   if ("error" in s) return s
   const session = state.session!
@@ -341,6 +350,8 @@ export function planStart(
   seen: ReadonlyMap<string, number>,
   random: () => number,
 ): Segment | Refusal {
+  // Another chart could be a cheaper pair: the account stays habis.
+  if (accountBust(state)) return BUST_REFUSAL
   if (state.open.length > 0) return { error: "Tutup trade yang terbuka dulu sebelum ganti chart." }
   const segment = pickSegment(pool, seen, random, state.session?.segmentId)
   return segment ?? { error: "Belum ada chart untuk stage ini." }

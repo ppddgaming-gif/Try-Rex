@@ -5,7 +5,8 @@ import { createAdminClient } from "@/lib/supabase/admin"
 
 /**
  * POST { lesson, answer }: checks a lesson's question here, where the answer
- * key lives. A right answer to the intro lesson unlocks the first trade.
+ * key lives. A right answer to the intro lesson unlocks the first trade; to
+ * the risk lesson, the next account after one ran out.
  */
 export async function POST(request: Request) {
   const auth = await authed(request)
@@ -23,6 +24,13 @@ export async function POST(request: Request) {
     const { error } = await admin
       .from("demo_profile")
       .upsert({ user_id: auth.userId, intro_lesson_passed_at: new Date().toISOString() }, { onConflict: "user_id" })
+    if (error) return json({ error: "Gagal menyimpan. Coba lagi sebentar lagi." }, 500)
+  }
+  if (result.correct && lesson === "risk") {
+    const { error } = await createAdminClient()
+      .from("demo_profile")
+      .update({ recovery_lesson_due: false })
+      .eq("user_id", auth.userId)
     if (error) return json({ error: "Gagal menyimpan. Coba lagi sebentar lagi." }, 500)
   }
 

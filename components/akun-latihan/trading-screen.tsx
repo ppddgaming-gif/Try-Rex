@@ -1,7 +1,19 @@
 "use client"
 
 import { useEffect, useEffectEvent, useState } from "react"
-import { AlertTriangle, CandlestickChart as ChartIcon, Pause, PencilLine, Play, RefreshCw, SkipForward, X } from "lucide-react"
+import Link from "next/link"
+import {
+  AlertTriangle,
+  ArrowRight,
+  CandlestickChart as ChartIcon,
+  GraduationCap,
+  Pause,
+  PencilLine,
+  Play,
+  RefreshCw,
+  SkipForward,
+  X,
+} from "lucide-react"
 import { Confetti } from "@/components/confetti"
 import { Rex } from "@/components/rex-mascot"
 import { AccountPanel, StageCard } from "@/components/akun-latihan/account-panel"
@@ -13,9 +25,9 @@ import { RexTipCard, useTipQueue } from "@/components/akun-latihan/rex-tip"
 import { TradeChart } from "@/components/akun-latihan/trade-chart"
 import { ClosedTrades } from "@/components/akun-latihan/trade-result"
 import { ACCOUNT, DISIPLIN, REPLAY } from "@/lib/demo/config"
-import { price, usd } from "@/lib/demo/format"
+import { lot as fmtLot, price, usd } from "@/lib/demo/format"
 import { instrument } from "@/lib/demo/instruments"
-import { marginFor, type Side } from "@/lib/demo/money"
+import type { Side } from "@/lib/demo/money"
 import type { ReviewAnswer } from "@/lib/demo/state"
 import type { DemoView } from "@/lib/demo/view"
 import { addServerXp } from "@/lib/progress/use-progress"
@@ -43,12 +55,14 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
   const [switching, setSwitching] = useState(false)
   const [drawn, setDrawn] = useState<{ session: string; prices: number[] } | null>(null)
   const [stageUp, setStageUp] = useState<number | null>(null)
+  const [graduated, setGraduated] = useState(false)
   const tips = useTipQueue(initial.tipsSeen)
 
   const session = view.session
-  const live = session !== null && !session.ended && session.remaining > 0
+  // "Akun habis", decided on the server: no candle, order or new chart.
+  const bust = view.account.bust
+  const live = session !== null && !session.ended && session.remaining > 0 && !bust
   const lines = session && drawn?.session === session.id ? drawn.prices : view.lines
-  const last = session?.candles[session.candles.length - 1]
   const pipSize = session ? instrument(session.pair).pipSize : 0.0001
 
   // Where SL and TP start: the average candle range of the recent candles, so
@@ -59,11 +73,6 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
 
   const quote = side && session && live ? quoteFor(view, side, draft).quote : null
   const full = view.open.length >= view.stage.maxOpenTrades
-  const bust =
-    session !== null &&
-    last !== undefined &&
-    view.open.length === 0 &&
-    view.account.figures.freeMargin < marginFor(session.pair, ACCOUNT.MIN_LOT, last.c)
 
   function apply(next: DemoView) {
     const before = view.session
@@ -77,6 +86,7 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
       if (e.kind === "opened" && e.revenge) tips.trigger("revenge-trading")
       if (e.kind === "opened" && e.noTp) tips.trigger("reward-risk")
       if (e.kind === "stage_up") setStageUp(e.stage)
+      if (e.kind === "graduated") setGraduated(true)
     }
     if (next.events.some((e) => e.kind === "closed" || e.kind === "stop_out" || e.kind === "segment_end")) setPlaying(false)
   }
@@ -220,7 +230,7 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
               <button
                 type="button"
                 onClick={() => void changeChart()}
-                disabled={busy || hasOpen}
+                disabled={busy || hasOpen || bust}
                 title={hasOpen ? "Tutup trade yang terbuka dulu" : undefined}
                 className="flex min-h-10 items-center gap-1.5 rounded-lg border border-border px-3 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
               >
@@ -268,7 +278,22 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" /> {error}
             </p>
           )}
-          {live ? (
+          {bust ? (
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <Rex size={44} mood="thinking" className="shrink-0" />
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold">Akun #{view.account.number} habis</p>
+                <p className="text-sm text-muted-foreground">
+                  Equity {usd(view.account.figures.equity)} tidak cukup lagi untuk margin trade terkecil (
+                  {fmtLot(ACCOUNT.MIN_LOT)} lot {session.pair} butuh {usd(view.account.bustLevel ?? 0)}). Tidak ada tombol
+                  tambah saldo: Rex sudah menyiapkan review akunmu.
+                </p>
+              </div>
+              <Link href="/akun-latihan" className="btn btn-sm shrink-0">
+                Lihat review Rex <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            </div>
+          ) : live ? (
             <>
               <div className="flex flex-wrap items-center gap-2">
                 <button type="button" onClick={next} disabled={busy} className="btn btn-ghost btn-sm">
@@ -310,7 +335,7 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
                     key={s}
                     type="button"
                     onClick={() => openPanel(s)}
-                    disabled={busy || full || bust}
+                    disabled={busy || full}
                     aria-pressed={side === s}
                     className="btn"
                     style={sideStyle(s)}
@@ -352,12 +377,6 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
               </button>
             </div>
           )}
-          {bust && (
-            <p className="mt-3 rounded-xl border border-primary/40 bg-primary/10 px-3 py-2 text-sm">
-              Akun habis: equity {usd(view.account.figures.equity)} tidak cukup lagi untuk margin trade terkecil (
-              {ACCOUNT.MIN_LOT.toFixed(2)} lot). Tidak ada tombol tambah saldo.
-            </p>
-          )}
         </section>
 
         {view.guide && (
@@ -377,6 +396,23 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
 
       {/* Right column on desktop. */}
       <div className="contents lg:flex lg:flex-col lg:gap-4">
+        {graduated && (
+          <section className="glass-card relative order-3 overflow-hidden rounded-2xl border-primary/40 p-4 lg:order-none">
+            <Confetti />
+            <div className="flex items-center gap-3">
+              <Rex size={40} mood="happy" className="shrink-0" />
+              <div className="min-w-0 flex-1">
+                <p className="font-display font-bold">Kamu lulus Akun Latihan!</p>
+                <p className="text-sm text-muted-foreground">
+                  Disiplinmu konsisten di Stage {view.stage.current}. Latihan tetap terbuka.
+                </p>
+              </div>
+            </div>
+            <Link href="/akun-latihan/lulus" className="btn btn-sm mt-3 w-full">
+              <GraduationCap className="h-4 w-4" aria-hidden="true" /> Lihat ringkasan
+            </Link>
+          </section>
+        )}
         {stageUp !== null && (
           <section className="glass-card relative order-3 overflow-hidden rounded-2xl border-primary/40 p-4 lg:order-none">
             <Confetti />

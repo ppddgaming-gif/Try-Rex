@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { planClose, planModify, planOrder, planStart, planStep, type NewTrade, type SettlePlan } from "@/lib/demo/actions"
+import { BUST_REFUSAL, planClose, planModify, planOrder, planStart, planStep, type NewTrade, type SettlePlan } from "@/lib/demo/actions"
 import type { Bar } from "@/lib/demo/fills"
 import { roundMoney } from "@/lib/demo/money"
 import type { OrderInput } from "@/lib/demo/orders"
@@ -25,6 +25,7 @@ function state(over: Partial<TradingState> = {}, candles: Record<number, Partial
     slChanges: {},
     lines: [],
     tipsSeen: [],
+    graduated: false,
     ...over,
   }
 }
@@ -326,8 +327,96 @@ describe("buildView never sends a candle past the cursor", () => {
   it("shows a new account's starting balance and — for every stat", () => {
     const v = buildView(state({ session: null, segment: null }))
     expect(v.account.figures).toMatchObject({ balance: 200, equity: 200, openPnl: 0, marginUsed: 0, freeMargin: 200 })
-    expect(v.stats).toEqual({ trades: 0, wins: 0, net: 0, disiplin: null })
+    expect(v.account.bust).toBe(false)
     expect(v.stage.label).toBe("0/10 trade · Disiplin — (butuh 80%)")
     expect(v.guide).toBe(true)
+  })
+})
+
+describe("akun habis: below the smallest trade's margin, trading stops", () => {
+  // EURUSD at 1.1700: 0.01 lot needs $11.70 margin.
+  const pool = ["eurusd-1", "eurusd-2"].map(
+    (id): Segment => ({ id, datasetId: id, pair: "EURUSD", offset: 0, length: 40, startCursor: 29, lastIndex: 39 }),
+  )
+  const broke = (balance: number) => state({ account: { ...state().account, balance } })
+
+  it.each([
+    [11.69, true],
+    [11.7, false],
+    [0, true],
+  ])("balance $%s → habis %s", (balance, bust) => {
+    expect(buildView(broke(balance)).account).toMatchObject({ bust, bustLevel: 11.7 })
+  })
+
+  it("refuses the next candle, an order and a new chart", () => {
+    const s = broke(9.8)
+    expect(planStep(s)).toEqual(BUST_REFUSAL)
+    expect(planOrder(s, plan)).toEqual(BUST_REFUSAL)
+    expect(planStart(s, pool, new Map(), () => 0)).toEqual(BUST_REFUSAL)
+  })
+
+  it("a trade still open keeps the account going until it closes", () => {
+    const s = state()
+    const trade = open(s)
+    const v = buildView(state({ open: [trade], account: { ...s.account, balance: 9.8 } }))
+    expect(v.account.bust).toBe(false)
+  })
+
+  it("the SL that takes the balance under the line leaves the account habis", () => {
+    const s = state({ account: { ...state().account, balance: 14 } })
+    const trade = open(s)
+    const p = settled(planStep(state({ open: [trade], account: s.account }, { 30: { l: 1.166 } })))
+    expect(p.balance).toBe(10.9)
+    const after = state({ account: { ...s.account, balance: p.balance }, session: { ...s.session!, cursor: 30 } })
+    expect(buildView(after).account.bust).toBe(true)
+  })
+})
+
+describe("graduation", () => {
+  const stage3 = (n: number, score: number): ClosedSummary[] =>
+    Array.from({ length: n }, (_, i) => ({ accountId: "acc", stage: 3, counted: true, disiplin: score, net: 1, swap: 0, lot: 0.01, closedClock: i }))
+
+  it("the 30th counted Stage 3 trade at 80%+ graduates the player, once", () => {
+    const s = state({ stage: 3, history: stage3(29, 100) })
+    const trade = open(s, { ...plan, lot: 0.01 }, { stage: 3, openedClock: -1 })
+    const p = settled(planStep(state({ stage: 3, history: s.history, open: [trade] }, { 30: { h: 1.18 } })))
+    expect(p.graduated).toBe(true)
+    expect(p.events).toContainEqual({ kind: "graduated" })
+
+    const again = settled(planStep(state({ stage: 3, history: s.history, open: [trade], graduated: true }, { 30: { h: 1.18 } })))
+    expect(again.graduated).toBe(false)
+    expect(again.events).not.toContainEqual({ kind: "graduated" })
+  })
+
+  it("not below the average", () => {
+    const s = state({ stage: 3, history: stage3(29, 70) })
+    const trade = open(s, plan, { stage: 3, openedClock: -1 })
+    expect(settled(planStep(state({ stage: 3, history: s.history, open: [trade] }, { 30: { h: 1.18 } }))).graduated).toBe(false)
+  })
+})
+
+describe("closed trades carry Rex's comments", () => {
+  it("a planned SL hit gets praise, not a verdict on the loss", () => {
+    const s = state()
+    const trade = open(s)
+    const p = settled(planStep(state({ open: [trade] }, { 30: { l: 1.166 } })))
+    const close = p.updates[0].close!
+    const closed: TradeRow = {
+      ...trade,
+      status: "closed",
+      exitPrice: close.exit_price,
+      exitIndex: close.exit_index,
+      closedClock: close.closed_clock,
+      exitReason: close.exit_reason,
+      pips: close.pips,
+      gross: close.gross,
+      net: close.net,
+      counted: close.counted,
+      checks: close.checks,
+      disiplin: close.disiplin,
+    }
+    const v = buildView(state({ sessionClosed: [closed], session: { ...s.session!, cursor: 30 } }))
+    expect(v.closed[0].rex).toEqual([expect.objectContaining({ id: "good", tone: "good" })])
+    expect(v.open).toEqual([])
   })
 })

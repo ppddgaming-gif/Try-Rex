@@ -1,0 +1,223 @@
+import Link from "next/link"
+import { ArrowRight, CandlestickChart as ChartIcon, GraduationCap, Layers, Wallet } from "lucide-react"
+import { Card } from "@/components/card"
+import { ResetAccount } from "@/components/akun-latihan/account-actions"
+import { DISIPLIN } from "@/lib/demo/config"
+import { pct, usd } from "@/lib/demo/format"
+import { roundMoney } from "@/lib/demo/money"
+import type { LedgerRow } from "@/lib/demo/server"
+import type { AccountStats } from "@/lib/demo/stats"
+import type { DemoView } from "@/lib/demo/view"
+
+const dateFmt = new Intl.DateTimeFormat("id-ID", {
+  day: "numeric",
+  month: "short",
+  hour: "2-digit",
+  minute: "2-digit",
+  timeZone: "Asia/Jakarta",
+})
+
+const NO_TRADES = "Belum ada trade"
+
+/**
+ * The account's dashboard, Disiplin first: how the plan was kept, then what
+ * it did to the money. Every number is counted from the account's own trades
+ * and ledger; with no trades yet, each reads "—", never 0 or 0%.
+ */
+export function AccountDashboard({
+  view,
+  stats,
+  ledger,
+  startingBalance,
+}: {
+  view: DemoView
+  stats: AccountStats
+  ledger: LedgerRow[]
+  startingBalance: string
+}) {
+  const f = view.account.figures
+  const none = stats.trades === 0
+  const net = roundMoney(f.balance - view.account.startingBalance)
+  const p = view.stage.progress
+  const share = Math.min(1, p.trades / p.needed)
+
+  return (
+    <div className="flex flex-col gap-4">
+      {view.graduated && (
+        <Link href="/akun-latihan/lulus" className="lift group block">
+          <Card className="glow-card flex items-center gap-4 border-primary/40 sm:p-6">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/30">
+              <GraduationCap className="h-5 w-5 text-primary" aria-hidden="true" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block font-semibold">Kamu sudah lulus Akun Latihan</span>
+              <span className="block text-sm text-muted-foreground">Lihat ringkasan dan apa yang tidak bisa diajarkan demo.</span>
+            </span>
+            <ArrowRight className="h-5 w-5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1" aria-hidden="true" />
+          </Card>
+        </Link>
+      )}
+
+      {/* 1. Disiplin, with the way to the next stage. */}
+      <Card className="glow-card sm:p-7">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="flex items-center gap-2 font-display text-lg font-bold">
+            <Wallet className="h-5 w-5 text-primary" aria-hidden="true" /> Akun #{view.account.number}
+          </p>
+          <span className="rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-primary">
+            Stage {view.stage.current}
+          </span>
+        </div>
+        <div className="mt-5 grid gap-6 sm:grid-cols-[minmax(0,auto)_minmax(0,1fr)] sm:items-center">
+          <div>
+            <p className="text-sm text-muted-foreground">Disiplin</p>
+            <p className={`font-mono text-5xl font-bold tracking-tight ${stats.disiplin === null ? "text-muted-foreground" : "text-primary"}`}>
+              {stats.disiplin === null ? "—" : `${stats.disiplin}%`}
+            </p>
+            <p className="mt-1 text-xs text-faint">
+              {stats.disiplin === null
+                ? "Muncul setelah trade pertama ditutup"
+                : `Rata-rata ${DISIPLIN.ROLLING_TRADES} trade terakhir akun ini`}
+            </p>
+          </div>
+          <div className="rounded-xl bg-inset p-4">
+            <div className="flex items-center justify-between gap-2 text-xs">
+              <span className="flex items-center gap-1.5 font-semibold">
+                <Layers className="h-3.5 w-3.5 text-primary" aria-hidden="true" /> Stage {view.stage.current}
+              </span>
+              <span className="text-muted-foreground">
+                {view.graduated ? "Lulus" : p.next ? `menuju Stage ${p.next}` : "menuju kelulusan"}
+              </span>
+            </div>
+            <p className="mt-2 font-mono text-xs font-semibold">{view.stage.label}</p>
+            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-background/60" aria-hidden="true">
+              <div
+                className="h-full origin-left rounded-full bg-primary transition-transform duration-500 ease-out-expo"
+                style={{ transform: `scaleX(${share})` }}
+              />
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* 2. How the plans were made. */}
+      <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Stat
+          label="Rata-rata risiko"
+          value={stats.avgRiskPct === null ? null : `${pct(stats.avgRiskPct)} saldo`}
+          note={
+            stats.withoutSl > 0
+              ? `${stats.withoutSl} trade tanpa SL tidak dihitung`
+              : stats.avgRiskPct !== null
+                ? `Batas ${DISIPLIN.MAX_RISK_PCT}%`
+                : undefined
+          }
+          hint={none ? NO_TRADES : "Belum ada trade dengan SL"}
+        />
+        <Stat
+          label="Rata-rata reward : risk"
+          value={stats.avgRewardRisk === null ? null : `1 : ${stats.avgRewardRisk.toFixed(2)}`}
+          note={stats.avgRewardRisk !== null ? `Minimal ${DISIPLIN.MIN_REWARD_RISK}` : undefined}
+          hint={none ? NO_TRADES : "Belum ada trade dengan SL dan TP"}
+        />
+        <Stat label="SL saat entry" value={stats.slAtEntryPct === null ? null : `${stats.slAtEntryPct}%`} note={none ? undefined : "dari semua trade"} hint={NO_TRADES} />
+        <Stat
+          label="Penurunan terbesar"
+          value={stats.drawdown === null ? null : stats.drawdown.amount === 0 ? usd(0) : usd(-stats.drawdown.amount)}
+          note={stats.drawdown === null ? undefined : `${pct(stats.drawdown.pct)} dari puncak saldo`}
+          hint={NO_TRADES}
+        />
+      </dl>
+
+      {/* 3. The money, then 4. win rate and why it isn't the point. */}
+      <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Stat label="Saldo" value={usd(f.balance)} />
+        <Stat label="Equity" value={usd(f.equity)} />
+        <Stat
+          label="Net profit"
+          value={none ? null : usd(net, { signed: true })}
+          tone={net > 0 ? "text-success" : net < 0 ? "text-danger" : ""}
+          hint={NO_TRADES}
+        />
+        <Stat
+          label="Win rate"
+          value={stats.winRate === null ? null : `${stats.winRate}%`}
+          note={none ? undefined : `${stats.wins} dari ${stats.trades} trade untung`}
+          hint={NO_TRADES}
+          footer="Win rate tinggi belum tentu untung — lihat rasio reward:risk."
+        />
+      </dl>
+
+      <Link href="/akun-latihan/trading" className="lift group block">
+        <Card className="flex items-center gap-4 sm:p-7">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/30">
+            <ChartIcon className="h-5 w-5 text-primary" aria-hidden="true" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <h2 className="font-semibold">
+              {view.open.length > 0 ? `Lanjut trading · ${view.open.length} trade terbuka` : "Mulai trading"}
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Stage {view.stage.current} · {view.stage.label}
+            </p>
+          </div>
+          <ArrowRight className="h-5 w-5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1" aria-hidden="true" />
+        </Card>
+      </Link>
+
+      <Card className="sm:p-7">
+        <h2 className="text-base font-semibold">Riwayat saldo</h2>
+        <ul className="mt-3 divide-y divide-border">
+          {ledger.map((row) => (
+            <li key={row.id} className="flex min-h-12 items-center gap-3 py-2 text-sm">
+              <span className="min-w-0 flex-1">
+                <span className="block font-medium">{row.label}</span>
+                <span className="block text-xs text-muted-foreground">{dateFmt.format(new Date(row.createdAt))}</span>
+              </span>
+              <span
+                className={`font-mono font-semibold ${row.kind === "deposit" ? "" : row.amount > 0 ? "text-success" : row.amount < 0 ? "text-danger" : ""}`}
+              >
+                {usd(row.amount, { signed: true })}
+              </span>
+              <span className="w-24 text-right font-mono text-xs text-muted-foreground">{usd(row.balanceAfter)}</span>
+            </li>
+          ))}
+        </ul>
+      </Card>
+
+      <ResetAccount
+        number={view.account.number}
+        startingBalance={startingBalance}
+        blocked={view.open.length > 0 ? "Tutup trade yang terbuka dulu sebelum reset." : null}
+      />
+    </div>
+  )
+}
+
+function Stat({
+  label,
+  value,
+  hint,
+  note,
+  footer,
+  tone = "",
+}: {
+  label: string
+  /** null shows "—" with `hint` under it. */
+  value: string | null
+  hint?: string
+  /** A short line under a value. */
+  note?: string
+  footer?: string
+  tone?: string
+}) {
+  return (
+    <div className="rounded-2xl border border-border bg-card px-4 py-3.5">
+      <dt className="text-xs text-muted-foreground">{label}</dt>
+      <dd className={`mt-1 font-mono text-lg font-bold ${value === null ? "text-muted-foreground" : tone}`}>{value ?? "—"}</dd>
+      {value === null && hint && <dd className="mt-0.5 text-[11px] leading-tight text-faint">{hint}</dd>}
+      {value !== null && note && <dd className="mt-0.5 text-[11px] leading-tight text-muted-foreground">{note}</dd>}
+      {footer && <dd className="mt-2 text-xs text-muted-foreground">{footer}</dd>}
+    </div>
+  )
+}

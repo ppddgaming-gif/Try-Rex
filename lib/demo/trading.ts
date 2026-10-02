@@ -19,17 +19,17 @@ import { createClient } from "@/lib/supabase/server"
 // one transaction; the account's version makes a write built on stale state
 // fail instead of acting twice.
 
-const TRADE_COLUMNS =
+export const TRADE_COLUMNS =
   "id, number, session_id, pair, side, lot, stage, reasons, entry_price, entry_index, opened_clock, " +
   "sl_initial, tp_initial, sl, tp, balance_at_entry, margin, spread, commission, risk_amount, risk_pct, " +
   "reward_risk, range_avg, revenge, swap, status, exit_price, exit_index, closed_clock, exit_reason, pips, " +
   "gross, net, counted, checks, disiplin, xp, review, review_note"
 
-type Row = Record<string, unknown>
+export type Row = Record<string, unknown>
 const num = (v: unknown) => Number(v)
 const numOrNull = (v: unknown) => (v === null || v === undefined ? null : Number(v))
 
-function toTradeRow(r: Row): TradeRow {
+export function toTradeRow(r: Row): TradeRow {
   return {
     id: String(r.id),
     number: num(r.number),
@@ -97,7 +97,7 @@ export async function loadTrading(userId: string): Promise<Loaded | null> {
   }
 
   const [profile, session, open, history, tips] = await Promise.all([
-    supabase.from("demo_profile").select("stage, intro_lesson_passed_at").eq("user_id", userId).maybeSingle(),
+    supabase.from("demo_profile").select("stage, intro_lesson_passed_at, graduated_at").eq("user_id", userId).maybeSingle(),
     supabase
       .from("demo_sessions")
       .select("id, segment_id, pair, cursor, last_index, status")
@@ -191,6 +191,7 @@ export async function loadTrading(userId: string): Promise<Loaded | null> {
       slChanges,
       lines: ((lines?.data?.prices as unknown[]) ?? []).map(Number).filter(Number.isFinite),
       tipsSeen: ((tips.data ?? []) as Row[]).map((t) => t.tip_id).filter(isTipId) as TipId[],
+      graduated: Boolean(profile.data?.graduated_at),
     },
   }
 }
@@ -248,6 +249,16 @@ async function settle(userId: string, state: TradingState, plan: SettlePlan): Pr
     p_stage: plan.stage,
   })
   if (error) return refused(userId, error.message)
+  if (plan.graduated) {
+    // Recorded once; the summary page reads it. If this write fails, the next
+    // settle tries again, so the player still sees the moment.
+    const { error: gradError } = await createAdminClient()
+      .from("demo_profile")
+      .update({ graduated_at: new Date().toISOString() })
+      .eq("user_id", userId)
+      .is("graduated_at", null)
+    if (gradError) console.error("Akun Latihan: could not record graduation", gradError.message)
+  }
   return viewAfter(userId, plan.events)
 }
 
@@ -335,12 +346,15 @@ export async function modifyTrade(
   return viewAfter(userId, [])
 }
 
+const cleanNote = (note: string | null) => note?.replace(/\s+/g, " ").trim().slice(0, REVIEW.NOTE_MAX_CHARS) || null
+
 /** "Apakah kamu mengikuti rencanamu?" on a closed trade. Self-reported; never scored. */
 export async function reviewTrade(userId: string, tradeId: string, answer: ReviewAnswer, note: string | null) {
-  const clean = note?.replace(/\s+/g, " ").trim().slice(0, REVIEW.NOTE_MAX_CHARS) || null
+  const clean = cleanNote(note)
+  // An empty note keeps one already added from the journal.
   const { data, error } = await createAdminClient()
     .from("demo_trades")
-    .update({ review: answer, review_note: clean })
+    .update(clean ? { review: answer, review_note: clean } : { review: answer })
     .eq("id", tradeId)
     .eq("user_id", userId)
     .eq("status", "closed")
@@ -348,6 +362,24 @@ export async function reviewTrade(userId: string, tradeId: string, answer: Revie
   if (error) return fail("Gagal menyimpan.", 500)
   if (!data?.length) return fail("Trade tidak ditemukan.", 404)
   return viewAfter(userId, [])
+}
+
+/**
+ * "Tambah catatan" in the journal: the note on a closed trade of the
+ * player's, on any of their accounts. Self-written, never scored.
+ */
+export async function saveNote(userId: string, tradeId: string, note: string | null) {
+  const clean = cleanNote(note)
+  const { data, error } = await createAdminClient()
+    .from("demo_trades")
+    .update({ review_note: clean })
+    .eq("id", tradeId)
+    .eq("user_id", userId)
+    .eq("status", "closed")
+    .select("id")
+  if (error) return fail("Gagal menyimpan catatan.", 500)
+  if (!data?.length) return fail("Trade tidak ditemukan.", 404)
+  return { ok: true as const, note: clean }
 }
 
 /** The drawn lines of the session's segment. Never scored. */

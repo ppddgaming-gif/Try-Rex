@@ -2,13 +2,15 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { CandlestickChart, Lightbulb, Wallet } from "lucide-react"
+import { Calculator, CandlestickChart, History, Lightbulb, NotebookPen, Wallet } from "lucide-react"
 
-// Akun Latihan's sections. Jurnal, Dashboard, Riwayat and the calculator
-// join these later.
+// Akun Latihan's sections. On a phone the bar scrolls sideways.
 const TABS = [
   { href: "/akun-latihan", label: "Akun", icon: Wallet },
   { href: "/akun-latihan/trading", label: "Trading", icon: CandlestickChart },
+  { href: "/akun-latihan/jurnal", label: "Jurnal", icon: NotebookPen },
+  { href: "/akun-latihan/riwayat", label: "Riwayat", icon: History },
+  { href: "/akun-latihan/kalkulator", label: "Kalkulator", icon: Calculator },
   { href: "/akun-latihan/tips", label: "Tips Rex", icon: Lightbulb },
 ]
 

@@ -1,14 +1,25 @@
 import "server-only"
-import { ACCOUNT, DISIPLIN } from "@/lib/demo/config"
+import { ACCOUNT, COSTS, DISIPLIN } from "@/lib/demo/config"
 import { lot, pct, usd } from "@/lib/demo/format"
-import { LESSON_LOSS_PIPS, LESSON_PAIR, LESSON_PRICE, leverageRows, stopOutPoint } from "@/lib/demo/lesson-math"
-import { bustLevel } from "@/lib/demo/money"
+import {
+  LESSON_LOSS_PIPS,
+  LESSON_PAIR,
+  LESSON_PRICE,
+  RISK_QUESTION_SL_PIPS,
+  leverageRows,
+  lossAtSl,
+  maxLotWithin,
+  riskBudget,
+  riskRows,
+  stopOutPoint,
+} from "@/lib/demo/lesson-math"
+import { bustLevel, normalizeLot, pipValue } from "@/lib/demo/money"
 
 // Akun Latihan lessons. Server-only because each holds its answer key
 // (non-negotiable #1): the page sends the question and options, and only the
 // route handler knows which option is right.
 
-export type LessonId = "intro"
+export type LessonId = "intro" | "risk"
 
 export type LessonTable = { head: string[]; rows: string[][]; caption: string }
 export type LessonSection = { title: string; paragraphs: string[]; table?: LessonTable }
@@ -86,7 +97,80 @@ function introLesson(): KeyedLesson {
   }
 }
 
-const LESSONS: Record<LessonId, () => KeyedLesson> = { intro: introLesson }
+/** After an account runs out (required) or is reset (optional): sizing a trade from its SL. */
+function riskLesson(): KeyedLesson {
+  const start = ACCOUNT.STARTING_BALANCE
+  const budget = riskBudget()
+  const spread = COSTS.SPREAD_PIPS[LESSON_PAIR]
+  const minLot = ACCOUNT.MIN_LOT
+  const perPip = pipValue(LESSON_PAIR, minLot, LESSON_PRICE)
+  const rows = riskRows()
+  const tooFar = rows.find((r) => r.maxLot === null)
+  const q = RISK_QUESTION_SL_PIPS
+  const answerLot = maxLotWithin(q)!
+  const over = normalizeLot(answerLot + ACCOUNT.LOT_STEP)
+  const at = lossAtSl(answerLot, q)
+  const atOver = lossAtSl(over, q)
+  // The trap: the lot that fits the budget if the spread is forgotten.
+  const naive = normalizeLot(Math.floor(budget / (q * perPip) + 1e-9) * minLot)
+  const options = [minLot, answerLot, naive, 0.1].map(lot)
+
+  return {
+    id: "risk",
+    title: "Ukuran posisi dimulai dari risiko",
+    summary: `Sebelum akun berikutnya: cara memilih lot dari stop loss, supaya satu trade tidak pernah memakan lebih dari ${DISIPLIN.MAX_RISK_PCT}% saldo.`,
+    sections: [
+      {
+        title: "Mulai dari anggaran risiko",
+        paragraphs: [
+          `Lot bukan langkah pertama. Tentukan dulu berapa yang rela kamu hilangkan kalau idemu salah. Batas Disiplin di sini ${DISIPLIN.MAX_RISK_PCT}% saldo: dengan saldo ${usd(start)}, itu ${usd(budget)} per trade.`,
+          "Angka itu tetap sama, seyakin apa pun kamu pada setup-nya. Yang berubah hanya lot, mengikuti jarak stop loss.",
+        ],
+      },
+      {
+        title: "Dari stop loss ke lot",
+        paragraphs: [
+          `Kerugian di SL = (jarak SL + spread) × nilai pip. Di ${LESSON_PAIR}, ${lot(minLot)} lot bernilai ${usd(perPip)} per pip dan spread-nya sekitar ${spread} pip, yang sudah dibayar sejak trade dibuka.`,
+          "Taruh SL di tempat idemu terbukti salah, lalu cari lot terbesar yang kerugiannya masih di bawah anggaran. SL lebih jauh berarti lot lebih kecil.",
+        ],
+        table: {
+          head: ["Jarak SL", `Rugi per ${lot(minLot)} lot`, "Lot terbesar", "Rugi di SL", `% dari ${usd(start)}`],
+          rows: rows.map((r) => [
+            `${r.slPips} pip`,
+            usd(r.perMinLot),
+            r.maxLot === null ? "Tidak ada" : lot(r.maxLot),
+            usd(r.loss),
+            pct(r.lossPct),
+          ]),
+          caption: `${LESSON_PAIR} di harga ${LESSON_PRICE.toFixed(4)}, spread ${spread} pip, saldo ${usd(start)}, anggaran ${usd(budget)} (${DISIPLIN.MAX_RISK_PCT}%). Baris "Tidak ada": angka rugi memakai ${lot(minLot)} lot.`,
+        },
+      },
+      {
+        title: "Kalau lot terkecil pun terlalu besar",
+        paragraphs: [
+          tooFar
+            ? `Dengan SL ${tooFar.slPips} pip, ${lot(minLot)} lot saja sudah kehilangan ${usd(tooFar.loss)} (${pct(tooFar.lossPct)}). Jangan mendekatkan SL hanya supaya lolos batas: SL yang terlalu dekat kena oleh gerakan biasa.`
+            : `Kalau ${lot(minLot)} lot pun melewati batas, jangan mendekatkan SL hanya supaya lolos: SL yang terlalu dekat kena oleh gerakan biasa.`,
+          "Lewati setup itu dan tunggu yang lebih rapi. Tidak trade juga keputusan yang disiplin.",
+        ],
+      },
+      {
+        title: "Kerugian tidak perlu dibalas",
+        paragraphs: [
+          `Setelah rugi, lot tetap mengikuti anggaran, bukan keinginan menutup kerugian. Lot lebih besar dalam ${DISIPLIN.REVENGE_WINDOW_CANDLES} candle setelah rugi dihitung revenge trade.`,
+          "Akun berikutnya mulai dari saldo awal lagi. Stage-mu tetap, begitu juga jurnal akun lama di Riwayat akun.",
+        ],
+      },
+    ],
+    question: `Saldo ${usd(start)}, batas risiko ${DISIPLIN.MAX_RISK_PCT}%, SL ${q} pip di ${LESSON_PAIR} (spread ${spread} pip). Lot terbesar yang masih lolos pemeriksaan risiko?`,
+    options,
+    answer: 1,
+    explain: `Tepat. Anggaranmu ${usd(budget)}. Dengan SL ${q} pip plus spread ${spread} pip, ${lot(answerLot)} lot rugi ${usd(at.loss)} (${pct(at.lossPct)}) di SL. ${lot(over)} lot sudah ${usd(atOver.loss)} (${pct(atOver.lossPct)}), lewat batas.`,
+    hint: `Belum tepat. Hitung anggaranmu dulu (${DISIPLIN.MAX_RISK_PCT}% dari ${usd(start)}), lalu kerugian per ${lot(minLot)} lot: (SL + spread) × ${usd(perPip)}. Jangan lupa spread-nya.`,
+  }
+}
+
+const LESSONS: Record<LessonId, () => KeyedLesson> = { intro: introLesson, risk: riskLesson }
 
 export const isLessonId = (v: unknown): v is LessonId => typeof v === "string" && v in LESSONS
 

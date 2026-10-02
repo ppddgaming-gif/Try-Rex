@@ -128,8 +128,26 @@ export const STAGE_UNLOCK = {
 export const GRADUATION = {
   /** Counted trades in Stage 3… */
   TRADES: 30,
-  /** …with this average Disiplin, in %. */
+  /** …with this average Disiplin over the last TRADES of them, in %. */
   MIN_DISIPLIN: 80,
+} as const
+
+/** Rex's review when an account runs out or is reset. */
+export const ACCOUNT_REVIEW = {
+  /** How many of the most often failed Disiplin checks it names. */
+  TOP_FAILED_CHECKS: 2,
+} as const
+
+/**
+ * The standalone Kalkulator Profit page. Example prices only, never a current
+ * one: other pairs start from APPROX_USD_RATE.
+ */
+export const CALCULATOR = {
+  PAIR: "EURUSD",
+  LOT: 0.1,
+  /** The design's example: 0.10 lot, 1.1700 → 1.1750 = $50.00, margin $117. */
+  ENTRY: 1.17,
+  MOVE_PIPS: 50,
 } as const
 
 export const COUNTING = {

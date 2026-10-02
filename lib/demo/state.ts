@@ -1,7 +1,7 @@
 import type { StageNumber } from "@/lib/demo/config"
 import type { Checks, SlChange } from "@/lib/demo/disiplin"
 import type { Bar, ExitReason, OpenTrade } from "@/lib/demo/fills"
-import { roundMoney, type Side } from "@/lib/demo/money"
+import { isBust, roundMoney, type Side } from "@/lib/demo/money"
 import type { TipId } from "@/lib/demo/tips"
 import type { ReasonId } from "@/lib/reasons"
 
@@ -107,6 +107,8 @@ export type TradingState = {
   slChanges: Record<string, SlChange[]>
   lines: number[]
   tipsSeen: TipId[]
+  /** The player has graduated (demo_profile.graduated_at is set). */
+  graduated: boolean
 }
 
 export const toOpenTrade = (t: TradeRow): OpenTrade => ({
@@ -121,3 +123,14 @@ export const toOpenTrade = (t: TradeRow): OpenTrade => ({
   margin: t.margin,
   swap: t.swap,
 })
+
+/**
+ * "Akun habis": nothing is open and the balance no longer covers the margin
+ * of the smallest trade on the chart at hand. Trading stops; what's left is
+ * Rex's review, the risk lesson and a new account. The current chart decides,
+ * so changing charts is refused once it's true (lib/demo/actions.ts).
+ */
+export function accountBust(state: TradingState) {
+  const candle = state.session ? state.segmentCandles[state.session.cursor] : undefined
+  return state.open.length === 0 && candle !== undefined && isBust(state.account.balance, state.session!.pair, candle.c)
+}

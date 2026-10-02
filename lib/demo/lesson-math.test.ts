@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { leverageRows, stopOutPoint } from "@/lib/demo/lesson-math"
+import { leverageRows, lossAtSl, maxLotWithin, riskBudget, riskRows, stopOutPoint } from "@/lib/demo/lesson-math"
 
 describe("the required lesson's leverage table (EURUSD at 1.1700, $200 start)", () => {
   it("matches the ticket: 0.10 lot = $1/pip, 0.01 lot = $0.10/pip", () => {
@@ -22,5 +22,34 @@ describe("stop out on the starting balance", () => {
     expect(p.equity).toBe(equity)
     expect(p.loss).toBe(loss)
     expect(p.pips).toBe(pips)
+  })
+})
+
+describe("the risk lesson: the biggest lot inside 2% of $200, spread included", () => {
+  it("the budget is $4.00", () => {
+    expect(riskBudget()).toBe(4)
+  })
+
+  it.each([
+    // SL pips, max lot, loss at SL with it, % of $200
+    // 10 pips + 1 pip spread = $1.10 per 0.01 lot: 0.03 costs $3.30, 0.04 would cost $4.40 (2.2%).
+    [10, 0.03, 3.3, 1.7],
+    [20, 0.01, 2.1, 1.1],
+    // 51 pips × $0.10 = $5.10: even 0.01 lot is over the limit.
+    [50, null, 5.1, 2.6],
+  ])("SL %s pip → %s lot", (sl, maxLot, loss, lossPct) => {
+    const row = riskRows([sl])[0]
+    expect(row.maxLot).toBe(maxLot)
+    expect(row.loss).toBe(loss)
+    expect(row.lossPct).toBe(lossPct)
+  })
+
+  it("the trap answer, ignoring the spread, fails the risk check", () => {
+    expect(lossAtSl(0.04, 10)).toEqual({ loss: 4.4, lossPct: 2.2 })
+    expect(maxLotWithin(10)).toBe(0.03)
+  })
+
+  it("a bigger balance allows a bigger lot", () => {
+    expect(maxLotWithin(10, 1000)).toBe(0.18)
   })
 })

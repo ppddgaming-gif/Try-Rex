@@ -11,10 +11,20 @@ import { postJson } from "@/components/akun-latihan/post-json"
 import type { PublicLesson } from "@/lib/demo/lessons"
 
 /**
- * A required lesson with its check question. The browser has the options but
- * not the answer: the server checks it and only a right answer moves on.
+ * A lesson with its check question. The browser has the options but not the
+ * answer: the server checks it. Required, only a right answer moves on;
+ * optional (the risk lesson after a reset), it's there to practise.
  */
-export function RequiredLesson({ lesson }: { lesson: PublicLesson }) {
+export function RequiredLesson({
+  lesson,
+  optional = false,
+  doneLabel = "Lanjut ke akunku",
+}: {
+  lesson: PublicLesson
+  optional?: boolean
+  /** The button after a right answer, which reloads the page's next step. */
+  doneLabel?: string
+}) {
   const router = useRouter()
   const [picked, setPicked] = useState<number | null>(null)
   const [result, setResult] = useState<{ correct: boolean; message: string } | null>(null)
@@ -39,7 +49,7 @@ export function RequiredLesson({ lesson }: { lesson: PublicLesson }) {
     <article className="flex flex-col gap-5">
       <Card className="sm:p-8">
         <p className="eyebrow flex items-center gap-2">
-          <BookOpen className="h-4 w-4" aria-hidden="true" /> Materi wajib
+          <BookOpen className="h-4 w-4" aria-hidden="true" /> {optional ? "Materi opsional" : "Materi wajib"}
         </p>
         <h2 className="mt-3 text-2xl font-bold sm:text-3xl">{lesson.title}</h2>
         <p className="mt-2 text-muted-foreground">{lesson.summary}</p>
@@ -85,7 +95,9 @@ export function RequiredLesson({ lesson }: { lesson: PublicLesson }) {
 
       <Card className="glow-card relative border-primary/30 sm:p-8">
         {result?.correct && <Confetti pieces={20} />}
-        <p className="text-xs font-semibold uppercase tracking-wider text-primary">Cek pemahaman · wajib benar</p>
+        <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+          {optional ? "Cek pemahaman" : "Cek pemahaman · wajib benar"}
+        </p>
         <p className="mt-2 font-display text-lg font-bold leading-snug">{lesson.question}</p>
 
         <div role="radiogroup" aria-label={lesson.question} className="mt-4 grid gap-2 sm:grid-cols-2">
@@ -138,9 +150,11 @@ export function RequiredLesson({ lesson }: { lesson: PublicLesson }) {
 
         <div className="mt-5">
           {result?.correct ? (
-            <button type="button" onClick={() => startTransition(() => router.refresh())} className="btn">
-              Lanjut ke akunku <ArrowRight className="h-4 w-4" />
-            </button>
+            !optional && (
+              <button type="button" onClick={() => startTransition(() => router.refresh())} className="btn">
+                {doneLabel} <ArrowRight className="h-4 w-4" />
+              </button>
+            )
           ) : (
             <button type="button" onClick={submit} disabled={picked === null || busy} className="btn">
               {busy && <LoaderCircle className="h-4 w-4 animate-spin" />}

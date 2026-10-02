@@ -1,9 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { Check, X } from "lucide-react"
+import { CheckList, RexComments } from "@/components/akun-latihan/trade-parts"
 import { ACCOUNT, REVIEW } from "@/lib/demo/config"
-import { CHECK_IDS, CHECK_LABELS } from "@/lib/demo/disiplin"
 import type { ExitReason } from "@/lib/demo/fills"
 import { lot, price, usd } from "@/lib/demo/format"
 import { roundMoney } from "@/lib/demo/money"
@@ -74,7 +73,8 @@ function ClosedTrade({
   onReview: (id: string, answer: ReviewAnswer, note: string) => Promise<boolean>
 }) {
   const [answer, setAnswer] = useState<ReviewAnswer | null>(null)
-  const [note, setNote] = useState("")
+  // A note added from the journal first carries over.
+  const [note, setNote] = useState(t.note ?? "")
   const exit = t.exit!
   const d = t.disiplin
   const tone = (v: number) => (v > 0 ? "text-success" : v < 0 ? "text-danger" : "")
@@ -122,22 +122,15 @@ function ClosedTrade({
               {d.counted ? `+${d.xp} XP dari Disiplin` : "Tidak dihitung: ditutup di candle yang sama saat dibuka"}
             </p>
           </div>
-          <ul className="mt-2 flex flex-col gap-1.5 text-sm">
-            {CHECK_IDS.map((id) => {
-              const ok = d.checks[id]
-              return (
-                <li key={id} className="flex items-center gap-2">
-                  {ok ? (
-                    <Check className="h-4 w-4 shrink-0 text-primary" aria-label="Lolos" />
-                  ) : (
-                    <X className="h-4 w-4 shrink-0 text-muted-foreground" aria-label="Tidak lolos" />
-                  )}
-                  <span className={ok ? "" : "text-muted-foreground"}>{CHECK_LABELS[id]}</span>
-                </li>
-              )
-            })}
-          </ul>
+          <div className="mt-2">
+            <CheckList checks={d.checks} />
+          </div>
           <p className="mt-2 text-[11px] text-faint">Untung atau rugi tidak mengubah skor ini.</p>
+        </div>
+      )}
+      {t.rex && (
+        <div className="mt-3">
+          <RexComments comments={t.rex} />
         </div>
       )}
 
