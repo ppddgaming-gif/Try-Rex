@@ -112,8 +112,6 @@ export const statTrade = (t: TradeRow): StatTrade => ({
   slInitial: t.slInitial,
   riskPct: t.riskPct,
   rewardRisk: t.rewardRisk,
-  counted: Boolean(t.counted),
-  disiplin: t.disiplin ?? 0,
   checks: t.checks ?? { slAtEntry: false, riskWithinLimit: false, rewardRisk: false, slNotWidened: false, notRevenge: false },
   revenge: t.revenge,
 })

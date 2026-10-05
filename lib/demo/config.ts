@@ -115,6 +115,16 @@ export const STAGES = {
 
 export type StageNumber = keyof typeof STAGES
 
+/**
+ * "Akun habis": with no trade open, a balance below this line ends the
+ * account. One fixed line per stage, shown on the dashboard in advance: the
+ * 0.01-lot margin of the stage's most expensive pair at its highest price in
+ * the data (GBPUSD at 1.62122 = $16.21), rounded up to a whole dollar. Above
+ * it the smallest trade always fits on any chart of the stage.
+ * lib/demo/money.test.ts recomputes it from the data, so it can't drift.
+ */
+export const AKUN_HABIS: Record<StageNumber, number> = { 1: 17, 2: 17, 3: 17 }
+
 /** What it takes to move up. Counted trades only (see COUNTING). */
 export const STAGE_UNLOCK = {
   /** Stage 1 → 2: this many trades in Stage 1… */

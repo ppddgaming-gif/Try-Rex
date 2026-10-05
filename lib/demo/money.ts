@@ -1,4 +1,4 @@
-import { ACCOUNT, COSTS } from "@/lib/demo/config"
+import { ACCOUNT, AKUN_HABIS, COSTS, type StageNumber } from "@/lib/demo/config"
 import { baseToUsd, instrument, quoteToUsd } from "@/lib/demo/instruments"
 
 // Money on an Akun Latihan: pip value, margin, profit and loss, costs.
@@ -104,9 +104,8 @@ export function accountFigures(balance: number, open: { pnl: number; margin: num
   }
 }
 
-/**
- * "Akun habis": equity no longer covers the margin for the smallest trade on
- * this pair at this price. Trading stops and the account review opens.
- */
-export const bustLevel = (pair: string, price: number) => marginFor(pair, ACCOUNT.MIN_LOT, price)
-export const isBust = (equity: number, pair: string, price: number) => equity < bustLevel(pair, price)
+/** The stage's "akun habis" line (config AKUN_HABIS): the same on every chart, known in advance. */
+export const bustLine = (stage: StageNumber) => AKUN_HABIS[stage]
+
+/** Below the line with no trade open, the account has run out: trading stops and Rex's review opens. */
+export const isBust = (balance: number, stage: StageNumber) => balance < bustLine(stage)

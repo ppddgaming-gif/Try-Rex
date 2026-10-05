@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest"
-import { ACCOUNT } from "@/lib/demo/config"
+import { ACCOUNT, AKUN_HABIS, STAGES, type StageNumber } from "@/lib/demo/config"
 import {
   accountFigures,
-  bustLevel,
+  bustLine,
   grossPnl,
   isBust,
   isValidLot,
@@ -14,6 +14,7 @@ import {
   pipsBetween,
   roundMoney,
 } from "@/lib/demo/money"
+import { gameDatasets } from "@/lib/game-data"
 
 describe("the calculator example from the design", () => {
   it("0.10 lot EURUSD BUY 1.1700 → 1.1750 is $50.00 gross", () => {
@@ -114,17 +115,27 @@ describe("lots", () => {
   })
 })
 
-describe("the 'akun habis' level", () => {
-  it("is the margin for one 0.01 lot at the current price", () => {
-    expect(bustLevel("EURUSD", 1.17)).toBe(11.7)
-    expect(bustLevel("USDJPY", 85)).toBe(10)
-  })
+describe("the 'akun habis' line: one fixed amount per stage", () => {
+  it.each([1, 2, 3] as StageNumber[])(
+    "Stage %i: the 0.01-lot margin of its most expensive pair at that pair's highest price in the data, rounded up",
+    (stage) => {
+      const pairs: readonly string[] = STAGES[stage].pairs
+      const worst = Math.max(
+        ...gameDatasets
+          .filter((d) => pairs.includes(d.pair))
+          .flatMap((d) => d.candles.map((c) => marginFor(d.pair, ACCOUNT.MIN_LOT, c.h))),
+      )
+      expect(bustLine(stage)).toBe(Math.ceil(worst))
+      expect(AKUN_HABIS[stage]).toBe(17)
+    },
+  )
   it.each([
-    [11.69, true],
-    [11.7, false],
+    [16.99, true],
+    [17, false],
+    [0, true],
     [200, false],
-  ])("equity $%s on EURUSD 1.1700 → habis: %s", (equity, bust) => {
-    expect(isBust(equity, "EURUSD", 1.17)).toBe(bust)
+  ])("balance $%s in Stage 1 → habis: %s", (balance, bust) => {
+    expect(isBust(balance, 1)).toBe(bust)
   })
 })
 

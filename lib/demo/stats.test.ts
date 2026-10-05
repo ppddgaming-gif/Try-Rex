@@ -17,8 +17,6 @@ function trade(over: Partial<StatTrade> = {}): StatTrade {
     slInitial: 1.167,
     riskPct: 1.5,
     rewardRisk: 1.5,
-    counted: true,
-    disiplin: 100,
     checks: pass,
     revenge: false,
     ...over,
@@ -45,7 +43,6 @@ describe("accountStats", () => {
       trades: 0,
       wins: 0,
       winRate: null,
-      disiplin: null,
       avgRiskPct: null,
       withoutSl: 0,
       avgRewardRisk: null,
@@ -56,19 +53,17 @@ describe("accountStats", () => {
 
   it("counts the account's own trades", () => {
     const trades = [
-      trade({ net: 4.38, riskPct: 2.1, rewardRisk: 1.1, disiplin: 60 }),
+      trade({ net: 4.38, riskPct: 2.1, rewardRisk: 1.1 }),
       trade({ net: -3.1, riskPct: 1.5, rewardRisk: 2 }),
       // Opened without SL or TP: outside the risk and reward averages.
-      trade({ net: 1, slInitial: null, riskPct: null, rewardRisk: null, disiplin: 40 }),
-      // Closed in the candle it opened: no Disiplin average.
-      trade({ net: -0.5, swap: 0, counted: false, disiplin: 0, riskPct: 0.9 }),
+      trade({ net: 1, slInitial: null, riskPct: null, rewardRisk: null }),
+      trade({ net: -0.5, swap: 0, riskPct: 0.9 }),
     ]
     const s = accountStats(trades, [200, 204.38, 201.28, 202.28, 201.78])
     expect(s).toEqual({
       trades: 4,
       wins: 2,
       winRate: 50,
-      disiplin: 67,
       avgRiskPct: 1.5,
       withoutSl: 1,
       avgRewardRisk: 1.53,

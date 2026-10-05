@@ -125,12 +125,10 @@ export const toOpenTrade = (t: TradeRow): OpenTrade => ({
 })
 
 /**
- * "Akun habis": nothing is open and the balance no longer covers the margin
- * of the smallest trade on the chart at hand. Trading stops; what's left is
- * Rex's review, the risk lesson and a new account. The current chart decides,
- * so changing charts is refused once it's true (lib/demo/actions.ts).
+ * "Akun habis": nothing is open and the balance is below the stage's fixed
+ * line (config AKUN_HABIS). Trading stops, a new chart included; what's left
+ * is Rex's review, the risk lesson and a new account.
  */
 export function accountBust(state: TradingState) {
-  const candle = state.session ? state.segmentCandles[state.session.cursor] : undefined
-  return state.open.length === 0 && candle !== undefined && isBust(state.account.balance, state.session!.pair, candle.c)
+  return state.open.length === 0 && isBust(state.account.balance, state.stage)
 }

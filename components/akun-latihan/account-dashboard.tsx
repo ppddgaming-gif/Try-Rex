@@ -21,8 +21,9 @@ const NO_TRADES = "Belum ada trade"
 
 /**
  * The account's dashboard, Disiplin first: how the plan was kept, then what
- * it did to the money. Every number is counted from the account's own trades
- * and ledger; with no trades yet, each reads "—", never 0 or 0%.
+ * it did to the money. Disiplin and the stage are the player's, over every
+ * account, so a reset never wipes them; the rest is this account's own
+ * trades and ledger. With no trades yet, each reads "—", never 0 or 0%.
  */
 export function AccountDashboard({
   view,
@@ -37,6 +38,7 @@ export function AccountDashboard({
 }) {
   const f = view.account.figures
   const none = stats.trades === 0
+  const disiplin = view.disiplin
   const net = roundMoney(f.balance - view.account.startingBalance)
   const p = view.stage.progress
   const share = Math.min(1, p.trades / p.needed)
@@ -71,13 +73,13 @@ export function AccountDashboard({
         <div className="mt-5 grid gap-6 sm:grid-cols-[minmax(0,auto)_minmax(0,1fr)] sm:items-center">
           <div>
             <p className="text-sm text-muted-foreground">Disiplin</p>
-            <p className={`font-mono text-5xl font-bold tracking-tight ${stats.disiplin === null ? "text-muted-foreground" : "text-primary"}`}>
-              {stats.disiplin === null ? "—" : `${stats.disiplin}%`}
+            <p className={`font-mono text-5xl font-bold tracking-tight ${disiplin === null ? "text-muted-foreground" : "text-primary"}`}>
+              {disiplin === null ? "—" : `${disiplin}%`}
             </p>
             <p className="mt-1 text-xs text-faint">
-              {stats.disiplin === null
+              {disiplin === null
                 ? "Muncul setelah trade pertama ditutup"
-                : `Rata-rata ${DISIPLIN.ROLLING_TRADES} trade terakhir akun ini`}
+                : `Rata-rata ${DISIPLIN.ROLLING_TRADES} trade terakhirmu, di semua akun`}
             </p>
           </div>
           <div className="rounded-xl bg-inset p-4">
@@ -131,7 +133,7 @@ export function AccountDashboard({
 
       {/* 3. The money, then 4. win rate and why it isn't the point. */}
       <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Stat label="Saldo" value={usd(f.balance)} />
+        <Stat label="Saldo" value={usd(f.balance)} note={`Akun habis di bawah ${usd(view.account.bustLine)}`} />
         <Stat label="Equity" value={usd(f.equity)} />
         <Stat
           label="Net profit"

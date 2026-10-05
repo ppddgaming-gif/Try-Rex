@@ -25,7 +25,7 @@ import { RexTipCard, useTipQueue } from "@/components/akun-latihan/rex-tip"
 import { TradeChart } from "@/components/akun-latihan/trade-chart"
 import { ClosedTrades } from "@/components/akun-latihan/trade-result"
 import { ACCOUNT, DISIPLIN, REPLAY } from "@/lib/demo/config"
-import { lot as fmtLot, price, usd } from "@/lib/demo/format"
+import { price, usd } from "@/lib/demo/format"
 import { instrument } from "@/lib/demo/instruments"
 import type { Side } from "@/lib/demo/money"
 import type { ReviewAnswer } from "@/lib/demo/state"
@@ -284,9 +284,9 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
               <div className="min-w-0 flex-1">
                 <p className="font-semibold">Akun #{view.account.number} habis</p>
                 <p className="text-sm text-muted-foreground">
-                  Equity {usd(view.account.figures.equity)} tidak cukup lagi untuk margin trade terkecil (
-                  {fmtLot(ACCOUNT.MIN_LOT)} lot {session.pair} butuh {usd(view.account.bustLevel ?? 0)}). Tidak ada tombol
-                  tambah saldo: Rex sudah menyiapkan review akunmu.
+                  Saldo {usd(view.account.figures.balance)} di bawah batas akun habis Stage {view.stage.current} (
+                  {usd(view.account.bustLine)}) dan tidak ada trade terbuka. Tidak ada tombol tambah saldo: Rex sudah
+                  menyiapkan review akunmu.
                 </p>
               </div>
               <Link href="/akun-latihan" className="btn btn-sm shrink-0">

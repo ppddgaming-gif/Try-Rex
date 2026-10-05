@@ -350,7 +350,7 @@ export function planStart(
   seen: ReadonlyMap<string, number>,
   random: () => number,
 ): Segment | Refusal {
-  // Another chart could be a cheaper pair: the account stays habis.
+  // Habis stays habis: no new chart either.
   if (accountBust(state)) return BUST_REFUSAL
   if (state.open.length > 0) return { error: "Tutup trade yang terbuka dulu sebelum ganti chart." }
   const segment = pickSegment(pool, seen, random, state.session?.segmentId)

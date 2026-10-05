@@ -56,7 +56,7 @@ export function AccountEnd({
             <h2 className="mt-2 text-2xl font-bold">{title}</h2>
             <p className="mt-2 text-muted-foreground">
               {ending === "habis"
-                ? "Equity tidak cukup lagi untuk margin trade terkecil, jadi trading berhenti. Tidak ada tombol tambah saldo. Ini review dari data akunmu sendiri."
+                ? "Saldo turun di bawah batas akun habis tanpa trade terbuka, jadi trading berhenti. Tidak ada tombol tambah saldo. Ini review dari data akunmu sendiri."
                 : "Kamu menutup akun ini sendiri. Ini review dari data akunmu sendiri."}
             </p>
           </div>

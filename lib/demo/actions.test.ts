@@ -333,19 +333,29 @@ describe("buildView never sends a candle past the cursor", () => {
   })
 })
 
-describe("akun habis: below the smallest trade's margin, trading stops", () => {
-  // EURUSD at 1.1700: 0.01 lot needs $11.70 margin.
+describe("akun habis: below the stage's fixed line ($17), trading stops", () => {
   const pool = ["eurusd-1", "eurusd-2"].map(
     (id): Segment => ({ id, datasetId: id, pair: "EURUSD", offset: 0, length: 40, startCursor: 29, lastIndex: 39 }),
   )
   const broke = (balance: number) => state({ account: { ...state().account, balance } })
 
   it.each([
-    [11.69, true],
-    [11.7, false],
+    [16.99, true],
+    [17, false],
     [0, true],
   ])("balance $%s → habis %s", (balance, bust) => {
-    expect(buildView(broke(balance)).account).toMatchObject({ bust, bustLevel: 11.7 })
+    expect(buildView(broke(balance)).account).toMatchObject({ bust, bustLine: 17 })
+  })
+
+  it("is the same on every chart, and without one", () => {
+    const usdjpy = state({
+      account: { ...state().account, balance: 12 },
+      session: { id: "ses", segmentId: "usdjpy-1", pair: "USDJPY", cursor: 29, lastIndex: 39, status: "active" },
+    })
+    expect(buildView(usdjpy).account.bust).toBe(true)
+    const noChart = state({ account: { ...state().account, balance: 12 }, session: null, segment: null })
+    expect(buildView(noChart).account.bust).toBe(true)
+    expect(planStart(noChart, pool, new Map(), () => 0)).toEqual(BUST_REFUSAL)
   })
 
   it("refuses the next candle, an order and a new chart", () => {
@@ -363,10 +373,10 @@ describe("akun habis: below the smallest trade's margin, trading stops", () => {
   })
 
   it("the SL that takes the balance under the line leaves the account habis", () => {
-    const s = state({ account: { ...state().account, balance: 14 } })
+    const s = state({ account: { ...state().account, balance: 20 } })
     const trade = open(s)
     const p = settled(planStep(state({ open: [trade], account: s.account }, { 30: { l: 1.166 } })))
-    expect(p.balance).toBe(10.9)
+    expect(p.balance).toBe(16.9)
     const after = state({ account: { ...s.account, balance: p.balance }, session: { ...s.session!, cursor: 30 } })
     expect(buildView(after).account.bust).toBe(true)
   })
@@ -418,5 +428,31 @@ describe("closed trades carry Rex's comments", () => {
     const v = buildView(state({ sessionClosed: [closed], session: { ...s.session!, cursor: 30 } }))
     expect(v.closed[0].rex).toEqual([expect.objectContaining({ id: "good", tone: "good" })])
     expect(v.open).toEqual([])
+  })
+})
+
+describe("a reset never wipes the record: stages, Disiplin and graduation count every account", () => {
+  const past = (accountId: string, stage: 1 | 2 | 3, scores: number[]): ClosedSummary[] =>
+    scores.map((score, i) => ({ accountId, stage, counted: true, disiplin: score, net: -1, swap: 0, lot: 0.01, closedClock: i }))
+  // The current account ("acc") is new; every past trade was on Akun #1 ("old").
+  const fresh = (stage: 1 | 2 | 3, history: ClosedSummary[]) =>
+    state({ stage, history, account: { ...state().account, id: "acc", number: 2, candlesPlayed: 0 } })
+
+  it("stage progress keeps the old account's trades", () => {
+    const v = buildView(fresh(1, past("old", 1, [40, 40, 40, 40, 40, 40, 40])))
+    expect(v.stage.label).toBe("7/10 trade · Disiplin 40% (butuh 80%)")
+  })
+
+  it("the Disiplin average keeps them too", () => {
+    expect(buildView(fresh(1, past("old", 1, [40, 60, 80]))).disiplin).toBe(60)
+    expect(buildView(fresh(1, [])).disiplin).toBeNull()
+  })
+
+  it("so does graduation: 29 Stage 3 trades on Akun #1 and the 30th on Akun #2", () => {
+    const s = fresh(3, past("old", 3, Array<number>(29).fill(100)))
+    const trade = open(s, plan, { stage: 3, openedClock: -1 })
+    const p = settled(planStep(state({ stage: 3, history: s.history, account: s.account, open: [trade] }, { 30: { h: 1.18 } })))
+    expect(p.events).toContainEqual({ kind: "closed", number: 1, reason: "tp" })
+    expect(p.events).toContainEqual({ kind: "graduated" })
   })
 })

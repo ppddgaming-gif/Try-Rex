@@ -77,6 +77,7 @@ export function StageCard({ view }: { view: DemoView }) {
         <li>Lot: {stage.fixedLot !== null ? `tetap ${lot(stage.fixedLot)}` : "bebas dipilih"}</li>
         <li>Trade terbuka: maksimal {stage.maxOpenTrades}</li>
         <li>SL dan TP: {stage.slTpRequired ? "wajib" : "boleh tanpa, tetap diperiksa Disiplin"}</li>
+        <li>Akun habis: saldo di bawah {usd(view.account.bustLine)} tanpa trade terbuka</li>
       </ul>
       <p className="mt-2 text-[11px] leading-snug text-faint">
         Hanya trade yang dipegang minimal 1 candle yang dihitung untuk stage dan XP.

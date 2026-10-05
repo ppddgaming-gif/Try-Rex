@@ -1,7 +1,7 @@
 import { DISIPLIN, STAGES, type StageNumber } from "@/lib/demo/config"
-import type { Checks } from "@/lib/demo/disiplin"
+import { rollingDisiplin, type Checks } from "@/lib/demo/disiplin"
 import { figuresAt, openPnl, type ExitReason } from "@/lib/demo/fills"
-import { accountFigures, bustLevel, roundMoney, type AccountFigures, type Side } from "@/lib/demo/money"
+import { accountFigures, bustLine, roundMoney, type AccountFigures, type Side } from "@/lib/demo/money"
 import { levelPips } from "@/lib/demo/orders"
 import { commentsFor } from "@/lib/demo/journal"
 import type { RexComment } from "@/lib/demo/rex-comments"
@@ -68,9 +68,15 @@ export type DemoView = {
     figures: AccountFigures
     /** "Akun habis" (lib/demo/state.ts accountBust): trading has stopped. */
     bust: boolean
-    /** Margin of the smallest trade on this chart, the "akun habis" line; null without a chart. */
-    bustLevel: number | null
+    /** The stage's fixed "akun habis" line (config AKUN_HABIS). */
+    bustLine: number
   }
+  /**
+   * The player's Disiplin: the rolling average of their last counted trades
+   * on every account, so a reset or a new account never wipes the record.
+   * null before the first.
+   */
+  disiplin: number | null
   stage: {
     current: StageNumber
     pairs: string[]
@@ -184,8 +190,9 @@ export function buildView(state: TradingState, events: DemoEvent[] = []): DemoVi
       startingBalance: account.startingBalance,
       figures,
       bust: accountBust(state),
-      bustLevel: session && price !== null ? bustLevel(session.pair, price) : null,
+      bustLine: bustLine(state.stage),
     },
+    disiplin: rollingDisiplin(scored.map((t) => t.score)),
     stage: {
       current: state.stage,
       pairs: [...stageCfg.pairs],

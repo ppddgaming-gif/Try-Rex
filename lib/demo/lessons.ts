@@ -1,5 +1,5 @@
 import "server-only"
-import { ACCOUNT, COSTS, DISIPLIN } from "@/lib/demo/config"
+import { ACCOUNT, AKUN_HABIS, COSTS, DISIPLIN } from "@/lib/demo/config"
 import { lot, pct, usd } from "@/lib/demo/format"
 import {
   LESSON_LOSS_PIPS,
@@ -13,7 +13,7 @@ import {
   riskRows,
   stopOutPoint,
 } from "@/lib/demo/lesson-math"
-import { bustLevel, normalizeLot, pipValue } from "@/lib/demo/money"
+import { normalizeLot, pipValue } from "@/lib/demo/money"
 
 // Akun Latihan lessons. Server-only because each holds its answer key
 // (non-negotiable #1): the page sends the question and options, and only the
@@ -47,7 +47,7 @@ function introLesson(): KeyedLesson {
   const small = rows[0]
   const big = rows[2]
   const out = stopOutPoint(0.1)
-  const habis = bustLevel(LESSON_PAIR, LESSON_PRICE)
+  const habis = AKUN_HABIS[1]
   const start = ACCOUNT.STARTING_BALANCE
 
   return {
@@ -84,7 +84,7 @@ function introLesson(): KeyedLesson {
       {
         title: "Akun habis",
         paragraphs: [
-          `Kalau equity tidak cukup lagi untuk margin trade terkecil (${lot(ACCOUNT.MIN_LOT)} lot, sekitar ${usd(habis)} di ${LESSON_PAIR}), akunmu habis dan trading berhenti. Dengan lot ${lot(small.lot)}, batas ini tercapai lebih dulu daripada stop out.`,
+          `Di Stage 1, kalau tidak ada trade terbuka dan saldo di bawah ${usd(habis)}, akunmu habis dan trading berhenti. Batas ini tetap untuk setiap chart: margin ${lot(ACCOUNT.MIN_LOT)} lot di pair termahal stage-mu, dibulatkan ke atas. Di atasnya, trade terkecil selalu muat. Batasnya juga tertulis di dashboard akunmu.`,
           "Tidak ada tombol tambah saldo. Rex akan meninjau akunmu dari datanya sendiri, kamu belajar satu materi risiko, lalu memulai akun baru dengan saldo awal.",
         ],
       },

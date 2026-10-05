@@ -1,11 +1,12 @@
 import { ACCOUNT_REVIEW } from "@/lib/demo/config"
-import { CHECK_IDS, rollingDisiplin, type CheckId, type Checks } from "@/lib/demo/disiplin"
+import { CHECK_IDS, type CheckId, type Checks } from "@/lib/demo/disiplin"
 import { roundMoney, type Side } from "@/lib/demo/money"
 
 // The numbers on the account dashboard, in Rex's review of a finished
 // account and in the graduation summary. Every one is counted from the
 // player's own closed trades and ledger; with no trades, the callers show
-// "—". Pure.
+// "—". Disiplin isn't here: it's the player's across all accounts
+// (DemoView.disiplin), so a reset can't wipe it. Pure.
 
 /** A closed trade, reduced to what the statistics need. */
 export type StatTrade = {
@@ -19,8 +20,6 @@ export type StatTrade = {
   slInitial: number | null
   riskPct: number | null
   rewardRisk: number | null
-  counted: boolean
-  disiplin: number
   checks: Checks
   revenge: boolean
 }
@@ -58,8 +57,6 @@ export type AccountStats = {
   wins: number
   /** Whole %; null with no trades. */
   winRate: number | null
-  /** Rolling Disiplin of the counted trades; null before the first. */
-  disiplin: number | null
   /** Average risk at entry, % of balance, over trades opened with SL. */
   avgRiskPct: number | null
   /** Trades opened without SL: their risk had no limit, so they sit outside the average. */
@@ -80,7 +77,6 @@ export function accountStats(trades: StatTrade[], balances: number[]): AccountSt
     trades: trades.length,
     wins,
     winRate: share(wins, trades.length),
-    disiplin: rollingDisiplin(trades.filter((t) => t.counted).map((t) => t.disiplin)),
     avgRiskPct: average(withSl.flatMap((t) => (t.riskPct === null ? [] : [t.riskPct])), 1),
     withoutSl: trades.length - withSl.length,
     avgRewardRisk: average(trades.flatMap((t) => (t.rewardRisk === null ? [] : [t.rewardRisk])), 2),
