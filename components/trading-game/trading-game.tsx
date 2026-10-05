@@ -216,13 +216,13 @@ function GameRound({
           then the decision. From lg the chart spans both rows on the left and
           progress sits above the decision on the right. */}
       <div className="mt-6 grid grid-cols-1 items-start gap-4 lg:grid-cols-[1fr_340px] lg:grid-rows-[auto_1fr]">
-        <div className="enter lg:col-start-2 lg:row-start-1">
+        <div className="enter lg:col-start-2 lg:row-start-1" data-tour="game-progress">
           <QuestionProgress index={index} results={results} total={round.length} xp={xp} seconds={seconds} />
         </div>
 
         {/* Chart */}
         <Card className="enter flex flex-col self-start p-4 sm:p-[22px] lg:col-start-1 lg:row-span-2 lg:row-start-1">
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2" data-tour="game-pair">
             <span className="rounded-lg border border-border bg-muted/40 px-3 py-1.5 text-sm font-semibold">
               {challenge.pair}
             </span>
@@ -260,7 +260,7 @@ function GameRound({
               revealed candles cascade in on top. */}
           <ViewTransition key={challenge.id} name="game-chart" share="auto" update="auto" default="none">
             {/* Fixed height: the SVG stretches to its box, text included. */}
-            <div className="mt-4 h-[280px] w-full sm:h-[400px] lg:h-[440px]">
+            <div className="mt-4 h-[280px] w-full sm:h-[400px] lg:h-[440px]" data-tour="game-chart">
               <CandlestickChart
                 candles={shown}
                 min={frame.min}
@@ -293,7 +293,7 @@ function GameRound({
         {/* Situation + actions */}
         <div className="flex flex-col gap-4 lg:col-start-2 lg:row-start-2">
           <ViewTransition key={challenge.id} name="game-situation" share="auto" default="none">
-            <Card className="enter" style={{ "--enter-delay": "80ms" } as React.CSSProperties}>
+            <Card className="enter" style={{ "--enter-delay": "80ms" } as React.CSSProperties} tour="game-situation">
               <h2 className="text-base font-semibold">Situasi Market</h2>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                 <GlossaryText text={challenge.situation} />
@@ -311,7 +311,7 @@ function GameRound({
 
           {!submitted && (
             <>
-              <button onClick={submit} disabled={!choice} className="btn w-full">
+              <button onClick={submit} disabled={!choice} className="btn w-full" data-tour="game-submit">
                 {choice ? `Kirim Jawaban: ${decisionLabels[choice]}` : "Pilih BUY, SELL, atau WAIT"}
               </button>
               {/* Shortcuts only mean something with a keyboard. */}
@@ -396,17 +396,19 @@ function GameHeader({
         )}
       </div>
       {level && onLevel ? (
-        <SelectMenu
-          label="Tingkat kesulitan"
-          className="w-full sm:w-60"
-          value={level}
-          onChange={(v) => onLevel(v as GameLevel)}
-          options={gameLevels.map((l) => ({
-            value: l.id,
-            label: `${l.label} · ${l.xp} XP`,
-            prefix: <Target className="h-4 w-4" />,
-          }))}
-        />
+        <div className="w-full sm:w-60" data-tour="game-level">
+          <SelectMenu
+            label="Tingkat kesulitan"
+            className="w-full"
+            value={level}
+            onChange={(v) => onLevel(v as GameLevel)}
+            options={gameLevels.map((l) => ({
+              value: l.id,
+              label: `${l.label} · ${l.xp} XP`,
+              prefix: <Target className="h-4 w-4" />,
+            }))}
+          />
+        </div>
       ) : (
         <Skeleton className="h-10 w-full rounded-lg sm:w-60" />
       )}

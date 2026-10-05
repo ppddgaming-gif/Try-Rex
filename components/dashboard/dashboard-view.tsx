@@ -64,7 +64,7 @@ export function DashboardView({
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <div className="hidden lg:block">
+          <div className="hidden lg:block" data-tour="dash-streak">
             <Streak compact />
           </div>
           {started && (
@@ -76,7 +76,7 @@ export function DashboardView({
       </header>
 
       {/* 1. The next action: the first-session hero, then the stat row. */}
-      <div className="enter mt-6" style={{ "--enter-delay": "60ms" } as React.CSSProperties}>
+      <div className="enter mt-6" style={{ "--enter-delay": "60ms" } as React.CSSProperties} data-tour="dash-stats">
         {progress && !started ? <FirstSessionHero motivation={motivation} /> : <StatRow progress={progress} />}
       </div>
 
@@ -86,17 +86,19 @@ export function DashboardView({
       </div>
 
       {/* 2. Level + streak. The sidebar carries these from lg. */}
-      <Card className="mt-4 flex flex-col gap-5 lg:hidden">
+      <Card className="mt-4 flex flex-col gap-5 lg:hidden" tour="dash-streak-mobile">
         <LevelXp />
         <Streak />
       </Card>
 
       <div className="mt-4 grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
         {/* 3. */}
-        <PracticeCalendar />
+        <div data-tour="dash-calendar">
+          <PracticeCalendar />
+        </div>
 
         {/* 4. */}
-        <Card>
+        <Card tour="dash-skills">
           <h2 className="text-base font-semibold">Kemampuan</h2>
           <p className="mt-1 text-xs text-muted-foreground">
             Terisi setelah soal mulai menguji tiap kemampuan secara terpisah.
@@ -109,7 +111,7 @@ export function DashboardView({
         </Card>
 
         {/* 5. */}
-        <Card>
+        <Card tour="dash-activity">
           <h2 className="text-base font-semibold">Aktivitas Terbaru</h2>
           {!progress ? (
             <div className="mt-3 flex flex-col">

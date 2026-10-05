@@ -27,12 +27,14 @@ type Availability = "idle" | "checking" | "free" | "taken" | "invalid"
 
 /**
  * Name + username. The username is checked as you type (debounced), so a
- * taken name shows before you press save.
+ * taken name shows before you press save. `requireUsername` (on
+ * /lengkapi-profil, and once a profile is complete) won't save without one.
  */
 export function ProfileForm({
   name,
   username,
   disabledUsername = false,
+  requireUsername = false,
   submitLabel = "Simpan profil",
   onSaved,
 }: {
@@ -40,6 +42,7 @@ export function ProfileForm({
   username: string | null
   /** True when the server can't store usernames yet. */
   disabledUsername?: boolean
+  requireUsername?: boolean
   submitLabel?: string
   onSaved?: () => void
 }) {
@@ -86,8 +89,11 @@ export function ProfileForm({
     }
   }, [candidate, needsCheck])
 
+  const missing = requireUsername && !candidate && !disabledUsername
   const hint: Record<Availability, React.ReactNode> = {
-    idle: "3–20 karakter: huruf kecil, angka, atau garis bawah.",
+    idle: requireUsername
+      ? "Wajib. 3–20 karakter: huruf kecil, angka, atau garis bawah."
+      : "3–20 karakter: huruf kecil, angka, atau garis bawah.",
     checking: (
       <span className="flex items-center gap-1.5">
         <LoaderCircle className="h-3 w-3 animate-spin" /> Mengecek…
@@ -108,6 +114,7 @@ export function ProfileForm({
 
   return (
     <form action={action} className="flex flex-col gap-5" noValidate>
+      {requireUsername && <input type="hidden" name="require_username" value="1" />}
       <FormError message={state.error} />
       <Field id="name" name="name" label="Nama tampilan" autoComplete="name" required maxLength={60} defaultValue={name} />
       <div className="flex flex-col gap-2">
@@ -127,6 +134,7 @@ export function ProfileForm({
             spellCheck={false}
             disabled={disabledUsername}
             aria-describedby="username-hint"
+            aria-required={requireUsername || undefined}
             aria-invalid={availability === "taken" || availability === "invalid"}
             placeholder="trader_rex"
             className="h-12 w-full rounded-xl border border-border bg-inset pl-10 pr-4 text-base text-foreground transition-colors placeholder:text-faint hover:border-faint disabled:opacity-50"
@@ -137,7 +145,11 @@ export function ProfileForm({
         </p>
       </div>
       <div className="flex flex-wrap items-center gap-4">
-        <button type="submit" className="btn" disabled={pending || availability === "taken" || availability === "invalid"}>
+        <button
+          type="submit"
+          className="btn"
+          disabled={pending || missing || availability === "taken" || availability === "invalid"}
+        >
           {pending ? "Menyimpan…" : submitLabel}
         </button>
         <FormSaved show={Boolean(state.ok) && !pending}>Tersimpan</FormSaved>

@@ -1,12 +1,21 @@
 import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
+import { COMPLETE_PROFILE_PATH, PATH_HEADER } from "@/lib/profile-gate"
 
 /** Routes that need an account. Guests are sent to /login?next=… */
-const PROTECTED = ["/dashboard"]
+const PROTECTED = ["/dashboard", COMPLETE_PROFILE_PATH]
 /** Auth screens a signed-in user has no reason to see. */
 const GUEST_ONLY = ["/login", "/signup"]
 
 const matches = (path: string, list: string[]) => list.some((p) => path === p || path.startsWith(p + "/"))
+
+/** Path and query, without the _rsc cache-buster Next adds to navigations. */
+function requestedPath(request: NextRequest) {
+  const params = new URLSearchParams(request.nextUrl.search)
+  params.delete("_rsc")
+  const query = params.toString()
+  return request.nextUrl.pathname + (query ? `?${query}` : "")
+}
 
 /**
  * Runs from the root proxy.ts on every page request. Refreshes the Supabase
@@ -14,6 +23,10 @@ const matches = (path: string, list: string[]) => list.some((p) => path === p ||
  * /ai-evaluation and /start are deliberately open to guests.
  */
 export async function updateSession(request: NextRequest) {
+  // The page asked for, for the profile gate in app/(app)/layout.tsx (a
+  // layout can't read the URL). Set before any response is built, so every
+  // NextResponse.next({ request }) below forwards it. No database call here.
+  request.headers.set(PATH_HEADER, requestedPath(request))
   let supabaseResponse = NextResponse.next({ request })
 
   // Create a new client per request; never keep it in a module global.

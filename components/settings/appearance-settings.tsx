@@ -15,7 +15,7 @@ export function AppearanceSettings() {
 
   return (
     <>
-      <Section title="Tema" hint="Sistem mengikuti pengaturan terang/gelap perangkatmu.">
+      <Section tour="settings-theme" title="Tema" hint="Sistem mengikuti pengaturan terang/gelap perangkatmu.">
         <div role="radiogroup" aria-label="Tema" className="grid gap-3 sm:grid-cols-3">
           <ThemeOption value="dark" current={prefs.theme} icon={<Moon className="h-4 w-4" />} label="Gelap" />
           <ThemeOption value="light" current={prefs.theme} icon={<Sun className="h-4 w-4" />} label="Terang" />
@@ -24,6 +24,7 @@ export function AppearanceSettings() {
       </Section>
 
       <Section
+        tour="settings-font"
         title="Huruf"
         hint="OpenDyslexic memberi bobot di bagian bawah huruf agar tidak terbalik-balik. Atkinson Hyperlegible dibuat supaya huruf mirip (I, l, 1) mudah dibedakan."
       >
@@ -55,7 +56,7 @@ export function AppearanceSettings() {
         </div>
       </Section>
 
-      <Section title="Ukuran teks">
+      <Section tour="settings-size" title="Ukuran teks">
         <div role="radiogroup" aria-label="Ukuran teks" className="grid grid-cols-3 gap-3">
           {(
             [
@@ -76,7 +77,7 @@ export function AppearanceSettings() {
         </div>
       </Section>
 
-      <Section title="Gerakan" hint="Kurangi mematikan animasi di situs ini saja, tanpa mengubah pengaturan perangkatmu.">
+      <Section tour="settings-motion" title="Gerakan" hint="Kurangi mematikan animasi di situs ini saja, tanpa mengubah pengaturan perangkatmu.">
         <div role="radiogroup" aria-label="Gerakan" className="grid gap-3 sm:grid-cols-2">
           <Choice<Motion>
             name="motion"
@@ -121,12 +122,26 @@ export function AppearanceSettings() {
   )
 }
 
-function Section({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {
+function Section({
+  title,
+  hint,
+  tour,
+  children,
+}: {
+  title: string
+  hint?: string
+  /** data-tour value for the Pengaturan tour (lib/tours.ts). */
+  tour?: string
+  children: ReactNode
+}) {
   return (
     <Card className="sm:p-7">
       <h2 className="text-base font-semibold">{title}</h2>
       {hint && <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{hint}</p>}
-      <div className="mt-5">{children}</div>
+      {/* The tour points at the options: a whole section is taller than a phone screen. */}
+      <div className="mt-5" data-tour={tour}>
+        {children}
+      </div>
     </Card>
   )
 }

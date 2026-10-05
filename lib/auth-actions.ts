@@ -58,8 +58,9 @@ export async function signup(_: FormState, fd: FormData): Promise<FormState> {
     password,
     options: {
       // Read by the handle_new_user trigger; the client never writes profiles.
+      // The confirmation link lands on /lengkapi-profil: username and quiz first.
       data: { display_name: name.slice(0, 60), privacy_accepted: true },
-      emailRedirectTo: `${await origin()}/auth/callback?next=/dashboard`,
+      emailRedirectTo: `${await origin()}/auth/callback?next=/lengkapi-profil`,
     },
   })
   if (error) return { error: authErrorMessage(error), email }

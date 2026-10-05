@@ -105,6 +105,9 @@
 
   /* What drop shadows are mixed from. Near-black in both themes. */
   --shadow: #050705;
+  /* The guided tour's dim around the highlighted element. Stronger on the
+     dark theme, where near-black over a near-black page barely shows. */
+  --tour-dim: color-mix(in srgb, var(--shadow) 82%, transparent);
 
   /* Desktop sidebar width; html[data-sidebar="collapsed"] narrows it. */
   --sidebar-w: 16rem;
@@ -148,6 +151,7 @@
   --rex-eye: #161b13;
 
   --shadow: #3a3420;
+  --tour-dim: color-mix(in srgb, var(--shadow) 58%, transparent);
 
   color-scheme: light;
 }
@@ -633,6 +637,35 @@ p {
   }
 }
 
+/* Guided tours (components/tour/). The ring's huge shadow is the dim, so the
+   highlighted element shows through a cut-out with an amber edge. The card
+   rises with `translate`, which adds to the inline centring transform
+   instead of replacing it. */
+.tour-ring {
+  box-shadow:
+    0 0 0 2px var(--primary),
+    0 0 0 200vmax var(--tour-dim);
+  animation: tour-fade 0.24s var(--ease-out-quart) both;
+}
+.tour-dim {
+  background: var(--tour-dim);
+  animation: tour-fade 0.24s var(--ease-out-quart) both;
+}
+.tour-card {
+  animation: tour-card 0.32s var(--ease-out-expo) both;
+}
+@keyframes tour-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes tour-card {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+  }
+}
+
 /* Dropdowns grow out of their trigger on open. */
 .pop {
   transform-origin: top;
@@ -827,7 +860,10 @@ p {
   .aurora::after,
   .flicker,
   .shimmer,
-  .confetti {
+  .confetti,
+  .tour-ring,
+  .tour-dim,
+  .tour-card {
     animation: none !important;
   }
   ::view-transition-old(*),
@@ -864,7 +900,7 @@ p {
   animation-iteration-count: 1 !important;
   transition-duration: 0.01ms !important;
 }
-:root[data-motion="reduce"] :is(.reveal, .reveal-tilt, .skeleton, .xp-chip, .toast-life, .float, .flicker, .shimmer, .confetti),
+:root[data-motion="reduce"] :is(.reveal, .reveal-tilt, .skeleton, .xp-chip, .toast-life, .float, .flicker, .shimmer, .confetti, .tour-ring, .tour-dim, .tour-card),
 :root[data-motion="reduce"] .aurora::before,
 :root[data-motion="reduce"] .aurora::after {
   animation: none !important;

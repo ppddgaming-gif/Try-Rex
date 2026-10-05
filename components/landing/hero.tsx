@@ -1,12 +1,13 @@
 import type { CSSProperties } from "react"
 import Link from "next/link"
-import { ArrowDown, ArrowUpRight } from "lucide-react"
+import { ArrowUpRight, LayoutDashboard, UserPlus } from "lucide-react"
 import { GlowPanel, HeroShowcase } from "./showcase"
 
 // The hero builds in on load, top to bottom, each line a beat after the last.
 const delay = (ms: number) => ({ "--enter-delay": `${ms}ms` }) as CSSProperties
 
-export function Hero() {
+/** `signedIn` swaps "Buat akun gratis" for the way back to the dashboard. */
+export function Hero({ signedIn }: { signedIn: boolean }) {
   return (
     <section className="relative isolate mx-auto max-w-7xl px-5 pt-20 pb-10 lg:px-8 lg:pt-28">
       {/* Slow-drifting warm light behind the headline. */}
@@ -43,10 +44,17 @@ export function Hero() {
             Mulai latihan gratis
             <ArrowUpRight className="h-4 w-4" />
           </Link>
-          <a href="#how" className="btn btn-ghost btn-lg w-full sm:w-auto">
-            Lihat cara kerjanya
-            <ArrowDown className="h-4 w-4 text-primary" />
-          </a>
+          {signedIn ? (
+            <Link href="/dashboard" className="btn btn-ghost btn-lg w-full sm:w-auto">
+              <LayoutDashboard className="h-4 w-4 text-primary" />
+              Buka Dashboard
+            </Link>
+          ) : (
+            <Link href="/signup" className="btn btn-ghost btn-lg w-full sm:w-auto">
+              <UserPlus className="h-4 w-4 text-primary" />
+              Buat akun gratis
+            </Link>
+          )}
         </div>
         <p className="enter mt-4 text-xs text-faint" style={delay(300)}>
           Tanpa daftar, tanpa uang sungguhan. Langsung main.

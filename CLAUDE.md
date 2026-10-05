@@ -57,6 +57,7 @@ Routing splits into four surfaces:
 - **`app/page.tsx`** — public landing page. Composes ~8 section components from `components/landing/` (hero, stats banner, feature rows, testimonials, footer…) in top-to-bottom order. No sidebar.
 - **`app/(app)/`** — the authenticated-style product shell. Its `layout.tsx` wraps children in a fixed 64-unit `Sidebar` plus `lg:ml-64` main area, with `AppNavMobile` (a `lg:hidden` sticky bar + drawer) covering navigation below the `lg` breakpoint where the sidebar is hidden. Contains `dashboard`, `trading-game`, `ai-evaluation`, `belajar` (Belajar 101) and `pengaturan` (Settings) routes; `/akun` only redirects to `/pengaturan#profil`. The layout loads the signed-in user once (`getCurrentUser()`) and passes a `ProfileSummary` (name, username, avatar URL) down; guests see a sign-in prompt in `ProfileCard` instead.
 - **`app/start/`**: the onboarding quiz (build spec ticket 1.12), full-screen with no shell, laid out as in the "Try-Rex Screens" PDF. See **Onboarding** below.
+- **`app/lengkapi-profil/`**: "complete your profile first", full-screen with no shell. See **Profile first and guided tours** below.
 - **`app/(auth)/`**: `/login`, `/signup`, `/lupa-password` (request a reset email) and `/reset-password` (set the new password), as one centred card with no sidebar.
 - **`app/(legal)/`**: `/privacy`, `/terms` and `/disclaimer`, using the landing nav and footer. They are **drafts**: `<Isi>` and `<Tinjau>` from `components/legal-doc.tsx` render the `[PERLU DIISI]` / `[PERLU DITINJAU]` markers that must be resolved (and the text legally reviewed) before launch.
 
@@ -123,10 +124,10 @@ Everything rendered is deterministic so server and client agree — no `Math.ran
 Cookie sessions via `@supabase/ssr`, email + password only. Env: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (see `.env.example`). **No service-role key exists anywhere in the app yet**; the grading route in the spec will be the first user.
 
 - `lib/supabase/client.ts` (browser) and `lib/supabase/server.ts` (Server Components, Route Handlers, Server Actions) both use the anon key.
-- `proxy.ts` (Next 16's name for middleware) calls `lib/supabase/middleware.ts`, which refreshes the session and holds the route rules: `/dashboard` and `/akun` need an account (guests go to `/login?next=…`), signed-in users are bounced off `/login` and `/signup`, and `/trading-game`, `/ai-evaluation` and `/start` stay open to guests.
+- `proxy.ts` (Next 16's name for middleware) calls `lib/supabase/middleware.ts`, which refreshes the session and holds the route rules: `/dashboard` and `/akun` need an account (guests go to `/login?next=…`), signed-in users are bounced off `/login` and `/signup`, and `/trading-game`, `/ai-evaluation` and `/start` stay open to guests. `/lengkapi-profil` needs an account too. The proxy also passes the requested path and query to the app in the `x-tryrex-path` request header (`PATH_HEADER`) for the profile gate; it makes no database call.
 - `lib/auth-actions.ts` holds the server actions (login, signup, reset request, new password, sign-out). `app/auth/callback/route.ts` turns email links into a session.
-- `lib/auth-rules.ts` is pure and client-safe: `safeNext()` (only same-site paths starting with a single "/"; always run `next` through it), the Indonesian error messages, `MIN_PASSWORD`. `lib/auth.ts` is server-only (`getCurrentUser()`, `isSignedIn()`); never import it from a client component.
-- **Profiles are created by the `handle_new_user` trigger, never by the client.** It also seeds the four competencies at 50. SQL: `docs/schema.sql`, then `supabase/migrations/*.sql` in filename order (`_accounts`, `_progress_sync`, `_lock_down_functions`, `_profile_customization`). The build spec lives in `docs/build-spec.md`.
+- `lib/auth-rules.ts` is pure and client-safe: `safeNext()` (only same-site paths starting with a single "/"; always run `next` through it), the Indonesian error messages, `MIN_PASSWORD`. `lib/auth.ts` is server-only (`getCurrentUser()`, which also reads `profileDone` and `toursSeen` and falls back one migration at a time); never import it from a client component.
+- **Profiles are created by the `handle_new_user` trigger, never by the client.** It also seeds the four competencies at 50. SQL: `docs/schema.sql`, then `supabase/migrations/*.sql` in filename order (`_accounts`, `_progress_sync`, `_lock_down_functions`, `_profile_customization`, the `_akun_latihan_*` files, `_onboarding_tour`). The build spec lives in `docs/build-spec.md`.
 - **Revoke EXECUTE on every server-only function.** Postgres grants it to PUBLIC by default, and Supabase exposes each `public` function at `/rest/v1/rpc/<name>`. `apply_competency` and `touch_streak` were callable by anyone for any user until `_lock_down_functions`.
 - `ProfileCard` shows the player's avatar, name and @username (linking to `/akun`) plus real level, XP and streak from `lib/progress` (guests included, as "Tamu"), so it is a client component.
 - **Settings (`/pengaturan`)**: hash-driven tabs (`SettingsTabs`: `#tampilan`, `#profil`, `#keamanan`, `#latihan`). Tampilan works for guests; Profil and Keamanan show a sign-in card to guests. Profil: photo, display name, username. Keamanan: email, password. Latihan: the training plan, retake quiz, reset progress. Server actions live in `lib/profile-actions.ts`; pure rules (`USERNAME_RULE`, `initials`) in `lib/profile-rules.ts`.
@@ -203,9 +204,38 @@ The tabs (`DemoTabs`): Akun (the dashboard, or the end-of-account flow), Trading
 Five questions (`lib/onboarding.ts` `QUESTIONS`): why trading (question 1 is verbatim from the design PDF), experience, chart skill, focus pairs, daily time. **No answer is wrong**: every option is a preference or a self-assessment, never a test. `planFrom(record)` turns answers into a `Plan`: experience + skill (0–6) picks the starting level (≤2 Mudah, ≤4 Menengah, else Sulit), focus picks `focusPairs` for the shuffle, time sets `dailyGoal` (5/15/30 or none), and motivation picks Rex's line (`MOTIVATION_LINES`). "Lewati" stores `skipped: true` and the defaults apply.
 
 - **Storage**: an `OnboardingRecord` (`version`, `answers`, `skipped`, `completedAt`) goes in `profiles.onboarding` (existing jsonb, size-capped) for accounts, and always in localStorage `tryrex:onboarding:v1`. `parseRecord()` validates both ways, so only known question/option keys are ever stored. Guest answers are copied to the account on the first visit to `/start` after signing up.
-- **Gate**: `/dashboard` and `/trading-game` redirect signed-in players without a record to `/start?next=…` on the server; the game sends guests there from the browser (`useOnboarding()` reads the device via `useSyncExternalStore`). `/start?ulang=1` retakes the quiz.
-- **Flow**: questions, then (accounts) a profile step with photo, name and username, then the plan. The starting step is decided once on mount, so the `router.refresh()` after a photo upload can't bounce the player. Keys 1–4 pick, Enter continues.
+- **Gate**: signed-in players answer the quiz on `/lengkapi-profil` (the profile gate below), and `/start` sends a signed-in player whose profile isn't complete there. The game sends guests without a record on the device to `/start?next=…` from the browser (`useOnboarding()` reads the device via `useSyncExternalStore`). `/start?ulang=1` retakes the quiz; the stored answers are only replaced once the new ones are complete.
+- **Flow**: questions, then the plan. `QuestionStep` is exported and reused by `/lengkapi-profil`. Keys 1–4 pick, Enter continues. "Lewati" stores a full record with `skipped: true`, never `{}`.
 - **Where the answers show up**: the game's starting level and focus (named under its title), `DailyGoal` on the dashboard (today's answers against the chosen target), `FirstSessionHero`'s line, and the plan card on `/akun`.
+
+### Profile first and guided tours
+
+- **Landing header** (`components/landing/marketing-nav.tsx`, also on the legal pages): guests see "Masuk" (ghost) and "Daftar" (amber); on phones, Daftar is a full-width button with Masuk under it. Signed in, it shows "Dashboard" and the avatar menu (`account-menu.tsx`: Pengaturan, Panduan, Keluar). The hero offers "Mulai latihan gratis" (the game, no account) and "Buat akun gratis", or "Buka Dashboard" when signed in.
+- **`/lengkapi-profil`** (`components/onboarding/complete-profile.tsx`):
+  - Step 1 is name plus a required username (`ProfileForm requireUsername`, the same live check as Pengaturan), then an optional photo ("Nanti saja").
+  - Step 2 is the quiz. It's skipped when the account already has answers, or when the device has a guest's answers, which are saved to the account first.
+  - Then `completeProfile()` checks both on the server and sets `profiles.profile_completed_at`, and the player goes on to `next`, where the welcome tour starts.
+  - A confirmed sign-up lands here (`emailRedirectTo …?next=/lengkapi-profil`).
+- **The gate** (`lib/profile-gate.ts`, tested):
+  - The `(app)` layout calls `profileGate(user, path)` with the path from the proxy header, and sends a signed-in player whose flag isn't set to `/lengkapi-profil?next=<page>`.
+  - Guests are never gated, and `profileDone: null` (the column missing) holds nobody up.
+  - The landing page, auth, `/auth/*`, legal pages and `/start` sit outside `(app)`, and `isGatedPath` lists them anyway.
+  - Complete means a username plus the quiz answered or skipped, recorded as the flag and never guessed from fields. A database check (`profiles_completed_is_complete`) refuses the flag on an incomplete profile, so a complete profile's username can't be emptied; Pengaturan then marks it required.
+- **Tours** (`lib/tours.ts`, all copy in one file; `components/tour/`):
+  - Rex's coach marks: the page is dimmed (`--tour-dim`), the target is ringed in amber, and a card sits beside it, or docked at the bottom on phones.
+  - Steps point at `data-tour` values, also set through Card's `tour` prop and the `tour` field of `navItems`, the Akun Latihan tabs and the settings tabs. A step can list fallbacks (a sidebar link, then the phone's `nav-menu` button), and the first visible one wins.
+  - A step with nothing visible is skipped. A tour with nothing on screen doesn't start and isn't marked as seen.
+  - Positions come from `getBoundingClientRect()` every frame, through the pure, tested `lib/tour-geometry.ts`. While a docked card is open the page gets room at the bottom, so any element can scroll above the card. Keep targets shorter than a phone screen minus the card; a whole tall section can't be shown clear of it.
+  - Keyboard: Esc closes, arrow keys move, focus goes to "Lanjut" and stays in the card. Under reduced motion there's no animation.
+  - No tour starts over a visible `role="dialog"`, a listbox, the open phone menu or `[data-tour-busy]`. The Akun Latihan trading screen sets `[data-tour-busy]` while a trade is open.
+  - At most one tour starts automatically per page visit. Accounts get the welcome tour first, then each page's tour on its first visit. The welcome tour ends with "Mulai sesi pertama", which opens the Trading Game.
+  - `lib/tours.test.ts` checks that every target is declared in `app/` or `components/`, and that no tour has more than 7 steps.
+- **Seen tours**:
+  - Guests keep them in localStorage `tryrex:tours:v1`.
+  - Accounts keep them in `profiles.tours_seen` (at most 32 ids matching `^[a-z0-9-]{1,40}$`, enforced by a check), saved through `markToursSeen()` (known ids only, union).
+  - The device's list is merged into the account on load, so a tour never shows twice.
+  - A tour counts as seen once it shows.
+- **Replay**: the "?" button (`TourButton`, in the sidebar and the phone's top bar) plays the open page's tour, or opens `/panduan` on a page without one. `/panduan` lists every tour as Selesai or Belum with "Putar ulang", which opens `<page>?tur=<id>`. It's linked from the avatar menu and Pengaturan.
 
 ### Charts are hand-rolled SVG
 

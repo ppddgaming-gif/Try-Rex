@@ -167,7 +167,7 @@ export default async function AiEvaluationPage({
             />
           </div>
 
-          <Card>
+          <Card tour="eval-next">
             <h2 className="text-base font-semibold">Langkah Selanjutnya</h2>
             <p className="mt-2 text-sm text-muted-foreground">
               Terapkan sarannya di ronde berikutnya: 5 soal baru dari data harga asli.

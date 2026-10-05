@@ -54,7 +54,7 @@ export function DecisionButtons({
   const revealed = answer !== undefined
 
   return (
-    <div role="radiogroup" aria-label="Keputusan trading" className="grid grid-cols-3 gap-2.5">
+    <div role="radiogroup" aria-label="Keputusan trading" className="grid grid-cols-3 gap-2.5" data-tour="game-decision">
       {actions.map((a) => {
         const selected = value === a.id
         const isAnswer = answer === a.id

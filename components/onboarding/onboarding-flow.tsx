@@ -4,8 +4,6 @@ import { useEffect, useRef, useState, type CSSProperties } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, ArrowRight, CalendarCheck, Gauge, LineChart } from "lucide-react"
-import { AvatarUploader } from "@/components/account/avatar-uploader"
-import { ProfileForm } from "@/components/account/account-forms"
 import { BrandMark } from "@/components/brand-mark"
 import { Rex } from "@/components/rex-mascot"
 import {
@@ -21,32 +19,24 @@ import {
 import { saveOnboarding } from "@/lib/profile-actions"
 import { readLocalOnboarding, saveLocalOnboarding, useOnboarding } from "@/lib/use-onboarding"
 
-type Account = {
-  id: string
-  displayName: string
-  username: string | null
-  avatarUrl: string | null
-  profileExtras: boolean
-}
-
-type Step = { kind: "question"; index: number } | { kind: "profile" } | { kind: "result" }
+type Step = { kind: "question"; index: number } | { kind: "result" }
 
 const TOTAL = QUESTIONS.length
 const delay = (ms: number) => ({ "--enter-delay": `${ms}ms` }) as CSSProperties
 
 /**
- * /start: five questions, then (for accounts) a profile step, then the plan.
+ * /start: five questions, then the plan. Accounts fill in their profile on
+ * /lengkapi-profil, which reuses QuestionStep; here they only retake the quiz.
  * Layout follows the "Try-Rex Screens" design: a left rail with the promise
  * and the progress, the question on the right.
  */
 export function OnboardingFlow({
-  account,
+  signedIn,
   existing,
   redo,
   next,
 }: {
-  /** null for guests. */
-  account: Account | null
+  signedIn: boolean
   /** The record already on the account, if any. */
   existing: OnboardingRecord | null
   /** ?ulang=1: answer again even though a record exists. */
@@ -62,7 +52,6 @@ export function OnboardingFlow({
   const [answers, setAnswers] = useState<Answers>(() => (redo && existing ? { ...existing.answers } : {}))
   const [record, setRecord] = useState<OnboardingRecord | null>(existing && !redo ? existing : null)
   const [direction, setDirection] = useState<1 | -1>(1)
-  const [notice, setNotice] = useState<string | null>(null)
   const [restarted, setRestarted] = useState(false)
   const synced = useRef(false)
 
@@ -71,14 +60,14 @@ export function OnboardingFlow({
   const local = useOnboarding()
   const answered = QUESTIONS.filter((q) => answers[q.id]).length
   const showLocal =
-    !account && !redo && !restarted && Boolean(local) && step.kind === "question" && step.index === 0 && answered === 0
+    !signedIn && !redo && !restarted && Boolean(local) && step.kind === "question" && step.index === 0 && answered === 0
   const view: Step = showLocal ? { kind: "result" } : step
   const shownRecord = showLocal ? (local ?? null) : record
 
   // Answered as a guest, then signed up: carry the device's answers over to
   // the account instead of asking again.
   useEffect(() => {
-    if (synced.current || !account || existing || redo) return
+    if (synced.current || !signedIn || existing || redo) return
     synced.current = true
     const saved = readLocalOnboarding()
     if (!saved) return
@@ -87,10 +76,9 @@ export function OnboardingFlow({
       if (!ok) return
       setRecord(local)
       setAnswers(local.answers)
-      setNotice("Jawaban kuismu sebelumnya sudah disimpan ke akunmu.")
-      setStep({ kind: "profile" })
+      setStep({ kind: "result" })
     })
-  }, [account, existing, redo])
+  }, [signedIn, existing, redo])
 
   async function finish(skipped: boolean) {
     const done: OnboardingRecord = {
@@ -101,9 +89,10 @@ export function OnboardingFlow({
     }
     saveLocalOnboarding(done)
     setRecord(done)
-    if (account) await saveOnboarding(done)
+    // A retake only replaces the stored answers once the new ones are complete.
+    if (signedIn) await saveOnboarding(done)
     setDirection(1)
-    setStep(account && !redo ? { kind: "profile" } : { kind: "result" })
+    setStep({ kind: "result" })
   }
 
   function go(to: Step, dir: 1 | -1) {
@@ -178,49 +167,10 @@ export function OnboardingFlow({
             />
           )}
 
-          {view.kind === "profile" && account && (
-            <div key="profile" className={direction === 1 ? "step-forward" : "step-back"}>
-              <p className="eyebrow font-mono">Satu langkah lagi</p>
-              <h1 className="mt-3 text-[32px] font-extrabold leading-[1.1] sm:text-[40px]">Kenalan dulu, yuk.</h1>
-              <p className="mt-3 text-muted-foreground">
-                Foto dan username tampil di profilmu. Semuanya bisa diubah kapan saja di halaman Akun.
-              </p>
-              {notice && (
-                <p role="status" className="mt-4 rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-sm">
-                  {notice}
-                </p>
-              )}
-              <div className="glass-card mt-8 rounded-2xl p-5 sm:p-7">
-                <AvatarUploader
-                  userId={account.id}
-                  name={account.displayName}
-                  src={account.avatarUrl}
-                  disabled={!account.profileExtras}
-                />
-                <div className="mt-6 border-t border-border pt-6">
-                  <ProfileForm
-                    name={account.displayName}
-                    username={account.username}
-                    disabledUsername={!account.profileExtras}
-                    submitLabel="Simpan dan lanjut"
-                    onSaved={() => go({ kind: "result" }, 1)}
-                  />
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => go({ kind: "result" }, 1)}
-                className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
-              >
-                Nanti saja
-              </button>
-            </div>
-          )}
-
           {view.kind === "result" && (
             <ResultStep
               record={shownRecord}
-              signedIn={Boolean(account)}
+              signedIn={signedIn}
               onStart={() => {
                 router.push(next)
                 router.refresh()
@@ -238,7 +188,7 @@ export function OnboardingFlow({
   )
 }
 
-function QuestionStep({
+export function QuestionStep({
   index,
   direction,
   value,

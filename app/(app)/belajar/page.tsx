@@ -45,6 +45,7 @@ export default function LearnPage() {
 
       <Link
         href="/belajar/kamus"
+        data-tour="learn-kamus"
         className="reveal lift spotlight mt-6 flex items-center gap-4 rounded-2xl border border-border bg-card p-5 hover:border-primary/40"
       >
         <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/30">
@@ -66,7 +67,7 @@ export default function LearnPage() {
           const lessons = track.lessons.map((s) => lessonBySlug.get(s)!).filter(Boolean)
           return (
             <section key={track.id} className="reveal" aria-labelledby={`track-${track.id}`}>
-              <div className="flex items-start gap-4">
+              <div className="flex items-start gap-4" data-tour={ti === 0 ? "learn-chapter" : undefined}>
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/30">
                   <Icon className="h-5 w-5 text-primary" aria-hidden="true" />
                 </span>
@@ -80,10 +81,11 @@ export default function LearnPage() {
               </div>
 
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                {lessons.map((l) => (
+                {lessons.map((l, li) => (
                   <Link
                     key={l.slug}
                     href={`/belajar/${l.slug}`}
+                    data-tour={ti === 0 && li === 0 ? "learn-lesson" : undefined}
                     className="lift spotlight group flex items-start gap-3 rounded-2xl border border-border bg-card p-4 hover:border-primary/40"
                   >
                     <LessonStatus slug={l.slug} />

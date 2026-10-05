@@ -22,7 +22,8 @@ export function Explanation({
     <Card className="relative flex h-full flex-col overflow-hidden">
       <h2 className="text-base font-semibold">Penjelasan TRY-REX</h2>
 
-      <div className="mt-4 rounded-xl border border-border bg-muted/40 p-4">
+      {/* The tour points at the reasons: the whole card is taller than a phone screen. */}
+      <div className="mt-4 rounded-xl border border-border bg-muted/40 p-4" data-tour="eval-explanation">
         <p className="flex items-center gap-2 text-sm font-semibold">
           {correct ? (
             <CheckCircle2 className="h-5 w-5 shrink-0 text-success" />

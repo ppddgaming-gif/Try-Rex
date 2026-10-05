@@ -1,12 +1,13 @@
 import { cache } from "react"
 import { parseRecord, type OnboardingRecord } from "@/lib/onboarding"
 import { createClient } from "@/lib/supabase/server"
+import { parseSeen, type TourId } from "@/lib/tours"
 
 export type CurrentUser = {
   id: string
   email: string | undefined
   displayName: string
-  /** null until the player picks one on /start or /pengaturan. */
+  /** null until the player picks one on /lengkapi-profil or /pengaturan. */
   username: string | null
   /** Public URL of the uploaded photo, or null (the UI shows initials). */
   avatarUrl: string | null
@@ -18,6 +19,13 @@ export type CurrentUser = {
    * explains instead of offering fields that can't be saved.
    */
   profileExtras: boolean
+  /**
+   * profiles.profile_completed_at is set. null when the column doesn't exist
+   * yet (the _onboarding_tour migration hasn't run): nobody is gated then.
+   */
+  profileDone: boolean | null
+  /** Tours already shown on this account; null when the column doesn't exist yet. */
+  toursSeen: TourId[] | null
 }
 
 type ProfileRow = {
@@ -25,7 +33,17 @@ type ProfileRow = {
   onboarding: unknown
   username?: string | null
   avatar_path?: string | null
+  profile_completed_at?: string | null
+  tours_seen?: unknown
 }
+
+// Newest columns first. Each step back drops the columns a later migration
+// added, so the app keeps working on a database that is one migration behind.
+const SELECTS = [
+  "display_name, onboarding, username, avatar_path, profile_completed_at, tours_seen",
+  "display_name, onboarding, username, avatar_path",
+  "display_name, onboarding",
+]
 
 /**
  * The signed-in user with their profile, or null for guests. Cached per
@@ -40,22 +58,17 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   } = await supabase.auth.getUser()
   if (!user) return null
 
-  // Ask for the customisation columns, and fall back to the original ones if
-  // the migration that adds them hasn't been applied yet.
   let profile: ProfileRow | null = null
-  let profileExtras = true
-  const full = await supabase
-    .from("profiles")
-    .select("display_name, onboarding, username, avatar_path")
-    .eq("id", user.id)
-    .maybeSingle()
-  if (full.error) {
-    profileExtras = false
-    const basic = await supabase.from("profiles").select("display_name, onboarding").eq("id", user.id).maybeSingle()
-    profile = basic.data
-  } else {
-    profile = full.data
+  let level = 0
+  for (; level < SELECTS.length; level++) {
+    const res = await supabase.from("profiles").select(SELECTS[level]).eq("id", user.id).maybeSingle()
+    if (!res.error) {
+      profile = res.data as ProfileRow | null
+      break
+    }
   }
+  const tourColumns = level === 0
+  const profileExtras = level <= 1
 
   const displayName =
     profile?.display_name ??
@@ -74,12 +87,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     avatarUrl,
     onboarding: parseRecord(profile?.onboarding),
     profileExtras,
+    profileDone: tourColumns && profile ? Boolean(profile.profile_completed_at) : null,
+    toursSeen: tourColumns && profile ? parseSeen(profile.tours_seen) : null,
   }
 })
-
-/** Cheap signed-in check for pages that only need to pick a button label. */
-export async function isSignedIn() {
-  const supabase = await createClient()
-  const { data } = await supabase.auth.getClaims()
-  return Boolean(data?.claims)
-}

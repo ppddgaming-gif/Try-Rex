@@ -27,8 +27,8 @@ export default async function DashboardPage() {
   // proxy matcher ever stops covering this route.
   const user = await getCurrentUser()
   if (!user) redirect("/login?next=/dashboard")
-  // New accounts answer the /start quiz first; it sets their level and target.
-  if (!user.onboarding) redirect("/start?next=/dashboard")
+  // New accounts answer the quiz on /lengkapi-profil first (the gate in the
+  // (app) layout); it sets their level and target.
 
   const plan = planFrom(user.onboarding)
 

@@ -203,7 +203,11 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
   }
 
   return (
-    <div className="flex flex-col gap-4 lg:grid lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
+    <div
+      // No guided tour starts over an open trade (components/tour/).
+      data-tour-busy={hasOpen ? "trade" : undefined}
+      className="flex flex-col gap-4 lg:grid lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start"
+    >
       {/* Left column on desktop. On a phone both columns dissolve into one
           list and `order` interleaves them: chart, controls, the order
           panel and Rex right under them, then the rest. */}

@@ -31,7 +31,7 @@ export function EvalStatCards({
 
   return (
     <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-      <Card>
+      <Card tour="eval-result">
         <p className="text-sm text-muted-foreground">Hasil Keputusan</p>
         <p className={`mt-2 flex items-center gap-2 text-2xl font-extrabold ${tone}`}>
           {correct ? <CheckCircle2 className="h-6 w-6" /> : <XCircle className="h-6 w-6" />}
@@ -47,7 +47,7 @@ export function EvalStatCards({
         </span>
       </Card>
 
-      <Card>
+      <Card tour="eval-score">
         <p className="text-sm text-muted-foreground">Akurasi Keputusan</p>
         <p
           className={`mt-2 font-mono text-3xl font-extrabold tabular-nums ${accuracy >= 70 ? "text-success" : "text-warning"}`}

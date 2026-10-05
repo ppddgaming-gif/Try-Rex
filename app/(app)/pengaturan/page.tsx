@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { KeyRound, Mail, Palette, Route, UserRound } from "lucide-react"
+import { CircleHelp, KeyRound, Mail, Palette, Route, UserRound } from "lucide-react"
 import { AvatarUploader } from "@/components/account/avatar-uploader"
 import { EmailForm, PasswordForm, ProfileForm } from "@/components/account/account-forms"
 import { Card } from "@/components/card"
@@ -23,11 +23,16 @@ export default async function SettingsPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-5 py-6 lg:px-8">
-      <header className="enter">
-        <h1 className="text-2xl font-bold tracking-tight">Pengaturan</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Atur tampilan, profil, keamanan, dan jalur latihanmu. Tampilan tersimpan di perangkat ini.
-        </p>
+      <header className="enter flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Pengaturan</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Atur tampilan, profil, keamanan, dan jalur latihanmu. Tampilan tersimpan di perangkat ini.
+          </p>
+        </div>
+        <Link href="/panduan" className="btn btn-ghost btn-sm self-start">
+          <CircleHelp className="h-4 w-4" aria-hidden="true" /> Panduan fitur
+        </Link>
       </header>
 
       <div className="enter mt-6" style={{ "--enter-delay": "60ms" } as React.CSSProperties}>
@@ -37,13 +42,19 @@ export default async function SettingsPage() {
             {
               id: "profil",
               label: "Profil",
+              tour: "settings-tab-profil",
               icon: <UserRound className={icon} />,
               panel: user ? (
                 <Card className="sm:p-7">
                   <h2 className="mb-5 text-base font-semibold">Foto dan nama</h2>
                   <AvatarUploader userId={user.id} name={user.displayName} src={user.avatarUrl} disabled={!user.profileExtras} />
                   <div className="mt-6 border-t border-border pt-6">
-                    <ProfileForm name={user.displayName} username={user.username} disabledUsername={!user.profileExtras} />
+                    <ProfileForm
+                      name={user.displayName}
+                      username={user.username}
+                      disabledUsername={!user.profileExtras}
+                      requireUsername={Boolean(user.profileDone)}
+                    />
                   </div>
                 </Card>
               ) : (
@@ -53,6 +64,7 @@ export default async function SettingsPage() {
             {
               id: "keamanan",
               label: "Keamanan",
+              tour: "settings-tab-keamanan",
               icon: <KeyRound className={icon} />,
               panel: user ? (
                 <>
@@ -76,6 +88,7 @@ export default async function SettingsPage() {
             {
               id: "latihan",
               label: "Latihan",
+              tour: "settings-tab-latihan",
               icon: <Route className={icon} />,
               panel: <TrainingPlan serverRecord={user ? user.onboarding : undefined} />,
             },

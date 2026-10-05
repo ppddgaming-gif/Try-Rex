@@ -2,8 +2,11 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Menu, X, ArrowUpRight } from "lucide-react"
+import { CircleHelp, LayoutDashboard, LogOut, Menu, Settings, X } from "lucide-react"
+import { Avatar } from "@/components/avatar"
+import { AccountMenu, type LandingProfile } from "@/components/landing/account-menu"
 import { Rex } from "@/components/rex-mascot"
+import { signOut } from "@/lib/auth-actions"
 
 const links = [
   { label: "Product", href: "/#product" },
@@ -11,13 +14,17 @@ const links = [
   { label: "Fitur", href: "/#features" },
 ]
 
+const menuLink =
+  "flex min-h-12 items-center gap-3 rounded-lg px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+
 /**
- * `signedIn` comes from the server (app/page.tsx), so the right button is in
- * the first paint instead of flashing "Masuk" and swapping.
+ * `profile` comes from the server (app/page.tsx), so the right buttons are in
+ * the first paint instead of flashing "Masuk" and swapping. Guests get Masuk
+ * and Daftar; a signed-in player gets Dashboard and their avatar menu.
  */
-export function MarketingNav({ signedIn }: { signedIn: boolean }) {
+export function MarketingNav({ profile }: { profile: LandingProfile | null }) {
   const [open, setOpen] = useState(false)
-  const account = signedIn ? { href: "/dashboard", label: "Dashboard" } : { href: "/login", label: "Masuk" }
+  const close = () => setOpen(false)
 
   return (
     <header
@@ -46,16 +53,23 @@ export function MarketingNav({ signedIn }: { signedIn: boolean }) {
 
         {/* Actions */}
         <div className="hidden items-center gap-3 md:flex">
-          <Link
-            href={account.href}
-            className="inline-flex min-h-11 items-center px-2 text-sm font-semibold text-foreground transition-colors hover:text-primary"
-          >
-            {account.label}
-          </Link>
-          <Link href="/trading-game" className="btn btn-sm">
-            Mulai Sekarang
-            <ArrowUpRight className="h-4 w-4" />
-          </Link>
+          {profile ? (
+            <>
+              <Link href="/dashboard" className="btn btn-sm">
+                Dashboard
+              </Link>
+              <AccountMenu profile={profile} />
+            </>
+          ) : (
+            <>
+              <Link href="/login" className="btn btn-ghost btn-sm">
+                Masuk
+              </Link>
+              <Link href="/signup" className="btn btn-sm">
+                Daftar
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile toggle */}
@@ -79,29 +93,51 @@ export function MarketingNav({ signedIn }: { signedIn: boolean }) {
         data-open={open}
         className="presence border-t border-border/60 px-5 py-4 md:hidden"
       >
-          <nav className="flex flex-col gap-1">
-            {links.map((l) => (
-              <a
-                key={l.href}
-                href={l.href}
-                onClick={() => setOpen(false)}
-                className="rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-              >
-                {l.label}
-              </a>
-            ))}
-            <Link
-              href={account.href}
-              onClick={() => setOpen(false)}
-              className="rounded-lg px-3 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
+        <nav className="flex flex-col gap-1">
+          {links.map((l) => (
+            <a
+              key={l.href}
+              href={l.href}
+              onClick={close}
+              className="rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
-              {account.label}
+              {l.label}
+            </a>
+          ))}
+        </nav>
+
+        {profile ? (
+          <div className="mt-3 flex flex-col gap-1 border-t border-border/60 pt-4">
+            <div className="flex items-center gap-3 px-3 pb-2">
+              <Avatar src={profile.avatarUrl} name={profile.name} size={36} />
+              <span className="truncate text-sm font-semibold">{profile.name}</span>
+            </div>
+            <Link href="/dashboard" onClick={close} className="btn w-full">
+              <LayoutDashboard className="h-4 w-4" /> Dashboard
             </Link>
-            <Link href="/trading-game" onClick={() => setOpen(false)} className="btn btn-sm mt-2">
-              Mulai Sekarang
-              <ArrowUpRight className="h-4 w-4" />
+            <Link href="/pengaturan" onClick={close} className={`${menuLink} mt-2`}>
+              <Settings className="h-4 w-4" aria-hidden="true" /> Pengaturan
             </Link>
-          </nav>
+            <Link href="/panduan" onClick={close} className={menuLink}>
+              <CircleHelp className="h-4 w-4" aria-hidden="true" /> Panduan
+            </Link>
+            <form action={signOut}>
+              <button type="submit" className={`${menuLink} w-full`}>
+                <LogOut className="h-4 w-4" aria-hidden="true" /> Keluar
+              </button>
+            </form>
+          </div>
+        ) : (
+          // Full-size buttons (52px, 56px on phones): Daftar first, Masuk under it.
+          <div className="mt-3 flex flex-col gap-3 border-t border-border/60 pt-4">
+            <Link href="/signup" onClick={close} className="btn w-full">
+              Daftar
+            </Link>
+            <Link href="/login" onClick={close} className="btn btn-ghost w-full">
+              Masuk
+            </Link>
+          </div>
+        )}
       </div>
     </header>
   )

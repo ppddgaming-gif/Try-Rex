@@ -4,6 +4,7 @@ import { NavLinks, type NavLocks } from "@/components/nav-links"
 import { ProfileCard, type ProfileSummary } from "@/components/profile-card"
 import { Rex } from "@/components/rex-mascot"
 import { SidebarToggle } from "@/components/sidebar-toggle"
+import { TourButton } from "@/components/tour/tour-button"
 
 /**
  * Desktop navigation. Collapses to a 76px icon rail with the burger toggle;
@@ -26,6 +27,9 @@ export function Sidebar({ profile, locks }: { profile: ProfileSummary | null; lo
         <SidebarToggle />
       </div>
       <NavLinks className="mt-8" locks={locks} />
+      <div className="mt-1">
+        <TourButton variant="sidebar" />
+      </div>
       <ProfileCard profile={profile} className="mt-auto" />
     </aside>
   )

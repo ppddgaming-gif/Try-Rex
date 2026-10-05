@@ -39,6 +39,7 @@ export function NavLinks({
             aria-current={active ? "page" : undefined}
             aria-label={lock ? `${item.label}, terkunci. ${lock}` : item.label}
             data-tip={lock ? `${item.label} · terkunci` : item.label}
+            data-tour={item.tour}
             className={[
               "group relative flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
               active ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground",

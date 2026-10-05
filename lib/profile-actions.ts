@@ -4,6 +4,7 @@ import { headers } from "next/headers"
 import { revalidatePath } from "next/cache"
 import { MIN_PASSWORD, authErrorMessage } from "@/lib/auth-rules"
 import { parseRecord } from "@/lib/onboarding"
+import { profileComplete } from "@/lib/profile-gate"
 import { USERNAME_RULE, normalizeUsername } from "@/lib/profile-rules"
 import { createClient } from "@/lib/supabase/server"
 
@@ -42,13 +43,18 @@ export async function saveOnboarding(input: unknown): Promise<{ ok: boolean }> {
   return { ok: true }
 }
 
-/** Name and username. Either may be left unchanged. */
+/**
+ * Name and username. The username may be left empty until the profile is
+ * complete; from then on the database refuses an empty one
+ * (profiles_completed_is_complete), and /lengkapi-profil asks for it up front.
+ */
 export async function updateProfile(_: ProfileFormState, fd: FormData): Promise<ProfileFormState> {
   const name = text(fd, "name")
   const username = normalizeUsername(text(fd, "username"))
 
   if (!name) return { error: "Isi nama tampilanmu." }
   if (name.length > 60) return { error: "Nama maksimal 60 karakter." }
+  if (!username && fd.get("require_username") === "1") return { error: USERNAME_NEEDED }
   if (username && !USERNAME_RULE.test(username)) {
     return { error: "Username 3–20 karakter: huruf kecil, angka, atau garis bawah (_)." }
   }
@@ -62,9 +68,41 @@ export async function updateProfile(_: ProfileFormState, fd: FormData): Promise<
     .eq("id", user.id)
   if (error) {
     if (error.code === "23505") return { error: "Username itu sudah dipakai. Coba yang lain." }
+    if (error.code === "23514") return { error: USERNAME_NEEDED }
     if (missingColumn(error.code)) return { error: NOT_READY }
     return { error: "Gagal menyimpan. Coba lagi sebentar lagi." }
   }
+
+  revalidatePath("/", "layout")
+  return { ok: true }
+}
+
+const USERNAME_NEEDED = "Isi username. Username tampil di profilmu dan tidak bisa dikosongkan."
+
+/**
+ * Records that the profile is complete, after checking it here: a username
+ * and the quiz answered or skipped. The database checks the same thing.
+ */
+export async function completeProfile(): Promise<{ ok: boolean; error?: string }> {
+  const { supabase, user } = await signedIn()
+  if (!user) return { ok: false, error: "Sesi berakhir. Masuk lagi." }
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("username, onboarding, profile_completed_at")
+    .eq("id", user.id)
+    .maybeSingle()
+  if (error || !data) return { ok: false, error: missingColumn(error?.code) ? NOT_READY : "Gagal memuat profil. Coba lagi." }
+  if (!profileComplete({ username: data.username, onboarding: parseRecord(data.onboarding) })) {
+    return { ok: false, error: data.username ? "Jawab atau lewati kuisnya dulu." : USERNAME_NEEDED }
+  }
+  if (data.profile_completed_at) return { ok: true }
+
+  const { error: saveError } = await supabase
+    .from("profiles")
+    .update({ profile_completed_at: new Date().toISOString() })
+    .eq("id", user.id)
+  if (saveError) return { ok: false, error: "Gagal menyimpan. Coba lagi sebentar lagi." }
 
   revalidatePath("/", "layout")
   return { ok: true }

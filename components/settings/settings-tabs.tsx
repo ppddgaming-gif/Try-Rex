@@ -3,7 +3,14 @@
 import { useRef, useSyncExternalStore, type ReactNode } from "react"
 
 /** `icon` is a rendered element: components can't cross from server to client. */
-export type SettingsTab = { id: string; label: string; icon: ReactNode; panel: ReactNode }
+export type SettingsTab = {
+  id: string
+  label: string
+  icon: ReactNode
+  panel: ReactNode
+  /** data-tour value for the Pengaturan tour (lib/tours.ts). */
+  tour?: string
+}
 
 function subscribe(onChange: () => void) {
   window.addEventListener("hashchange", onChange)
@@ -52,6 +59,7 @@ export function SettingsTabs({ tabs }: { tabs: SettingsTab[] }) {
               role="tab"
               aria-selected={selected}
               aria-controls={`panel-${t.id}`}
+              data-tour={t.tour}
               tabIndex={selected ? 0 : -1}
               onClick={() => select(t.id)}
               onKeyDown={(e) => {
