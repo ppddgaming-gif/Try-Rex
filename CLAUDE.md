@@ -32,10 +32,10 @@ node node_modules/typescript/bin/tsc --noEmit
 ```
 
 ## Branches and deploys
-- dev = the live site (tryrex-iota.vercel.app). Vercel publishes every push to dev automatically, about a minute later.
-- main is no longer used for deploys. Don't push to it.
-- For every new task, create a branch from dev named feat/<short-name> and push it. Vercel gives it its own private preview link; tell me that link so I can check it.
-- Only merge a feat branch into dev after I've said it looks good, because merging into dev publishes it.
+- main = the live site (tryrex-iota.vercel.app). Vercel publishes every push to main automatically, about a minute later.
+- For every new task, create a branch from main named feat/<short-name> and push it. Vercel gives it its own private preview link; tell me that link so I can check it.
+- Only merge a feat branch into main after I've said it looks good, because merging into main publishes it.
+- dev is no longer used. Don't push to it.
 
 ## Non-negotiables
 1. Answer keys and future candles never reach the browser. Anything that decides a score, or shows what price does next, stays on the server until the player has committed.
