@@ -1,4 +1,5 @@
-import type { Candle, Marker, Zone } from "@/lib/mock-data"
+import type { ReactNode } from "react"
+import { CHART, PLOT_H, PLOT_W, priceToY, slotWidth, type Candle, type Marker, type Zone } from "@/lib/chart-geometry"
 
 type Props = {
   candles: Candle[]
@@ -19,18 +20,19 @@ type Props = {
    * saw" and "what happened next" read as two parts.
    */
   dividerAt?: number
+  /**
+   * Extra SVG drawn over the candles in the same viewBox (drawn lines, entry
+   * and exit marks). Position it with priceToY() from lib/chart-geometry.
+   */
+  overlay?: ReactNode
 }
 
 // Delay between consecutive revealed candles.
 const REVEAL_STAGGER_MS = 45
 
-const W = 1000
-const H = 460
-const PAD_RIGHT = 64
-const PAD_BOTTOM = 28
-const PAD_TOP = 8
-const plotW = W - PAD_RIGHT
-const plotH = H - PAD_BOTTOM - PAD_TOP
+const { W, H, PAD_RIGHT, PAD_TOP } = CHART
+const plotW = PLOT_W
+const plotH = PLOT_H
 
 const variantColor = {
   neutral: "var(--foreground)",
@@ -50,11 +52,12 @@ export function CandlestickChart({
   digits = 5,
   revealFrom,
   dividerAt,
+  overlay,
 }: Props) {
-  const y = (p: number) => PAD_TOP + ((max - p) / (max - min)) * plotH
+  const y = (p: number) => priceToY(p, min, max)
   // Axis ticks read one decimal shorter than quoted prices, as FX platforms show them.
   const tickDigits = Math.max(0, digits - 1)
-  const slot = plotW / candles.length
+  const slot = slotWidth(candles.length)
   const cw = Math.max(2, slot * 0.55)
 
   return (
@@ -201,6 +204,8 @@ export function CandlestickChart({
           </g>
         )
       })}
+
+      {overlay}
 
       {/* Current price label on right edge */}
       {currentPrice !== undefined && (

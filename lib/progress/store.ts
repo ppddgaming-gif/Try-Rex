@@ -16,6 +16,11 @@ export interface ProgressStore {
   /** null while progress is still loading: render a skeleton. */
   loadProgress(): Progress | null
   recordAttempt(attempt: Omit<Attempt, "createdAt">): ProgressEvent
+  /**
+   * XP the server has already booked elsewhere (Akun Latihan trades earn it
+   * from their Disiplin score). Adds it to the total and announces the gain.
+   */
+  addServerXp(amount: number): ProgressEvent
   resetProgress(): void
   /** Called on every change, with the event for recorded attempts. */
   subscribe(listener: (event?: ProgressEvent) => void): () => void
@@ -125,6 +130,11 @@ function createGuestStore(): ProgressStore & { reload(): void } {
       return event
     },
 
+    // Guests can't use Akun Latihan, so nothing is booked for them.
+    addServerXp() {
+      return { xpGained: 0, leveledUpTo: null }
+    },
+
     resetProgress() {
       writeKey(GUEST_KEY, null)
       cache = emptyProgress()
@@ -149,7 +159,8 @@ function createGuestStore(): ProgressStore & { reload(): void } {
 // ---------------------------------------------------------------------------
 // Account: Supabase `practice_attempts` (supabase/migrations/*_progress_sync.sql)
 //
-// Only attempts are stored; XP and streak are rebuilt from them. Attempts
+// Only attempts are stored; XP and streak are rebuilt from them, plus the
+// Disiplin XP of Akun Latihan trades (demo_trades.xp, booked by the server). Attempts
 // show up immediately and are saved in the background. One that fails to
 // save waits in a per-account outbox in localStorage and is sent again on
 // the next load.
@@ -240,6 +251,24 @@ async function fetchAttempts(supabase: SupabaseClient, userId: string) {
   }
 }
 
+/** Disiplin XP from Akun Latihan trades; 0 when those tables aren't there. */
+async function fetchDemoXp(supabase: SupabaseClient, userId: string) {
+  const PAGE = 1000
+  let total = 0
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await supabase
+      .from("demo_trades")
+      .select("xp")
+      .eq("user_id", userId)
+      .gt("xp", 0)
+      .order("id")
+      .range(from, from + PAGE - 1)
+    if (error) return total
+    total += data.reduce((s, r) => s + Number(r.xp), 0)
+    if (data.length < PAGE) return total
+  }
+}
+
 type AccountStore = ProgressStore & { userId: string; stop(): void }
 
 function createAccountStore(supabase: SupabaseClient, userId: string): AccountStore {
@@ -248,6 +277,8 @@ function createAccountStore(supabase: SupabaseClient, userId: string): AccountSt
   let saved: Attempt[] | null = null
   /** Recorded in this tab and not confirmed yet. */
   let unsaved: Attempt[] = []
+  /** Disiplin XP the server has booked for Akun Latihan trades. */
+  let demoXp = 0
   let cache: Progress | null = null
   let stopped = false
   let failures = 0
@@ -263,7 +294,8 @@ function createAccountStore(supabase: SupabaseClient, userId: string): AccountSt
       return
     }
     const known = new Set(saved.map(attemptKey))
-    cache = progressFromAttempts([...saved, ...unsaved.filter((a) => !known.has(attemptKey(a)))].sort(byTime))
+    const fromGame = progressFromAttempts([...saved, ...unsaved.filter((a) => !known.has(attemptKey(a)))].sort(byTime))
+    cache = { ...fromGame, xp: fromGame.xp + demoXp }
   }
 
   async function load() {
@@ -281,9 +313,10 @@ function createAccountStore(supabase: SupabaseClient, userId: string): AccountSt
         removeFromOutbox(userId, outbox)
       }
 
-      const attempts = await fetchAttempts(supabase, userId)
+      const [attempts, trades] = await Promise.all([fetchAttempts(supabase, userId), fetchDemoXp(supabase, userId)])
       if (stopped) return
       saved = attempts
+      demoXp = trades
       failures = 0
       rebuild()
       emit()
@@ -325,6 +358,15 @@ function createAccountStore(supabase: SupabaseClient, userId: string): AccountSt
           addToOutbox(userId, attempt)
         },
       )
+      return event
+    },
+
+    addServerXp(amount) {
+      const before = cache
+      demoXp += amount
+      rebuild()
+      const event = gainEvent(before, cache, amount)
+      emit(event)
       return event
     },
 
@@ -418,6 +460,10 @@ function createAppStore(): AppStore {
 
     recordAttempt(input) {
       return (active ?? guest).recordAttempt(input)
+    },
+
+    addServerXp(amount) {
+      return (active ?? guest).addServerXp(amount)
     },
 
     resetProgress() {

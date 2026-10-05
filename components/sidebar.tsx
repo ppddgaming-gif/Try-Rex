@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { BrandMark } from "@/components/brand-mark"
-import { NavLinks } from "@/components/nav-links"
+import { NavLinks, type NavLocks } from "@/components/nav-links"
 import { ProfileCard, type ProfileSummary } from "@/components/profile-card"
 import { Rex } from "@/components/rex-mascot"
 import { SidebarToggle } from "@/components/sidebar-toggle"
@@ -10,7 +10,7 @@ import { SidebarToggle } from "@/components/sidebar-toggle"
  * the width comes from --sidebar-w, which the main column's margin shares
  * (.sidebar / .app-main in globals.css).
  */
-export function Sidebar({ profile }: { profile: ProfileSummary | null }) {
+export function Sidebar({ profile, locks }: { profile: ProfileSummary | null; locks: NavLocks }) {
   return (
     <aside
       className="sidebar glass-rail fixed inset-y-0 left-0 z-40 hidden flex-col overflow-y-auto border-r border-border px-3.5 py-6 lg:flex"
@@ -25,7 +25,7 @@ export function Sidebar({ profile }: { profile: ProfileSummary | null }) {
         </Link>
         <SidebarToggle />
       </div>
-      <NavLinks className="mt-8" />
+      <NavLinks className="mt-8" locks={locks} />
       <ProfileCard profile={profile} className="mt-auto" />
     </aside>
   )

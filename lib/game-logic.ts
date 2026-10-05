@@ -160,7 +160,7 @@ export function labelFor(unixSeconds: number) {
 }
 
 /** Five evenly spaced labels across the window, matching the chart's time axis. */
-export function timeLabelsFor(candles: RawCandle[], count = 5) {
+export function timeLabelsFor(candles: { t: number }[], count = 5) {
   if (candles.length === 0) return []
   return Array.from({ length: count }, (_, i) => {
     const idx = Math.round((candles.length - 1) * (i / (count - 1)))

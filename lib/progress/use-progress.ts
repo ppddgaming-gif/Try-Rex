@@ -38,6 +38,11 @@ export function recordAttempt(attempt: Omit<Attempt, "createdAt">) {
   return progressStore().recordAttempt(attempt)
 }
 
+/** XP an Akun Latihan trade earned on the server; updates the level and announces it. */
+export function addServerXp(amount: number) {
+  return progressStore().addServerXp(amount)
+}
+
 export function resetProgress() {
   progressStore().resetProgress()
 }
