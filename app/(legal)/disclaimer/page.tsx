@@ -1,12 +1,15 @@
 import type { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
 import { Isi, LegalDoc, Section, Tinjau } from "@/components/legal-doc"
 
-export const metadata: Metadata = { title: "Disclaimer" }
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getTranslations("legal.titles"))("disclaimer") }
+}
 
 export default function DisclaimerPage() {
   return (
     <LegalDoc
-      title="Disclaimer"
+      doc="disclaimer"
       intro={<p>Singkatnya: TRY-REX adalah tempat berlatih, bukan tempat mencari sinyal trading.</p>}
     >
       <Section title="Edukasi, bukan saran finansial">

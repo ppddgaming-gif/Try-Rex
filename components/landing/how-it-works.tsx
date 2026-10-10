@@ -1,37 +1,25 @@
 import { Gamepad2, ScanSearch, TrendingUp } from "lucide-react"
+import { useTranslations } from "next-intl"
 
+// Words: landing.how.<key>.title / .body.
 const steps = [
-  {
-    icon: Gamepad2,
-    step: "01",
-    title: "Ambil keputusan",
-    body: "Hadapi situasi market di Trading Game dan tentukan BUY, SELL, atau WAIT.",
-  },
-  {
-    icon: ScanSearch,
-    step: "02",
-    title: "Dievaluasi AI",
-    body: "TRY-REX menilai keputusanmu, memberi skor, dan menjelaskan alasannya.",
-  },
-  {
-    icon: TrendingUp,
-    step: "03",
-    title: "Naik level",
-    body: "Perbaiki kelemahan, kumpulkan XP, dan jadi trader yang makin konsisten.",
-  },
+  { key: "s1", icon: Gamepad2, step: "01" },
+  { key: "s2", icon: ScanSearch, step: "02" },
+  { key: "s3", icon: TrendingUp, step: "03" },
 ]
 
 export function HowItWorks() {
+  const t = useTranslations("landing.how")
   return (
     <section id="how" className="border-y border-border/60 bg-card/30">
       <div className="mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-24">
         <div className="reveal mx-auto max-w-2xl text-center">
-          <p className="eyebrow">Cara kerja</p>
+          <p className="eyebrow">{t("eyebrow")}</p>
           <h2 className="mt-3 text-balance text-3xl font-bold tracking-tight sm:text-4xl">
-            Belajar lewat siklus latihan yang terbukti
+            {t("title")}
           </h2>
           <p className="mt-4 text-pretty leading-relaxed text-muted-foreground">
-            Praktik, feedback, perbaikan—berulang setiap hari sampai jadi kebiasaan.
+            {t("body")}
           </p>
         </div>
 
@@ -49,8 +37,8 @@ export function HowItWorks() {
                   </div>
                   <span className="text-3xl font-extrabold text-muted">{s.step}</span>
                 </div>
-                <h3 className="mt-5 text-lg font-bold">{s.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.body}</p>
+                <h3 className="mt-5 text-lg font-bold">{t(`${s.key}.title`)}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t(`${s.key}.body`)}</p>
               </div>
             )
           })}

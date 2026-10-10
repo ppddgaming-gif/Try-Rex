@@ -13,7 +13,7 @@
     "minutesAgo": "{n} min ago",
     "hoursAgo": "{n, plural, =1 {1 hour ago} other {# hours ago}}",
     "yesterday": "yesterday",
-    "daysAgo": "{n} days ago"
+    "daysAgo": "{n, plural, one {# day ago} other {# days ago}}"
   },
   "insight": {
     "title": "AI Insight",
@@ -41,11 +41,11 @@
   "xpOf": "{into} of {needed} XP",
   "calendar": {
     "title": "Practice Calendar",
-    "days": "<num>{n}</num> practice days",
+    "days": "{n, plural, one {<num>#</num> practice day} other {<num>#</num> practice days}}",
     "less": "Less",
     "more": "More",
-    "aria": "{n} questions answered in the last 12 weeks",
-    "tip": "{n} questions · {date}",
+    "aria": "{n, plural, one {# question answered in the last 12 weeks} other {# questions answered in the last 12 weeks}}",
+    "tip": "{n, plural, one {# question} other {# questions}} · {date}",
     "mon": "Mon",
     "wed": "Wed",
     "fri": "Fri"
@@ -70,9 +70,9 @@
     "start": "Start your streak today",
     "doneToday": "You've practiced today",
     "playOne": "Play 1 question today",
-    "compactTitle": "{hint} · Best: {best} days",
+    "compactTitle": "{hint} · Best: {best, plural, one {# day} other {# days}}",
     "srDays": "days in a row. {hint}.",
-    "days": "<num>{n}</num> days in a row",
-    "best": "Best: <num>{n}</num> days"
+    "days": "{n, plural, one {<num>#</num> day in a row} other {<num>#</num> days in a row}}",
+    "best": "Best: {n, plural, one {<num>#</num> day} other {<num>#</num> days}}"
   }
 }

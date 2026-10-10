@@ -1,1 +1,205 @@
-{}
+{
+  "entries": {
+    "pair": {
+      "term": "Pair",
+      "short": "Dua mata uang yang diperdagangkan satu sama lain. Di EURUSD, kamu membeli atau menjual euro dengan dolar AS.",
+      "example": "Kalau EURUSD naik dari 1.0800 ke 1.0850, euro menguat terhadap dolar."
+    },
+    "buy": {
+      "term": "BUY (beli)",
+      "short": "Membuka posisi karena kamu memperkirakan harga akan naik. Untung jika harga naik, rugi jika turun."
+    },
+    "sell": {
+      "term": "SELL (jual)",
+      "short": "Membuka posisi karena kamu memperkirakan harga akan turun. Untung jika harga turun, rugi jika naik."
+    },
+    "wait": {
+      "term": "WAIT (tunggu)",
+      "short": "Sengaja tidak membuka posisi karena belum ada keunggulan yang jelas. Tidak trading juga sebuah keputusan."
+    },
+    "entry": {
+      "term": "Entry",
+      "short": "Harga saat kamu membuka posisi. Semua untung dan rugi dihitung dari titik ini."
+    },
+    "pip": {
+      "term": "Pip",
+      "short": "Satuan gerak harga terkecil yang lazim di forex: 0.0001 untuk kebanyakan pair, 0.01 untuk pair yen.",
+      "example": "EURUSD dari 1.0800 ke 1.0842 naik 42 pip."
+    },
+    "posisi": {
+      "term": "Posisi",
+      "short": "Transaksi yang sedang terbuka, beli atau jual, sampai kamu menutupnya."
+    },
+    "spread": {
+      "term": "Spread",
+      "short": "Selisih harga beli dan harga jual yang ditawarkan broker. Ini biaya yang kamu bayar setiap membuka posisi."
+    },
+    "volatilitas": {
+      "term": "Volatilitas",
+      "short": "Seberapa besar dan cepat harga bergerak. Volatilitas tinggi berarti peluang dan risiko sama-sama lebih besar."
+    },
+    "likuiditas": {
+      "term": "Likuiditas",
+      "short": "Seberapa mudah sesuatu dibeli atau dijual tanpa menggeser harga banyak. Pair utama seperti EURUSD sangat likuid."
+    },
+    "candlestick": {
+      "term": "Candlestick",
+      "short": "Satu batang di chart yang merangkum harga pembukaan, penutupan, tertinggi, dan terendah dalam satu periode.",
+      "example": "Di timeframe H4, satu candle mewakili 4 jam pergerakan harga."
+    },
+    "body": {
+      "term": "Body candle",
+      "short": "Bagian tebal candle, dari harga pembukaan ke penutupan. Body panjang berarti satu pihak menang telak di periode itu."
+    },
+    "sumbu": {
+      "term": "Sumbu (wick)",
+      "short": "Garis tipis di atas dan bawah body: harga sempat ke sana, tapi tidak bertahan sampai candle ditutup."
+    },
+    "timeframe": {
+      "term": "Timeframe",
+      "short": "Lama waktu yang diwakili satu candle. M15 = 15 menit, H1 = 1 jam, H4 = 4 jam, D1 = 1 hari."
+    },
+    "h4": {
+      "term": "H4",
+      "short": "Timeframe 4 jam: setiap candle merangkum 4 jam harga. Semua soal di Trading Game memakai H4."
+    },
+    "trend": {
+      "term": "Trend",
+      "short": "Arah umum harga dalam satu rentang waktu: naik (puncak dan lembah makin tinggi), turun, atau menyamping."
+    },
+    "menyamping": {
+      "term": "Sideways (menyamping)",
+      "short": "Harga bolak-balik di antara dua batas tanpa arah jelas. Sering jadi saat terbaik untuk WAIT."
+    },
+    "kemiringan": {
+      "term": "Kemiringan trend",
+      "short": "Seberapa curam trend, diukur rata-rata pip per candle. Positif berarti naik, negatif berarti turun."
+    },
+    "support": {
+      "term": "Support",
+      "short": "Area harga di mana penurunan beberapa kali tertahan dan memantul. Makin sering disentuh, makin diperhatikan pasar.",
+      "example": "Di Trading Game, support digambar sebagai pita hijau putus-putus."
+    },
+    "resistance": {
+      "term": "Resistance",
+      "short": "Area harga di mana kenaikan beberapa kali tertahan dan berbalik turun. Kebalikan dari support.",
+      "example": "Di Trading Game, resistance digambar sebagai pita merah putus-putus."
+    },
+    "rentang": {
+      "term": "Rentang harga",
+      "short": "Jarak antara harga terendah dan tertinggi dalam periode tertentu. “Di 80% rentang” berarti dekat puncaknya."
+    },
+    "breakout": {
+      "term": "Breakout",
+      "short": "Saat harga menembus support atau resistance dengan meyakinkan. Breakout palsu (fakeout) cepat kembali ke dalam."
+    },
+    "konfirmasi": {
+      "term": "Konfirmasi",
+      "short": "Tanda tambahan yang mendukung idemu sebelum masuk, misalnya candle yang ditutup di atas resistance setelah breakout."
+    },
+    "pin-bar": {
+      "term": "Pin bar",
+      "short": "Candle dengan body kecil dan sumbu panjang di satu sisi: tanda harga ditolak dari area itu."
+    },
+    "penolakan": {
+      "term": "Penolakan (rejection)",
+      "short": "Harga menyentuh sebuah level lalu cepat didorong kembali, meninggalkan sumbu panjang."
+    },
+    "bullish": {
+      "term": "Bullish",
+      "short": "Condong naik. Candle bullish ditutup lebih tinggi dari pembukaannya."
+    },
+    "bearish": {
+      "term": "Bearish",
+      "short": "Condong turun. Candle bearish ditutup lebih rendah dari pembukaannya."
+    },
+    "stop-loss": {
+      "term": "Stop loss",
+      "short": "Harga batas yang otomatis menutup posisi rugi. Kamu menentukan berapa besar rugi yang bisa diterima sebelum masuk."
+    },
+    "take-profit": {
+      "term": "Take profit",
+      "short": "Harga target yang otomatis menutup posisi untung."
+    },
+    "risk-reward": {
+      "term": "Risk-reward ratio",
+      "short": "Perbandingan jarak stop loss dengan jarak take profit. 1:2 berarti risiko 20 pip untuk target 40 pip."
+    },
+    "leverage": {
+      "term": "Leverage",
+      "short": "Pinjaman dari broker yang memperbesar ukuran posisi. Untung dan rugi ikut membesar dengan kelipatan yang sama."
+    },
+    "margin": {
+      "term": "Margin",
+      "short": "Dana jaminan yang ditahan broker saat posisi ber-leverage terbuka."
+    },
+    "diversifikasi": {
+      "term": "Diversifikasi",
+      "short": "Menyebar risiko ke beberapa aset atau ide agar satu kesalahan tidak menghabiskan semuanya."
+    },
+    "crypto": {
+      "term": "Crypto",
+      "short": "Aset digital yang dicatat di blockchain, bukan diterbitkan bank sentral. Contoh: Bitcoin dan Ethereum."
+    },
+    "blockchain": {
+      "term": "Blockchain",
+      "short": "Buku catatan transaksi yang disalin di banyak komputer sekaligus, sehingga sulit diubah diam-diam."
+    },
+    "bitcoin": {
+      "term": "Bitcoin",
+      "short": "Crypto pertama (2009), dengan jumlah maksimum 21 juta koin yang ditetapkan dalam aturan jaringannya."
+    },
+    "altcoin": {
+      "term": "Altcoin",
+      "short": "Sebutan untuk crypto selain Bitcoin. Umumnya lebih volatil dan lebih berisiko."
+    },
+    "stablecoin": {
+      "term": "Stablecoin",
+      "short": "Crypto yang dirancang mengikuti nilai aset lain, biasanya dolar AS. Stabilnya bergantung pada cadangan penerbitnya."
+    },
+    "wallet": {
+      "term": "Wallet",
+      "short": "Tempat menyimpan kunci akses ke crypto-mu. Siapa pun yang memegang kunci (seed phrase) menguasai asetnya."
+    },
+    "seed-phrase": {
+      "term": "Seed phrase",
+      "short": "Rangkaian 12 atau 24 kata untuk memulihkan wallet. Jangan pernah dibagikan ke siapa pun, termasuk “admin”."
+    },
+    "exchange": {
+      "term": "Exchange",
+      "short": "Platform jual beli crypto. Pilih yang terdaftar resmi di negaramu."
+    },
+    "fomo": {
+      "term": "FOMO",
+      "short": "Fear of missing out: takut ketinggalan, jadi masuk terburu-buru setelah harga sudah lari jauh."
+    },
+    "overtrading": {
+      "term": "Overtrading",
+      "short": "Membuka terlalu banyak posisi, biasanya karena bosan atau ingin membalas rugi. Biaya dan kesalahan ikut menumpuk."
+    },
+    "jurnal-trading": {
+      "term": "Jurnal trading",
+      "short": "Catatan setiap keputusan: alasan masuk, hasil, dan pelajarannya. Cara paling sederhana untuk berhenti mengulang kesalahan."
+    }
+  },
+  "categories": {
+    "dasar": "Dasar",
+    "chart": "Membaca chart",
+    "risiko": "Manajemen risiko",
+    "crypto": "Crypto",
+    "psikologi": "Psikologi"
+  },
+  "seeMeaning": "{term}: lihat arti",
+  "close": "Tutup",
+  "example": "Contoh: ",
+  "lesson": "Pelajari materinya",
+  "openKamus": "Buka di Kamus",
+  "search": "Cari istilah",
+  "searchPlaceholder": "Cari: support, leverage, stablecoin…",
+  "clear": "Hapus pencarian",
+  "category": "Kategori",
+  "all": "Semua",
+  "count": "<num>{n}</num> istilah",
+  "noneTitle": "Tidak ketemu",
+  "noneBody": "Belum ada istilah untuk \"{query}\". Coba kata lain."
+}

@@ -1,6 +1,8 @@
 // Teaching diagrams for Belajar 101: plain SVG, coloured from the theme
 // tokens so they follow light and dark mode. Unlike CandlestickChart these
-// keep their aspect ratio, so the labels never stretch.
+// keep their aspect ratio, so the labels never stretch. Labels: learn.diagrams.
+
+import { useTranslations } from "next-intl"
 
 const label = { fill: "var(--muted-foreground)", fontSize: 13, fontFamily: "var(--font-sans)" }
 const strong = { fill: "var(--foreground)", fontSize: 13, fontWeight: 700, fontFamily: "var(--font-sans)" }
@@ -18,6 +20,7 @@ function Frame({ title, children, viewBox }: { title: string; children: React.Re
 
 /** One candle, labelled: high, open/close, body, wicks, low. */
 function LabelledCandle({ x, up }: { x: number; up: boolean }) {
+  const t = useTranslations("learn.diagrams")
   const color = up ? "var(--success)" : "var(--danger)"
   const [openY, closeY] = up ? [190, 90] : [90, 190]
   const side = up ? -1 : 1
@@ -29,10 +32,10 @@ function LabelledCandle({ x, up }: { x: number; up: boolean }) {
       <rect x={x - 22} y={90} width={44} height={100} rx={3} fill={color} />
       {/* Leader lines and labels */}
       {[
-        { y: 30, text: "High (tertinggi)" },
-        { y: openY, text: "Open (buka)" },
-        { y: closeY, text: "Close (tutup)" },
-        { y: 250, text: "Low (terendah)" },
+        { y: 30, text: t("high") },
+        { y: openY, text: t("open") },
+        { y: closeY, text: t("close") },
+        { y: 250, text: t("low") },
       ].map((l) => (
         <g key={l.text}>
           <line x1={x + side * 26} x2={lx - side * 4} y1={l.y} y2={l.y} stroke="var(--border)" strokeDasharray="3 3" />
@@ -49,31 +52,33 @@ function LabelledCandle({ x, up }: { x: number; up: boolean }) {
 }
 
 export function CandleAnatomy() {
+  const t = useTranslations("learn.diagrams")
   return (
-    <Frame title="Anatomi candle: body (tebal) dan sumbu (tipis). Hijau ditutup lebih tinggi, merah lebih rendah." viewBox="0 0 560 300">
+    <Frame title={t("anatomyTitle")} viewBox="0 0 560 300">
       <LabelledCandle x={200} up />
       <LabelledCandle x={360} up={false} />
       <text x={280} y={60} textAnchor="middle" {...label}>
-        sumbu atas
+        {t("upperWick")}
       </text>
       <text x={280} y={145} textAnchor="middle" {...strong}>
-        body
+        {t("body")}
       </text>
       <text x={280} y={232} textAnchor="middle" {...label}>
-        sumbu bawah
+        {t("lowerWick")}
       </text>
     </Frame>
   )
 }
 
 export function TrendShapes() {
+  const t = useTranslations("learn.diagrams")
   const shapes = [
-    { title: "Naik", sub: "puncak & lembah makin tinggi", pts: "10,150 45,110 70,125 105,80 130,95 165,45 190,60", color: "var(--success)" },
-    { title: "Turun", sub: "puncak & lembah makin rendah", pts: "10,40 45,80 70,65 105,110 130,95 165,145 190,130", color: "var(--danger)" },
-    { title: "Menyamping", sub: "bolak-balik di rentang", pts: "10,95 40,60 70,125 100,62 130,122 160,64 190,100", color: "var(--wait)" },
+    { title: t("up"), sub: t("upSub"), pts: "10,150 45,110 70,125 105,80 130,95 165,45 190,60", color: "var(--success)" },
+    { title: t("down"), sub: t("downSub"), pts: "10,40 45,80 70,65 105,110 130,95 165,145 190,130", color: "var(--danger)" },
+    { title: t("flat"), sub: t("flatSub"), pts: "10,95 40,60 70,125 100,62 130,122 160,64 190,100", color: "var(--wait)" },
   ]
   return (
-    <Frame title="Tiga bentuk trend. Lihat arah puncak dan lembahnya, bukan satu candle." viewBox="0 0 660 230">
+    <Frame title={t("trendTitle")} viewBox="0 0 660 230">
       {shapes.map((s, i) => (
         <g key={s.title} transform={`translate(${i * 220 + 10}, 10)`}>
           <rect width={200} height={170} rx={12} fill="var(--card)" stroke="var(--border)" />
@@ -91,8 +96,9 @@ export function TrendShapes() {
 }
 
 export function RiskReward() {
+  const t = useTranslations("learn.diagrams")
   return (
-    <Frame title="Posisi BUY dengan rasio 1:2: risiko 20 pip ke stop loss, target 40 pip ke take profit." viewBox="0 0 560 280">
+    <Frame title={t("rrTitle")} viewBox="0 0 560 280">
       <rect x={150} y={30} width={180} height={140} rx={6} fill="var(--success)" opacity={0.16} />
       <rect x={150} y={170} width={180} height={70} rx={6} fill="var(--danger)" opacity={0.16} />
       <line x1={120} x2={360} y1={30} y2={30} stroke="var(--success)" strokeWidth={2} strokeDasharray="6 4" />
@@ -108,38 +114,39 @@ export function RiskReward() {
         Stop loss
       </text>
       <text x={240} y={104} textAnchor="middle" {...strong}>
-        +40 pip
+        {t("plus40")}
       </text>
       <text x={240} y={210} textAnchor="middle" {...strong}>
-        −20 pip
+        {t("minus20")}
       </text>
       <text x={20} y={140} {...label}>
-        Rasio 1:2
+        {t("ratio")}
       </text>
     </Frame>
   )
 }
 
 export function Leverage() {
+  const t = useTranslations("learn.diagrams")
   return (
-    <Frame title="Leverage 1:100. Gerak 1% pada posisi 100 juta = 1 juta: seluruh modal pada contoh ini." viewBox="0 0 560 250">
+    <Frame title={t("levTitle")} viewBox="0 0 560 250">
       <text x={40} y={40} {...strong}>
-        Modal
+        {t("capital")}
       </text>
       <rect x={40} y={52} width={8} height={40} rx={2} fill="var(--primary)" />
       <text x={58} y={78} {...label}>
-        Rp1 juta
+        {t("capitalValue")}
       </text>
       <text x={40} y={132} {...strong}>
-        Ukuran posisi
+        {t("size")}
       </text>
       <rect x={40} y={144} width={480} height={40} rx={6} fill="var(--primary)" opacity={0.35} />
       <text x={52} y={170} {...strong}>
-        Rp100 juta
+        {t("sizeValue")}
       </text>
       <rect x={515} y={144} width={5} height={40} fill="var(--danger)" />
       <text x={520} y={210} textAnchor="end" {...label} fill="var(--danger)">
-        1% melawanmu = −Rp1 juta
+        {t("against")}
       </text>
     </Frame>
   )

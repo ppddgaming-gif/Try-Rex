@@ -1,6 +1,7 @@
 import { readdirSync } from "node:fs"
 import { join } from "node:path"
 import { parse, TYPE, type MessageFormatElement } from "@formatjs/icu-messageformat-parser"
+import { createTranslator } from "next-intl"
 import { describe, expect, it } from "vitest"
 import { LOCALES, NAMESPACES } from "@/lib/i18n/locale"
 import { loadCatalogue, type Catalogue } from "@/lib/i18n/test-messages"
@@ -92,5 +93,27 @@ describe("message catalogues", () => {
       const empty = [...catalogues[locale]].filter(([, v]) => v.trim() === "").map(([k]) => k)
       expect(empty, locale).toEqual([])
     }
+  })
+})
+
+describe("English counts", () => {
+  // Rich-text messages (<num>) go through markup, which drops the tags here.
+  const markup = (locale: "id" | "en") => {
+    const t = createTranslator({ locale, messages: loadCatalogue(locale) })
+    return (key: string, values: Record<string, number>) =>
+      (t as unknown as { markup: (k: string, v: object) => string }).markup(key, { ...values, num: (c: string) => c })
+  }
+
+  it("says 1 day, 2 days (not 1 days)", () => {
+    const en = markup("en")
+    expect(en("progress.streak.days", { n: 1 })).toBe("1 day in a row")
+    expect(en("progress.streak.days", { n: 3 })).toBe("3 days in a row")
+    expect(en("demo.ui.screen.remaining", { n: 1 })).toBe("1 candle left")
+    expect(en("demo.ui.dashboard.continueTrading", { n: 1 })).toBe("Continue trading · 1 open trade")
+    expect(en("game.challenge.situation.supportOnly", { s: 1 })).toBe("Support is 1 pip below the current price.")
+  })
+
+  it("keeps Indonesian thousands separators on public counts", () => {
+    expect(markup("id")("landing.stats.answers", { answers: 1234 })).toBe(", 1.234 soal sudah dijawab")
   })
 })

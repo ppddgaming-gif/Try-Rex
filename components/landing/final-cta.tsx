@@ -1,11 +1,13 @@
 import Link from "next/link"
 import { ArrowUpRight } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { Rex } from "@/components/rex-mascot"
 
 // Primary is always "play now"; the second button saves progress for guests
 // and goes back to the dashboard for players who already have an account.
 export function FinalCta({ signedIn }: { signedIn: boolean }) {
-  const second = signedIn ? { href: "/dashboard", label: "Buka Dashboard" } : { href: "/signup", label: "Buat akun gratis" }
+  const t = useTranslations("landing.cta")
+  const second = signedIn ? { href: "/dashboard", label: t("dashboard") } : { href: "/signup", label: t("signUp") }
 
   return (
     <section className="mx-auto max-w-7xl px-5 pb-24 lg:px-8">
@@ -19,17 +21,17 @@ export function FinalCta({ signedIn }: { signedIn: boolean }) {
         <div className="relative mx-auto max-w-2xl">
           <Rex size={60} mood="happy" className="float mx-auto" />
           <h2 className="mt-4 text-balance text-3xl font-extrabold tracking-tight sm:text-5xl">
-            Mulai jadi trader yang konsisten hari ini
+            {t("title")}
           </h2>
           <p className="mx-auto mt-4 max-w-lg text-pretty leading-relaxed text-muted-foreground">
-            Gratis untuk memulai. Latih satu challenge setiap hari dan biarkan TRY-REX memandumu.
+            {t("body")}
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
               href="/trading-game"
               className="btn btn-lg w-full sm:w-auto"
             >
-              Mulai latihan gratis
+              {t("start")}
               <ArrowUpRight className="h-4 w-4" />
             </Link>
             <Link href={second.href} className="btn btn-ghost btn-lg w-full sm:w-auto">

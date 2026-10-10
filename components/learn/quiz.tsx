@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { CheckCircle2, HelpCircle, RotateCcw, XCircle } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { Confetti } from "@/components/confetti"
 import { Rex } from "@/components/rex-mascot"
 
@@ -23,12 +24,13 @@ export function Quiz({
   const [picked, setPicked] = useState<number | null>(null)
   const done = picked !== null
   const right = picked === answer
+  const t = useTranslations("learn.quiz")
 
   return (
     <div className="glow-card relative rounded-2xl border border-primary/30 p-5 sm:p-6">
       {done && right && <Confetti pieces={20} />}
       <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
-        <HelpCircle className="h-4 w-4" aria-hidden="true" /> Cek pemahaman
+        <HelpCircle className="h-4 w-4" aria-hidden="true" /> {t("eyebrow")}
       </p>
       <p className="mt-2 font-display text-lg font-bold leading-snug">{question}</p>
 
@@ -57,8 +59,8 @@ export function Quiz({
                 {String.fromCharCode(65 + i)}
               </span>
               <span className="flex-1">{o}</span>
-              {done && isAnswer && <CheckCircle2 className="pop-in h-5 w-5 text-success" aria-label="Jawaban benar" />}
-              {done && isPicked && !isAnswer && <XCircle className="pop-in h-5 w-5 text-danger" aria-label="Pilihanmu" />}
+              {done && isAnswer && <CheckCircle2 className="pop-in h-5 w-5 text-success" aria-label={t("right")} />}
+              {done && isPicked && !isAnswer && <XCircle className="pop-in h-5 w-5 text-danger" aria-label={t("picked")} />}
             </button>
           )
         })}
@@ -68,7 +70,7 @@ export function Quiz({
         <div role="status" className="enter mt-4 flex items-start gap-3 rounded-xl bg-inset p-4">
           <Rex size={36} mood={right ? "happy" : "thinking"} />
           <div className="min-w-0 flex-1 text-sm leading-relaxed">
-            <p className="font-semibold">{right ? "Tepat!" : "Belum tepat, tapi ini bagian dari belajar."}</p>
+            <p className="font-semibold">{right ? t("correct") : t("wrong")}</p>
             <p className="mt-0.5 text-muted-foreground">{explain}</p>
             {!right && (
               <button
@@ -76,7 +78,7 @@ export function Quiz({
                 onClick={() => setPicked(null)}
                 className="mt-2 inline-flex min-h-9 items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary-hi"
               >
-                <RotateCcw className="h-3.5 w-3.5" /> Coba lagi
+                <RotateCcw className="h-3.5 w-3.5" /> {t("retry")}
               </button>
             )}
           </div>

@@ -1,6 +1,10 @@
+import type { Locale } from "@/lib/i18n/locale"
 import type { Lesson, Track } from "@/lib/learn/types"
 
-// Belajar 101: MOCK CONTENT. Written as placeholder teaching copy while
+// Belajar 101: MOCK CONTENT. Track and lesson titles and summaries live in the
+// learn catalogue (learn.tracks.*, learn.lessons.*) in both languages; the
+// lesson bodies below are Indonesian only until they're translated.
+// Written as placeholder teaching copy while
 // reputable sources are gathered. Every lesson is `draft: true` and lists the
 // sources it still needs; the UI shows both. Keep it definitional and
 // cautious: no statistics, no performance claims, no product endorsements.
@@ -8,38 +12,28 @@ import type { Lesson, Track } from "@/lib/learn/types"
 export const TRACKS: Track[] = [
   {
     id: "dasar",
-    title: "Dasar Trading",
-    description: "Apa itu trading, apa yang diperdagangkan, dan tiga keputusan yang selalu kamu punya.",
     lessons: ["apa-itu-trading", "pasar-dan-instrumen", "buy-sell-wait"],
   },
   {
     id: "chart",
-    title: "Membaca Chart",
-    description: "Candlestick, trend, support dan resistance: bahasa yang dipakai setiap chart.",
     lessons: ["anatomi-candlestick", "trend", "support-resistance", "timeframe"],
   },
   {
     id: "risiko",
-    title: "Manajemen Risiko",
-    description: "Cara bertahan cukup lama untuk belajar: stop loss, rasio risiko, dan leverage.",
     lessons: ["stop-loss-take-profit", "risk-reward", "leverage"],
   },
   {
     id: "crypto",
-    title: "Crypto 101",
-    description: "Blockchain, Bitcoin, stablecoin, dan cara menjaga aset digital tetap milikmu.",
     lessons: ["apa-itu-crypto", "bitcoin-altcoin-stablecoin", "keamanan-crypto"],
   },
   {
     id: "psikologi",
-    title: "Psikologi Trading",
-    description: "Musuh terbesar trader sering bukan pasar, tapi kebiasaannya sendiri.",
     lessons: ["fomo-overtrading", "jurnal-trading"],
   },
 ]
 
 const needed = (note: string) => ({ status: "needed" as const, note })
-const practice = { label: "Latih di Trading Game", href: "/trading-game" }
+const practice = { key: "game" as const, href: "/trading-game" }
 
 export const LESSONS: Lesson[] = [
   // -------------------------------------------------------------------------
@@ -47,8 +41,6 @@ export const LESSONS: Lesson[] = [
   {
     slug: "apa-itu-trading",
     track: "dasar",
-    title: "Apa itu trading?",
-    summary: "Membeli dan menjual untuk mengambil untung dari perubahan harga, dan kenapa itu berbeda dari menabung.",
     minutes: 4,
     level: "pemula",
     draft: true,
@@ -93,8 +85,6 @@ export const LESSONS: Lesson[] = [
   {
     slug: "pasar-dan-instrumen",
     track: "dasar",
-    title: "Pasar dan instrumen",
-    summary: "Forex, saham, komoditas, dan crypto: apa yang diperdagangkan dan bagaimana pair dibaca.",
     minutes: 5,
     level: "pemula",
     draft: true,
@@ -140,8 +130,6 @@ export const LESSONS: Lesson[] = [
   {
     slug: "buy-sell-wait",
     track: "dasar",
-    title: "BUY, SELL, dan WAIT",
-    summary: "Tiga keputusan dalam setiap soal, dan kenapa tidak trading sering jadi pilihan terbaik.",
     minutes: 4,
     level: "pemula",
     draft: true,
@@ -182,8 +170,6 @@ export const LESSONS: Lesson[] = [
   {
     slug: "anatomi-candlestick",
     track: "chart",
-    title: "Anatomi candlestick",
-    summary: "Body, sumbu, dan warna: satu candle menceritakan pertarungan pembeli dan penjual.",
     minutes: 5,
     level: "pemula",
     draft: true,
@@ -223,8 +209,6 @@ export const LESSONS: Lesson[] = [
   {
     slug: "trend",
     track: "chart",
-    title: "Trend: naik, turun, menyamping",
-    summary: "Puncak dan lembah memberitahu arah. Belajar membedakan ketiganya di chart asli.",
     minutes: 6,
     level: "pemula",
     draft: true,
@@ -256,8 +240,6 @@ export const LESSONS: Lesson[] = [
   {
     slug: "support-resistance",
     track: "chart",
-    title: "Support dan resistance",
-    summary: "Area di mana harga berkali-kali berhenti, dan kenapa area itu penting untuk entry dan stop loss.",
     minutes: 6,
     level: "pemula",
     draft: true,
@@ -290,8 +272,6 @@ export const LESSONS: Lesson[] = [
   {
     slug: "timeframe",
     track: "chart",
-    title: "Timeframe: H4 itu apa?",
-    summary: "Chart yang sama terlihat berbeda di M15, H4, atau D1. Pilih sesuai gaya latihanmu.",
     minutes: 3,
     level: "pemula",
     draft: true,
@@ -327,8 +307,6 @@ export const LESSONS: Lesson[] = [
   {
     slug: "stop-loss-take-profit",
     track: "risiko",
-    title: "Stop loss dan take profit",
-    summary: "Tentukan pintu keluar sebelum masuk. Dua angka yang memisahkan rencana dari tebakan.",
     minutes: 5,
     level: "pemula",
     draft: true,
@@ -361,13 +339,11 @@ export const LESSONS: Lesson[] = [
       },
     ],
     sources: [needed("Panduan penggunaan stop loss dari regulator atau materi edukasi broker teregulasi.")],
-    practice: { label: "Lihat contoh di AI Evaluation", href: "/ai-evaluation" },
+    practice: { key: "evaluation" as const, href: "/ai-evaluation" },
   },
   {
     slug: "risk-reward",
     track: "risiko",
-    title: "Risk-reward ratio",
-    summary: "Kenapa kamu bisa benar kurang dari setengah waktu dan tetap bertahan.",
     minutes: 5,
     level: "menengah",
     draft: true,
@@ -400,8 +376,6 @@ export const LESSONS: Lesson[] = [
   {
     slug: "leverage",
     track: "risiko",
-    title: "Leverage: pedang bermata dua",
-    summary: "Leverage memperbesar untung dan rugi dengan kelipatan yang sama. Pahami sebelum tergoda.",
     minutes: 5,
     level: "menengah",
     draft: true,
@@ -445,8 +419,6 @@ export const LESSONS: Lesson[] = [
   {
     slug: "apa-itu-crypto",
     track: "crypto",
-    title: "Apa itu crypto dan blockchain?",
-    summary: "Uang digital tanpa bank sentral, dicatat di buku besar yang disalin di banyak komputer.",
     minutes: 6,
     level: "pemula",
     draft: true,
@@ -490,8 +462,6 @@ export const LESSONS: Lesson[] = [
   {
     slug: "bitcoin-altcoin-stablecoin",
     track: "crypto",
-    title: "Bitcoin, altcoin, dan stablecoin",
-    summary: "Tidak semua crypto sama. Kenali tiga kelompok besar dan risikonya masing-masing.",
     minutes: 5,
     level: "pemula",
     draft: true,
@@ -523,8 +493,6 @@ export const LESSONS: Lesson[] = [
   {
     slug: "keamanan-crypto",
     track: "crypto",
-    title: "Keamanan: wallet dan exchange",
-    summary: "Siapa yang memegang kunci, memegang asetnya. Cara menghindari penipuan paling umum.",
     minutes: 5,
     level: "pemula",
     draft: true,
@@ -559,8 +527,6 @@ export const LESSONS: Lesson[] = [
   {
     slug: "fomo-overtrading",
     track: "psikologi",
-    title: "FOMO dan overtrading",
-    summary: "Takut ketinggalan dan ingin membalas rugi: dua kebiasaan yang menguras akun pelan-pelan.",
     minutes: 4,
     level: "pemula",
     draft: true,
@@ -597,8 +563,6 @@ export const LESSONS: Lesson[] = [
   {
     slug: "jurnal-trading",
     track: "psikologi",
-    title: "Jurnal trading",
-    summary: "Catatan sederhana yang mengubah kesalahan jadi pelajaran, bukan pengulangan.",
     minutes: 3,
     level: "pemula",
     draft: true,
@@ -622,6 +586,13 @@ export const LESSONS: Lesson[] = [
     sources: [needed("Sumber tentang praktik jurnal trading dan refleksi keputusan.")],
   },
 ]
+
+/**
+ * Whether a lesson's body exists in `locale`. Bodies are Indonesian only for
+ * now; elsewhere the page shows the Indonesian text with a "not yet
+ * available" label.
+ */
+export const bodyAvailableIn = (_lesson: Lesson, locale: Locale) => locale === "id"
 
 export const lessonBySlug = new Map(LESSONS.map((l) => [l.slug, l]))
 export const trackById = new Map(TRACKS.map((t) => [t.id, t]))

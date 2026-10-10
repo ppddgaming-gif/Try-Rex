@@ -4,10 +4,9 @@
 
 export type TrackId = "dasar" | "chart" | "risiko" | "crypto" | "psikologi"
 
+/** Title and description: learn.tracks.<id> in the catalogue. */
 export type Track = {
   id: TrackId
-  title: string
-  description: string
   /** Lesson slugs in reading order. */
   lessons: string[]
 }
@@ -32,11 +31,10 @@ export type Block =
   | { kind: "chart"; pick: ChartPick; caption: string; reveal?: boolean }
   | { kind: "quiz"; question: string; options: string[]; answer: number; explain: string }
 
+/** Title and summary: learn.lessons.<slug> in the catalogue. */
 export type Lesson = {
   slug: string
   track: TrackId
-  title: string
-  summary: string
   minutes: number
   level: "pemula" | "menengah"
   blocks: Block[]
@@ -44,5 +42,5 @@ export type Lesson = {
   /** Placeholder copy awaiting review against the sources. */
   draft: boolean
   /** Where to practise it, if the game covers it. */
-  practice?: { label: string; href: string }
+  practice?: { key: "game" | "evaluation"; href: string }
 }

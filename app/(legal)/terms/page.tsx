@@ -1,13 +1,16 @@
 import type { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
 import Link from "next/link"
 import { Isi, LegalDoc, Section, Tinjau } from "@/components/legal-doc"
 
-export const metadata: Metadata = { title: "Syarat & Ketentuan" }
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getTranslations("legal.titles"))("terms") }
+}
 
 export default function TermsPage() {
   return (
     <LegalDoc
-      title="Syarat & Ketentuan"
+      doc="terms"
       intro={
         <p>
           Dengan membuat akun atau memakai TRY-REX, kamu setuju dengan syarat berikut. TRY-REX dikelola oleh{" "}

@@ -1,1 +1,183 @@
-{}
+{
+  "tracks": {
+    "dasar": {
+      "title": "Dasar Trading",
+      "description": "Apa itu trading, apa yang diperdagangkan, dan tiga keputusan yang selalu kamu punya."
+    },
+    "chart": {
+      "title": "Membaca Chart",
+      "description": "Candlestick, trend, support dan resistance: bahasa yang dipakai setiap chart."
+    },
+    "risiko": {
+      "title": "Manajemen Risiko",
+      "description": "Cara bertahan cukup lama untuk belajar: stop loss, rasio risiko, dan leverage."
+    },
+    "crypto": {
+      "title": "Crypto 101",
+      "description": "Blockchain, Bitcoin, stablecoin, dan cara menjaga aset digital tetap milikmu."
+    },
+    "psikologi": {
+      "title": "Psikologi Trading",
+      "description": "Musuh terbesar trader sering bukan pasar, tapi kebiasaannya sendiri."
+    }
+  },
+  "lessons": {
+    "apa-itu-trading": {
+      "title": "Apa itu trading?",
+      "summary": "Membeli dan menjual untuk mengambil untung dari perubahan harga, dan kenapa itu berbeda dari menabung."
+    },
+    "pasar-dan-instrumen": {
+      "title": "Pasar dan instrumen",
+      "summary": "Forex, saham, komoditas, dan crypto: apa yang diperdagangkan dan bagaimana pair dibaca."
+    },
+    "buy-sell-wait": {
+      "title": "BUY, SELL, dan WAIT",
+      "summary": "Tiga keputusan dalam setiap soal, dan kenapa tidak trading sering jadi pilihan terbaik."
+    },
+    "anatomi-candlestick": {
+      "title": "Anatomi candlestick",
+      "summary": "Body, sumbu, dan warna: satu candle menceritakan pertarungan pembeli dan penjual."
+    },
+    "trend": {
+      "title": "Trend: naik, turun, menyamping",
+      "summary": "Puncak dan lembah memberitahu arah. Belajar membedakan ketiganya di chart asli."
+    },
+    "support-resistance": {
+      "title": "Support dan resistance",
+      "summary": "Area di mana harga berkali-kali berhenti, dan kenapa area itu penting untuk entry dan stop loss."
+    },
+    "timeframe": {
+      "title": "Timeframe: H4 itu apa?",
+      "summary": "Chart yang sama terlihat berbeda di M15, H4, atau D1. Pilih sesuai gaya latihanmu."
+    },
+    "stop-loss-take-profit": {
+      "title": "Stop loss dan take profit",
+      "summary": "Tentukan pintu keluar sebelum masuk. Dua angka yang memisahkan rencana dari tebakan."
+    },
+    "risk-reward": {
+      "title": "Risk-reward ratio",
+      "summary": "Kenapa kamu bisa benar kurang dari setengah waktu dan tetap bertahan."
+    },
+    "leverage": {
+      "title": "Leverage: pedang bermata dua",
+      "summary": "Leverage memperbesar untung dan rugi dengan kelipatan yang sama. Pahami sebelum tergoda."
+    },
+    "apa-itu-crypto": {
+      "title": "Apa itu crypto dan blockchain?",
+      "summary": "Uang digital tanpa bank sentral, dicatat di buku besar yang disalin di banyak komputer."
+    },
+    "bitcoin-altcoin-stablecoin": {
+      "title": "Bitcoin, altcoin, dan stablecoin",
+      "summary": "Tidak semua crypto sama. Kenali tiga kelompok besar dan risikonya masing-masing."
+    },
+    "keamanan-crypto": {
+      "title": "Keamanan: wallet dan exchange",
+      "summary": "Siapa yang memegang kunci, memegang asetnya. Cara menghindari penipuan paling umum."
+    },
+    "fomo-overtrading": {
+      "title": "FOMO dan overtrading",
+      "summary": "Takut ketinggalan dan ingin membalas rugi: dua kebiasaan yang menguras akun pelan-pelan."
+    },
+    "jurnal-trading": {
+      "title": "Jurnal trading",
+      "summary": "Catatan sederhana yang mengubah kesalahan jadi pelajaran, bukan pengulangan."
+    }
+  },
+  "practice": {
+    "game": "Latih di Trading Game",
+    "evaluation": "Lihat contoh di AI Evaluation"
+  },
+  "level": {
+    "pemula": "pemula",
+    "menengah": "menengah"
+  },
+  "hub": {
+    "title": "Belajar 101",
+    "eyebrow": "Belajar 101",
+    "heading": "Semua dasar trading, satu tempat.",
+    "body": "Dari cara membaca candle sampai menjaga aset crypto. Materi singkat, contoh dari chart asli, dan satu pertanyaan di akhir tiap bab.",
+    "kamus": "Kamus Trading",
+    "kamusBody": "<num>{n}</num> istilah, dijelaskan dalam satu atau dua kalimat. Istilah yang sama bisa diketuk di Trading Game.",
+    "chapter": "Bab {n}",
+    "minutes": "{n} menit",
+    "practiceTitle": "Teori sudah, saatnya praktik.",
+    "practiceBody": "Setiap soal di Trading Game adalah chart asli. Coba baca trend dan levelnya sendiri.",
+    "openGame": "Buka Trading Game"
+  },
+  "lesson": {
+    "fallbackTitle": "Materi",
+    "back": "Belajar 101",
+    "readMinutes": "{n} menit baca",
+    "level": "Tingkat {level}",
+    "tapHint": "Ketuk kata bergaris untuk melihat artinya.",
+    "others": "Materi lain",
+    "prev": "Sebelumnya",
+    "next": "Berikutnya",
+    "notTranslated": "Belum tersedia dalam bahasa Inggris",
+    "notTranslatedBody": "Isi materi ini ditampilkan dalam bahasa aslinya, Bahasa Indonesia."
+  },
+  "kamusPage": {
+    "title": "Kamus Trading",
+    "eyebrow": "Kamus",
+    "body": "Istilah yang sering muncul di chart dan di soal, dijelaskan singkat. Di Trading Game, istilah bergaris bisa diketuk untuk membuka penjelasan yang sama."
+  },
+  "draft": {
+    "title": "Materi contoh.",
+    "body": "Isi ini masih draf dan sedang dicocokkan dengan sumber terpercaya. Gunakan sebagai gambaran, bukan saran finansial.",
+    "sources": "Sumber",
+    "accessed": ", {publisher}. Diakses {date}."
+  },
+  "quiz": {
+    "eyebrow": "Cek pemahaman",
+    "right": "Jawaban benar",
+    "picked": "Pilihanmu",
+    "correct": "Tepat!",
+    "wrong": "Belum tepat, tapi ini bagian dari belajar.",
+    "retry": "Coba lagi"
+  },
+  "done": {
+    "finished": "Sudah selesai",
+    "mark": "Tandai selesai",
+    "doneLabel": "Selesai",
+    "notDone": "Belum",
+    "none": "Belum ada materi selesai.",
+    "onDevice": "materi selesai di perangkat ini"
+  },
+  "next": {
+    "title": "Lanjut belajar",
+    "count": "<num>{count}</num> dari <num>{total}</num> materi selesai · {minutes} menit",
+    "first": "Mulai materi pertama",
+    "continue": "Lanjutkan",
+    "allDone": "Semua materi Belajar 101 sudah kamu selesaikan."
+  },
+  "chart": {
+    "real": "{period} · data harga asli"
+  },
+  "diagrams": {
+    "high": "High (tertinggi)",
+    "open": "Open (buka)",
+    "close": "Close (tutup)",
+    "low": "Low (terendah)",
+    "anatomyTitle": "Anatomi candle: body (tebal) dan sumbu (tipis). Hijau ditutup lebih tinggi, merah lebih rendah.",
+    "upperWick": "sumbu atas",
+    "body": "body",
+    "lowerWick": "sumbu bawah",
+    "up": "Naik",
+    "upSub": "puncak & lembah makin tinggi",
+    "down": "Turun",
+    "downSub": "puncak & lembah makin rendah",
+    "flat": "Menyamping",
+    "flatSub": "bolak-balik di rentang",
+    "trendTitle": "Tiga bentuk trend. Lihat arah puncak dan lembahnya, bukan satu candle.",
+    "rrTitle": "Posisi BUY dengan rasio 1:2: risiko 20 pip ke stop loss, target 40 pip ke take profit.",
+    "plus40": "+40 pip",
+    "minus20": "−20 pip",
+    "ratio": "Rasio 1:2",
+    "levTitle": "Leverage 1:100. Gerak 1% pada posisi 100 juta = 1 juta: seluruh modal pada contoh ini.",
+    "capital": "Modal",
+    "capitalValue": "Rp1 juta",
+    "size": "Ukuran posisi",
+    "sizeValue": "Rp100 juta",
+    "against": "1% melawanmu = −Rp1 juta"
+  }
+}
