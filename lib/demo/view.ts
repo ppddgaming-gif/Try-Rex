@@ -20,6 +20,7 @@ export type ViewCandle = { t: number; o: number; h: number; l: number; c: number
 export type TradeView = {
   id: string
   number: number
+  pair: string
   side: Side
   lot: number
   reasons: ReasonId[]
@@ -126,6 +127,7 @@ function tradeView(t: TradeRow, price: number | null): TradeView {
   return {
     id: t.id,
     number: t.number,
+    pair: t.pair,
     side: t.side,
     lot: t.lot,
     reasons: t.reasons,

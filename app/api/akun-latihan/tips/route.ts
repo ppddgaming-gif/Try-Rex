@@ -1,5 +1,6 @@
 import { authed, errorJson, json } from "@/lib/demo/route"
 import { isTipId } from "@/lib/demo/tips"
+import { TUTORIAL_VIDEO } from "@/lib/live/config"
 import { msg } from "@/lib/i18n/translator"
 import { createAdminClient } from "@/lib/supabase/admin"
 
@@ -9,7 +10,7 @@ export async function POST(request: Request) {
   if (!auth.ok) return auth.response
 
   const { tip } = auth.body
-  if (!isTipId(tip)) return errorJson(msg("errors.unknownTip"), 400)
+  if (!isTipId(tip) && tip !== TUTORIAL_VIDEO.id) return errorJson(msg("errors.unknownTip"), 400)
 
   const admin = createAdminClient()
   const { error } = await admin

@@ -91,22 +91,28 @@ export const LINES = { MAX_PER_SEGMENT: 10 } as const
 /** "Apakah kamu mengikuti rencanamu?" Self-reported, never scored. */
 export const REVIEW = { NOTE_MAX_CHARS: 120 } as const
 
+/**
+ * Every pair is open from the first stage (the owner's choice); stages limit
+ * lot size, open trades and SL/TP rules instead.
+ */
+const ALL_PAIRS = ["EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "USDCAD", "EURJPY", "GBPCAD", "EURAUD", "GBPNZD"]
+
 /** Stages belong to the player and survive a new account. */
 export const STAGES = {
   1: {
-    pairs: ["EURUSD", "GBPUSD", "AUDUSD", "USDJPY", "USDCAD"],
+    pairs: ALL_PAIRS,
     fixedLot: 0.01 as number | null,
     maxOpenTrades: 1,
     slTpRequired: true,
   },
   2: {
-    pairs: ["EURUSD", "GBPUSD", "AUDUSD", "USDJPY", "USDCAD", "EURJPY", "EURAUD", "GBPCAD"],
+    pairs: ALL_PAIRS,
     fixedLot: null as number | null,
     maxOpenTrades: 1,
     slTpRequired: false,
   },
   3: {
-    pairs: ["EURUSD", "GBPUSD", "AUDUSD", "USDJPY", "USDCAD", "EURJPY", "EURAUD", "GBPCAD"],
+    pairs: ALL_PAIRS,
     fixedLot: null as number | null,
     maxOpenTrades: 3,
     slTpRequired: false,

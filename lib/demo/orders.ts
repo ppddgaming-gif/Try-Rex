@@ -132,6 +132,8 @@ export type OrderContext = {
   openTrades: number
   /** Candles left to play in the segment. */
   candlesLeft: number
+  /** SL and TP required whatever the stage says (the trading screen's rule). */
+  requireSlTp?: boolean
 }
 
 export type OrderProblem = {
@@ -168,13 +170,14 @@ export function orderProblems(input: OrderInput, ctx: OrderContext, quote: Order
     add("lot", "lotRange", { min: ACCOUNT.MIN_LOT.toFixed(2), max: ACCOUNT.MAX_LOT.toFixed(2), step: ACCOUNT.LOT_STEP })
   }
 
+  const slTpRequired = ctx.requireSlTp || stage.slTpRequired
   if (input.slPips === null) {
-    if (stage.slTpRequired) add("sl", "needSl")
+    if (slTpRequired) add("sl", "needSl")
   } else if (!isValidDistance(input.slPips)) {
     add("sl", "slRange", { max: PLAN.MAX_DISTANCE_PIPS })
   }
   if (input.tpPips === null) {
-    if (stage.slTpRequired) add("tp", "needTp")
+    if (slTpRequired) add("tp", "needTp")
   } else if (!isValidDistance(input.tpPips)) {
     add("tp", "tpRange", { max: PLAN.MAX_DISTANCE_PIPS })
   }

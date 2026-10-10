@@ -108,7 +108,7 @@ describe("English counts", () => {
     const en = markup("en")
     expect(en("progress.streak.days", { n: 1 })).toBe("1 day in a row")
     expect(en("progress.streak.days", { n: 3 })).toBe("3 days in a row")
-    expect(en("demo.ui.screen.remaining", { n: 1 })).toBe("1 candle left")
+    expect(en("demo.ui.desk.openOn", { n: 1 })).toBe("1 open position on this pair")
     expect(en("demo.ui.dashboard.continueTrading", { n: 1 })).toBe("Continue trading · 1 open trade")
     expect(en("game.challenge.situation.supportOnly", { s: 1 })).toBe("Support is 1 pip below the current price.")
   })

@@ -211,6 +211,18 @@ The tabs (`DemoTabs`): Akun (the dashboard, or the end-of-account flow), Trading
 - **XP**: each trade stores its Disiplin XP (`demo_trades.xp`); the progress store adds that to game XP, and `addServerXp` announces a gain as it happens.
 - The Trading Game ships its candles to the browser (the known exception to rules 1–2). Akun Latihan code must never import `lib/game-data.ts` or `lib/mock-data.ts` into a client component; client code uses `lib/chart-geometry.ts` for the chart.
 
+### Trading screen (`/akun-latihan/trading`): nine pairs, four timeframes, drawing tools
+
+Built on the **"DATA FOR LIVE"** MT4 exports (9 pairs × M15/M30/H1/H4, ±2012-11 to 2022-03, broker clock, no header: `YYYY.MM.DD,HH:MM,o,h,l,c,v`). EURAUD and GBPCAD are cross rates computed from the real pairs (exact closes, approximate wicks); GBPNZD is labelled synthetic and couldn't be checked; the owner chose to use all three.
+
+- **Data pipeline**: `node scripts/build-live-data.mjs "<DATA FOR LIVE>" live-data-out` packs gzipped chunks per pair/timeframe/year plus `manifest.json` (≈40 MB); `scripts/upload-live-data.mjs` puts them in the private Storage bucket `live-data` (service role only). `lib/live/store.ts` (server-only) reads them, or a local folder when `LIVE_DATA_DIR` is set.
+- **No period leak**: the browser never gets an absolute time. Candles and drawings carry seconds relative to the account's "now" plus `nowWeek`; labels are weekday + hour only (`lib/live/time.ts dayTimeLabel`). "Now" is provisional (`provisionalNow`, seeded by an HMAC of the account id with the service-role key) until the live engine keeps a real clock.
+- **Drawings** (`lib/live/drawings.ts`, `components/akun-latihan/live-chart.tsx`): position (buy/sell with SL, TP, RR), trendline, rectangle, horizontal line, path. Points are (time, price), placed with `timeToIndex`/`indexToTime`, so they stay put across timeframes. Stored per account and pair in `demo_drawings` with absolute times; that table has RLS on and **no policies** (the times would leak the period). Never scored, never advise.
+- The chart draws at real pixel size with one scale (`lib/live/geometry.ts makeScale`) for candles and drawings.
+- **Orders**: BUY and SELL only (no WAIT); SL and TP always required (`orderProblems` `requireSlTp`); every pair is open from Stage 1 (`STAGES.*.pairs`). Confirming an order waits for the live engine (next stage), so the panel's confirm is off with a note. GBPNZD has no spread or NZD→USD rate in config yet, so its quote is off.
+- Tutorial video slot: `TUTORIAL_VIDEO` in `lib/live/config.ts` (`src: null` until the video exists); watched is stored in `demo_tips_seen` as `tools-video`.
+- Migration `_trading_pairs`: `demo_accounts.last_pair/last_timeframe`, `demo_drawings`, the `live-data` bucket.
+
 ### Onboarding: `/start`
 
 Five questions (`lib/onboarding.ts` `QUESTIONS`): why trading (question 1 is verbatim from the design PDF), experience, chart skill, focus pairs, daily time. **No answer is wrong**: every option is a preference or a self-assessment, never a test. `planFrom(record)` turns answers into a `Plan`: experience + skill (0–6) picks the starting level (≤2 Mudah, ≤4 Menengah, else Sulit), focus picks `focusPairs` for the shuffle, time sets `dailyGoal` (5/15/30 or none), and motivation picks Rex's line (`onboarding.motivationLines.<value>`). "Lewati" stores `skipped: true` and the defaults apply.

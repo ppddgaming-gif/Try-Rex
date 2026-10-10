@@ -3,3 +3,6 @@ node_modules
 next-env.d.ts
 *.tsbuildinfo
 .env*.local
+
+# Output of scripts/build-live-data.mjs (uploaded to Supabase Storage, not committed)
+live-data-out/

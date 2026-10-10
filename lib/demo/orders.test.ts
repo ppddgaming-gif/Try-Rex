@@ -107,7 +107,9 @@ describe("orderProblems", () => {
     ["a second open trade in Stage 1", {}, { openTrades: 1 }, ["trades"]],
     ["a third open trade in Stage 3", {}, { stage: 3, openTrades: 2 }, []],
     ["a fourth open trade in Stage 3", {}, { stage: 3, openTrades: 3 }, ["trades"]],
-    ["a cross in Stage 1", {}, { pair: "EURJPY" }, ["pair"]],
+    ["a cross in Stage 1 is open (every pair is, from the start)", {}, { pair: "EURJPY" }, []],
+    ["a pair outside the nine", {}, { pair: "AUDCAD" }, ["pair"]],
+    ["SL and TP required by the trading screen in Stage 2", { slPips: null, tpPips: null }, { stage: 2, requireSlTp: true }, ["sl", "tp"]],
     ["no candles left", {}, { candlesLeft: 0 }, ["candles"]],
     ["a zero SL", { slPips: 0 }, { stage: 2 }, ["sl"]],
   ] as const)("%s", (_name, input, over, fields) => {

@@ -20,10 +20,10 @@ describe("segmentsOf", () => {
 describe("segmentPool on the real data", () => {
   const sources = gameDatasets.map((d) => ({ id: d.id, pair: d.pair, length: d.candles.length }))
 
-  it("Stage 1 holds the USD-quoted pairs only", () => {
+  it("Stage 1 holds every pair the data has (all nine are open from the start)", () => {
     const pool = segmentPool(1, sources)
-    expect(new Set(pool.map((s) => s.pair))).toEqual(new Set(["EURUSD", "GBPUSD", "AUDUSD", "USDJPY", "USDCAD"]))
-    expect(pool).toHaveLength(25)
+    expect(new Set(pool.map((s) => s.pair))).toEqual(new Set(sources.map((s) => s.pair)))
+    expect(pool).toHaveLength(39)
   })
 
   it("Stage 2 adds the crosses", () => {
