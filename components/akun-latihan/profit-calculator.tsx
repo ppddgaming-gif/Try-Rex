@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { Calculator } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { SelectMenu } from "@/components/select-menu"
 import { Stepper } from "@/components/akun-latihan/stepper"
 import { ACCOUNT, CALCULATOR } from "@/lib/demo/config"
@@ -34,6 +35,8 @@ export function ProfitCalculator({
   const [exit, setExit] = useState(() => exampleExit(CALCULATOR.PAIR, "buy"))
   const { digits, pipSize } = instrument(pair)
   const r = profitCalc({ pair, side, lot, entry, exit, balance })
+  const t = useTranslations("demo.ui.calc")
+  const to = useTranslations("demo.ui.order")
 
   function pickPair(next: string) {
     setPair(next)
@@ -48,20 +51,17 @@ export function ProfitCalculator({
       <section aria-labelledby="calc-title" className="glass-card flex flex-col gap-4 rounded-2xl p-4 sm:p-6">
         <div>
           <h2 id="calc-title" className="flex items-center gap-2 font-display text-lg font-bold">
-            <Calculator className="h-5 w-5 text-primary" aria-hidden="true" /> Kalkulator Profit
+            <Calculator className="h-5 w-5 text-primary" aria-hidden="true" /> {t("title")}
           </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Hitung untung atau rugi sebuah gerakan harga sebelum trading. Panel order di layar trading menghitung hal yang
-            sama secara otomatis.
-          </p>
+          <p className="mt-1 text-sm text-muted-foreground">{t("body")}</p>
         </div>
 
         <div>
-          <p className="mb-1.5 text-xs font-semibold text-muted-foreground">Pair</p>
-          <SelectMenu label="Pair" value={pair} onChange={pickPair} options={pairs.map((p) => ({ value: p, label: p }))} />
+          <p className="mb-1.5 text-xs font-semibold text-muted-foreground">{t("pair")}</p>
+          <SelectMenu label={t("pair")} value={pair} onChange={pickPair} options={pairs.map((p) => ({ value: p, label: p }))} />
         </div>
 
-        <div role="radiogroup" aria-label="Arah trade" className="grid grid-cols-2 gap-2">
+        <div role="radiogroup" aria-label={t("direction")} className="grid grid-cols-2 gap-2">
           {(["buy", "sell"] as const).map((s) => {
             const on = side === s
             return (
@@ -88,53 +88,50 @@ export function ProfitCalculator({
         </div>
 
         <div>
-          <p className="mb-1.5 text-xs font-semibold text-muted-foreground">Lot</p>
+          <p className="mb-1.5 text-xs font-semibold text-muted-foreground">{t("lot")}</p>
           <Stepper
             id="calc-lot"
-            label="lot"
+            label={to("lotUnit")}
             value={lot}
             onChange={setLot}
             step={ACCOUNT.LOT_STEP}
             min={ACCOUNT.MIN_LOT}
             max={ACCOUNT.MAX_LOT}
             decimals={2}
-            unit="lot"
+            unit={to("lotUnit")}
           />
         </div>
         <div>
-          <p className="mb-1.5 text-xs font-semibold text-muted-foreground">Harga masuk</p>
-          <Stepper id="calc-entry" label="harga masuk" value={entry} onChange={setEntry} {...priceProps} />
+          <p className="mb-1.5 text-xs font-semibold text-muted-foreground">{t("entry")}</p>
+          <Stepper id="calc-entry" label={t("entryLabel")} value={entry} onChange={setEntry} {...priceProps} />
         </div>
         <div>
-          <p className="mb-1.5 text-xs font-semibold text-muted-foreground">Harga keluar</p>
-          <Stepper id="calc-exit" label="harga keluar" value={exit} onChange={setExit} {...priceProps} />
+          <p className="mb-1.5 text-xs font-semibold text-muted-foreground">{t("exit")}</p>
+          <Stepper id="calc-exit" label={t("exitLabel")} value={exit} onChange={setExit} {...priceProps} />
         </div>
-        <p className="text-[11px] leading-snug text-faint">
-          Harga awal hanya contoh, bukan harga pasar saat ini. Akun Latihan tidak memakai harga live. Tombol − / + menggeser 1
-          pip.
-        </p>
+        <p className="text-[11px] leading-snug text-faint">{t("note")}</p>
       </section>
 
       <section aria-labelledby="calc-result" className="glass-card rounded-2xl p-4 sm:p-6" aria-live="polite">
         <h2 id="calc-result" className="text-sm font-semibold">
-          Hasil · {side.toUpperCase()} {fmtLot(r.lot)} lot {pair}
+          {t("result", { side: side.toUpperCase(), lot: fmtLot(r.lot), pair })}
         </h2>
         <p className={`mt-3 font-mono text-4xl font-bold tracking-tight ${tone(r.gross)}`}>{usd(r.gross, { signed: true })}</p>
-        <p className="text-xs text-muted-foreground">Profit/rugi kotor · {r.pips > 0 ? "+" : ""}{r.pips.toFixed(1)} pip</p>
+        <p className="text-xs text-muted-foreground">{t("gross", { pips: `${r.pips > 0 ? "+" : ""}${r.pips.toFixed(1)}` })}</p>
 
         <dl className="mt-5 grid grid-cols-[1fr_auto] gap-x-3 gap-y-1.5 rounded-xl bg-inset p-3.5 text-sm">
-          <Row term="Nilai 1 pip" value={usd(r.pipValue)} />
-          <Row term="Margin dibutuhkan" value={usd(r.margin)} />
+          <Row term={to("pipValue")} value={usd(r.pipValue)} />
+          <Row term={to("marginNeeded")} value={usd(r.margin)} />
           <div aria-hidden="true" className="col-span-2 my-0.5 h-px bg-border" />
-          <Row term={`Spread (perkiraan, ${r.costs.spreadPips} pip)`} value={usd(-r.costs.spread)} muted />
-          <Row term="Komisi" value={usd(r.costs.commission)} muted />
+          <Row term={to("spread", { pips: r.costs.spreadPips })} value={usd(-r.costs.spread)} muted />
+          <Row term={to("commission")} value={usd(r.costs.commission)} muted />
           <div aria-hidden="true" className="col-span-2 my-0.5 h-px bg-border" />
-          <Row term="Hasil setelah biaya" value={usd(r.net, { signed: true })} tone={tone(r.net)} />
-          <Row term={`% dari ${balanceLabel}`} value={pct(r.netPct, { signed: true })} tone={tone(r.netPct)} />
+          <Row term={t("net")} value={usd(r.net, { signed: true })} tone={tone(r.net)} />
+          <Row term={t("pctOf", { label: balanceLabel })} value={pct(r.netPct, { signed: true })} tone={tone(r.netPct)} />
         </dl>
         <p className="mt-3 text-[11px] leading-snug text-faint">
-          Swap tidak termasuk: dihitung per malam selama trade terbuka.
-          {r.approximate && " Nilai dolar pair silang memakai kurs konversi tetap (perkiraan)."}
+          {t("swapNote")}
+          {r.approximate && ` ${to("approx")}`}
         </p>
       </section>
     </div>

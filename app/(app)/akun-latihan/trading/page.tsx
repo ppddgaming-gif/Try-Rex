@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
 import { redirect } from "next/navigation"
 import { DemoTabs } from "@/components/akun-latihan/demo-tabs"
 import { TradingScreen } from "@/components/akun-latihan/trading-screen"
@@ -7,7 +8,9 @@ import { getAccess, loadDemoState } from "@/lib/demo/server"
 import { loadTrading } from "@/lib/demo/trading"
 import { buildView } from "@/lib/demo/view"
 
-export const metadata: Metadata = { title: "Trading · Akun Latihan" }
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getTranslations("demo.ui.meta"))("trading") }
+}
 
 /**
  * The replay and the order panel. Same gate as /akun-latihan (account and

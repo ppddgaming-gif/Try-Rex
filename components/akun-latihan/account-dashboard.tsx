@@ -1,23 +1,18 @@
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { ArrowRight, CandlestickChart as ChartIcon, GraduationCap, Layers, Wallet } from "lucide-react"
 import { Card } from "@/components/card"
 import { ResetAccount } from "@/components/akun-latihan/account-actions"
 import { DISIPLIN } from "@/lib/demo/config"
-import { pct, usd } from "@/lib/demo/format"
+import { ledgerLabel, pct, usd } from "@/lib/demo/format"
 import { roundMoney } from "@/lib/demo/money"
 import type { LedgerRow } from "@/lib/demo/server"
+import { progressLabel } from "@/lib/demo/stages"
 import type { AccountStats } from "@/lib/demo/stats"
 import type { DemoView } from "@/lib/demo/view"
 
-const dateFmt = new Intl.DateTimeFormat("id-ID", {
-  day: "numeric",
-  month: "short",
-  hour: "2-digit",
-  minute: "2-digit",
-  timeZone: "Asia/Jakarta",
-})
-
-const NO_TRADES = "Belum ada trade"
+import { INTL_LOCALE, type Locale } from "@/lib/i18n/locale"
+import { useLocale } from "next-intl"
 
 /**
  * The account's dashboard, Disiplin first: how the plan was kept, then what
@@ -42,6 +37,17 @@ export function AccountDashboard({
   const net = roundMoney(f.balance - view.account.startingBalance)
   const p = view.stage.progress
   const share = Math.min(1, p.trades / p.needed)
+  const t = useTranslations("demo.ui.dashboard")
+  const root = useTranslations()
+  const label = progressLabel(p, root)
+  const NO_TRADES = t("noTrades")
+  const dateFmt = new Intl.DateTimeFormat(INTL_LOCALE[useLocale() as Locale], {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "Asia/Jakarta",
+  })
 
   return (
     <div className="flex flex-col gap-4">
@@ -52,8 +58,8 @@ export function AccountDashboard({
               <GraduationCap className="h-5 w-5 text-primary" aria-hidden="true" />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block font-semibold">Kamu sudah lulus Akun Latihan</span>
-              <span className="block text-sm text-muted-foreground">Lihat ringkasan dan apa yang tidak bisa diajarkan demo.</span>
+              <span className="block font-semibold">{t("graduatedTitle")}</span>
+              <span className="block text-sm text-muted-foreground">{t("graduatedBody")}</span>
             </span>
             <ArrowRight className="h-5 w-5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1" aria-hidden="true" />
           </Card>
@@ -64,34 +70,32 @@ export function AccountDashboard({
       <Card className="glow-card sm:p-7">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="flex items-center gap-2 font-display text-lg font-bold">
-            <Wallet className="h-5 w-5 text-primary" aria-hidden="true" /> Akun #{view.account.number}
+            <Wallet className="h-5 w-5 text-primary" aria-hidden="true" /> {t("account", { n: view.account.number })}
           </p>
           <span className="rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-primary">
-            Stage {view.stage.current}
+            {t("stage", { n: view.stage.current })}
           </span>
         </div>
         <div className="mt-5 grid gap-6 sm:grid-cols-[minmax(0,auto)_minmax(0,1fr)] sm:items-center">
           <div>
-            <p className="text-sm text-muted-foreground">Disiplin</p>
+            <p className="text-sm text-muted-foreground">{t("disiplin")}</p>
             <p className={`font-mono text-5xl font-bold tracking-tight ${disiplin === null ? "text-muted-foreground" : "text-primary"}`}>
               {disiplin === null ? "—" : `${disiplin}%`}
             </p>
             <p className="mt-1 text-xs text-faint">
-              {disiplin === null
-                ? "Muncul setelah trade pertama ditutup"
-                : `Rata-rata ${DISIPLIN.ROLLING_TRADES} trade terakhirmu, di semua akun`}
+              {disiplin === null ? t("disiplinNone") : t("disiplinAvg", { n: DISIPLIN.ROLLING_TRADES })}
             </p>
           </div>
           <div className="rounded-xl bg-inset p-4">
             <div className="flex items-center justify-between gap-2 text-xs">
               <span className="flex items-center gap-1.5 font-semibold">
-                <Layers className="h-3.5 w-3.5 text-primary" aria-hidden="true" /> Stage {view.stage.current}
+                <Layers className="h-3.5 w-3.5 text-primary" aria-hidden="true" /> {t("stage", { n: view.stage.current })}
               </span>
               <span className="text-muted-foreground">
-                {view.graduated ? "Lulus" : p.next ? `menuju Stage ${p.next}` : "menuju kelulusan"}
+                {view.graduated ? t("graduated") : p.next ? t("toStage", { n: p.next }) : t("toGraduation")}
               </span>
             </div>
-            <p className="mt-2 font-mono text-xs font-semibold">{view.stage.label}</p>
+            <p className="mt-2 font-mono text-xs font-semibold">{label}</p>
             <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-background/60" aria-hidden="true">
               <div
                 className="h-full origin-left rounded-full bg-primary transition-transform duration-500 ease-out-expo"
@@ -105,48 +109,48 @@ export function AccountDashboard({
       {/* 2. How the plans were made. */}
       <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Stat
-          label="Rata-rata risiko"
-          value={stats.avgRiskPct === null ? null : `${pct(stats.avgRiskPct)} saldo`}
+          label={t("avgRisk")}
+          value={stats.avgRiskPct === null ? null : t("riskValue", { risk: pct(stats.avgRiskPct) })}
           note={
             stats.withoutSl > 0
-              ? `${stats.withoutSl} trade tanpa SL tidak dihitung`
+              ? t("withoutSl", { n: stats.withoutSl })
               : stats.avgRiskPct !== null
-                ? `Batas ${DISIPLIN.MAX_RISK_PCT}%`
+                ? t("limit", { n: DISIPLIN.MAX_RISK_PCT })
                 : undefined
           }
-          hint={none ? NO_TRADES : "Belum ada trade dengan SL"}
+          hint={none ? NO_TRADES : t("noSlTrades")}
         />
         <Stat
-          label="Rata-rata reward : risk"
+          label={t("avgRR")}
           value={stats.avgRewardRisk === null ? null : `1 : ${stats.avgRewardRisk.toFixed(2)}`}
-          note={stats.avgRewardRisk !== null ? `Minimal ${DISIPLIN.MIN_REWARD_RISK}` : undefined}
-          hint={none ? NO_TRADES : "Belum ada trade dengan SL dan TP"}
+          note={stats.avgRewardRisk !== null ? t("min", { n: DISIPLIN.MIN_REWARD_RISK }) : undefined}
+          hint={none ? NO_TRADES : t("noSlTpTrades")}
         />
-        <Stat label="SL saat entry" value={stats.slAtEntryPct === null ? null : `${stats.slAtEntryPct}%`} note={none ? undefined : "dari semua trade"} hint={NO_TRADES} />
+        <Stat label={t("slAtEntry")} value={stats.slAtEntryPct === null ? null : `${stats.slAtEntryPct}%`} note={none ? undefined : t("ofAll")} hint={NO_TRADES} />
         <Stat
-          label="Penurunan terbesar"
+          label={t("drawdown")}
           value={stats.drawdown === null ? null : stats.drawdown.amount === 0 ? usd(0) : usd(-stats.drawdown.amount)}
-          note={stats.drawdown === null ? undefined : `${pct(stats.drawdown.pct)} dari puncak saldo`}
+          note={stats.drawdown === null ? undefined : t("fromPeak", { pct: pct(stats.drawdown.pct) })}
           hint={NO_TRADES}
         />
       </dl>
 
       {/* 3. The money, then 4. win rate and why it isn't the point. */}
       <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Stat label="Saldo" value={usd(f.balance)} note={`Akun habis di bawah ${usd(view.account.bustLine)}`} />
-        <Stat label="Equity" value={usd(f.equity)} />
+        <Stat label={t("balance")} value={usd(f.balance)} note={t("bustBelow", { amount: usd(view.account.bustLine) })} />
+        <Stat label={t("equity")} value={usd(f.equity)} />
         <Stat
-          label="Net profit"
+          label={t("netProfit")}
           value={none ? null : usd(net, { signed: true })}
           tone={net > 0 ? "text-success" : net < 0 ? "text-danger" : ""}
           hint={NO_TRADES}
         />
         <Stat
-          label="Win rate"
+          label={t("winRate")}
           value={stats.winRate === null ? null : `${stats.winRate}%`}
-          note={none ? undefined : `${stats.wins} dari ${stats.trades} trade untung`}
+          note={none ? undefined : t("wins", { wins: stats.wins, trades: stats.trades })}
           hint={NO_TRADES}
-          footer="Win rate tinggi belum tentu untung — lihat rasio reward:risk."
+          footer={t("winRateNote")}
         />
       </dl>
 
@@ -157,10 +161,10 @@ export function AccountDashboard({
           </span>
           <div className="min-w-0 flex-1">
             <h2 className="font-semibold">
-              {view.open.length > 0 ? `Lanjut trading · ${view.open.length} trade terbuka` : "Mulai trading"}
+              {view.open.length > 0 ? t("continueTrading", { n: view.open.length }) : t("startTrading")}
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Stage {view.stage.current} · {view.stage.label}
+              {t("stageLine", { n: view.stage.current, progress: label })}
             </p>
           </div>
           <ArrowRight className="h-5 w-5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1" aria-hidden="true" />
@@ -168,12 +172,12 @@ export function AccountDashboard({
       </Link>
 
       <Card className="sm:p-7">
-        <h2 className="text-base font-semibold">Riwayat saldo</h2>
+        <h2 className="text-base font-semibold">{t("ledger")}</h2>
         <ul className="mt-3 divide-y divide-border">
           {ledger.map((row) => (
             <li key={row.id} className="flex min-h-12 items-center gap-3 py-2 text-sm">
               <span className="min-w-0 flex-1">
-                <span className="block font-medium">{row.label}</span>
+                <span className="block font-medium">{ledgerLabel(row, root)}</span>
                 <span className="block text-xs text-muted-foreground">{dateFmt.format(new Date(row.createdAt))}</span>
               </span>
               <span
@@ -190,7 +194,7 @@ export function AccountDashboard({
       <ResetAccount
         number={view.account.number}
         startingBalance={startingBalance}
-        blocked={view.open.length > 0 ? "Tutup trade yang terbuka dulu sebelum reset." : null}
+        blocked={view.open.length > 0 ? t("resetBlocked") : null}
       />
     </div>
   )

@@ -3,9 +3,10 @@
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { LoaderCircle, Wallet } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { Card } from "@/components/card"
 import { Rex } from "@/components/rex-mascot"
-import { postJson } from "@/components/akun-latihan/post-json"
+import { usePostJson } from "@/components/akun-latihan/post-json"
 
 /**
  * "Buat Akun Latihan": one short explanation, one button. The balance shown
@@ -16,6 +17,8 @@ export function CreateAccount({ startingBalance, leverage }: { startingBalance: 
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [, startTransition] = useTransition()
+  const postJson = usePostJson()
+  const t = useTranslations("demo.ui.create")
 
   async function create() {
     setBusy(true)
@@ -32,15 +35,17 @@ export function CreateAccount({ startingBalance, leverage }: { startingBalance: 
   return (
     <Card className="glow-card flex flex-col items-center py-12 text-center sm:p-12">
       <Rex size={96} mood="happy" className="float" />
-      <h2 className="mt-5 text-2xl font-bold">Buat Akun Latihan</h2>
+      <h2 className="mt-5 text-2xl font-bold">{t("title")}</h2>
       <p className="mt-3 max-w-lg text-muted-foreground">
-        Kamu mendapat saldo virtual <strong className="font-mono text-foreground">{startingBalance}</strong> dengan
-        leverage 1:{leverage}, lalu trading di chart historis yang berjalan candle demi candle. Yang dinilai adalah
-        disiplinmu, bukan untungnya. Kalau saldo habis, tidak ada top-up: kita tinjau bersama, lalu mulai akun baru.
+        {t.rich("body", {
+          balance: startingBalance,
+          leverage,
+          b: (c) => <strong className="font-mono text-foreground">{c}</strong>,
+        })}
       </p>
       <button type="button" onClick={create} disabled={busy} className="btn btn-lg mt-8">
         {busy ? <LoaderCircle className="h-5 w-5 animate-spin" /> : <Wallet className="h-5 w-5" />}
-        Buat Akun Latihan
+        {t("button")}
       </button>
       {error && (
         <p role="alert" className="mt-4 text-sm text-danger">

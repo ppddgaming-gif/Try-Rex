@@ -193,5 +193,5 @@ export const APPROX_USD_RATE: Record<string, number> = {
   JPY: 1 / 85,
 }
 
-/** The screen line every Akun Latihan page carries. */
-export const DISCLAIMER = "Saldo virtual · data historis. Hasil simulasi tidak memprediksi hasil trading nyata."
+// The screen line every Akun Latihan page carries: demo.disclaimer in the
+// message catalogues.

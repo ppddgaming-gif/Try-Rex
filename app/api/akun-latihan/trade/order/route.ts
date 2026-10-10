@@ -1,5 +1,6 @@
-import { authed, json, numberOrNull, respond } from "@/lib/demo/route"
+import { authed, errorJson, numberOrNull, respond } from "@/lib/demo/route"
 import { placeOrder } from "@/lib/demo/trading"
+import { msg } from "@/lib/i18n/translator"
 
 /**
  * POST { side, lot, slPips, tpPips, reasons }: a market order at the current
@@ -21,7 +22,7 @@ export async function POST(request: Request) {
     !Array.isArray(reasons) ||
     !reasons.every((r) => typeof r === "string")
   ) {
-    return json({ error: "Format order tidak valid." }, 400)
+    return errorJson(msg("errors.badOrder"), 400)
   }
   return respond(await placeOrder(auth.userId, { side, lot, slPips: sl, tpPips: tp, reasons: reasons as string[] }))
 }

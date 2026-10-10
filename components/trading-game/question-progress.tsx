@@ -1,4 +1,5 @@
 import { Clock, Flame, Star, Target } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 function clock(seconds: number) {
   const m = Math.floor(seconds / 60)
@@ -28,27 +29,30 @@ export function QuestionProgress({
   // Right answers in a row, counted back from the latest.
   let combo = 0
   for (let i = results.length - 1; i >= 0 && results[i]; i--) combo++
+  const t = useTranslations("game.progress")
 
   return (
     <div className="w-full rounded-2xl border border-border bg-card p-4">
       <div className="flex items-baseline justify-between text-sm">
         <span className="font-medium">
-          Soal{" "}
-          <span className="font-mono">
-            <span className="font-bold text-primary">{index + 1}</span>
-            <span className="text-muted-foreground">/{total}</span>
-          </span>
+          {t.rich("question", {
+            n: index + 1,
+            total,
+            num: (c) => <span className="font-mono">{c}</span>,
+            cur: (c) => <span className="font-bold text-primary">{c}</span>,
+            dim: (c) => <span className="text-muted-foreground">{c}</span>,
+          })}
         </span>
         <span className="flex items-center gap-1 font-mono text-xs text-muted-foreground">
           <Clock className="h-3.5 w-3.5" aria-hidden="true" />
-          <span className="sr-only">Waktu</span> {clock(seconds)}
+          <span className="sr-only">{t("time")}</span> {clock(seconds)}
         </span>
       </div>
 
       <ol
         className="mt-3 grid gap-1.5"
         style={{ gridTemplateColumns: `repeat(${total}, minmax(0, 1fr))` }}
-        aria-label={`${results.length} dari ${total} soal dijawab, ${correct} benar`}
+        aria-label={t("aria", { answered: results.length, total, correct })}
       >
         {Array.from({ length: total }, (_, i) => {
           const done = i < results.length
@@ -74,11 +78,11 @@ export function QuestionProgress({
             className="pop-in shimmer flex items-center gap-1 rounded-full bg-primary/15 px-2 py-0.5 font-semibold text-primary"
           >
             <Flame className="flicker h-3.5 w-3.5 fill-primary" aria-hidden="true" />
-            <span className="font-mono">{combo}x</span> beruntun
+            {t.rich("combo", { n: combo, num: (c) => <span className="font-mono">{c}</span> })}
           </span>
         ) : (
           <span className="flex items-center gap-1.5 text-muted-foreground">
-            <Target className="h-3.5 w-3.5" aria-hidden="true" /> <span className="font-mono">{correct}</span> benar
+            <Target className="h-3.5 w-3.5" aria-hidden="true" /> {t.rich("correct", { n: correct, num: (c) => <span className="font-mono">{c}</span> })}
           </span>
         )}
       </div>

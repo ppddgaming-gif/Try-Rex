@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { ChevronRight, LogOut } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { signOut } from "@/lib/auth-actions"
 import { Avatar } from "@/components/avatar"
 import { LevelXp } from "@/components/progress/level-xp"
@@ -25,19 +26,20 @@ export function ProfileCard({
   className?: string
   onNavigate?: () => void
 }) {
+  const t = useTranslations("nav.profile")
   return (
     <div className={`profile-card glass-card rounded-2xl p-4 ${className}`}>
       {/* Collapsed sidebar: just the face, linking to Settings (or sign-in). */}
       <Link
         href={profile ? "/pengaturan#profil" : "/login"}
         onClick={onNavigate}
-        aria-label={profile ? `Pengaturan akun ${profile.name}` : "Masuk"}
-        data-tip={profile ? profile.name : "Masuk"}
+        aria-label={profile ? t("settingsOf", { name: profile.name }) : t("signIn")}
+        data-tip={profile ? profile.name : t("signIn")}
         className="sb-mini justify-center"
       >
         <Avatar
           src={profile?.avatarUrl ?? null}
-          name={profile?.name ?? "Tamu"}
+          name={profile?.name ?? t("guest")}
           size={40}
           fallback={profile ? undefined : <Rex size={30} />}
         />
@@ -54,7 +56,7 @@ export function ProfileCard({
           <div className="min-w-0 flex-1 leading-tight">
             <p className="truncate text-sm font-semibold">{profile.name}</p>
             <p className="truncate text-xs text-muted-foreground">
-              {profile.username ? `@${profile.username}` : "Atur profil"}
+              {profile.username ? `@${profile.username}` : t("setUpProfile")}
             </p>
           </div>
           <ChevronRight
@@ -64,10 +66,10 @@ export function ProfileCard({
         </Link>
       ) : (
         <div className="flex items-center gap-3">
-          <Avatar src={null} name="Tamu" size={40} fallback={<Rex size={30} />} />
+          <Avatar src={null} name={t("guest")} size={40} fallback={<Rex size={30} />} />
           <div className="min-w-0 leading-tight">
-            <p className="truncate text-sm font-semibold">Tamu</p>
-            <p className="text-xs text-muted-foreground">Belum masuk</p>
+            <p className="truncate text-sm font-semibold">{t("guest")}</p>
+            <p className="text-xs text-muted-foreground">{t("notSignedIn")}</p>
           </div>
         </div>
       )}
@@ -82,19 +84,19 @@ export function ProfileCard({
       {profile ? (
         <form action={signOut} className="mt-4">
           <button type="submit" className="btn btn-ghost btn-sm w-full">
-            <LogOut className="h-4 w-4" /> Keluar
+            <LogOut className="h-4 w-4" /> {t("signOut")}
           </button>
         </form>
       ) : (
         <div className="mt-4 flex flex-col gap-2">
           <p className="text-xs leading-relaxed text-muted-foreground">
-            Progres tersimpan di perangkat ini. Masuk untuk menyimpannya ke akunmu.
+            {t("guestNote")}
           </p>
           <Link href="/login" onClick={onNavigate} className="btn btn-sm w-full">
-            Masuk
+            {t("signIn")}
           </Link>
           <Link href="/signup" onClick={onNavigate} className="btn btn-ghost btn-sm w-full">
-            Daftar gratis
+            {t("signUp")}
           </Link>
         </div>
       )}

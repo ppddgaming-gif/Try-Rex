@@ -1,0 +1,53 @@
+{
+  "stop-loss": {
+    "title": "Apa itu stop loss?",
+    "when": "Saat pertama kali membuka panel order",
+    "body": {
+      "p1": "Stop loss adalah harga tempat trade-mu otomatis ditutup kalau ternyata salah. Kamu memilihnya sebelum masuk, saat kepala masih dingin.",
+      "p2": "Taruh SL di tempat idemu terbukti salah, misalnya sedikit di luar support atau resistance, bukan di angka yang terasa nyaman.",
+      "p3": "Di Stage 1, setiap trade wajib punya SL dan TP. Setelah itu tetap boleh tanpa, tapi Disiplin tetap memeriksanya."
+    }
+  },
+  "risk-per-trade": {
+    "title": "Kenapa risiko per trade penting",
+    "when": "Saat pertama kali risikomu melewati {max}% saldo",
+    "body": {
+      "p1": "Risiko per trade adalah berapa persen saldo yang hilang kalau SL kena. Batas di sini {max}%.",
+      "p2": "Dengan risiko {max}%, sepuluh kekalahan beruntun masih menyisakan sekitar 80% saldo. Dengan risiko 10%, lima kekalahan sudah menghabiskan hampir setengahnya.",
+      "p3": "Perkecil lot atau pindahkan SL ke tempat yang masuk akal. Jangan melebarkan risiko demi satu trade yang terasa pasti."
+    }
+  },
+  "reward-risk": {
+    "title": "Reward : risk",
+    "when": "Saat trade pertamamu tanpa take profit (Stage 2 ke atas)",
+    "body": {
+      "p1": "Reward:risk membandingkan jarak ke TP dengan jarak ke SL. Minimal {minRR} berarti targetmu setidaknya {minRR}× risikonya.",
+      "p2": "Tanpa TP, kamu tidak tahu apakah trade ini sepadan. Rasio yang baik membuatmu tetap bertahan walau benar kurang dari separuh waktu."
+    }
+  },
+  "revenge-trading": {
+    "title": "Revenge trading",
+    "when": "Saat pertama kali sebuah trade ditandai revenge",
+    "body": {
+      "p1": "Revenge trading adalah masuk lagi dengan lot lebih besar tak lama setelah rugi, di sini dalam {window} candle, untuk “membalas” kerugian.",
+      "p2": "Keputusan itu datang dari emosi, bukan dari chart. Setelah rugi, jeda satu-dua candle, lalu tanya: apakah setup-nya benar-benar ada?"
+    }
+  },
+  "stop-out": {
+    "title": "Apa yang barusan terjadi: stop out",
+    "when": "Saat pertama kali akunmu kena stop out",
+    "body": {
+      "p1": "Equity-mu turun sampai {stopOut}% dari margin yang dipakai, jadi semua trade ditutup otomatis agar saldo tidak minus.",
+      "p2": "Ini tanda posisi terlalu besar dibanding saldo. Lot lebih kecil memberi ruang untuk salah tanpa kehilangan kendali."
+    }
+  },
+  "disiplin-score": {
+    "title": "Cara kerja skor Disiplin",
+    "when": "Saat hasil Disiplin pertamamu keluar",
+    "body": {
+      "p1": "Setiap trade yang ditutup diperiksa: SL dipasang saat masuk, risiko di bawah batas, TP dengan reward cukup, SL tidak dijauhkan, dan bukan revenge trade.",
+      "p2": "Skor trade = pemeriksaan yang lolos dibagi jumlah pemeriksaan. Disiplin akunmu adalah rata-rata {rolling} trade terakhir.",
+      "p3": "XP hanya datang dari Disiplin. Untung atau rugi tidak menambah XP: trade yang rugi tapi terencana tetap dihargai."
+    }
+  }
+}

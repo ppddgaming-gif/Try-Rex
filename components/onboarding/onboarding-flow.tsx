@@ -4,16 +4,16 @@ import { useEffect, useRef, useState, type CSSProperties } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, ArrowRight, CalendarCheck, Gauge, LineChart } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { AvatarUploader } from "@/components/account/avatar-uploader"
 import { ProfileForm } from "@/components/account/account-forms"
 import { BrandMark } from "@/components/brand-mark"
 import { Rex } from "@/components/rex-mascot"
 import {
-  LEVEL_LABELS,
-  MOTIVATION_LINES,
   ONBOARDING_VERSION,
   QUESTIONS,
-  answerLabel,
+  answerLabelKey,
+  isMotivation,
   planFrom,
   type Answers,
   type OnboardingRecord,
@@ -65,6 +65,7 @@ export function OnboardingFlow({
   const [notice, setNotice] = useState<string | null>(null)
   const [restarted, setRestarted] = useState(false)
   const synced = useRef(false)
+  const t = useTranslations("onboarding")
 
   // A guest who already finished the quiz on this device sees their plan
   // rather than the first question, until they choose to redo it.
@@ -87,10 +88,10 @@ export function OnboardingFlow({
       if (!ok) return
       setRecord(local)
       setAnswers(local.answers)
-      setNotice("Jawaban kuismu sebelumnya sudah disimpan ke akunmu.")
+      setNotice(t("carried"))
       setStep({ kind: "profile" })
     })
-  }, [account, existing, redo])
+  }, [account, existing, redo, t])
 
   async function finish(skipped: boolean) {
     const done: OnboardingRecord = {
@@ -120,29 +121,28 @@ export function OnboardingFlow({
         <div className="flex items-center justify-between gap-4">
           <BrandMark />
           <span className="font-mono text-xs text-muted-foreground lg:hidden">
-            {view.kind === "question" ? `${view.index + 1} dari ${TOTAL}` : "Selesai"}
+            {view.kind === "question" ? t("stepOf", { n: view.index + 1, total: TOTAL }) : t("done")}
           </span>
         </div>
 
         <div className="hidden flex-1 flex-col justify-center lg:flex">
-          <h2 className="enter text-[34px] font-extrabold leading-[1.08]">Lima pertanyaan, lalu kita mulai.</h2>
+          <h2 className="enter text-[34px] font-extrabold leading-[1.08]">{t("railTitle")}</h2>
           <p className="enter mt-5 leading-relaxed text-muted-foreground" style={delay(80)}>
-            Jawabannya menentukan jalur latihan dan tingkat kesulitan soal pertamamu. Tidak ada jawaban salah —
-            termasuk &ldquo;belum tahu&rdquo;.
+            {t("railBody")}
           </p>
         </div>
 
         <div className="mt-3 lg:mt-0">
           <div className="hidden items-baseline justify-between font-mono text-xs lg:flex">
             <span className="text-muted-foreground">
-              {view.kind === "question" ? `${view.index + 1} dari ${TOTAL}` : `${TOTAL} dari ${TOTAL}`}
+              {t("stepOf", { n: view.kind === "question" ? view.index + 1 : TOTAL, total: TOTAL })}
             </span>
             <span className="text-primary">{Math.round(progress * 100)}%</span>
           </div>
           <div
             className="h-1.5 w-full overflow-hidden rounded-full bg-inset ring-1 ring-border lg:mt-3"
             role="progressbar"
-            aria-label="Progres kuis"
+            aria-label={t("progressLabel")}
             aria-valuemin={0}
             aria-valuemax={100}
             aria-valuenow={Math.round(progress * 100)}
@@ -158,7 +158,7 @@ export function OnboardingFlow({
               onClick={() => finish(true)}
               className="mt-3 inline-flex min-h-11 items-center text-xs text-faint transition-colors hover:text-foreground lg:mt-5"
             >
-              Lewati kuis, pakai pengaturan standar
+              {t("skip")}
             </button>
           )}
         </div>
@@ -180,11 +180,9 @@ export function OnboardingFlow({
 
           {view.kind === "profile" && account && (
             <div key="profile" className={direction === 1 ? "step-forward" : "step-back"}>
-              <p className="eyebrow font-mono">Satu langkah lagi</p>
-              <h1 className="mt-3 text-[32px] font-extrabold leading-[1.1] sm:text-[40px]">Kenalan dulu, yuk.</h1>
-              <p className="mt-3 text-muted-foreground">
-                Foto dan username tampil di profilmu. Semuanya bisa diubah kapan saja di halaman Akun.
-              </p>
+              <p className="eyebrow font-mono">{t("profile.eyebrow")}</p>
+              <h1 className="mt-3 text-[32px] font-extrabold leading-[1.1] sm:text-[40px]">{t("profile.title")}</h1>
+              <p className="mt-3 text-muted-foreground">{t("profile.body")}</p>
               {notice && (
                 <p role="status" className="mt-4 rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-sm">
                   {notice}
@@ -202,7 +200,7 @@ export function OnboardingFlow({
                     name={account.displayName}
                     username={account.username}
                     disabledUsername={!account.profileExtras}
-                    submitLabel="Simpan dan lanjut"
+                    submitLabel={t("profile.save")}
                     onSaved={() => go({ kind: "result" }, 1)}
                   />
                 </div>
@@ -212,7 +210,7 @@ export function OnboardingFlow({
                 onClick={() => go({ kind: "result" }, 1)}
                 className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
               >
-                Nanti saja
+                {t("profile.later")}
               </button>
             </div>
           )}
@@ -255,6 +253,7 @@ function QuestionStep({
 }) {
   const q = QUESTIONS[index]
   const group = useRef<HTMLDivElement>(null)
+  const t = useTranslations("onboarding")
 
   // 1–4 pick an option, Enter moves on: the whole quiz works from the keyboard.
   useEffect(() => {
@@ -275,9 +274,9 @@ function QuestionStep({
 
   return (
     <div className={direction === 1 ? "step-forward" : "step-back"}>
-      <p className="eyebrow font-mono">Pertanyaan {index + 1}</p>
+      <p className="eyebrow font-mono">{t("question", { n: index + 1 })}</p>
       <h1 id={`q-${q.id}`} className="mt-3 text-[32px] font-extrabold leading-[1.1] sm:text-[42px]">
-        {q.title}
+        {t(`questions.${q.id}.title`)}
       </h1>
 
       <div ref={group} role="radiogroup" aria-labelledby={`q-${q.id}`} className="mt-8 flex flex-col gap-3">
@@ -315,8 +314,8 @@ function QuestionStep({
                 <span className={`radio-dot h-2.5 w-2.5 rounded-full bg-primary ${selected ? "is-on" : ""}`} />
               </span>
               <span className="min-w-0">
-                <span className="block text-[17px] font-semibold">{o.label}</span>
-                <span className="mt-0.5 block text-sm text-muted-foreground">{o.sub}</span>
+                <span className="block text-[17px] font-semibold">{t(`questions.${q.id}.options.${o.value}.label`)}</span>
+                <span className="mt-0.5 block text-sm text-muted-foreground">{t(`questions.${q.id}.options.${o.value}.sub`)}</span>
               </span>
               <kbd className="ml-auto hidden font-mono text-[11px] text-faint [@media(hover:hover)]:inline">{i + 1}</kbd>
             </button>
@@ -326,7 +325,7 @@ function QuestionStep({
 
       <div className="mt-8 flex items-center gap-5">
         <button type="button" onClick={onNext} disabled={!value} className="btn">
-          {index === TOTAL - 1 ? "Selesai" : "Lanjut"}
+          {index === TOTAL - 1 ? t("finish") : t("next")}
           <ArrowRight className="h-4 w-4" />
         </button>
         {onBack ? (
@@ -335,14 +334,14 @@ function QuestionStep({
             onClick={onBack}
             className="inline-flex min-h-11 items-center gap-1.5 text-[15px] font-semibold text-muted-foreground transition-colors hover:text-foreground"
           >
-            Kembali
+            {t("back")}
           </button>
         ) : (
           <Link
             href="/"
             className="inline-flex min-h-11 items-center gap-1.5 text-[15px] font-semibold text-muted-foreground transition-colors hover:text-foreground"
           >
-            <ArrowLeft className="h-4 w-4" /> Kembali
+            <ArrowLeft className="h-4 w-4" /> {t("back")}
           </Link>
         )}
       </div>
@@ -363,22 +362,25 @@ function ResultStep({
 }) {
   const plan = planFrom(record)
   const skipped = !record || record.skipped
+  const t = useTranslations("onboarding")
+  const tl = useTranslations("common.levels")
+  const focusKey = skipped ? null : answerLabelKey("focus", record?.answers.focus)
   const items = [
-    { icon: Gauge, label: "Mulai di tingkat", value: LEVEL_LABELS[plan.level] },
+    { icon: Gauge, label: t("result.startLevel"), value: tl(plan.level) },
+    { icon: LineChart, label: t("result.focus"), value: focusKey ? t(focusKey) : t("result.allPairs") },
     {
-      icon: LineChart,
-      label: "Fokus pair",
-      value: skipped ? "Semua pair" : (answerLabel("focus", record?.answers.focus) ?? "Semua pair"),
+      icon: CalendarCheck,
+      label: t("result.dailyGoal"),
+      value: plan.dailyGoal ? t("result.goalCount", { n: plan.dailyGoal }) : t("result.noGoal"),
     },
-    { icon: CalendarCheck, label: "Target harian", value: plan.dailyGoal ? `${plan.dailyGoal} soal` : "Tanpa target" },
   ]
 
   return (
     <div className="step-forward">
       <Rex size={84} mood="happy" className="pop-in" />
-      <p className="eyebrow mt-6 font-mono">{skipped ? "Pengaturan standar" : "Jalurmu siap"}</p>
+      <p className="eyebrow mt-6 font-mono">{skipped ? t("result.defaultEyebrow") : t("result.readyEyebrow")}</p>
       <h1 className="mt-3 text-[32px] font-extrabold leading-[1.1] sm:text-[42px]">
-        {skipped ? "Oke, kita mulai dari dasar." : "Ini jalur latihanmu."}
+        {skipped ? t("result.defaultTitle") : t("result.readyTitle")}
       </h1>
 
       <dl className="mt-8 grid gap-3 sm:grid-cols-3">
@@ -392,20 +394,20 @@ function ResultStep({
         ))}
       </dl>
 
-      {plan.motivation && MOTIVATION_LINES[plan.motivation] && (
+      {isMotivation(plan.motivation) && (
         <p className="enter mt-6 flex gap-3 rounded-2xl border border-border bg-card p-4 text-sm leading-relaxed text-muted-foreground" style={delay(360)}>
           <Rex size={28} className="mt-0.5" />
-          {MOTIVATION_LINES[plan.motivation]}
+          {t(`motivationLines.${plan.motivation}`)}
         </p>
       )}
 
       <div className="enter mt-8 flex flex-col gap-3 sm:flex-row sm:items-center" style={delay(420)}>
         <button type="button" onClick={onStart} className="btn btn-lg">
-          Mulai soal pertama <ArrowRight className="h-4 w-4" />
+          {t("result.start")} <ArrowRight className="h-4 w-4" />
         </button>
         {!signedIn && (
           <Link href="/signup" className="btn btn-ghost btn-lg">
-            Buat akun untuk simpan profil
+            {t("result.signUp")}
           </Link>
         )}
       </div>
@@ -414,7 +416,7 @@ function ResultStep({
         onClick={onRedo}
         className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
       >
-        Ulangi kuis
+        {t("result.redo")}
       </button>
     </div>
   )

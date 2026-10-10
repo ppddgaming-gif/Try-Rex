@@ -1,4 +1,5 @@
 import { Check } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { Rex } from "@/components/rex-mascot"
 import { DISIPLIN, PLAN } from "@/lib/demo/config"
 
@@ -17,15 +18,10 @@ export type GuideProgress = {
  * Rex's tips appear at the moments they matter along the way.
  */
 export function FirstTradeGuide({ progress }: { progress: GuideProgress }) {
-  const steps: [keyof GuideProgress, string][] = [
-    ["looked", "Baca chart. Tandai level penting dengan alat Garis (opsional)."],
-    ["panelOpen", "Tekan BUY atau SELL untuk membuka rencana trade."],
-    ["reasons", `Pilih ${PLAN.MIN_REASONS}–${PLAN.MAX_REASONS} alasan.`],
-    ["levels", `Atur SL dan TP. Lihat kalkulator: risiko maksimal ${DISIPLIN.MAX_RISK_PCT}% saldo.`],
-    ["placed", "Konfirmasi order."],
-    ["closed", "Majukan candle sampai trade selesai."],
-    ["reviewed", "Jawab: apakah kamu mengikuti rencanamu?"],
-  ]
+  const t = useTranslations("demo.ui.guide")
+  const values = { min: PLAN.MIN_REASONS, max: PLAN.MAX_REASONS, risk: DISIPLIN.MAX_RISK_PCT }
+  const keys: (keyof GuideProgress)[] = ["looked", "panelOpen", "reasons", "levels", "placed", "closed", "reviewed"]
+  const steps = keys.map((key) => [key, t(key, values)] as const)
   const next = steps.findIndex(([key]) => !progress[key])
 
   return (
@@ -33,9 +29,9 @@ export function FirstTradeGuide({ progress }: { progress: GuideProgress }) {
       <div className="flex items-center gap-3">
         <Rex size={36} mood="thinking" className="shrink-0" />
         <div>
-          <p className="eyebrow">Trade pertama</p>
+          <p className="eyebrow">{t("eyebrow")}</p>
           <h2 id="guide-title" className="font-display font-bold leading-tight">
-            Ikuti langkahnya bersama Rex
+            {t("title")}
           </h2>
         </div>
       </div>
@@ -58,7 +54,7 @@ export function FirstTradeGuide({ progress }: { progress: GuideProgress }) {
                   done ? "bg-primary text-primary-foreground" : current ? "border border-primary text-primary" : "border border-border",
                 ].join(" ")}
               >
-                {done ? <Check className="h-3 w-3" aria-label="Selesai" /> : i + 1}
+                {done ? <Check className="h-3 w-3" aria-label={t("done")} /> : i + 1}
               </span>
               {text}
             </li>

@@ -1,0 +1,118 @@
+{
+  "title": "Pengaturan",
+  "lead": "Atur tampilan, profil, keamanan, dan jalur latihanmu. Tampilan tersimpan di perangkat ini.",
+  "tabs": {
+    "label": "Bagian pengaturan",
+    "tampilan": "Tampilan",
+    "profil": "Profil",
+    "keamanan": "Keamanan",
+    "latihan": "Latihan"
+  },
+  "photoAndName": "Foto dan nama",
+  "email": "Email",
+  "password": "Password",
+  "signIn": {
+    "title": "Masuk dulu, yuk",
+    "body": "Kamu perlu akun untuk {what}. Gratis, dan progresmu ikut tersimpan.",
+    "profile": "mengatur foto, nama, dan username",
+    "security": "mengganti email dan password",
+    "signIn": "Masuk",
+    "signUp": "Daftar gratis"
+  },
+  "language": {
+    "title": "Bahasa",
+    "hint": "Kalau kamu masuk, pilihan ini tersimpan di akunmu. Kalau tidak, di perangkat ini."
+  },
+  "theme": {
+    "title": "Tema",
+    "hint": "Sistem mengikuti pengaturan terang/gelap perangkatmu.",
+    "dark": "Gelap",
+    "light": "Terang",
+    "system": "Sistem"
+  },
+  "font": {
+    "title": "Huruf",
+    "hint": "OpenDyslexic memberi bobot di bagian bawah huruf agar tidak terbalik-balik. Atkinson Hyperlegible dibuat supaya huruf mirip (I, l, 1) mudah dibedakan.",
+    "default": "Standar",
+    "dyslexic": "Ramah disleksia",
+    "readable": "Mudah dibaca"
+  },
+  "size": {
+    "title": "Ukuran teks",
+    "normal": "Normal",
+    "large": "Besar",
+    "xlarge": "Lebih besar"
+  },
+  "motion": {
+    "title": "Gerakan",
+    "hint": "Kurangi mematikan animasi di situs ini saja, tanpa mengubah pengaturan perangkatmu.",
+    "system": "Ikuti sistem",
+    "systemSub": "Animasi penuh, kecuali perangkat minta dikurangi",
+    "reduce": "Kurangi",
+    "reduceSub": "Tanpa animasi dan transisi"
+  },
+  "sidebar": {
+    "title": "Sidebar",
+    "hint": "Hanya di layar lebar. Bisa juga lewat tombol di atas sidebar.",
+    "expanded": "Lebar",
+    "expandedSub": "Ikon dan nama menu",
+    "collapsed": "Ciut",
+    "collapsedSub": "Ikon saja, lebih banyak ruang"
+  },
+  "profile": {
+    "save": "Simpan profil",
+    "displayName": "Nama tampilan",
+    "username": "Username",
+    "usernameIdle": "3–20 karakter: huruf kecil, angka, atau garis bawah.",
+    "checking": "Mengecek…",
+    "free": "Tersedia",
+    "taken": "Sudah dipakai",
+    "invalid": "Hanya huruf kecil, angka, dan garis bawah. 3–20 karakter.",
+    "usernameDisabled": "Username bisa diatur setelah fitur akun diaktifkan di server.",
+    "saving": "Menyimpan…",
+    "saved": "Tersimpan"
+  },
+  "emailForm": {
+    "sentTitle": "Konfirmasi email barumu",
+    "sentBody": "Kami mengirim link ke <b>{email}</b>. Emailmu baru berganti setelah link itu dibuka. Cek juga email lamamu: demi keamanan, perubahan ini mungkin perlu dikonfirmasi dari sana juga.",
+    "current": "Email sekarang: <b>{email}</b>",
+    "newEmail": "Email baru",
+    "sending": "Mengirim…",
+    "submit": "Kirim link konfirmasi"
+  },
+  "passwordForm": {
+    "current": "Password lama",
+    "new": "Password baru",
+    "repeat": "Ulangi password baru",
+    "saving": "Menyimpan…",
+    "submit": "Ganti password",
+    "saved": "Password diganti"
+  },
+  "avatar": {
+    "change": "Ganti foto profil",
+    "replace": "Ganti foto",
+    "upload": "Unggah foto",
+    "remove": "Hapus",
+    "formats": "JPG, PNG, atau WebP. Dipotong jadi persegi otomatis.",
+    "notImage": "Pilih file gambar (JPG, PNG, atau WebP).",
+    "tooBig": "Ukuran foto maksimal 10 MB.",
+    "failed": "Gagal mengunggah foto. Coba lagi."
+  },
+  "errors": {
+    "notReady": "Fitur ini belum aktif di server. Coba lagi nanti.",
+    "fillName": "Isi nama tampilanmu.",
+    "nameTooLong": "Nama maksimal 60 karakter.",
+    "usernameRule": "Username 3–20 karakter: huruf kecil, angka, atau garis bawah (_).",
+    "sessionEnded": "Sesi berakhir. Masuk lagi.",
+    "usernameTaken": "Username itu sudah dipakai. Coba yang lain.",
+    "saveFailed": "Gagal menyimpan. Coba lagi sebentar lagi.",
+    "invalidPhoto": "Foto tidak valid.",
+    "photoSaveFailed": "Gagal menyimpan foto.",
+    "invalidEmail": "Isi email baru yang valid.",
+    "sameEmail": "Itu sudah email akunmu.",
+    "fillCurrent": "Isi password lamamu.",
+    "newTooShort": "Password baru terlalu pendek. Minimal {min} karakter.",
+    "newMismatch": "Kedua password baru tidak sama.",
+    "wrongCurrent": "Password lama salah."
+  }
+}

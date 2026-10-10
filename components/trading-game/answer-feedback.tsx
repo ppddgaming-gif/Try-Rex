@@ -1,4 +1,5 @@
 import { CheckCircle2, Star, XCircle } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { GlossaryText } from "@/components/glossary/glossary-text"
 import { Rex } from "@/components/rex-mascot"
 
@@ -18,6 +19,7 @@ export function AnswerFeedback({
   message: string
   answerLabel: string
 }) {
+  const t = useTranslations("game.feedbackCard")
   return (
     <div
       role="status"
@@ -33,7 +35,7 @@ export function AnswerFeedback({
           <div className="flex items-center justify-between gap-3">
             <p className={`flex items-center gap-2 text-sm font-bold ${correct ? "text-success" : "text-danger"}`}>
               {correct ? <CheckCircle2 className="h-5 w-5" /> : <XCircle className="h-5 w-5" />}
-              {correct ? "Tepat!" : "Kurang tepat"}
+              {correct ? t("correct") : t("incorrect")}
             </p>
             {xp > 0 && (
               <span className="pop-in flex items-center gap-1 text-xs font-bold text-warning" style={{ "--enter-delay": "200ms" } as React.CSSProperties}>
@@ -48,7 +50,7 @@ export function AnswerFeedback({
 
           {!correct && (
             <p className="mt-2 text-xs text-muted-foreground">
-              Jawaban yang tepat: <span className="font-semibold text-foreground">{answerLabel}</span>
+              {t.rich("rightAnswer", { answer: answerLabel, b: (c) => <span className="font-semibold text-foreground">{c}</span> })}
             </p>
           )}
         </div>

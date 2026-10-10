@@ -1,5 +1,6 @@
-import { authed, isUuid, json } from "@/lib/demo/route"
+import { authed, errorJson, isUuid, json } from "@/lib/demo/route"
 import { saveNote } from "@/lib/demo/trading"
+import { msg } from "@/lib/i18n/translator"
 
 /**
  * POST { trade, note }: "Tambah catatan" in the journal, on any closed trade
@@ -10,8 +11,8 @@ export async function POST(request: Request) {
   if (!auth.ok) return auth.response
   const { trade, note } = auth.body
   if (!isUuid(trade) || (note != null && typeof note !== "string")) {
-    return json({ error: "Format catatan tidak valid." }, 400)
+    return errorJson(msg("errors.badNote"), 400)
   }
   const result = await saveNote(auth.userId, trade, (note as string | null | undefined) ?? null)
-  return "error" in result ? json({ error: result.error }, result.status) : json(result)
+  return "error" in result ? errorJson(result.error, result.status) : json(result)
 }

@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server"
 import { AccountDashboard } from "@/components/akun-latihan/account-dashboard"
 import { AccountEnd } from "@/components/akun-latihan/account-end"
 import { CreateAccount } from "@/components/akun-latihan/create-account"
@@ -31,10 +32,11 @@ export default async function AkunLatihanPage() {
   if (!state.ready) return <NotReadyCard />
   if (!access.open) return <SessionsLockedCard unlock={access.unlock} />
   const startingBalance = usd(ACCOUNT.STARTING_BALANCE)
+  const tLessons = await getTranslations("demo.lessons")
   if (state.accountCount === 0) return <CreateAccount startingBalance={startingBalance} leverage={ACCOUNT.LEVERAGE} />
-  if (!state.introLessonPassed) return <RequiredLesson lesson={publicLesson("intro")} />
+  if (!state.introLessonPassed) return <RequiredLesson lesson={publicLesson("intro", tLessons)} />
 
-  const risk = publicLesson("risk")
+  const risk = publicLesson("risk", tLessons)
 
   // Between accounts: the last one ran out or was reset.
   if (!state.account) {

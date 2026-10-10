@@ -1,0 +1,37 @@
+{
+  "title": "AI Evaluation",
+  "lead": "Your trading decision, evaluated by the TRY-REX AI Mentor",
+  "back": "Back to Trading Game",
+  "example": "<b>This is an example evaluation.</b> <muted>Answer a question in the Trading Game, then choose “Break this one down” to see the evaluation of your own answer.</muted>",
+  "playNow": "Play now",
+  "review": "Review Your Decision",
+  "afterEntry": "{change} after entry",
+  "meta": {
+    "pair": "Pair",
+    "timeframe": "Timeframe",
+    "period": "Period",
+    "decision": "Your decision"
+  },
+  "nextTitle": "Next Step",
+  "nextBody": "Put the advice to work in your next round: 5 new questions from real price data.",
+  "newRound": "Play a new round",
+  "explanation": {
+    "title": "TRY-REX Explains",
+    "rightBecause": "was right because:",
+    "wrongBecause": "wasn't quite right because:",
+    "suggestion": "TRY-REX Suggests"
+  },
+  "stats": {
+    "result": "Decision Result",
+    "correct": "Correct",
+    "incorrect": "Not Quite",
+    "accuracy": "Decision Accuracy",
+    "accuracyHint": "Based on how far price moved afterwards",
+    "xp": "XP",
+    "xpEarned": "Earned from this question",
+    "xpNone": "Answers that aren't right don't earn XP",
+    "time": "Time Taken",
+    "timeUnit": "Minutes : Seconds",
+    "timeNone": "Play a question to record your time"
+  }
+}

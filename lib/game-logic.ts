@@ -149,21 +149,4 @@ export function trendSlope(candles: RawCandle[]) {
 /** 1 pip: 0.0001 for 5-decimal pairs, 0.01 for 3-decimal JPY crosses. */
 export const pipSize = (digits: number) => Math.pow(10, -(digits - 1))
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"]
-
-/** Fixed UTC formatting — never locale- or timezone-dependent. */
-export function labelFor(unixSeconds: number) {
-  const d = new Date(unixSeconds * 1000)
-  const day = String(d.getUTCDate()).padStart(2, "0")
-  const hh = String(d.getUTCHours()).padStart(2, "0")
-  return `${day} ${MONTHS[d.getUTCMonth()]} ${hh}:00`
-}
-
-/** Five evenly spaced labels across the window, matching the chart's time axis. */
-export function timeLabelsFor(candles: { t: number }[], count = 5) {
-  if (candles.length === 0) return []
-  return Array.from({ length: count }, (_, i) => {
-    const idx = Math.round((candles.length - 1) * (i / (count - 1)))
-    return labelFor(candles[idx].t)
-  })
-}
+// Time-axis labels are per language: lib/challenge-text.ts (timeLabel).

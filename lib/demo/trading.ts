@@ -9,6 +9,7 @@ import type { OrderInput } from "@/lib/demo/orders"
 import type { ClosedSummary, ReviewAnswer, TradeRow, TradingState } from "@/lib/demo/state"
 import { isTipId, type TipId } from "@/lib/demo/tips"
 import { buildView, type DemoEvent, type DemoView } from "@/lib/demo/view"
+import { msg, type Msg } from "@/lib/i18n/translator"
 import type { ReasonId } from "@/lib/reasons"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { createClient } from "@/lib/supabase/server"
@@ -198,27 +199,30 @@ export async function loadTrading(userId: string): Promise<Loaded | null> {
 
 export type ActionResult = { view: DemoView } | Failure
 
-/** A refusal in words, with the current view when there is one so the screen can catch up. */
-type Failure = { error: string; status: number; view?: DemoView }
-const fail = (error: string, status = 409, view?: DemoView): Failure => ({ error, status, view })
+/**
+ * A refusal (a demo-catalogue message; the route puts it into words), with the
+ * current view when there is one so the screen can catch up.
+ */
+type Failure = { error: Msg; status: number; view?: DemoView }
+const fail = (error: Msg, status = 409, view?: DemoView): Failure => ({ error, status, view })
 
 /** Database refusals, in words. 'demo_stale' is a double tap or a second tab. */
 async function refused(userId: string, message: string | undefined): Promise<ActionResult> {
   const loaded = await loadTrading(userId)
   const view = loaded ? buildView(loaded.state) : undefined
-  if (message?.includes("demo_stale")) return fail("Akunmu baru saja berubah. Layar sudah diperbarui.", 409, view)
-  if (message?.includes("demo_open_trades")) return fail("Tutup trade yang terbuka dulu.", 409, view)
-  if (message?.includes("demo_no_session")) return fail("Chart ini sudah selesai. Ganti chart.", 409, view)
-  if (message?.includes("demo_trade_missing")) return fail("Trade ini sudah ditutup.", 409, view)
+  if (message?.includes("demo_stale")) return fail(msg("errors.stale"), 409, view)
+  if (message?.includes("demo_open_trades")) return fail(msg("errors.openTrades"), 409, view)
+  if (message?.includes("demo_no_session")) return fail(msg("errors.noSession"), 409, view)
+  if (message?.includes("demo_trade_missing")) return fail(msg("errors.tradeClosed"), 409, view)
   console.error("Akun Latihan: write failed", message)
-  return fail("Gagal menyimpan. Coba lagi sebentar lagi.", 500, view)
+  return fail(msg("errors.saveFailed"), 500, view)
 }
 
 /** Loads the state for a write: an account and the required lesson first. */
 async function ready(userId: string): Promise<TradingState | ActionResult> {
   const loaded = await loadTrading(userId)
-  if (!loaded) return fail("Buat Akun Latihan dulu.", 403)
-  if (!loaded.lessonPassed) return fail("Selesaikan materi wajib dulu.", 403)
+  if (!loaded) return fail(msg("errors.noAccount"), 403)
+  if (!loaded.lessonPassed) return fail(msg("errors.lessonFirst"), 403)
   return loaded.state
 }
 
@@ -226,7 +230,7 @@ const isResult = (v: TradingState | ActionResult): v is ActionResult => "error" 
 
 async function viewAfter(userId: string, events: DemoEvent[]): Promise<ActionResult> {
   const loaded = await loadTrading(userId)
-  if (!loaded) return fail("Akun tidak ditemukan.", 404)
+  if (!loaded) return fail(msg("errors.accountMissing"), 404)
   return { view: buildView(loaded.state, events) }
 }
 
@@ -268,7 +272,7 @@ export async function startSession(userId: string): Promise<ActionResult> {
   if (isResult(state)) return state
   const supabase = await createClient()
   const { data, error } = await supabase.from("demo_sessions").select("segment_id").eq("user_id", userId)
-  if (error) return fail("Gagal memuat chart.", 500)
+  if (error) return fail(msg("errors.chartLoadFailed"), 500)
   const seen = new Map<string, number>()
   for (const r of data ?? []) seen.set(String(r.segment_id), (seen.get(String(r.segment_id)) ?? 0) + 1)
 
@@ -359,8 +363,8 @@ export async function reviewTrade(userId: string, tradeId: string, answer: Revie
     .eq("user_id", userId)
     .eq("status", "closed")
     .select("id")
-  if (error) return fail("Gagal menyimpan.", 500)
-  if (!data?.length) return fail("Trade tidak ditemukan.", 404)
+  if (error) return fail(msg("errors.saveFailedShort"), 500)
+  if (!data?.length) return fail(msg("errors.tradeMissing"), 404)
   return viewAfter(userId, [])
 }
 
@@ -377,8 +381,8 @@ export async function saveNote(userId: string, tradeId: string, note: string | n
     .eq("user_id", userId)
     .eq("status", "closed")
     .select("id")
-  if (error) return fail("Gagal menyimpan catatan.", 500)
-  if (!data?.length) return fail("Trade tidak ditemukan.", 404)
+  if (error) return fail(msg("errors.noteFailed"), 500)
+  if (!data?.length) return fail(msg("errors.tradeMissing"), 404)
   return { ok: true as const, note: clean }
 }
 
@@ -386,8 +390,8 @@ export async function saveNote(userId: string, tradeId: string, note: string | n
 export async function saveLines(userId: string, sessionId: string, prices: number[]) {
   const loaded = await loadTrading(userId)
   const session = loaded?.state.session
-  if (!loaded || !session || session.id !== sessionId) return fail("Chart ini sudah berganti.")
-  if (prices.length > LINES.MAX_PER_SEGMENT) return fail(`Maksimal ${LINES.MAX_PER_SEGMENT} garis.`, 422)
+  if (!loaded || !session || session.id !== sessionId) return fail(msg("errors.chartChanged"))
+  if (prices.length > LINES.MAX_PER_SEGMENT) return fail(msg("errors.maxLines", { max: LINES.MAX_PER_SEGMENT }), 422)
   const clean = prices.map((p) => roundPrice(session.pair, p))
   const { error } = await createAdminClient()
     .from("demo_lines")
@@ -395,6 +399,6 @@ export async function saveLines(userId: string, sessionId: string, prices: numbe
       { user_id: userId, segment_id: session.segmentId, prices: clean, updated_at: new Date().toISOString() },
       { onConflict: "user_id,segment_id" },
     )
-  if (error) return fail("Gagal menyimpan garis.", 500)
+  if (error) return fail(msg("errors.linesFailed"), 500)
   return { ok: true as const }
 }

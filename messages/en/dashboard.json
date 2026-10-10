@@ -1,0 +1,21 @@
+{
+  "title": "Dashboard",
+  "accountSettings": "Account settings",
+  "welcomeBack": "Welcome back, {name}!",
+  "welcome": "Welcome, {name}!",
+  "lead": "A little practice every day does more than a lot all at once.",
+  "continue": "Continue practicing",
+  "skills": "Skills",
+  "skillsHint": "These fill in once questions start testing each skill separately.",
+  "recent": "Recent Activity",
+  "noActivity": "No activity yet",
+  "noActivityBody": "Your first answer will show up here.",
+  "firstSession": "Start your first session",
+  "daily": {
+    "title": "Today's Challenge",
+    "badge": "Daily Challenge",
+    "reward": "Reward",
+    "difficulty": "Difficulty",
+    "start": "Start Challenge"
+  }
+}

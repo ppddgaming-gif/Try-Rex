@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest"
 import type { StageNumber } from "@/lib/demo/config"
 import { graduationReached, progressLabel, stageAfter, stageProgress, type ScoredTrade } from "@/lib/demo/stages"
+import { translator } from "@/lib/i18n/test-messages"
+
+const id = translator("id")
+const en = translator("en")
 
 const run = (stage: StageNumber, scores: number[]): ScoredTrade[] => scores.map((score) => ({ stage, score }))
 const times = (n: number, score: number) => Array<number>(n).fill(score)
@@ -28,7 +32,11 @@ describe("progressLabel", () => {
     ["Stage 2", 2, run(2, times(3, 100)), "3/20 trade · Disiplin 100% (butuh 80%)"],
     ["Stage 3 counts toward graduation", 3, run(3, times(4, 90)), "4/30 trade · Disiplin 90% (butuh 80%)"],
   ] as [string, StageNumber, ScoredTrade[], string][])("%s", (_name, stage, trades, label) => {
-    expect(progressLabel(stageProgress(stage, trades))).toBe(label)
+    expect(progressLabel(stageProgress(stage, trades), id)).toBe(label)
+  })
+
+  it("has the same shape in English", () => {
+    expect(progressLabel(stageProgress(1, run(1, [...times(6, 80), 36])), en)).toBe("7/10 trades · Disiplin 74% (need 80%)")
   })
 })
 

@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next"
 import { Atkinson_Hyperlegible, Bricolage_Grotesque, JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google"
 import localFont from "next/font/local"
+import { NextIntlClientProvider } from "next-intl"
+import { getLocale, getTranslations } from "next-intl/server"
 import { SpotlightRoot } from "@/components/spotlight-root"
 import { DEFAULT_HTML_ATTRS, PREFS_BOOT } from "@/lib/preferences"
 import "./globals.css"
@@ -43,11 +45,13 @@ const readable = Atkinson_Hyperlegible({
   preload: false,
 })
 
-export const metadata: Metadata = {
-  // Pages set a short `title`; the template adds the brand once.
-  title: { default: "TRY-REX | AI Trading Mentor", template: "%s | TRY-REX" },
-  description:
-    "Belajar trading lewat latihan harian dengan data harga asli, evaluasi AI, dan progres yang terukur bersama TRY-REX, mentor trading AI-mu.",
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("common.meta")
+  return {
+    // Pages set a short `title`; the template adds the brand once.
+    title: { default: "TRY-REX | AI Trading Mentor", template: "%s | TRY-REX" },
+    description: t("description"),
+  }
 }
 
 export const viewport: Viewport = {
@@ -57,17 +61,18 @@ export const viewport: Viewport = {
   ],
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const locale = await getLocale()
   return (
     // The server renders the default preferences; PREFS_BOOT swaps in the
     // saved ones before first paint, so <html> legitimately differs from the
     // server HTML. suppressHydrationWarning covers <html>'s attributes only.
     <html
-      lang="id"
+      lang={locale}
       {...DEFAULT_HTML_ATTRS}
       className={`${bricolage.variable} ${jakarta.variable} ${jetbrains.variable} ${dyslexic.variable} ${readable.variable} bg-background`}
       suppressHydrationWarning
@@ -76,8 +81,11 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: PREFS_BOOT }} />
       </head>
       <body className="text-foreground">
-        {children}
-        <SpotlightRoot />
+        {/* Inherits the locale and the messages from i18n/request.ts. */}
+        <NextIntlClientProvider>
+          {children}
+          <SpotlightRoot />
+        </NextIntlClientProvider>
       </body>
     </html>
   )

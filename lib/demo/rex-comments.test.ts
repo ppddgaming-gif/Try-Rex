@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest"
 import type { Checks } from "@/lib/demo/disiplin"
-import { listId, reviewAdvice, rexComments, type CommentId, type CommentInput } from "@/lib/demo/rex-comments"
+import { reviewAdvice, rexCommentText, rexComments, type CommentId, type CommentInput, type RexComment } from "@/lib/demo/rex-comments"
+import { translator } from "@/lib/i18n/test-messages"
+import { joinList } from "@/lib/i18n/translator"
+
+const id = translator("id")
+const en = translator("en")
+/** The first comment's words, in Indonesian. */
+const first = (input: CommentInput) => rexCommentText(rexComments(input)[0], id)
 
 const pass: Checks = { slAtEntry: true, riskWithinLimit: true, rewardRisk: true, slNotWidened: true, notRevenge: true }
 
@@ -48,52 +55,75 @@ describe("rexComments: one rule each, process only", () => {
     expect(ids(over)).toEqual(expected)
   })
 
-  it("never mentions the result", () => {
-    const words = /untung|rugi \$|profit|loss|menang|kalah|hasil(?!nya)/i
-    const all = [
+  it("never mentions the result, in either language", () => {
+    const idWords = /untung|rugi \$|profit|loss|menang|kalah|hasil(?!nya)/i
+    const enWords = /profit|won|win|lost \$|loss of|result/i
+    const all: RexComment[] = [
       rexComments(planned),
       rexComments({ ...planned, reasons: ["trend-turun", "ikut-feeling"], slInitial: 1.1695, riskPct: 5, checks: { ...pass, notRevenge: false, slNotWidened: false, riskWithinLimit: false } }),
+      rexComments({ ...planned, slInitial: null, riskPct: null, rewardRisk: null, checks: { ...pass, slAtEntry: false, riskWithinLimit: false, rewardRisk: false } }),
+      rexComments({ ...planned, rewardRisk: 1.2, checks: { ...pass, rewardRisk: false } }),
     ].flat()
-    for (const c of all) expect(c.text).not.toMatch(words)
+    for (const c of all) {
+      expect(rexCommentText(c, id)).not.toMatch(idWords)
+      expect(rexCommentText(c, en)).not.toMatch(enWords)
+    }
   })
 
   it("puts numbers from the plan in the words", () => {
-    expect(rexComments({ ...planned, slInitial: 1.1688 })[0].text).toContain("SL hanya 12.0 pip dari entry")
-    expect(rexComments({ ...planned, slInitial: 1.1688 })[0].text).toContain("(20.0 pip)")
-    expect(rexComments({ ...planned, riskPct: 4.5, checks: { ...pass, riskWithinLimit: false } })[0].text).toContain("Risiko 4.5% saldo")
+    expect(first({ ...planned, slInitial: 1.1688 })).toContain("SL hanya 12.0 pip dari entry")
+    expect(first({ ...planned, slInitial: 1.1688 })).toContain("(20.0 pip)")
+    expect(first({ ...planned, riskPct: 4.5, checks: { ...pass, riskWithinLimit: false } })).toContain("Risiko 4.5% saldo")
   })
 
   it("praise names the reward only when its check passed, and asks for TP when it didn't", () => {
-    expect(rexComments(planned)[0].text).toContain("target 1.5× risiko")
+    expect(first(planned)).toContain("target 1.5× risiko")
     const noTp = rexComments({ ...planned, rewardRisk: null, checks: { ...pass, rewardRisk: false } })[0]
     expect(noTp.tone).toBe("good")
-    expect(noTp.text).not.toContain("target")
-    expect(noTp.text).toContain("pasang TP")
+    expect(rexCommentText(noTp, id)).not.toContain("target")
+    expect(rexCommentText(noTp, id)).toContain("pasang TP")
     const low = rexComments({ ...planned, rewardRisk: 1.2, checks: { ...pass, rewardRisk: false } })[0]
-    expect(low.text).toContain("target baru 1.2× risiko")
+    expect(rexCommentText(low, id)).toContain("target baru 1.2× risiko")
   })
 
   it("JPY pairs measure pips in hundredths", () => {
     const yen = rexComments({ ...planned, pair: "USDJPY", entry: 110, slInitial: 109.9, rangeAvg: 0.25 })
-    expect(yen[0].text).toContain("SL hanya 10.0 pip")
+    expect(rexCommentText(yen[0], id)).toContain("SL hanya 10.0 pip")
   })
 })
 
-describe("listId", () => {
+describe("joinList", () => {
   it.each([
-    [["a"], "a"],
-    [["a", "b"], "a dan b"],
-    [["a", "b", "c"], "a, b, dan c"],
-  ])("%j", (items, text) => {
-    expect(listId(items)).toBe(text)
+    [["a"], "a", "a"],
+    [["a", "b"], "a dan b", "a and b"],
+    [["a", "b", "c"], "a, b, dan c", "a, b, and c"],
+  ])("%j", (items, inId, inEn) => {
+    expect(joinList(items, id)).toBe(inId)
+    expect(joinList(items, en)).toBe(inEn)
+  })
+})
+
+describe("rexCommentText", () => {
+  it("quotes the reasons in the reader's language", () => {
+    const c = rexComments({ ...planned, reasons: ["trend-turun"] })[0]
+    expect(rexCommentText(c, id)).toBe(
+      "Kamu BUY dengan alasan “Trend turun”, padahal alasan itu menunjuk ke arah sebaliknya. Cek lagi apa yang sebenarnya kamu lihat di chart.",
+    )
+    expect(rexCommentText(c, en)).toContain("because of “Downtrend”")
+  })
+
+  it("praise reads the same as before", () => {
+    expect(first(planned)).toBe(
+      "Yang sudah baik: SL dipasang sejak awal dan tidak dijauhkan, risiko 1.5% saldo, target 1.5× risiko, dan alasan sejalan dengan arah BUY. Rencana seperti ini yang dinilai, apa pun hasilnya.",
+    )
   })
 })
 
 describe("reviewAdvice", () => {
   it("names the check failed most often", () => {
-    expect(reviewAdvice("riskWithinLimit")).toMatch(/^Risiko maksimal 2% saldo paling sering tidak lolos\. Mulai dari risiko/)
+    expect(reviewAdvice("riskWithinLimit", id)).toMatch(/^Risiko maksimal 2% saldo paling sering tidak lolos\. Mulai dari risiko/)
   })
   it("says the plan held when nothing failed", () => {
-    expect(reviewAdvice(null)).toContain("sudah mengikuti aturan Disiplin")
+    expect(reviewAdvice(null, id)).toContain("sudah mengikuti aturan Disiplin")
   })
 })

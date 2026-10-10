@@ -7,7 +7,6 @@ import {
   outcomeOf,
   pipSize,
   sliceGame,
-  timeLabelsFor,
   toChartCandles,
   trendSlope,
   xpForLevel,
@@ -17,12 +16,38 @@ import {
 // The chart's types and frameOf live in lib/chart-geometry (it carries no
 // data, so Akun Latihan's client code can use it without this file's candles).
 import type { Candle, Marker, Zone } from "@/lib/chart-geometry"
+import type { T } from "@/lib/i18n/translator"
 export { frameOf } from "@/lib/chart-geometry"
 export type { Candle, Marker, Zone }
 
 export type Decision = "buy" | "sell" | "wait"
 
 export type AspectKey = "trend" | "entry" | "risk" | "structure"
+
+export type Trend = "up" | "down" | "flat"
+
+/** A detected level near the last close: its price, distance in pips and touch count. */
+export type NearLevel = { price: number; pips: number; touches: number }
+
+/**
+ * What the candles say about a question, as numbers. lib/challenge-text.ts
+ * turns these into sentences in the player's language.
+ */
+export type ChallengeFacts = {
+  trend: Trend
+  /** Regression slope of the closes, in pips per candle. */
+  slopePips: number
+  /** Where the last close sits in the 30-candle range, 0–100. */
+  rangePos: number
+  lo: number
+  hi: number
+  resistance: NearLevel | null
+  support: NearLevel | null
+  /** What price did over the 15 hidden candles, in percent. */
+  changePercent: number
+  /** Unix seconds of the window's first candle (its period). */
+  startTime: number
+}
 
 export type Challenge = {
   /**
@@ -35,7 +60,6 @@ export type Challenge = {
   pair: string
   level: GameLevel
   timeframe: string
-  period: string
   digits: number
   difficulty: number
   xp: number
@@ -45,23 +69,26 @@ export type Challenge = {
   future: Candle[]
   zones: Zone[]
   currentPrice: number
-  timeLabels: string[]
-  revealTimeLabels: string[]
-  situation: string
+  /** Unix seconds of the five time-axis labels: question, and question + reveal. */
+  times: number[]
+  revealTimes: number[]
   answer: Decision
   changePercent: number
   focus: AspectKey
-  reasons: string[]
-  suggestion: string
-  feedback: Record<Decision, string>
+  facts: ChallengeFacts
 }
 
-const pct = (v: number) => `${v > 0 ? "+" : ""}${v.toFixed(2)}%`
+/** Five evenly spaced candle times across the window, matching the chart's time axis. */
+function axisTimes(candles: { t: number }[], count = 5) {
+  if (candles.length === 0) return []
+  return Array.from({ length: count }, (_, i) => candles[Math.round((candles.length - 1) * (i / (count - 1)))].t)
+}
 
 /**
  * Everything a challenge says about a setup is computed from its candles — the
  * trend slope, the detected levels, and what price actually did next. Nothing
  * here is hand-written per dataset, so the prose can never contradict the chart.
+ * The sentences themselves are assembled per language in lib/challenge-text.ts.
  */
 function buildChallenge(dataset: GameDataset, start: number): Challenge {
   const { history, future } = sliceGame(dataset.candles, start)
@@ -79,7 +106,7 @@ function buildChallenge(dataset: GameDataset, start: number): Challenge {
   const rangePos = hi === lo ? 50 : Math.round(((last - lo) / (hi - lo)) * 100)
 
   const slopePips = trendSlope(history) / pip
-  const trendWord = slopePips > 0.5 ? "naik" : slopePips < -0.5 ? "turun" : "menyamping"
+  const trend: Trend = slopePips > 0.5 ? "up" : slopePips < -0.5 ? "down" : "flat"
 
   const resistance = levels
     .filter((l) => l.type === "resistance" && l.price > last)
@@ -97,61 +124,23 @@ function buildChallenge(dataset: GameDataset, start: number): Challenge {
       ? "risk"
       : rangePos >= 80 || rangePos <= 20
         ? "structure"
-        : trendWord === "menyamping"
+        : trend === "flat"
           ? "entry"
           : "trend"
 
-  const reasons = [
-    `Trend 30 candle terakhir cenderung ${trendWord} (kemiringan ${slopePips > 0 ? "+" : ""}${slopePips.toFixed(1)} pip per candle).`,
-    resistance && toResistance !== null
-      ? `Resistance terdekat di ${resistance.price.toFixed(digits)}, sekitar ${toResistance} pip di atas harga sekarang (${resistance.touches}x tersentuh).`
-      : "Tidak ada resistance jelas di atas harga sekarang dalam 30 candle terakhir.",
-    support && toSupport !== null
-      ? `Support terdekat di ${support.price.toFixed(digits)}, sekitar ${toSupport} pip di bawah harga sekarang (${support.touches}x tersentuh).`
-      : "Tidak ada support jelas di bawah harga sekarang dalam 30 candle terakhir.",
-    `Harga berada di ${rangePos}% dari rentang 30 candle terakhir (${lo.toFixed(digits)} – ${hi.toFixed(digits)}).`,
-    `Hasilnya: 15 candle berikutnya bergerak ${pct(changePercent)} dari harga entry.`,
-  ]
-
-  const suggestionByAnswer: Record<Decision, string> = {
-    buy: `Harga naik ${pct(changePercent)} setelah titik ini, jadi BUY adalah jawabannya. Cari konfirmasi searah trend lebih dulu, dan taruh stop loss di bawah support terdekat${toSupport !== null ? ` (sekitar ${toSupport} pip)` : ""}.`,
-    sell: `Harga turun ${pct(changePercent)} setelah titik ini, jadi SELL adalah jawabannya. Tunggu penolakan di area resistance, dan taruh stop loss di atas resistance terdekat${toResistance !== null ? ` (sekitar ${toResistance} pip)` : ""}.`,
-    wait: `Harga hanya bergerak ${pct(changePercent)} — di bawah ambang ±0,1% — jadi WAIT adalah jawabannya. Saat market tidak memberi keunggulan arah, tidak mengambil posisi juga sebuah keputusan.`,
+  const facts: ChallengeFacts = {
+    trend,
+    slopePips,
+    rangePos,
+    lo,
+    hi,
+    resistance: resistance && toResistance !== null ? { price: resistance.price, pips: toResistance, touches: resistance.touches } : null,
+    support: support && toSupport !== null ? { price: support.price, pips: toSupport, touches: support.touches } : null,
+    changePercent,
+    // The window's own month, not the dataset's: later windows can cross
+    // into the next month.
+    startTime: history[0].t,
   }
-
-  const moved = Math.abs(changePercent).toFixed(2)
-  const feedback: Record<Decision, string> = {
-    buy:
-      answer === "buy"
-        ? `Tepat. Harga naik ${moved}% dalam 15 candle berikutnya.`
-        : answer === "sell"
-          ? `Kurang tepat. Harga justru turun ${moved}% setelah titik ini.`
-          : `Kurang tepat. Harga hampir tidak bergerak (${pct(changePercent)}), jadi posisi beli tidak menghasilkan apa-apa.`,
-    sell:
-      answer === "sell"
-        ? `Tepat. Harga turun ${moved}% dalam 15 candle berikutnya.`
-        : answer === "buy"
-          ? `Kurang tepat. Harga justru naik ${moved}% setelah titik ini.`
-          : `Kurang tepat. Harga hampir tidak bergerak (${pct(changePercent)}), jadi posisi jual tidak menghasilkan apa-apa.`,
-    wait:
-      answer === "wait"
-        ? `Tepat. Harga hanya bergerak ${pct(changePercent)}, masih di dalam ambang ±0,1%.`
-        : `Kurang tepat. Harga bergerak ${pct(changePercent)} — cukup besar untuk diambil, bukan dilewatkan.`,
-  }
-
-  // The window's own month, not the dataset's: later windows can cross into
-  // the next month. UTC, so server and browser print the same thing.
-  const period = periodFmt.format(new Date(history[0].t * 1000))
-
-  const situation =
-    `${dataset.pair} ${dataset.timeframe}, ${period}. Trend cenderung ${trendWord} dan harga kini di ${rangePos}% dari rentang 30 candle terakhir. ` +
-    (toResistance !== null && toSupport !== null
-      ? `Resistance ${toResistance} pip di atas, support ${toSupport} pip di bawah.`
-      : toResistance !== null
-        ? `Resistance ${toResistance} pip di atas harga sekarang.`
-        : toSupport !== null
-          ? `Support ${toSupport} pip di bawah harga sekarang.`
-          : "Tidak ada level kuat di dekat harga sekarang.")
 
   return {
     id: start === HISTORY ? dataset.id : `${dataset.id}@${start}`,
@@ -159,7 +148,6 @@ function buildChallenge(dataset: GameDataset, start: number): Challenge {
     pair: dataset.pair,
     level: dataset.level,
     timeframe: dataset.timeframe,
-    period,
     digits,
     difficulty: difficultyForLevel(dataset.level),
     xp: xpForLevel(dataset.level),
@@ -167,19 +155,14 @@ function buildChallenge(dataset: GameDataset, start: number): Challenge {
     future: toChartCandles(future),
     zones,
     currentPrice: last,
-    timeLabels: timeLabelsFor(history),
-    revealTimeLabels: timeLabelsFor([...history, ...future]),
-    situation,
+    times: axisTimes(history),
+    revealTimes: axisTimes([...history, ...future]),
     answer,
     changePercent,
     focus,
-    reasons,
-    suggestion: suggestionByAnswer[answer],
-    feedback,
+    facts,
   }
 }
-
-const periodFmt = new Intl.DateTimeFormat("id-ID", { month: "short", year: "numeric", timeZone: "UTC" })
 
 /** Candles between the starts of two windows cut from the same dataset. */
 export const WINDOW_STRIDE = 5
@@ -206,10 +189,11 @@ export const challengesForPair = (symbol: string) => challenges.filter((c) => c.
 
 export const challengesForLevel = (level: GameLevel) => challenges.filter((c) => c.level === level)
 
-export const gameLevels: { id: GameLevel; label: string; xp: number }[] = [
-  { id: "easy", label: "Mudah", xp: xpForLevel("easy") },
-  { id: "medium", label: "Menengah", xp: xpForLevel("medium") },
-  { id: "hard", label: "Sulit", xp: xpForLevel("hard") },
+/** Labels: common.levels.<id>. */
+export const gameLevels: { id: GameLevel; xp: number }[] = [
+  { id: "easy", xp: xpForLevel("easy") },
+  { id: "medium", xp: xpForLevel("medium") },
+  { id: "hard", xp: xpForLevel("hard") },
 ]
 
 export const decisionLabels: Record<Decision, string> = {
@@ -239,13 +223,13 @@ export function scoreFor(challenge: Challenge, decision: Decision) {
   }
 }
 
-/** Entry / stop / target lines implied by a decision on a given setup. */
-export function tradePlanFor(challenge: Challenge, decision: Decision): Marker[] {
+/** Entry / stop / target lines implied by a decision on a given setup. `t` is scoped to game.plan. */
+export function tradePlanFor(challenge: Challenge, decision: Decision, t: T): Marker[] {
   const resistance = challenge.zones.find((z) => z.variant === "resistance")
   const support = challenge.zones.find((z) => z.variant === "support")
   const entry: Marker = {
     price: challenge.currentPrice,
-    label: decision === "wait" ? "Harga Sekarang" : "Entry-mu",
+    label: decision === "wait" ? t("current") : t("entry"),
     variant: "neutral",
     align: "left",
   }
@@ -254,13 +238,13 @@ export function tradePlanFor(challenge: Challenge, decision: Decision): Marker[]
   return [
     {
       price: resistance.to,
-      label: buying ? "Take Profit" : "Stop Loss",
+      label: buying ? t("tp") : t("sl"),
       variant: buying ? "success" : "danger",
     },
     entry,
     {
       price: support.from,
-      label: buying ? "Stop Loss" : "Take Profit",
+      label: buying ? t("sl") : t("tp"),
       variant: buying ? "danger" : "success",
     },
   ]

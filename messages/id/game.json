@@ -1,0 +1,96 @@
+{
+  "title": "Trading Game",
+  "lead": "Data harga asli. Pilih keputusanmu, lalu lihat apa yang sebenarnya terjadi.",
+  "pool": "<num>{n}</num> soal di tingkat ini, diacak tiap ronde",
+  "focus": "Fokus: {label}",
+  "difficulty": "Tingkat kesulitan",
+  "levelOption": "{label} · {xp} XP",
+  "preparing": "Menyiapkan ronde",
+  "todaysChallenge": "Tantangan hari ini",
+  "moveIn": "{change} dalam {n} candle",
+  "revealNote": "Candle setelah garis ENTRY ({price}) adalah {n} candle yang tadi disembunyikan.",
+  "hiddenNote": "{n} candle berikutnya disembunyikan. Menurutmu harga akan ke mana dari <mono>{price}</mono>?",
+  "situationTitle": "Situasi Market",
+  "tapHint": "Ketuk kata bergaris untuk lihat artinya.",
+  "submit": "Kirim Jawaban: {decision}",
+  "pick": "Pilih BUY, SELL, atau WAIT",
+  "shortcuts": "Pintasan: <k>B</k> <k>S</k> <k>W</k> untuk memilih, <k>Enter</k> untuk kirim",
+  "newRound": "Main ronde baru",
+  "reviewLast": "Bedah soal terakhir",
+  "next": "Soal Berikutnya",
+  "reviewThis": "Bedah soal ini dulu",
+  "decisions": {
+    "label": "Keputusan trading",
+    "buy": "Harga naik",
+    "sell": "Harga turun",
+    "wait": "Tunggu dulu",
+    "right": "Jawaban benar",
+    "wrongPick": "Pilihanmu salah"
+  },
+  "feedbackCard": {
+    "correct": "Tepat!",
+    "incorrect": "Kurang tepat",
+    "rightAnswer": "Jawaban yang tepat: <b>{answer}</b>"
+  },
+  "progress": {
+    "question": "Soal <num><cur>{n}</cur><dim>/{total}</dim></num>",
+    "time": "Waktu",
+    "aria": "{answered} dari {total} soal dijawab, {correct} benar",
+    "combo": "<num>{n}x</num> beruntun",
+    "correct": "<num>{n}</num> benar"
+  },
+  "summary": {
+    "eyebrow": "Ronde selesai",
+    "good": "Mantap, bacaan chart-mu makin tajam.",
+    "keepGoing": "Setiap soal yang meleset adalah bahan belajar.",
+    "right": "Benar",
+    "xp": "XP",
+    "time": "Waktu"
+  },
+  "plan": {
+    "current": "Harga Sekarang",
+    "entry": "Entry-mu",
+    "tp": "Take Profit",
+    "sl": "Stop Loss"
+  },
+  "challenge": {
+    "trend": {
+      "up": "naik",
+      "down": "turun",
+      "flat": "menyamping"
+    },
+    "situation": {
+      "lead": "{pair} {timeframe}, {period}. Trend cenderung {trend} dan harga kini di {pos}% dari rentang 30 candle terakhir.",
+      "both": "Resistance {r} pip di atas, support {s} pip di bawah.",
+      "resistanceOnly": "Resistance {r} pip di atas harga sekarang.",
+      "supportOnly": "Support {s} pip di bawah harga sekarang.",
+      "none": "Tidak ada level kuat di dekat harga sekarang."
+    },
+    "reasons": {
+      "trend": "Trend 30 candle terakhir cenderung {trend} (kemiringan {slope} pip per candle).",
+      "resistance": "Resistance terdekat di {price}, sekitar {pips} pip di atas harga sekarang ({touches}x tersentuh).",
+      "noResistance": "Tidak ada resistance jelas di atas harga sekarang dalam 30 candle terakhir.",
+      "support": "Support terdekat di {price}, sekitar {pips} pip di bawah harga sekarang ({touches}x tersentuh).",
+      "noSupport": "Tidak ada support jelas di bawah harga sekarang dalam 30 candle terakhir.",
+      "range": "Harga berada di {pos}% dari rentang 30 candle terakhir ({lo} – {hi}).",
+      "result": "Hasilnya: 15 candle berikutnya bergerak {change} dari harga entry."
+    },
+    "suggestion": {
+      "buy": "Harga naik {change} setelah titik ini, jadi BUY adalah jawabannya. Cari konfirmasi searah trend lebih dulu, dan taruh stop loss di bawah support terdekat.",
+      "buySl": "Harga naik {change} setelah titik ini, jadi BUY adalah jawabannya. Cari konfirmasi searah trend lebih dulu, dan taruh stop loss di bawah support terdekat (sekitar {pips} pip).",
+      "sell": "Harga turun {change} setelah titik ini, jadi SELL adalah jawabannya. Tunggu penolakan di area resistance, dan taruh stop loss di atas resistance terdekat.",
+      "sellSl": "Harga turun {change} setelah titik ini, jadi SELL adalah jawabannya. Tunggu penolakan di area resistance, dan taruh stop loss di atas resistance terdekat (sekitar {pips} pip).",
+      "wait": "Harga hanya bergerak {change} — di bawah ambang ±0,1% — jadi WAIT adalah jawabannya. Saat market tidak memberi keunggulan arah, tidak mengambil posisi juga sebuah keputusan."
+    },
+    "feedback": {
+      "buyRight": "Tepat. Harga naik {moved}% dalam 15 candle berikutnya.",
+      "buyOpposite": "Kurang tepat. Harga justru turun {moved}% setelah titik ini.",
+      "buyFlat": "Kurang tepat. Harga hampir tidak bergerak ({change}), jadi posisi beli tidak menghasilkan apa-apa.",
+      "sellRight": "Tepat. Harga turun {moved}% dalam 15 candle berikutnya.",
+      "sellOpposite": "Kurang tepat. Harga justru naik {moved}% setelah titik ini.",
+      "sellFlat": "Kurang tepat. Harga hampir tidak bergerak ({change}), jadi posisi jual tidak menghasilkan apa-apa.",
+      "waitRight": "Tepat. Harga hanya bergerak {change}, masih di dalam ambang ±0,1%.",
+      "waitWrong": "Kurang tepat. Harga bergerak {change} — cukup besar untuk diambil, bukan dilewatkan."
+    }
+  }
+}

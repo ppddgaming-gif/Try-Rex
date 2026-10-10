@@ -1,3 +1,5 @@
+import createNextIntlPlugin from "next-intl/plugin"
+
 // Avatars are served from this project's Supabase Storage. Only the public
 // avatars path is allowed, not the whole host.
 const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -19,4 +21,7 @@ const nextConfig = {
   },
 }
 
-export default nextConfig
+// next-intl reads its per-request config from i18n/request.ts.
+const withNextIntl = createNextIntlPlugin("./i18n/request.ts")
+
+export default withNextIntl(nextConfig)

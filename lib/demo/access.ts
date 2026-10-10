@@ -5,8 +5,6 @@ export type Unlock = {
   sessions: number
   needed: number
   unlocked: boolean
-  /** "Selesaikan 3 sesi Trading Game dulu (1/3)", or null once open. */
-  hint: string | null
 }
 
 /**
@@ -22,6 +20,5 @@ export function unlockFromAnswers(answers: number): Unlock {
     sessions,
     needed,
     unlocked,
-    hint: unlocked ? null : `Selesaikan ${needed} sesi Trading Game dulu (${sessions}/${needed})`,
   }
 }

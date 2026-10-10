@@ -1,4 +1,5 @@
 import { Clock, Star, Target } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { Confetti } from "@/components/confetti"
 import { Rex } from "@/components/rex-mascot"
 
@@ -25,6 +26,7 @@ export function RoundSummary({
   seconds: number
 }) {
   const good = correct * 2 > total
+  const t = useTranslations("game.summary")
 
   return (
     <div
@@ -35,16 +37,16 @@ export function RoundSummary({
       <div className="flex items-center gap-3">
         <Rex size={44} mood={good ? "happy" : "thinking"} className={good ? "pop-in" : "float"} />
         <div className="min-w-0 leading-tight">
-          <p className="eyebrow">Ronde selesai</p>
+          <p className="eyebrow">{t("eyebrow")}</p>
           <p className="mt-1 text-sm font-semibold">
-            {good ? "Mantap, bacaan chart-mu makin tajam." : "Setiap soal yang meleset adalah bahan belajar."}
+            {good ? t("good") : t("keepGoing")}
           </p>
         </div>
       </div>
       <dl className="mt-4 grid grid-cols-3 gap-2 text-center">
-        <SummaryStat icon={Target} label="Benar" value={`${correct}/${total}`} />
-        <SummaryStat icon={Star} label="XP" value={`+${xp}`} tone={xp > 0 ? "text-warning" : undefined} />
-        <SummaryStat icon={Clock} label="Waktu" value={clock(seconds)} />
+        <SummaryStat icon={Target} label={t("right")} value={`${correct}/${total}`} />
+        <SummaryStat icon={Star} label={t("xp")} value={`+${xp}`} tone={xp > 0 ? "text-warning" : undefined} />
+        <SummaryStat icon={Clock} label={t("time")} value={clock(seconds)} />
       </dl>
     </div>
   )

@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { CircleCheck, Target } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { attemptsPerDay } from "@/lib/progress/derive"
 import { useProgress, useToday } from "@/lib/progress/use-progress"
 import { Card } from "@/components/card"
@@ -24,6 +25,7 @@ export function DailyGoal({ goal }: { goal: number | null }) {
   const done = ready ? (attemptsPerDay(progress.attempts).get(today) ?? 0) : 0
   const ratio = goal ? Math.min(1, done / goal) : 0
   const met = goal !== null && done >= goal
+  const t = useTranslations("progress.goal")
 
   return (
     <Card className="flex items-center gap-5">
@@ -62,28 +64,30 @@ export function DailyGoal({ goal }: { goal: number | null }) {
 
       <div className="min-w-0">
         <h2 className="flex items-center gap-2 text-base font-semibold">
-          <Target className="h-4 w-4 text-primary" aria-hidden="true" /> Target hari ini
+          <Target className="h-4 w-4 text-primary" aria-hidden="true" /> {t("title")}
         </h2>
         {!ready ? (
           <Skeleton className="mt-2 h-4 w-40" />
         ) : goal ? (
           <p className="mt-1 text-sm text-muted-foreground">
-            <span className="font-mono font-semibold text-foreground">
-              {Math.min(done, goal)} / {goal}
-            </span>{" "}
-            soal{met ? " · target tercapai" : ""}
+            {t.rich("count", {
+              done: Math.min(done, goal),
+              goal,
+              b: (c) => <span className="font-mono font-semibold text-foreground">{c}</span>,
+            })}
+            {met ? t("met") : ""}
           </p>
         ) : (
           <p className="mt-1 text-sm text-muted-foreground">
-            Belum ada target.{" "}
+            {t("none")}{" "}
             <Link href="/start?ulang=1&next=/dashboard" className="font-semibold text-primary hover:text-primary-hi">
-              Atur di kuis awal
+              {t("setUp")}
             </Link>
           </p>
         )}
         {ready && goal && !met && (
           <p className="mt-0.5 text-xs text-faint">
-            {goal - done === 1 ? "Satu soal lagi." : `${goal - done} soal lagi.`}
+            {t("left", { n: goal - done })}
           </p>
         )}
       </div>

@@ -1,11 +1,13 @@
 "use client"
 
 import { useRef, useState } from "react"
+import { useLocale, useTranslations } from "next-intl"
 import { CandlestickChart } from "@/components/candlestick-chart"
 import { CHART, PLOT_H, PLOT_W, candleX, frameOf, priceToY, slotWidth, yToPrice, type Frame, type Marker } from "@/lib/chart-geometry"
 import { LINES } from "@/lib/demo/config"
 import type { TradeView, ViewCandle } from "@/lib/demo/view"
-import { timeLabelsFor } from "@/lib/game-logic"
+import { timeLabels } from "@/lib/challenge-text"
+import type { Locale } from "@/lib/i18n/locale"
 
 type Props = {
   candles: ViewCandle[]
@@ -21,6 +23,12 @@ type Props = {
   revealFrom?: number
 }
 
+/** Five evenly spaced candle times, matching the chart's time axis. */
+function axisTimes(candles: { t: number }[], count = 5) {
+  if (candles.length === 0) return []
+  return Array.from({ length: count }, (_, i) => candles[Math.round((candles.length - 1) * (i / (count - 1)))].t)
+}
+
 // Pixels (on screen) within which a tap grabs an existing line.
 const GRAB_PX = 14
 
@@ -34,6 +42,8 @@ export function TradeChart({ candles, digits, open, closed, draft, lines, drawin
   // While dragging: the line's index, its live price, and the frame at the
   // start of the drag (held still so the line doesn't chase a rescaling axis).
   const [drag, setDrag] = useState<{ index: number; price: number; frame: Frame } | null>(null)
+  const t = useTranslations("demo.ui.chart")
+  const locale = useLocale() as Locale
 
   const shownLines = drag ? lines.map((p, i) => (i === drag.index ? drag.price : p)) : lines
   const levels = [
@@ -45,13 +55,13 @@ export function TradeChart({ candles, digits, open, closed, draft, lines, drawin
   const y = (p: number) => priceToY(p, frame.min, frame.max)
 
   const markers: Marker[] = [
-    ...open.flatMap((t): Marker[] => [
-      { price: t.entry, label: `Entry #${t.number}`, variant: "neutral" },
-      ...(t.sl !== null ? [{ price: t.sl, label: `SL #${t.number}`, variant: "danger" as const }] : []),
-      ...(t.tp !== null ? [{ price: t.tp, label: `TP #${t.number}`, variant: "success" as const }] : []),
+    ...open.flatMap((tr): Marker[] => [
+      { price: tr.entry, label: t("entry", { n: tr.number }), variant: "neutral" },
+      ...(tr.sl !== null ? [{ price: tr.sl, label: t("sl", { n: tr.number }), variant: "danger" as const }] : []),
+      ...(tr.tp !== null ? [{ price: tr.tp, label: t("tp", { n: tr.number }), variant: "success" as const }] : []),
     ]),
-    ...(draft?.sl != null ? [{ price: draft.sl, label: "SL (rencana)", variant: "danger" as const, align: "left" as const }] : []),
-    ...(draft?.tp != null ? [{ price: draft.tp, label: "TP (rencana)", variant: "success" as const, align: "left" as const }] : []),
+    ...(draft?.sl != null ? [{ price: draft.sl, label: t("slPlan"), variant: "danger" as const, align: "left" as const }] : []),
+    ...(draft?.tp != null ? [{ price: draft.tp, label: t("tpPlan"), variant: "success" as const, align: "left" as const }] : []),
   ]
 
   const count = candles.length
@@ -63,25 +73,25 @@ export function TradeChart({ candles, digits, open, closed, draft, lines, drawin
   const overlay = (
     <g aria-hidden="true">
       {/* Entry and exit of this chart's trades. */}
-      {[...closed, ...open].map((t) => {
-        const ex = candleX(t.entryIndex, count)
-        if (!t.exit) return <g key={t.id}>{tick(ex, t.entry, "var(--foreground)")}</g>
-        const xx = candleX(Math.min(t.exit.index, count - 1), count)
-        const color = t.pnl >= 0 ? "var(--success)" : "var(--danger)"
+      {[...closed, ...open].map((tr) => {
+        const ex = candleX(tr.entryIndex, count)
+        if (!tr.exit) return <g key={tr.id}>{tick(ex, tr.entry, "var(--foreground)")}</g>
+        const xx = candleX(Math.min(tr.exit.index, count - 1), count)
+        const color = tr.pnl >= 0 ? "var(--success)" : "var(--danger)"
         return (
-          <g key={t.id}>
+          <g key={tr.id}>
             <line
               x1={ex}
               x2={xx}
-              y1={y(t.entry)}
-              y2={y(t.exit.price)}
+              y1={y(tr.entry)}
+              y2={y(tr.exit.price)}
               stroke={color}
               strokeWidth={1.5}
               strokeDasharray="5 4"
               vectorEffect="non-scaling-stroke"
             />
-            {tick(ex, t.entry, "var(--foreground)")}
-            {tick(xx, t.exit.price, color)}
+            {tick(ex, tr.entry, "var(--foreground)")}
+            {tick(xx, tr.exit.price, color)}
           </g>
         )
       })}
@@ -152,7 +162,7 @@ export function TradeChart({ candles, digits, open, closed, draft, lines, drawin
         min={frame.min}
         max={frame.max}
         priceTicks={frame.priceTicks}
-        timeLabels={timeLabelsFor(candles)}
+        timeLabels={timeLabels(axisTimes(candles), locale)}
         markers={markers}
         currentPrice={last?.c}
         digits={digits}

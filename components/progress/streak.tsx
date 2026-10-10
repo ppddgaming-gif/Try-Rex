@@ -1,6 +1,7 @@
 "use client"
 
 import { Flame } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { liveStreak, playedToday } from "@/lib/progress/derive"
 import { useProgress, useToday } from "@/lib/progress/use-progress"
 import { Skeleton } from "@/components/progress/skeleton"
@@ -12,6 +13,8 @@ import { Skeleton } from "@/components/progress/skeleton"
 export function Streak({ compact = false }: { compact?: boolean }) {
   const progress = useProgress()
   const today = useToday()
+  const t = useTranslations("progress.streak")
+  const num = (c: React.ReactNode) => <span className="font-mono font-bold tabular-nums">{c}</span>
 
   if (!progress || !today) {
     return compact ? (
@@ -29,18 +32,18 @@ export function Streak({ compact = false }: { compact?: boolean }) {
 
   const current = liveStreak(progress.streak, today)
   const lit = playedToday(progress.streak, today)
-  const hint = current === 0 ? "Mulai streak-mu hari ini" : lit ? "Hari ini sudah latihan" : "Main 1 soal hari ini"
+  const hint = current === 0 ? t("start") : lit ? t("doneToday") : t("playOne")
   const flame = lit ? "flicker fill-warning text-warning" : "text-muted-foreground"
 
   if (compact) {
     return (
       <div
         className="flex min-h-11 items-center gap-1.5 rounded-xl border border-border bg-card px-3"
-        title={`${hint} · Terbaik: ${progress.streak.best} hari`}
+        title={t("compactTitle", { hint, best: progress.streak.best })}
       >
         <Flame className={`h-5 w-5 ${flame}`} aria-hidden="true" />
         <span className="font-mono text-base font-bold tabular-nums">{current}</span>
-        <span className="sr-only">hari berturut-turut. {hint}.</span>
+        <span className="sr-only">{t("srDays", { hint })}</span>
       </div>
     )
   }
@@ -52,11 +55,11 @@ export function Streak({ compact = false }: { compact?: boolean }) {
       </span>
       <div className="min-w-0 leading-tight">
         <p className="text-sm">
-          <span className="font-mono font-bold tabular-nums">{current}</span> hari berturut-turut
+          {t.rich("days", { n: current, num })}
         </p>
         <p className="mt-0.5 text-xs text-muted-foreground">{hint}</p>
         <p className="mt-0.5 text-xs text-muted-foreground">
-          Terbaik: <span className="font-mono tabular-nums">{progress.streak.best}</span> hari
+          {t.rich("best", { n: progress.streak.best, num: (c) => <span className="font-mono tabular-nums">{c}</span> })}
         </p>
       </div>
     </div>

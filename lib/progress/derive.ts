@@ -1,3 +1,4 @@
+import type { T } from "@/lib/i18n/translator"
 import { emptyProgress, type Attempt, type Progress, type Streak } from "@/lib/progress/types"
 
 // Every number the UI shows is derived here from the stored attempts. No
@@ -103,15 +104,16 @@ const DECISION_WORD = { buy: "BUY", sell: "SELL", wait: "WAIT" } as const
 
 /**
  * One factual line about how the player has answered, counted from the
- * attempts. It states what happened; it gives no advice.
+ * attempts. It states what happened; it gives no advice. `t` is scoped to
+ * progress.insight.
  */
-export function insightLine(p: Progress) {
+export function insightLine(p: Progress, t: T) {
   const n = totalChallenges(p)
   if (n < INSIGHT_UNLOCK) return null
   const tally = { buy: 0, sell: 0, wait: 0 }
   for (const a of p.attempts) tally[a.decision]++
   const top = (Object.keys(tally) as (keyof typeof tally)[]).sort((a, b) => tally[b] - tally[a])
   const tie = tally[top[0]] === tally[top[1]]
-  const pick = tie ? "Pilihanmu cukup merata." : `Kamu paling sering pilih ${DECISION_WORD[top[0]]}.`
-  return `${n} soal, ${correctCount(p)} tepat. ${pick}`
+  const pick = tie ? t("even") : t("most", { decision: DECISION_WORD[top[0]] })
+  return t("line", { n, correct: correctCount(p), pick })
 }

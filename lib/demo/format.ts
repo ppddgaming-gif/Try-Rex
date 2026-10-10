@@ -1,4 +1,5 @@
 import { instrument } from "@/lib/demo/instruments"
+import type { T } from "@/lib/i18n/translator"
 
 // Display formatting for Akun Latihan. Dots for decimals, like the prices
 // elsewhere in the app. Pure.
@@ -21,5 +22,26 @@ export const lot = (value: number) => value.toFixed(2)
 
 export const price = (pair: string, value: number) => value.toFixed(instrument(pair).digits)
 
-/** An account's status, as the journal and Riwayat akun name it. */
-export const ACCOUNT_STATUS: Record<"active" | "habis" | "reset", string> = { active: "aktif", habis: "habis", reset: "direset" }
+/** An account's status, as the journal and Riwayat akun name it. `t` is the root translator. */
+export const accountStatus = (status: "active" | "habis" | "reset", t: T) => t(`demo.status.${status}`)
+
+/**
+ * A ledger row's label in the reader's language. The database keeps the label
+ * written when the row was booked (in Indonesian); the words are rebuilt here
+ * from its kind and the trade number in it. Trade rows ("Trade #1 · BUY
+ * EURUSD") need no words and stay as stored, as does anything unknown.
+ */
+export function ledgerLabel(row: { kind: string; label: string }, t: T) {
+  const n = /#(\d+)/.exec(row.label)?.[1]
+  switch (row.kind) {
+    case "deposit":
+      return t("demo.ledger.deposit")
+    case "adjustment":
+      return t("demo.ledger.adjustment")
+    case "commission":
+    case "swap":
+      return n ? t(`demo.ledger.${row.kind}`, { n }) : row.label
+    default:
+      return row.label
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "title": "Trading Game",
+  "lead": "Real price data. Make your call, then see what actually happened.",
+  "pool": "<num>{n}</num> questions at this level, shuffled every round",
+  "focus": "Focus: {label}",
+  "difficulty": "Difficulty",
+  "levelOption": "{label} · {xp} XP",
+  "preparing": "Getting the round ready",
+  "todaysChallenge": "Today's challenge",
+  "moveIn": "{change} over {n} candles",
+  "revealNote": "The candles after the ENTRY line ({price}) are the {n} candles that were hidden.",
+  "hiddenNote": "The next {n} candles are hidden. Where do you think price goes from <mono>{price}</mono>?",
+  "situationTitle": "Market Situation",
+  "tapHint": "Tap an underlined word to see what it means.",
+  "submit": "Submit answer: {decision}",
+  "pick": "Pick BUY, SELL or WAIT",
+  "shortcuts": "Shortcuts: <k>B</k> <k>S</k> <k>W</k> to pick, <k>Enter</k> to submit",
+  "newRound": "Play a new round",
+  "reviewLast": "Break down the last question",
+  "next": "Next question",
+  "reviewThis": "Break this one down first",
+  "decisions": {
+    "label": "Trading decision",
+    "buy": "Price goes up",
+    "sell": "Price goes down",
+    "wait": "Hold off",
+    "right": "Correct answer",
+    "wrongPick": "Your pick was wrong"
+  },
+  "feedbackCard": {
+    "correct": "Correct!",
+    "incorrect": "Not quite",
+    "rightAnswer": "The right answer: <b>{answer}</b>"
+  },
+  "progress": {
+    "question": "Question <num><cur>{n}</cur><dim>/{total}</dim></num>",
+    "time": "Time",
+    "aria": "{answered} of {total} questions answered, {correct} correct",
+    "combo": "<num>{n}x</num> streak",
+    "correct": "<num>{n}</num> correct"
+  },
+  "summary": {
+    "eyebrow": "Round complete",
+    "good": "Nice, your chart reading is getting sharper.",
+    "keepGoing": "Every miss is something to learn from.",
+    "right": "Correct",
+    "xp": "XP",
+    "time": "Time"
+  },
+  "plan": {
+    "current": "Current price",
+    "entry": "Your entry",
+    "tp": "Take Profit",
+    "sl": "Stop Loss"
+  },
+  "challenge": {
+    "trend": {
+      "up": "upward",
+      "down": "downward",
+      "flat": "sideways"
+    },
+    "situation": {
+      "lead": "{pair} {timeframe}, {period}. The trend leans {trend} and price now sits at {pos}% of the last 30 candles' range.",
+      "both": "Resistance is {r} pips above, support {s} pips below.",
+      "resistanceOnly": "Resistance is {r} pips above the current price.",
+      "supportOnly": "Support is {s} pips below the current price.",
+      "none": "There's no strong level near the current price."
+    },
+    "reasons": {
+      "trend": "Over the last 30 candles the trend leans {trend} (a slope of {slope} pips per candle).",
+      "resistance": "The nearest resistance is at {price}, about {pips} pips above the current price (touched {touches}x).",
+      "noResistance": "There's no clear resistance above the current price in the last 30 candles.",
+      "support": "The nearest support is at {price}, about {pips} pips below the current price (touched {touches}x).",
+      "noSupport": "There's no clear support below the current price in the last 30 candles.",
+      "range": "Price sits at {pos}% of the last 30 candles' range ({lo} – {hi}).",
+      "result": "The result: over the next 15 candles price moved {change} from the entry price."
+    },
+    "suggestion": {
+      "buy": "Price rose {change} after this point, so BUY is the answer. Look for confirmation in the direction of the trend first, and put your stop loss below the nearest support.",
+      "buySl": "Price rose {change} after this point, so BUY is the answer. Look for confirmation in the direction of the trend first, and put your stop loss below the nearest support (about {pips} pips).",
+      "sell": "Price fell {change} after this point, so SELL is the answer. Wait for a rejection at resistance, and put your stop loss above the nearest resistance.",
+      "sellSl": "Price fell {change} after this point, so SELL is the answer. Wait for a rejection at resistance, and put your stop loss above the nearest resistance (about {pips} pips).",
+      "wait": "Price only moved {change}, inside the ±0.1% threshold, so WAIT is the answer. When the market gives no edge in either direction, staying out is a decision too."
+    },
+    "feedback": {
+      "buyRight": "Correct. Price rose {moved}% over the next 15 candles.",
+      "buyOpposite": "Not quite. Price actually fell {moved}% after this point.",
+      "buyFlat": "Not quite. Price barely moved ({change}), so a buy wouldn't have made anything.",
+      "sellRight": "Correct. Price fell {moved}% over the next 15 candles.",
+      "sellOpposite": "Not quite. Price actually rose {moved}% after this point.",
+      "sellFlat": "Not quite. Price barely moved ({change}), so a sell wouldn't have made anything.",
+      "waitRight": "Correct. Price only moved {change}, still inside the ±0.1% threshold.",
+      "waitWrong": "Not quite. Price moved {change}, big enough to trade rather than sit out."
+    }
+  }
+}

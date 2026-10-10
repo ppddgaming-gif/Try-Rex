@@ -3,6 +3,7 @@
 import { startTransition, useEffect, useEffectEvent, useMemo, useState, ViewTransition } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useLocale, useTranslations } from "next-intl"
 import { Card } from "@/components/card"
 import { GlossaryText } from "@/components/glossary/glossary-text"
 import { CandlestickChart } from "@/components/candlestick-chart"
@@ -13,6 +14,8 @@ import { DecisionButtons } from "@/components/trading-game/decision-buttons"
 import { QuestionProgress } from "@/components/trading-game/question-progress"
 import { RoundSummary } from "@/components/trading-game/round-summary"
 import { recordAttempt, useProgress } from "@/lib/progress/use-progress"
+import { challengeText } from "@/lib/challenge-text"
+import type { Locale } from "@/lib/i18n/locale"
 import type { GameLevel } from "@/lib/game-data"
 import { FUTURE } from "@/lib/game-logic"
 import {
@@ -25,7 +28,7 @@ import {
   type Challenge,
   type Decision,
 } from "@/lib/mock-data"
-import { answerLabel, planFrom, type OnboardingRecord } from "@/lib/onboarding"
+import { answerLabelKey, planFrom, type OnboardingRecord } from "@/lib/onboarding"
 import { buildRound, newSeed } from "@/lib/round"
 import { useOnboarding } from "@/lib/use-onboarding"
 import { ArrowRight, BrainCircuit, CalendarCheck, RotateCcw, Sparkles, Target } from "lucide-react"
@@ -64,6 +67,7 @@ export function TradingGame({
   const [game, setGame] = useState<Game | null>(null)
   const featured = challengeById(featuredId)
   const plan = planFrom(record ?? null)
+  const tOnboarding = useTranslations("onboarding")
 
   useEffect(() => {
     if (record !== null) return
@@ -93,13 +97,14 @@ export function TradingGame({
   }, [ready, game])
 
   if (!game) return <GameSkeleton />
+  const labelOf = (key: string | null) => (key ? tOnboarding(key) : null)
 
   return (
     <GameRound
       key={game.seed}
       game={game}
       featuredId={featured?.id}
-      focusLabel={record && !record.skipped ? answerLabel("focus", record.answers.focus) : null}
+      focusLabel={record && !record.skipped ? labelOf(answerLabelKey("focus", record.answers.focus)) : null}
       onNewRound={(level) => deal(level)}
     />
   )
@@ -125,6 +130,10 @@ function GameRound({
   const [seconds, setSeconds] = useState(0)
 
   const challenge = round[index]
+  const t = useTranslations("game")
+  const tc = useTranslations("game.challenge")
+  const locale = useLocale() as Locale
+  const text = useMemo(() => challengeText(challenge, tc, locale), [challenge, tc, locale])
 
   // After answering, the 15 future candles are appended so you see what happened.
   const shown = useMemo(
@@ -230,11 +239,11 @@ function GameRound({
               {challenge.timeframe}
             </span>
             <span className="rounded-lg border border-border bg-muted/40 px-3 py-1.5 text-xs text-muted-foreground">
-              {challenge.period}
+              {text.period}
             </span>
             {isFeatured && (
               <span className="flex items-center gap-1.5 rounded-lg bg-primary/15 px-3 py-1.5 text-xs font-semibold text-primary">
-                <CalendarCheck className="h-3.5 w-3.5" aria-hidden="true" /> Tantangan hari ini
+                <CalendarCheck className="h-3.5 w-3.5" aria-hidden="true" /> {t("todaysChallenge")}
               </span>
             )}
             {submitted && (
@@ -248,8 +257,10 @@ function GameRound({
                       : "bg-muted text-muted-foreground",
                 ].join(" ")}
               >
-                {challenge.changePercent > 0 ? "+" : ""}
-                {challenge.changePercent.toFixed(2)}% dalam {FUTURE} candle
+                {t("moveIn", {
+                  change: `${challenge.changePercent > 0 ? "+" : ""}${challenge.changePercent.toFixed(2)}%`,
+                  n: FUTURE,
+                })}
               </span>
             )}
           </div>
@@ -266,7 +277,7 @@ function GameRound({
                 min={frame.min}
                 max={frame.max}
                 priceTicks={frame.priceTicks}
-                timeLabels={submitted ? challenge.revealTimeLabels : challenge.timeLabels}
+                timeLabels={submitted ? text.revealTimeLabels : text.timeLabels}
                 zones={challenge.zones}
                 currentPrice={challenge.currentPrice}
                 digits={challenge.digits}
@@ -277,15 +288,13 @@ function GameRound({
           </ViewTransition>
           <p className="mt-2 text-xs text-muted-foreground">
             {submitted ? (
-              <>
-                Candle setelah garis ENTRY ({challenge.currentPrice.toFixed(challenge.digits)}) adalah {FUTURE} candle
-                yang tadi disembunyikan.
-              </>
+              t("revealNote", { price: challenge.currentPrice.toFixed(challenge.digits), n: FUTURE })
             ) : (
-              <>
-                {FUTURE} candle berikutnya disembunyikan. Menurutmu harga akan ke mana dari{" "}
-                <span className="font-mono text-foreground">{challenge.currentPrice.toFixed(challenge.digits)}</span>?
-              </>
+              t.rich("hiddenNote", {
+                n: FUTURE,
+                price: challenge.currentPrice.toFixed(challenge.digits),
+                mono: (c) => <span className="font-mono text-foreground">{c}</span>,
+              })
             )}
           </p>
         </Card>
@@ -294,11 +303,11 @@ function GameRound({
         <div className="flex flex-col gap-4 lg:col-start-2 lg:row-start-2">
           <ViewTransition key={challenge.id} name="game-situation" share="auto" default="none">
             <Card className="enter" style={{ "--enter-delay": "80ms" } as React.CSSProperties}>
-              <h2 className="text-base font-semibold">Situasi Market</h2>
+              <h2 className="text-base font-semibold">{t("situationTitle")}</h2>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                <GlossaryText text={challenge.situation} />
+                <GlossaryText text={text.situation} />
               </p>
-              <p className="mt-3 text-[11px] text-faint">Ketuk kata bergaris untuk lihat artinya.</p>
+              <p className="mt-3 text-[11px] text-faint">{t("tapHint")}</p>
             </Card>
           </ViewTransition>
 
@@ -312,11 +321,11 @@ function GameRound({
           {!submitted && (
             <>
               <button onClick={submit} disabled={!choice} className="btn w-full">
-                {choice ? `Kirim Jawaban: ${decisionLabels[choice]}` : "Pilih BUY, SELL, atau WAIT"}
+                {choice ? t("submit", { decision: decisionLabels[choice] }) : t("pick")}
               </button>
               {/* Shortcuts only mean something with a keyboard. */}
               <p className="hidden text-center text-xs text-faint [@media(hover:hover)]:block">
-                Pintasan: <Kbd>B</Kbd> <Kbd>S</Kbd> <Kbd>W</Kbd> untuk memilih, <Kbd>Enter</Kbd> untuk kirim
+                {t.rich("shortcuts", { k: (c) => <Kbd>{String(c)}</Kbd> })}
               </p>
             </>
           )}
@@ -326,7 +335,7 @@ function GameRound({
               <AnswerFeedback
                 correct={result.correct}
                 xp={result.xp}
-                message={challenge.feedback[choice]}
+                message={text.feedback[choice]}
                 answerLabel={decisionLabels[challenge.answer]}
               />
 
@@ -338,19 +347,19 @@ function GameRound({
                 {last ? (
                   <>
                     <button onClick={() => onNewRound(level)} className="btn w-full">
-                      <RotateCcw className="h-4 w-4" /> Main ronde baru
+                      <RotateCcw className="h-4 w-4" /> {t("newRound")}
                     </button>
                     <Link href={evaluationHref} className="btn btn-ghost w-full">
-                      <BrainCircuit className="h-4 w-4" /> Bedah soal terakhir
+                      <BrainCircuit className="h-4 w-4" /> {t("reviewLast")}
                     </Link>
                   </>
                 ) : (
                   <>
                     <button onClick={next} className="btn w-full">
-                      Soal Berikutnya <ArrowRight className="h-4 w-4" />
+                      {t("next")} <ArrowRight className="h-4 w-4" />
                     </button>
                     <Link href={evaluationHref} className="btn btn-ghost w-full">
-                      <BrainCircuit className="h-4 w-4" /> Bedah soal ini dulu
+                      <BrainCircuit className="h-4 w-4" /> {t("reviewThis")}
                     </Link>
                   </>
                 )}
@@ -373,23 +382,21 @@ function GameHeader({
   focusLabel?: string | null
 }) {
   const pool = level ? challenges.filter((c) => c.level === level).length : null
+  const t = useTranslations("game")
+  const tl = useTranslations("common.levels")
   return (
     <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0">
-        <h1 className="text-2xl font-bold tracking-tight">Trading Game</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Data harga asli. Pilih keputusanmu, lalu lihat apa yang sebenarnya terjadi.
-        </p>
+        <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
+        <p className="mt-1 text-sm text-muted-foreground">{t("lead")}</p>
         {(focusLabel || pool) && (
           <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-faint">
             {pool && (
-              <span>
-                <span className="font-mono text-muted-foreground">{pool}</span> soal di tingkat ini, diacak tiap ronde
-              </span>
+              <span>{t.rich("pool", { n: pool, num: (c) => <span className="font-mono text-muted-foreground">{c}</span> })}</span>
             )}
             {focusLabel && (
               <span className="flex items-center gap-1">
-                <Sparkles className="h-3 w-3 text-primary" aria-hidden="true" /> Fokus: {focusLabel}
+                <Sparkles className="h-3 w-3 text-primary" aria-hidden="true" /> {t("focus", { label: focusLabel })}
               </span>
             )}
           </p>
@@ -397,13 +404,13 @@ function GameHeader({
       </div>
       {level && onLevel ? (
         <SelectMenu
-          label="Tingkat kesulitan"
+          label={t("difficulty")}
           className="w-full sm:w-60"
           value={level}
           onChange={(v) => onLevel(v as GameLevel)}
           options={gameLevels.map((l) => ({
             value: l.id,
-            label: `${l.label} · ${l.xp} XP`,
+            label: t("levelOption", { label: tl(l.id), xp: l.xp }),
             prefix: <Target className="h-4 w-4" />,
           }))}
         />
@@ -416,8 +423,9 @@ function GameHeader({
 
 /** Same footprint as the game, shown while the round is being dealt. */
 function GameSkeleton() {
+  const t = useTranslations("game")
   return (
-    <div className="mx-auto max-w-7xl px-5 py-6 lg:px-8" aria-busy="true" aria-label="Menyiapkan ronde">
+    <div className="mx-auto max-w-7xl px-5 py-6 lg:px-8" aria-busy="true" aria-label={t("preparing")}>
       <GameHeader level={null} />
       <div className="mt-6 grid grid-cols-1 items-start gap-4 lg:grid-cols-[1fr_340px] lg:grid-rows-[auto_1fr]">
         <div className="lg:col-start-2 lg:row-start-1">

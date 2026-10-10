@@ -3,6 +3,7 @@
 import { useRef, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { Camera, LoaderCircle, Trash2 } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { Avatar } from "@/components/avatar"
 import { setAvatar } from "@/lib/profile-actions"
 import { createClient } from "@/lib/supabase/client"
@@ -48,12 +49,13 @@ export function AvatarUploader({
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [, startTransition] = useTransition()
+  const t = useTranslations("settings.avatar")
   const shown = preview ?? src
 
   async function upload(file: File) {
     setError(null)
-    if (!file.type.startsWith("image/")) return setError("Pilih file gambar (JPG, PNG, atau WebP).")
-    if (file.size > MAX_INPUT) return setError("Ukuran foto maksimal 10 MB.")
+    if (!file.type.startsWith("image/")) return setError(t("notImage"))
+    if (file.size > MAX_INPUT) return setError(t("tooBig"))
 
     setBusy(true)
     try {
@@ -70,7 +72,7 @@ export function AvatarUploader({
       startTransition(() => router.refresh())
     } catch (e) {
       setPreview(null)
-      setError(e instanceof Error && e.message.length < 80 ? e.message : "Gagal mengunggah foto. Coba lagi.")
+      setError(e instanceof Error && e.message.length < 80 ? e.message : t("failed"))
     } finally {
       setBusy(false)
     }
@@ -92,7 +94,7 @@ export function AvatarUploader({
         type="button"
         onClick={() => input.current?.click()}
         disabled={disabled || busy}
-        aria-label="Ganti foto profil"
+        aria-label={t("change")}
         className="group relative rounded-full transition-transform duration-300 ease-out-expo enabled:hover:scale-[1.03] disabled:cursor-not-allowed"
       >
         <Avatar src={shown} name={name} size={96} />
@@ -109,15 +111,15 @@ export function AvatarUploader({
             disabled={disabled || busy}
             className="btn btn-sm"
           >
-            <Camera className="h-4 w-4" /> {src ? "Ganti foto" : "Unggah foto"}
+            <Camera className="h-4 w-4" /> {src ? t("replace") : t("upload")}
           </button>
           {src && (
             <button type="button" onClick={remove} disabled={disabled || busy} className="btn btn-ghost btn-sm">
-              <Trash2 className="h-4 w-4" /> Hapus
+              <Trash2 className="h-4 w-4" /> {t("remove")}
             </button>
           )}
         </div>
-        <p className="text-xs text-faint">JPG, PNG, atau WebP. Dipotong jadi persegi otomatis.</p>
+        <p className="text-xs text-faint">{t("formats")}</p>
         {error && (
           <p role="alert" className="text-xs text-danger">
             {error}

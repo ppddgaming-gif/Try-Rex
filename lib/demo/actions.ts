@@ -8,15 +8,17 @@ import { pickSegment, type Segment } from "@/lib/demo/segments"
 import { graduationReached, stageAfter } from "@/lib/demo/stages"
 import { accountBust, toOpenTrade, type TradingState } from "@/lib/demo/state"
 import type { DemoEvent } from "@/lib/demo/view"
+import { msg, type Msg } from "@/lib/i18n/translator"
 import type { ReasonId } from "@/lib/reasons"
 
 // What each player action does to the account, worked out from the loaded
 // state before anything is written. Pure: the route handlers load the state,
 // call one of these, and hand the result to a database function that writes
 // it in one transaction (lib/demo/trading.ts). Refusals come back as
-// { error } in plain Indonesian.
+// { error } holding a demo-catalogue message (errors.*, problems.*), put into
+// words by the route in the player's language.
 
-export type Refusal = { error: string }
+export type Refusal = { error: Msg }
 
 export type TradeClose = {
   id: string
@@ -110,7 +112,10 @@ function settle(
     })
 
     // The trade's result before commission, then commission and swap as
-    // their own rows, so each cost is visible in "Riwayat saldo".
+    // their own rows, so each cost is visible in "Riwayat saldo". The labels
+    // are stored as written here (Indonesian); the dashboard rebuilds them in
+    // the reader's language from the kind and the trade number
+    // (lib/demo/format.ts ledgerLabel), so keep the "#n" in them.
     const label = `Trade #${row.number} · ${sideLabel(row.side)} ${row.pair}`
     const beforeCommission = roundMoney(c.gross - row.spread)
     balance = roundMoney(balance + beforeCommission)
@@ -154,12 +159,12 @@ function settle(
 }
 
 /** Refusal once the account is "habis": no candle, order or new chart. */
-export const BUST_REFUSAL: Refusal = { error: "Akun ini sudah habis. Lihat review Rex di tab Akun." }
+export const BUST_REFUSAL: Refusal = { error: msg("errors.bust") }
 
 function activeSession(state: TradingState): Refusal | { cursor: number; lastIndex: number } {
   const s = state.session
-  if (!s || s.status !== "active") return { error: "Mulai chart dulu." }
-  if (!state.segmentCandles[s.cursor]) return { error: "Chart ini tidak tersedia lagi. Ganti chart." }
+  if (!s || s.status !== "active") return { error: msg("errors.startChart") }
+  if (!state.segmentCandles[s.cursor]) return { error: msg("errors.chartGone") }
   return { cursor: s.cursor, lastIndex: s.lastIndex }
 }
 
@@ -168,7 +173,7 @@ export function planStep(state: TradingState): SettlePlan | Refusal {
   if (accountBust(state)) return BUST_REFUSAL
   const s = activeSession(state)
   if ("error" in s) return s
-  if (s.cursor >= s.lastIndex) return { error: "Segmen ini sudah habis. Ganti chart." }
+  if (s.cursor >= s.lastIndex) return { error: msg("errors.segmentOver") }
   const next = s.cursor + 1
   const last = next === s.lastIndex
   const result = stepBar({
@@ -194,7 +199,7 @@ export function planClose(state: TradingState, tradeId: string): SettlePlan | Re
   const s = activeSession(state)
   if ("error" in s) return s
   const row = state.open.find((t) => t.id === tradeId)
-  if (!row) return { error: "Trade ini sudah ditutup." }
+  if (!row) return { error: msg("errors.tradeClosed") }
   const closure = closeAt(toOpenTrade(row), state.segmentCandles[s.cursor].c, "manual")
   const others = state.open.filter((t) => t.id !== tradeId).map(toOpenTrade)
   return settle(state, [closure], others, {
@@ -313,11 +318,11 @@ export function planModify(
   const s = activeSession(state)
   if ("error" in s) return s
   const row = state.open.find((t) => t.id === tradeId)
-  if (!row) return { error: "Trade ini sudah ditutup." }
+  if (!row) return { error: msg("errors.tradeClosed") }
   const name = field === "sl" ? "SL" : "TP"
 
   if (pips === null) {
-    if (STAGES[state.stage].slTpRequired) return { error: `Stage ${state.stage}: SL dan TP wajib.` }
+    if (STAGES[state.stage].slTpRequired) return { error: msg("errors.slTpRequired", { stage: state.stage }) }
   } else {
     const tenths = Math.round(pips * 10)
     const valid =
@@ -325,19 +330,19 @@ export function planModify(
       Math.abs(tenths - pips * 10) < 1e-9 &&
       Math.abs(pips) <= PLAN.MAX_DISTANCE_PIPS &&
       (field === "sl" || pips > 0)
-    if (!valid) return { error: `Jarak ${name} tidak valid.` }
+    if (!valid) return { error: msg("errors.distanceInvalid", { name }) }
   }
 
   const price = pips === null ? null : levelPrice(row.pair, row.side, row.entryPrice, field, pips)
   const current = field === "sl" ? row.sl : row.tp
-  if (price === current) return { error: "Tidak ada perubahan." }
+  if (price === current) return { error: msg("errors.noChange") }
 
   if (price !== null) {
     const now = state.segmentCandles[s.cursor].c
     const buy = row.side === "buy"
     const lossSide = field === "sl"
     const ok = lossSide === buy ? price < now : price > now
-    if (!ok) return { error: `${name} harus di ${lossSide === buy ? "bawah" : "atas"} harga sekarang.` }
+    if (!ok) return { error: msg("errors.levelSide", { name, side: lossSide === buy ? "below" : "above" }) }
   }
 
   return { tradeId, field, price, atIndex: s.cursor }
@@ -352,7 +357,7 @@ export function planStart(
 ): Segment | Refusal {
   // Habis stays habis: no new chart either.
   if (accountBust(state)) return BUST_REFUSAL
-  if (state.open.length > 0) return { error: "Tutup trade yang terbuka dulu sebelum ganti chart." }
+  if (state.open.length > 0) return { error: msg("errors.closeBeforeChart") }
   const segment = pickSegment(pool, seen, random, state.session?.segmentId)
-  return segment ?? { error: "Belum ada chart untuk stage ini." }
+  return segment ?? { error: msg("errors.noChartForStage") }
 }

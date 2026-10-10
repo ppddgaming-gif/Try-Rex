@@ -2,11 +2,10 @@
 
 import { useState } from "react"
 import { ChevronDown, Lock } from "lucide-react"
+import { useLocale, useTranslations } from "next-intl"
 import { RexTipCard } from "@/components/akun-latihan/rex-tip"
-import { TIPS, type TipId } from "@/lib/demo/tips"
-
-// A fixed time zone, so the server render and the browser print the same date.
-const dateFmt = new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Jakarta" })
+import { TIPS, TIP_VALUES, type TipId } from "@/lib/demo/tips"
+import { INTL_LOCALE, type Locale } from "@/lib/i18n/locale"
 
 /**
  * "Tips Rex": every tip, in the order they tend to appear. Seen ones open to
@@ -15,6 +14,15 @@ const dateFmt = new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short
 export function TipsList({ seen }: { seen: { id: TipId; seenAt: string }[] }) {
   const seenAt = new Map(seen.map((s) => [s.id, s.seenAt]))
   const [open, setOpen] = useState<TipId | null>(null)
+  const t = useTranslations("demo.ui.tipsPage")
+  const tt = useTranslations("tips")
+  // A fixed time zone, so the server render and the browser print the same date.
+  const dateFmt = new Intl.DateTimeFormat(INTL_LOCALE[useLocale() as Locale], {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "Asia/Jakarta",
+  })
 
   return (
     <ul className="flex flex-col gap-3">
@@ -32,8 +40,8 @@ export function TipsList({ seen }: { seen: { id: TipId; seenAt: string }[] }) {
                   className="flex min-h-14 w-full items-center gap-3 px-4 py-3 text-left"
                 >
                   <span className="min-w-0 flex-1">
-                    <span className="block font-semibold">{tip.title}</span>
-                    <span className="block text-xs text-muted-foreground">Dilihat {dateFmt.format(new Date(when))}</span>
+                    <span className="block font-semibold">{tt(`${tip.id}.title`, TIP_VALUES)}</span>
+                    <span className="block text-xs text-muted-foreground">{t("seen", { date: dateFmt.format(new Date(when)) })}</span>
                   </span>
                   <ChevronDown
                     className={`h-4 w-4 text-muted-foreground transition-transform duration-300 ease-spring ${isOpen ? "rotate-180" : ""}`}
@@ -50,8 +58,8 @@ export function TipsList({ seen }: { seen: { id: TipId; seenAt: string }[] }) {
               <div className="flex min-h-14 items-center gap-3 px-4 py-3 text-muted-foreground">
                 <Lock className="h-4 w-4 shrink-0" aria-hidden="true" />
                 <span className="min-w-0 flex-1">
-                  <span className="block font-semibold text-foreground/70">{tip.title}</span>
-                  <span className="block text-xs">{tip.when}</span>
+                  <span className="block font-semibold text-foreground/70">{tt(`${tip.id}.title`, TIP_VALUES)}</span>
+                  <span className="block text-xs">{tt(`${tip.id}.when`, TIP_VALUES)}</span>
                 </span>
               </div>
             )}

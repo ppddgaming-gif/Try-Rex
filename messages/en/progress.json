@@ -1,0 +1,78 @@
+{
+  "competencies": {
+    "trend_reading": "Reading trends",
+    "entry_timing": "Entry timing",
+    "risk_management": "Risk management",
+    "market_structure": "Market structure"
+  },
+  "notTested": "Not tested yet",
+  "activity": {
+    "correct": "Correct",
+    "incorrect": "Not quite",
+    "justNow": "just now",
+    "minutesAgo": "{n} min ago",
+    "hoursAgo": "{n, plural, =1 {1 hour ago} other {# hours ago}}",
+    "yesterday": "yesterday",
+    "daysAgo": "{n} days ago"
+  },
+  "insight": {
+    "title": "AI Insight",
+    "lockedTitle": "Insight locked",
+    "lockedBody": "Answer {n} questions and Rex will share an insight.",
+    "line": "{n} questions, {correct} correct. {pick}",
+    "even": "Your picks are fairly even.",
+    "most": "You pick {decision} most often."
+  },
+  "goal": {
+    "title": "Today's target",
+    "count": "<b>{done} / {goal}</b> questions",
+    "met": " · target reached",
+    "none": "No target yet.",
+    "setUp": "Set one in the starter quiz",
+    "left": "{n, plural, =1 {One more question.} other {# more questions.}}"
+  },
+  "hero": {
+    "title": "Start your first session",
+    "meta": "5 questions · about 5 minutes · no money at risk",
+    "start": "Start now"
+  },
+  "levelUp": "You reached Level <num>{level}</num>!",
+  "level": "Level {level}",
+  "xpOf": "{into} of {needed} XP",
+  "calendar": {
+    "title": "Practice Calendar",
+    "days": "<num>{n}</num> practice days",
+    "less": "Less",
+    "more": "More",
+    "aria": "{n} questions answered in the last 12 weeks",
+    "tip": "{n} questions · {date}",
+    "mon": "Mon",
+    "wed": "Wed",
+    "fri": "Fri"
+  },
+  "reset": {
+    "open": "Delete all progress",
+    "confirm": "Delete all your XP, streak and practice history? This can't be undone.",
+    "yes": "Yes, delete",
+    "cancel": "Cancel"
+  },
+  "stats": {
+    "done": "Questions done",
+    "doneHint": "Answer your first question",
+    "accuracy": "Accuracy",
+    "noAnswers": "No answers yet",
+    "noCorrect": "No correct answers yet",
+    "ofAll": "of all your answers",
+    "xp": "Total XP",
+    "xpHint": "Correct answers earn XP"
+  },
+  "streak": {
+    "start": "Start your streak today",
+    "doneToday": "You've practiced today",
+    "playOne": "Play 1 question today",
+    "compactTitle": "{hint} · Best: {best} days",
+    "srDays": "days in a row. {hint}.",
+    "days": "<num>{n}</num> days in a row",
+    "best": "Best: <num>{n}</num> days"
+  }
+}

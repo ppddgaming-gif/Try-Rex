@@ -1,5 +1,6 @@
 import { COUNTING, DISIPLIN, XP } from "@/lib/demo/config"
 import type { Side } from "@/lib/demo/money"
+import type { T } from "@/lib/i18n/translator"
 
 // The Disiplin score: five checks on every closed trade, all about the plan
 // and none about the outcome (non-negotiable #3). Pure; the server scores
@@ -9,13 +10,9 @@ export const CHECK_IDS = ["slAtEntry", "riskWithinLimit", "rewardRisk", "slNotWi
 export type CheckId = (typeof CHECK_IDS)[number]
 export type Checks = Record<CheckId, boolean>
 
-export const CHECK_LABELS: Record<CheckId, string> = {
-  slAtEntry: "SL dipasang saat entry",
-  riskWithinLimit: `Risiko maksimal ${DISIPLIN.MAX_RISK_PCT}% saldo`,
-  rewardRisk: `TP dengan reward minimal ${DISIPLIN.MIN_REWARD_RISK}× risiko`,
-  slNotWidened: "SL tidak dijauhkan",
-  notRevenge: "Bukan revenge trade",
-}
+/** A check's name in words (demo.checks.*), with the limits from config. `t` is the root translator. */
+export const checkLabel = (id: CheckId, t: T) =>
+  t(`demo.checks.${id}`, { max: DISIPLIN.MAX_RISK_PCT, min: DISIPLIN.MIN_REWARD_RISK })
 
 /** One SL change, in order. null = no SL. */
 export type SlChange = { from: number | null; to: number | null }

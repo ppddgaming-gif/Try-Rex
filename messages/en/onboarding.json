@@ -1,0 +1,159 @@
+{
+  "title": "Get started",
+  "questions": {
+    "motivation": {
+      "title": "What got you curious about trading?",
+      "options": {
+        "social": {
+          "label": "Content on social media",
+          "sub": "TikTok, YouTube, Instagram"
+        },
+        "circle": {
+          "label": "Friends or family who trade",
+          "sub": "Curious what they're up to"
+        },
+        "income": {
+          "label": "I want extra income",
+          "sub": "Something on top of my salary"
+        },
+        "lost": {
+          "label": "I tried it and lost money",
+          "sub": "I want to understand what went wrong"
+        }
+      }
+    },
+    "experience": {
+      "title": "How much trading have you tried?",
+      "options": {
+        "none": {
+          "label": "Never, not at all",
+          "sub": "Starting from zero"
+        },
+        "demo": {
+          "label": "I've used a demo account",
+          "sub": "Virtual money, not real money yet"
+        },
+        "real": {
+          "label": "I've traded real money",
+          "sub": "A few times, not regularly"
+        },
+        "regular": {
+          "label": "I trade regularly",
+          "sub": "Almost every week"
+        }
+      }
+    },
+    "skill": {
+      "title": "How comfortable are you reading a candlestick chart?",
+      "options": {
+        "unknown": {
+          "label": "Not sure yet",
+          "sub": "What's a candlestick?"
+        },
+        "basics": {
+          "label": "I know the basics",
+          "sub": "Body, wicks, up and down colours"
+        },
+        "levels": {
+          "label": "I can mark levels",
+          "sub": "Support, resistance, trend direction"
+        },
+        "patterns": {
+          "label": "I use patterns and confirmation",
+          "sub": "Pin bars, breakouts, retests"
+        }
+      }
+    },
+    "focus": {
+      "title": "Which pairs do you most want to practice?",
+      "options": {
+        "majors": {
+          "label": "Major pairs with USD",
+          "sub": "EURUSD, GBPUSD, AUDUSD, USDCAD"
+        },
+        "yen": {
+          "label": "Yen pairs",
+          "sub": "USDJPY, EURJPY"
+        },
+        "cross": {
+          "label": "Cross pairs",
+          "sub": "EURAUD, GBPCAD. They move more wildly"
+        },
+        "all": {
+          "label": "Not sure, mix them up",
+          "sub": "Rex picks from every pair"
+        }
+      }
+    },
+    "time": {
+      "title": "How long do you want to practice each day?",
+      "options": {
+        "5": {
+          "label": "5 minutes",
+          "sub": "1 round, 5 questions"
+        },
+        "15": {
+          "label": "15 minutes",
+          "sub": "3 rounds, 15 questions"
+        },
+        "30": {
+          "label": "30 minutes or more",
+          "sub": "6 rounds, 30 questions"
+        },
+        "free": {
+          "label": "Not sure yet",
+          "sub": "No target for now"
+        }
+      }
+    }
+  },
+  "motivationLines": {
+    "social": "Trading content on social media rarely shows the losses. Here you see all of it, including when a good analysis still misses.",
+    "circle": "Now you can see for yourself what they do, without putting anyone's money at risk.",
+    "income": "Before real money, practice the decisions. Your daily target builds a habit, not a promise of profit.",
+    "lost": "After each question, open “Break this one down”. It shows where the decision went wrong and why."
+  },
+  "stepOf": "{n} of {total}",
+  "done": "Done",
+  "railTitle": "Five questions, then we start.",
+  "railBody": "Your answers set your practice plan and how hard your first questions are. There are no wrong answers, including “not sure yet”.",
+  "progressLabel": "Quiz progress",
+  "skip": "Skip the quiz and use the standard settings",
+  "carried": "Your earlier quiz answers have been saved to your account.",
+  "profile": {
+    "eyebrow": "One more step",
+    "title": "Let's get to know you.",
+    "body": "Your photo and username show on your profile. You can change them any time in Settings.",
+    "save": "Save and continue",
+    "later": "Maybe later"
+  },
+  "question": "Question {n}",
+  "finish": "Done",
+  "next": "Next",
+  "back": "Back",
+  "result": {
+    "startLevel": "Starting level",
+    "focus": "Pair focus",
+    "allPairs": "All pairs",
+    "dailyGoal": "Daily target",
+    "goalCount": "{n} questions",
+    "noGoal": "No target",
+    "experience": "Experience",
+    "defaultEyebrow": "Standard settings",
+    "readyEyebrow": "Your plan is ready",
+    "defaultTitle": "Okay, let's start with the basics.",
+    "readyTitle": "Here's your practice plan.",
+    "start": "Start the first question",
+    "signUp": "Create an account to save your profile",
+    "redo": "Retake the quiz"
+  },
+  "plan": {
+    "title": "Practice plan",
+    "lead": "Set from your starter quiz answers.",
+    "skipped": "You skipped the starter quiz, so practice uses the standard settings.",
+    "notTaken": "You haven't taken the starter quiz yet.",
+    "retake": "Retake the starter quiz",
+    "dataTitle": "Practice data",
+    "dataLead": "Deletes your XP, streak and answer history."
+  }
+}

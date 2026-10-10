@@ -1,0 +1,37 @@
+{
+  "title": "AI Evaluation",
+  "lead": "Evaluasi keputusan tradingmu oleh TRY-REX AI Mentor",
+  "back": "Kembali ke Trading Game",
+  "example": "<b>Ini contoh evaluasi.</b> <muted>Jawab satu soal di Trading Game, lalu pilih “Bedah soal ini” untuk melihat evaluasi jawabanmu sendiri.</muted>",
+  "playNow": "Main sekarang",
+  "review": "Review Keputusanmu",
+  "afterEntry": "{change} setelah entry",
+  "meta": {
+    "pair": "Pair",
+    "timeframe": "Timeframe",
+    "period": "Periode",
+    "decision": "Keputusanmu"
+  },
+  "nextTitle": "Langkah Selanjutnya",
+  "nextBody": "Terapkan sarannya di ronde berikutnya: 5 soal baru dari data harga asli.",
+  "newRound": "Main ronde baru",
+  "explanation": {
+    "title": "Penjelasan TRY-REX",
+    "rightBecause": "tepat karena:",
+    "wrongBecause": "kurang tepat karena:",
+    "suggestion": "Saran TRY-REX"
+  },
+  "stats": {
+    "result": "Hasil Keputusan",
+    "correct": "Tepat",
+    "incorrect": "Kurang Tepat",
+    "accuracy": "Akurasi Keputusan",
+    "accuracyHint": "Dari besarnya gerak harga sesudahnya",
+    "xp": "XP",
+    "xpEarned": "Didapat dari soal ini",
+    "xpNone": "Jawaban kurang tepat tidak memberi XP",
+    "time": "Waktu Penyelesaian",
+    "timeUnit": "Menit : Detik",
+    "timeNone": "Mainkan soal untuk mencatat waktumu"
+  }
+}

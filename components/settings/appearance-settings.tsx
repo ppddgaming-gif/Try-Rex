@@ -2,37 +2,42 @@
 
 import type { ReactNode } from "react"
 import { Check, Monitor, Moon, PanelLeft, PanelLeftClose, Sparkles, Sun, Waves } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { Card } from "@/components/card"
+import { LocaleSwitcher } from "@/components/locale-switcher"
 import type { Font, Motion, Preferences, SidebarState, TextSize, Theme } from "@/lib/preferences"
 import { setPreference, usePreferences } from "@/lib/use-preferences"
 
 /**
  * Settings > Tampilan. Every change applies at once (html data-* attributes)
- * and is remembered on this device. Available to guests too.
+ * and is remembered on this device. Available to guests too. The language is
+ * the exception: it follows the account when signed in (lib/i18n/actions.ts).
  */
 export function AppearanceSettings() {
   const prefs = usePreferences()
+  const t = useTranslations("settings")
 
   return (
     <>
-      <Section title="Tema" hint="Sistem mengikuti pengaturan terang/gelap perangkatmu.">
-        <div role="radiogroup" aria-label="Tema" className="grid gap-3 sm:grid-cols-3">
-          <ThemeOption value="dark" current={prefs.theme} icon={<Moon className="h-4 w-4" />} label="Gelap" />
-          <ThemeOption value="light" current={prefs.theme} icon={<Sun className="h-4 w-4" />} label="Terang" />
-          <ThemeOption value="system" current={prefs.theme} icon={<Monitor className="h-4 w-4" />} label="Sistem" />
+      <Section title={t("language.title")} hint={t("language.hint")}>
+        <LocaleSwitcher size="lg" />
+      </Section>
+
+      <Section title={t("theme.title")} hint={t("theme.hint")}>
+        <div role="radiogroup" aria-label={t("theme.title")} className="grid gap-3 sm:grid-cols-3">
+          <ThemeOption value="dark" current={prefs.theme} icon={<Moon className="h-4 w-4" />} label={t("theme.dark")} />
+          <ThemeOption value="light" current={prefs.theme} icon={<Sun className="h-4 w-4" />} label={t("theme.light")} />
+          <ThemeOption value="system" current={prefs.theme} icon={<Monitor className="h-4 w-4" />} label={t("theme.system")} />
         </div>
       </Section>
 
-      <Section
-        title="Huruf"
-        hint="OpenDyslexic memberi bobot di bagian bawah huruf agar tidak terbalik-balik. Atkinson Hyperlegible dibuat supaya huruf mirip (I, l, 1) mudah dibedakan."
-      >
-        <div role="radiogroup" aria-label="Huruf" className="grid gap-3 sm:grid-cols-3">
+      <Section title={t("font.title")} hint={t("font.hint")}>
+        <div role="radiogroup" aria-label={t("font.title")} className="grid gap-3 sm:grid-cols-3">
           <Choice<Font>
             name="font"
             value="default"
             current={prefs.font}
-            label="Standar"
+            label={t("font.default")}
             sub="Plus Jakarta Sans"
             preview={<span style={{ fontFamily: "var(--font-sans)" }}>Aa Bb 123</span>}
           />
@@ -40,7 +45,7 @@ export function AppearanceSettings() {
             name="font"
             value="dyslexic"
             current={prefs.font}
-            label="Ramah disleksia"
+            label={t("font.dyslexic")}
             sub="OpenDyslexic"
             preview={<span style={{ fontFamily: "var(--font-dyslexic)" }}>Aa Bb 123</span>}
           />
@@ -48,71 +53,71 @@ export function AppearanceSettings() {
             name="font"
             value="readable"
             current={prefs.font}
-            label="Mudah dibaca"
+            label={t("font.readable")}
             sub="Atkinson Hyperlegible"
             preview={<span style={{ fontFamily: "var(--font-readable)" }}>Il1 O0 rn</span>}
           />
         </div>
       </Section>
 
-      <Section title="Ukuran teks">
-        <div role="radiogroup" aria-label="Ukuran teks" className="grid grid-cols-3 gap-3">
+      <Section title={t("size.title")}>
+        <div role="radiogroup" aria-label={t("size.title")} className="grid grid-cols-3 gap-3">
           {(
             [
-              ["normal", "Normal", "text-base"],
-              ["large", "Besar", "text-lg"],
-              ["xlarge", "Lebih besar", "text-xl"],
+              ["normal", "text-base"],
+              ["large", "text-lg"],
+              ["xlarge", "text-xl"],
             ] as const
-          ).map(([value, label, size]) => (
+          ).map(([value, size]) => (
             <Choice<TextSize>
               key={value}
               name="size"
               value={value}
               current={prefs.size}
-              label={label}
+              label={t(`size.${value}`)}
               preview={<span className={`font-display font-bold ${size}`}>Aa</span>}
             />
           ))}
         </div>
       </Section>
 
-      <Section title="Gerakan" hint="Kurangi mematikan animasi di situs ini saja, tanpa mengubah pengaturan perangkatmu.">
-        <div role="radiogroup" aria-label="Gerakan" className="grid gap-3 sm:grid-cols-2">
+      <Section title={t("motion.title")} hint={t("motion.hint")}>
+        <div role="radiogroup" aria-label={t("motion.title")} className="grid gap-3 sm:grid-cols-2">
           <Choice<Motion>
             name="motion"
             value="system"
             current={prefs.motion}
-            label="Ikuti sistem"
-            sub="Animasi penuh, kecuali perangkat minta dikurangi"
+            label={t("motion.system")}
+            sub={t("motion.systemSub")}
             preview={<Sparkles className="h-5 w-5 text-primary" />}
           />
           <Choice<Motion>
             name="motion"
             value="reduce"
             current={prefs.motion}
-            label="Kurangi"
-            sub="Tanpa animasi dan transisi"
+            label={t("motion.reduce")}
+            sub={t("motion.reduceSub")}
             preview={<Waves className="h-5 w-5 text-muted-foreground" />}
           />
         </div>
       </Section>
 
-      <Section title="Sidebar" hint="Hanya di layar lebar. Bisa juga lewat tombol di atas sidebar.">
-        <div role="radiogroup" aria-label="Sidebar" className="grid gap-3 sm:grid-cols-2">
+      <Section title={t("sidebar.title")} hint={t("sidebar.hint")}>
+        <div role="radiogroup" aria-label={t("sidebar.title")} className="grid gap-3 sm:grid-cols-2">
           <Choice<SidebarState>
             name="sidebar"
             value="expanded"
             current={prefs.sidebar}
-            label="Lebar"
-            sub="Ikon dan nama menu"
+            label={t("sidebar.expanded")}
+            sub={t("sidebar.expandedSub")}
             preview={<PanelLeft className="h-5 w-5 text-primary" />}
           />
           <Choice<SidebarState>
             name="sidebar"
             value="collapsed"
             current={prefs.sidebar}
-            label="Ciut"
-            sub="Ikon saja, lebih banyak ruang"
+            label={t("sidebar.collapsed")}
+            sub={t("sidebar.collapsedSub")}
             preview={<PanelLeftClose className="h-5 w-5 text-primary" />}
           />
         </div>

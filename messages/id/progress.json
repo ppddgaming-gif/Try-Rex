@@ -1,0 +1,78 @@
+{
+  "competencies": {
+    "trend_reading": "Membaca tren",
+    "entry_timing": "Timing entry",
+    "risk_management": "Manajemen risiko",
+    "market_structure": "Struktur pasar"
+  },
+  "notTested": "Belum diuji",
+  "activity": {
+    "correct": "Tepat",
+    "incorrect": "Kurang tepat",
+    "justNow": "baru saja",
+    "minutesAgo": "{n} menit lalu",
+    "hoursAgo": "{n} jam lalu",
+    "yesterday": "kemarin",
+    "daysAgo": "{n} hari lalu"
+  },
+  "insight": {
+    "title": "AI Insight",
+    "lockedTitle": "Insight terkunci",
+    "lockedBody": "Selesaikan {n} soal, nanti Rex kasih insight.",
+    "line": "{n} soal, {correct} tepat. {pick}",
+    "even": "Pilihanmu cukup merata.",
+    "most": "Kamu paling sering pilih {decision}."
+  },
+  "goal": {
+    "title": "Target hari ini",
+    "count": "<b>{done} / {goal}</b> soal",
+    "met": " · target tercapai",
+    "none": "Belum ada target.",
+    "setUp": "Atur di kuis awal",
+    "left": "{n, plural, =1 {Satu soal lagi.} other {# soal lagi.}}"
+  },
+  "hero": {
+    "title": "Mulai sesi pertamamu",
+    "meta": "5 soal · sekitar 5 menit · tanpa risiko uang",
+    "start": "Mulai sekarang"
+  },
+  "levelUp": "Naik ke Level <num>{level}</num>!",
+  "level": "Level {level}",
+  "xpOf": "{into} dari {needed} XP",
+  "calendar": {
+    "title": "Kalender Latihan",
+    "days": "<num>{n}</num> hari latihan",
+    "less": "Sedikit",
+    "more": "Banyak",
+    "aria": "{n} soal dijawab dalam 12 minggu terakhir",
+    "tip": "{n} soal · {date}",
+    "mon": "Sen",
+    "wed": "Rab",
+    "fri": "Jum"
+  },
+  "reset": {
+    "open": "Hapus semua progres",
+    "confirm": "Hapus semua XP, streak dan riwayat latihanmu? Ini tidak bisa dibatalkan.",
+    "yes": "Ya, hapus",
+    "cancel": "Batal"
+  },
+  "stats": {
+    "done": "Soal selesai",
+    "doneHint": "Jawab soal pertamamu",
+    "accuracy": "Akurasi",
+    "noAnswers": "Belum ada jawaban",
+    "noCorrect": "Belum ada jawaban tepat",
+    "ofAll": "dari semua jawabanmu",
+    "xp": "Total XP",
+    "xpHint": "Jawaban tepat memberi XP"
+  },
+  "streak": {
+    "start": "Mulai streak-mu hari ini",
+    "doneToday": "Hari ini sudah latihan",
+    "playOne": "Main 1 soal hari ini",
+    "compactTitle": "{hint} · Terbaik: {best} hari",
+    "srDays": "hari berturut-turut. {hint}.",
+    "days": "<num>{n}</num> hari berturut-turut",
+    "best": "Terbaik: <num>{n}</num> hari"
+  }
+}

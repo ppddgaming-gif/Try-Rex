@@ -1,5 +1,6 @@
 import { ACCOUNT, DISIPLIN, PLAN, REPLAY, STAGES, type StageNumber } from "@/lib/demo/config"
 import { instrument, isApproximate } from "@/lib/demo/instruments"
+import { msg, type Msg, type TValues } from "@/lib/i18n/translator"
 import {
   grossPnl,
   isValidLot,
@@ -135,7 +136,8 @@ export type OrderContext = {
 
 export type OrderProblem = {
   field: "reasons" | "lot" | "sl" | "tp" | "margin" | "trades" | "pair" | "candles"
-  message: string
+  /** demo catalogue: problems.* */
+  message: Msg
 }
 
 /**
@@ -145,38 +147,39 @@ export type OrderProblem = {
 export function orderProblems(input: OrderInput, ctx: OrderContext, quote: OrderQuote): OrderProblem[] {
   const stage = STAGES[ctx.stage]
   const problems: OrderProblem[] = []
-  const add = (field: OrderProblem["field"], message: string) => problems.push({ field, message })
+  const add = (field: OrderProblem["field"], key: string, values?: TValues) =>
+    problems.push({ field, message: msg(`problems.${key}`, values) })
 
   const pairs: readonly string[] = stage.pairs
-  if (!pairs.includes(ctx.pair)) add("pair", `${ctx.pair} belum terbuka di Stage ${ctx.stage}.`)
-  if (ctx.candlesLeft < 1) add("candles", "Segmen ini sudah habis. Ganti chart dulu.")
+  if (!pairs.includes(ctx.pair)) add("pair", "pairClosed", { pair: ctx.pair, stage: ctx.stage })
+  if (ctx.candlesLeft < 1) add("candles", "segmentOver")
   if (ctx.openTrades >= stage.maxOpenTrades) {
-    add("trades", `Stage ${ctx.stage}: maksimal ${stage.maxOpenTrades} trade terbuka.`)
+    add("trades", "maxTrades", { stage: ctx.stage, max: stage.maxOpenTrades })
   }
 
   const reasons = input.reasons
-  if (reasons.length < PLAN.MIN_REASONS) add("reasons", "Pilih minimal 1 alasan.")
-  else if (reasons.length > PLAN.MAX_REASONS) add("reasons", `Pilih maksimal ${PLAN.MAX_REASONS} alasan.`)
-  else if (!reasons.every(isReasonId) || new Set(reasons).size !== reasons.length) add("reasons", "Alasan tidak dikenal.")
+  if (reasons.length < PLAN.MIN_REASONS) add("reasons", "minReasons")
+  else if (reasons.length > PLAN.MAX_REASONS) add("reasons", "maxReasons", { max: PLAN.MAX_REASONS })
+  else if (!reasons.every(isReasonId) || new Set(reasons).size !== reasons.length) add("reasons", "unknownReason")
 
   if (stage.fixedLot !== null && normalizeLot(input.lot) !== stage.fixedLot) {
-    add("lot", `Stage ${ctx.stage} memakai lot ${stage.fixedLot.toFixed(2)}.`)
+    add("lot", "fixedLot", { stage: ctx.stage, lot: stage.fixedLot.toFixed(2) })
   } else if (!isValidLot(input.lot)) {
-    add("lot", `Lot antara ${ACCOUNT.MIN_LOT.toFixed(2)} dan ${ACCOUNT.MAX_LOT.toFixed(2)}, kelipatan ${ACCOUNT.LOT_STEP}.`)
+    add("lot", "lotRange", { min: ACCOUNT.MIN_LOT.toFixed(2), max: ACCOUNT.MAX_LOT.toFixed(2), step: ACCOUNT.LOT_STEP })
   }
 
   if (input.slPips === null) {
-    if (stage.slTpRequired) add("sl", "Pasang stop loss.")
+    if (stage.slTpRequired) add("sl", "needSl")
   } else if (!isValidDistance(input.slPips)) {
-    add("sl", `Jarak SL 0.1–${PLAN.MAX_DISTANCE_PIPS} pip.`)
+    add("sl", "slRange", { max: PLAN.MAX_DISTANCE_PIPS })
   }
   if (input.tpPips === null) {
-    if (stage.slTpRequired) add("tp", "Pasang take profit.")
+    if (stage.slTpRequired) add("tp", "needTp")
   } else if (!isValidDistance(input.tpPips)) {
-    add("tp", `Jarak TP 0.1–${PLAN.MAX_DISTANCE_PIPS} pip.`)
+    add("tp", "tpRange", { max: PLAN.MAX_DISTANCE_PIPS })
   }
 
-  if (!quote.covered) add("margin", "Margin bebas tidak cukup untuk lot ini.")
+  if (!quote.covered) add("margin", "margin")
   return problems
 }
 

@@ -1,0 +1,34 @@
+{
+  "meta": {
+    "description": "Belajar trading lewat latihan harian dengan data harga asli, evaluasi AI, dan progres yang terukur bersama TRY-REX, mentor trading AI-mu."
+  },
+  "language": {
+    "label": "Bahasa",
+    "id": "Bahasa Indonesia",
+    "en": "English"
+  },
+  "levels": {
+    "easy": "Mudah",
+    "medium": "Menengah",
+    "hard": "Sulit"
+  },
+  "dash": "—",
+  "list": {
+    "two": "{a} dan {b}",
+    "many": "{head}, dan {last}"
+  },
+  "reasons": {
+    "trend-naik": "Trend naik",
+    "trend-turun": "Trend turun",
+    "pantulan-support": "Pantulan di support",
+    "penolakan-resistance": "Penolakan di resistance",
+    "breakout": "Breakout",
+    "menunggu-konfirmasi": "Menunggu konfirmasi",
+    "risk-reward-bagus": "Risk:reward bagus",
+    "ikut-feeling": "Ikut feeling"
+  },
+  "errors": {
+    "generic": "Terjadi kesalahan. Coba lagi sebentar lagi.",
+    "network": "Tidak bisa terhubung. Periksa koneksimu."
+  }
+}

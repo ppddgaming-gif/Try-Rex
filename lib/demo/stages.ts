@@ -1,5 +1,6 @@
 import { DISIPLIN, GRADUATION, STAGE_UNLOCK, type StageNumber } from "@/lib/demo/config"
 import { rollingDisiplin } from "@/lib/demo/disiplin"
+import type { T } from "@/lib/i18n/translator"
 
 // Stages belong to the player, not the account. Each one opens after enough
 // counted trades in the stage before, at a high enough Disiplin; Stage 3
@@ -55,8 +56,12 @@ export function stageAfter(stage: StageNumber, trades: ScoredTrade[]): StageNumb
 export const graduationReached = (stage: StageNumber, trades: ScoredTrade[]) =>
   stage === 3 && stageProgress(3, trades).ready
 
-/** "7/10 trade · Disiplin 76% (butuh 80%)". */
-export function progressLabel(p: StageProgress) {
-  const disiplin = `Disiplin ${p.disiplin === null ? "—" : `${p.disiplin}%`}`
-  return `${Math.min(p.trades, p.needed)}/${p.needed} trade · ${disiplin} (butuh ${p.minDisiplin}%)`
+/** "7/10 trade · Disiplin 76% (butuh 80%)". `t` is the root translator (demo.stageProgress). */
+export function progressLabel(p: StageProgress, t: T) {
+  return t("demo.stageProgress", {
+    done: Math.min(p.trades, p.needed),
+    needed: p.needed,
+    disiplin: p.disiplin === null ? "—" : `${p.disiplin}%`,
+    min: p.minDisiplin,
+  })
 }
