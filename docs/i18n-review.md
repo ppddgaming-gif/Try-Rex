@@ -10,9 +10,10 @@ memastikan key dan placeholder id/en tetap sama.
 
 Nama fitur dan istilah produk. Pilihannya memengaruhi banyak layar sekaligus.
 
+Sudah diputuskan: Akun Latihan tampil sebagai **Akun Demo** (ID) dan **Demo Account** (EN). URL `/akun-latihan` dan nama di kode tidak berubah.
+
 | Indonesia | Inggris sekarang | Kenapa ragu | Alternatif |
 |---|---|---|---|
-| Akun Latihan | Practice Account | Nama fitur. Bisa juga dibiarkan sebagai nama merek. | Demo Account (tapi "demo" mengesankan akun broker) |
 | Belajar 101 | Learn 101 | Nama menu. | Trading 101, Academy |
 | Kamus Trading | Trading Glossary | Aman, tapi "Kamus" juga dipakai sebagai nama tab. | Glossary |
 | Disiplin (skor) | Disiplin | Dibiarkan sebagai nama skor, seperti nama merek. Penutur Inggris mungkin mengira salah ketik. | Discipline |
@@ -93,23 +94,10 @@ Indonesia.
 
 ## 3. Belum beres atau perlu kamu cek
 
-1. **Kolom `profiles.locale` di database live.** Kode menyimpan pilihan bahasa
-   di kolom ini untuk pengguna yang login. Kolomnya ada di `docs/schema.sql`
-   dan izin UPDATE-nya ada di migrasi `_profile_customization`, tapi saya tidak
-   bisa memastikan kolom itu ada di database live (akses MCP Supabase ditolak).
-   Cek dengan:
-   ```sql
-   select column_name from information_schema.columns
-   where table_schema = 'public' and table_name = 'profiles' and column_name = 'locale';
-   ```
-   Kalau kosong, SQL ini menambahkannya (belum dijalankan):
-   ```sql
-   alter table public.profiles add column if not exists locale text not null default 'id'
-     check (locale in ('id', 'en'));
-   grant update (locale) on public.profiles to authenticated;
-   ```
-   Tanpa kolom ini, pemilih bahasa tetap jalan per perangkat; hanya sinkron
-   antar perangkat yang tidak terjadi.
+1. **Kolom `profiles.locale` belum ada di database live.** Migrasinya ada di
+   `supabase/migrations/20261011090000_profile_locale.sql` dan harus dijalankan
+   lewat Supabase SQL Editor. Sampai itu dijalankan, pilihan bahasa tetap
+   tersimpan per perangkat, tapi tidak ikut pindah antar perangkat.
 2. **Groq belum ada di repo.** `lib/i18n/llm.ts` menyediakan
    `languageInstruction(locale)` untuk dimasukkan ke system prompt saat
    integrasinya dibuat.

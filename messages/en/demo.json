@@ -38,7 +38,7 @@
     "openTrades": "Close your open trades first.",
     "noSession": "This chart has finished. Switch charts.",
     "saveFailed": "Couldn't save. Please try again in a moment.",
-    "noAccount": "Create a Practice Account first.",
+    "noAccount": "Create a Demo Account first.",
     "lessonFirst": "Finish the required lesson first.",
     "accountMissing": "Account not found.",
     "chartLoadFailed": "Couldn't load the chart.",
@@ -48,17 +48,17 @@
     "chartChanged": "This chart has changed.",
     "maxLines": "At most {max} lines.",
     "linesFailed": "Couldn't save the lines.",
-    "notReady": "The Practice Account isn't ready on the server yet.",
-    "hasActive": "You still have an active Practice Account.",
+    "notReady": "The Demo Account isn't ready on the server yet.",
+    "hasActive": "You still have an active Demo Account.",
     "riskLessonFirst": "Finish the risk lesson first.",
     "createFailed": "Couldn't create the account. Please try again in a moment.",
     "noActive": "No active account.",
     "notBust": "This account hasn't run out.",
-    "needsDbUpdate": "This feature is waiting for a Practice Account database update.",
+    "needsDbUpdate": "This feature is waiting for a Demo Account database update.",
     "staleRetry": "Your account just changed. Please try again.",
     "closeFailed": "Couldn't close the account. Please try again in a moment.",
     "badRequest": "Invalid request format.",
-    "signIn": "Sign in to use the Practice Account.",
+    "signIn": "Sign in to use the Demo Account.",
     "invalid": "Invalid request.",
     "badAnswer": "Invalid answer.",
     "unknownTip": "Unknown tip.",
@@ -161,20 +161,20 @@
   },
   "ui": {
     "layout": {
-      "eyebrow": "Practice Account",
+      "eyebrow": "Demo Account",
       "title": "Trade with a plan, not a guess"
     },
     "meta": {
-      "section": "Practice Account",
-      "jurnal": "Journal · Practice Account",
-      "kalkulator": "Calculator · Practice Account",
-      "lulus": "Graduation · Practice Account",
-      "riwayat": "Account history · Practice Account",
-      "tips": "Rex's Tips · Practice Account",
-      "trading": "Trading · Practice Account"
+      "section": "Demo Account",
+      "jurnal": "Journal · Demo Account",
+      "kalkulator": "Calculator · Demo Account",
+      "lulus": "Graduation · Demo Account",
+      "riwayat": "Account history · Demo Account",
+      "tips": "Rex's Tips · Demo Account",
+      "trading": "Trading · Demo Account"
     },
     "tabs": {
-      "label": "Practice Account sections",
+      "label": "Demo Account sections",
       "akun": "Account",
       "trading": "Trading",
       "jurnal": "Journal",
@@ -183,24 +183,24 @@
       "tips": "Rex's Tips"
     },
     "locked": {
-      "guestTitle": "Sign in to unlock the Practice Account",
-      "guestBody": "The Practice Account keeps your virtual balance, trades and journal in your account, so you need to sign in first.",
+      "guestTitle": "Sign in to unlock the Demo Account",
+      "guestBody": "The Demo Account keeps your virtual balance, trades and journal in your account, so you need to sign in first.",
       "signIn": "Sign in",
       "signUp": "Sign up free",
-      "sessionsTitle": "The Practice Account is still locked",
+      "sessionsTitle": "The Demo Account is still locked",
       "sessionsAria": "{sessions} of {needed, plural, one {# session} other {# sessions}} done",
       "sessionsCount": "{sessions}/{needed} sessions",
       "play": "Play the Trading Game",
       "oneSession": "One session = one round of 5 questions, recorded in your account."
     },
     "notReady": {
-      "title": "The Practice Account isn't ready",
-      "body": "The database doesn't have the Practice Account tables yet. Try again once the server update is done."
+      "title": "The Demo Account isn't ready",
+      "body": "The database doesn't have the Demo Account tables yet. Try again once the server update is done."
     },
     "create": {
-      "title": "Create a Practice Account",
+      "title": "Create a Demo Account",
       "body": "You get a virtual balance of <b>{balance}</b> with 1:{leverage} leverage, then trade on historical charts that play out candle by candle. What's scored is your discipline, not your profit. If the balance runs out, there's no top-up: we review it together, then start a new account.",
-      "button": "Create a Practice Account"
+      "button": "Create a Demo Account"
     },
     "reset": {
       "title": "Reset account",
@@ -212,7 +212,7 @@
       "cancel": "Cancel"
     },
     "dashboard": {
-      "graduatedTitle": "You've graduated from the Practice Account",
+      "graduatedTitle": "You've graduated from the Demo Account",
       "graduatedBody": "See the summary and what a demo can't teach.",
       "account": "Account #{n}",
       "stage": "Stage {n}",
@@ -484,7 +484,7 @@
       "segmentDone": "Segment finished",
       "segmentDoneBody": "Every candle on this chart has played. Move on to another chart.",
       "newChart": "New chart",
-      "graduatedTitle": "You've graduated from the Practice Account!",
+      "graduatedTitle": "You've graduated from the Demo Account!",
       "graduatedBody": "Your Disiplin held steady in Stage {n}. Practice stays open.",
       "summary": "See the summary",
       "stageUpTitle": "Stage {n} unlocked!",
@@ -508,7 +508,7 @@
       "exit": "Exit price",
       "entryLabel": "entry price",
       "exitLabel": "exit price",
-      "note": "The starting prices are only examples, not current market prices. The Practice Account doesn't use live prices. The − / + buttons move 1 pip.",
+      "note": "The starting prices are only examples, not current market prices. The Demo Account doesn't use live prices. The − / + buttons move 1 pip.",
       "result": "Result · {side} {lot} lot {pair}",
       "gross": "Gross profit/loss · {pips} pips",
       "net": "Result after costs",
@@ -555,7 +555,7 @@
       "noRevenge": "No revenge trades in Stage 3.",
       "revenge": "{n, plural, one {# revenge trade} other {# revenge trades}} in Stage 3.",
       "total": "{total, plural, one {# trade} other {# trades}} across {accounts, plural, one {# account} other {# accounts}} since your first trade.",
-      "eyebrow": "Practice Account",
+      "eyebrow": "Demo Account",
       "heading": "You've graduated",
       "body": "{n} trades in Stage 3 with Disiplin of at least {min}%. From the start, what was scored was your plan, not your profit, and your plans were consistent.",
       "shownTitle": "What you've shown",

@@ -38,7 +38,7 @@
     "openTrades": "Tutup trade yang terbuka dulu.",
     "noSession": "Chart ini sudah selesai. Ganti chart.",
     "saveFailed": "Gagal menyimpan. Coba lagi sebentar lagi.",
-    "noAccount": "Buat Akun Latihan dulu.",
+    "noAccount": "Buat Akun Demo dulu.",
     "lessonFirst": "Selesaikan materi wajib dulu.",
     "accountMissing": "Akun tidak ditemukan.",
     "chartLoadFailed": "Gagal memuat chart.",
@@ -48,17 +48,17 @@
     "chartChanged": "Chart ini sudah berganti.",
     "maxLines": "Maksimal {max} garis.",
     "linesFailed": "Gagal menyimpan garis.",
-    "notReady": "Akun Latihan belum siap di server.",
-    "hasActive": "Kamu masih punya Akun Latihan yang aktif.",
+    "notReady": "Akun Demo belum siap di server.",
+    "hasActive": "Kamu masih punya Akun Demo yang aktif.",
     "riskLessonFirst": "Selesaikan materi risiko dulu.",
     "createFailed": "Gagal membuat akun. Coba lagi sebentar lagi.",
     "noActive": "Tidak ada akun aktif.",
     "notBust": "Akun ini belum habis.",
-    "needsDbUpdate": "Fitur ini menunggu pembaruan database Akun Latihan.",
+    "needsDbUpdate": "Fitur ini menunggu pembaruan database Akun Demo.",
     "staleRetry": "Akunmu baru saja berubah. Coba lagi.",
     "closeFailed": "Gagal menutup akun. Coba lagi sebentar lagi.",
     "badRequest": "Format permintaan tidak valid.",
-    "signIn": "Masuk dulu untuk memakai Akun Latihan.",
+    "signIn": "Masuk dulu untuk memakai Akun Demo.",
     "invalid": "Permintaan tidak valid.",
     "badAnswer": "Jawaban tidak valid.",
     "unknownTip": "Tip tidak dikenal.",
@@ -161,20 +161,20 @@
   },
   "ui": {
     "layout": {
-      "eyebrow": "Akun Latihan",
+      "eyebrow": "Akun Demo",
       "title": "Trading dengan rencana, bukan tebakan"
     },
     "meta": {
-      "section": "Akun Latihan",
-      "jurnal": "Jurnal · Akun Latihan",
-      "kalkulator": "Kalkulator · Akun Latihan",
-      "lulus": "Lulus · Akun Latihan",
-      "riwayat": "Riwayat akun · Akun Latihan",
-      "tips": "Tips Rex · Akun Latihan",
-      "trading": "Trading · Akun Latihan"
+      "section": "Akun Demo",
+      "jurnal": "Jurnal · Akun Demo",
+      "kalkulator": "Kalkulator · Akun Demo",
+      "lulus": "Lulus · Akun Demo",
+      "riwayat": "Riwayat akun · Akun Demo",
+      "tips": "Tips Rex · Akun Demo",
+      "trading": "Trading · Akun Demo"
     },
     "tabs": {
-      "label": "Bagian Akun Latihan",
+      "label": "Bagian Akun Demo",
       "akun": "Akun",
       "trading": "Trading",
       "jurnal": "Jurnal",
@@ -183,24 +183,24 @@
       "tips": "Tips Rex"
     },
     "locked": {
-      "guestTitle": "Masuk untuk membuka Akun Latihan",
-      "guestBody": "Akun Latihan menyimpan saldo virtual, trade, dan jurnalmu di akun, jadi kamu perlu masuk dulu.",
+      "guestTitle": "Masuk untuk membuka Akun Demo",
+      "guestBody": "Akun Demo menyimpan saldo virtual, trade, dan jurnalmu di akun, jadi kamu perlu masuk dulu.",
       "signIn": "Masuk",
       "signUp": "Daftar gratis",
-      "sessionsTitle": "Akun Latihan masih terkunci",
+      "sessionsTitle": "Akun Demo masih terkunci",
       "sessionsAria": "{sessions} dari {needed} sesi selesai",
       "sessionsCount": "{sessions}/{needed} sesi",
       "play": "Main Trading Game",
       "oneSession": "Satu sesi = satu ronde 5 soal, tercatat di akunmu."
     },
     "notReady": {
-      "title": "Akun Latihan belum siap",
-      "body": "Database belum punya tabel Akun Latihan. Coba lagi setelah pembaruan server selesai."
+      "title": "Akun Demo belum siap",
+      "body": "Database belum punya tabel Akun Demo. Coba lagi setelah pembaruan server selesai."
     },
     "create": {
-      "title": "Buat Akun Latihan",
+      "title": "Buat Akun Demo",
       "body": "Kamu mendapat saldo virtual <b>{balance}</b> dengan leverage 1:{leverage}, lalu trading di chart historis yang berjalan candle demi candle. Yang dinilai adalah disiplinmu, bukan untungnya. Kalau saldo habis, tidak ada top-up: kita tinjau bersama, lalu mulai akun baru.",
-      "button": "Buat Akun Latihan"
+      "button": "Buat Akun Demo"
     },
     "reset": {
       "title": "Reset akun",
@@ -212,7 +212,7 @@
       "cancel": "Batal"
     },
     "dashboard": {
-      "graduatedTitle": "Kamu sudah lulus Akun Latihan",
+      "graduatedTitle": "Kamu sudah lulus Akun Demo",
       "graduatedBody": "Lihat ringkasan dan apa yang tidak bisa diajarkan demo.",
       "account": "Akun #{n}",
       "stage": "Stage {n}",
@@ -484,7 +484,7 @@
       "segmentDone": "Segmen selesai",
       "segmentDoneBody": "Semua candle chart ini sudah diputar. Lanjut ke chart lain.",
       "newChart": "Chart baru",
-      "graduatedTitle": "Kamu lulus Akun Latihan!",
+      "graduatedTitle": "Kamu lulus Akun Demo!",
       "graduatedBody": "Disiplinmu konsisten di Stage {n}. Latihan tetap terbuka.",
       "summary": "Lihat ringkasan",
       "stageUpTitle": "Stage {n} terbuka!",
@@ -508,7 +508,7 @@
       "exit": "Harga keluar",
       "entryLabel": "harga masuk",
       "exitLabel": "harga keluar",
-      "note": "Harga awal hanya contoh, bukan harga pasar saat ini. Akun Latihan tidak memakai harga live. Tombol − / + menggeser 1 pip.",
+      "note": "Harga awal hanya contoh, bukan harga pasar saat ini. Akun Demo tidak memakai harga live. Tombol − / + menggeser 1 pip.",
       "result": "Hasil · {side} {lot} lot {pair}",
       "gross": "Profit/rugi kotor · {pips} pip",
       "net": "Hasil setelah biaya",
@@ -555,7 +555,7 @@
       "noRevenge": "Tidak ada revenge trade di Stage 3.",
       "revenge": "{n} revenge trade di Stage 3.",
       "total": "{total} trade di {accounts} akun sejak trade pertamamu.",
-      "eyebrow": "Akun Latihan",
+      "eyebrow": "Akun Demo",
       "heading": "Kamu lulus",
       "body": "{n} trade di Stage 3 dengan Disiplin minimal {min}%. Yang dinilai sejak awal adalah rencanamu, bukan untungnya, dan rencanamu konsisten.",
       "shownTitle": "Yang sudah kamu tunjukkan",
