@@ -3,10 +3,13 @@
 import { useState, useTransition, type ReactNode } from "react"
 import { useRouter } from "next/navigation"
 import { LoaderCircle, RotateCcw } from "lucide-react"
-import { postJson } from "@/components/akun-latihan/post-json"
+import { useTranslations } from "next-intl"
+import { usePostJson } from "@/components/akun-latihan/post-json"
 
-async function post(action: "open" | "close" | "reset") {
-  return postJson("/api/akun-latihan/account", { action })
+/** Posts one account action; errors come back in the player's language. */
+function useAccountPost() {
+  const postJson = usePostJson()
+  return (action: "open" | "close" | "reset") => postJson("/api/akun-latihan/account", { action })
 }
 
 /**
@@ -29,6 +32,7 @@ export function AccountActionButton({
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [, startTransition] = useTransition()
+  const post = useAccountPost()
 
   async function run() {
     setBusy(true)
@@ -77,6 +81,8 @@ export function ResetAccount({
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [, startTransition] = useTransition()
+  const post = useAccountPost()
+  const t = useTranslations("demo.ui.reset")
 
   async function reset() {
     setBusy(true)
@@ -93,11 +99,9 @@ export function ResetAccount({
   return (
     <section aria-labelledby="reset-title" className="rounded-2xl border border-border p-5 sm:p-6">
       <h2 id="reset-title" className="text-base font-semibold">
-        Reset akun
+        {t("title")}
       </h2>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Tutup Akun #{number} dan mulai akun baru dengan {startingBalance}. Stage, XP dan jurnal akun lama tetap tersimpan.
-      </p>
+      <p className="mt-1 text-sm text-muted-foreground">{t("body", { n: number, balance: startingBalance })}</p>
       {!confirming ? (
         <button
           type="button"
@@ -105,21 +109,20 @@ export function ResetAccount({
           disabled={blocked !== null}
           className="btn btn-ghost btn-sm mt-4"
         >
-          <RotateCcw className="h-4 w-4" aria-hidden="true" /> Reset Akun #{number}
+          <RotateCcw className="h-4 w-4" aria-hidden="true" /> {t("button", { n: number })}
         </button>
       ) : (
-        <div role="group" aria-label="Konfirmasi reset" className="pop-in mt-4 rounded-xl border border-primary/40 bg-primary/10 p-4">
+        <div role="group" aria-label={t("confirmLabel")} className="pop-in mt-4 rounded-xl border border-primary/40 bg-primary/10 p-4">
           <p className="text-sm">
-            Akun #{number} akan ditutup dan tercatat sebagai <strong>direset</strong> di Riwayat akun. Saldonya tidak
-            dipindahkan. Rex akan meninjau akunmu dulu, lalu kamu membuka Akun #{number + 1}.
+            {t.rich("confirmBody", { n: number, next: number + 1, b: (c) => <strong>{c}</strong> })}
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
             <button type="button" onClick={reset} disabled={busy} className="btn btn-sm">
               {busy && <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />}
-              Ya, reset Akun #{number}
+              {t("yes", { n: number })}
             </button>
             <button type="button" onClick={() => setConfirming(false)} disabled={busy} className="btn btn-ghost btn-sm">
-              Batal
+              {t("cancel")}
             </button>
           </div>
         </div>

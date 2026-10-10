@@ -5,7 +5,15 @@ import { roundMoney } from "@/lib/demo/money"
 import type { OrderInput } from "@/lib/demo/orders"
 import type { Segment } from "@/lib/demo/segments"
 import type { ClosedSummary, TradeRow, TradingState } from "@/lib/demo/state"
+import { progressLabel } from "@/lib/demo/stages"
 import { buildView } from "@/lib/demo/view"
+import { translator } from "@/lib/i18n/test-messages"
+import { say, type Msg } from "@/lib/i18n/translator"
+
+// Refusals are catalogue messages; the tests read them in Indonesian.
+const id = translator("id")
+const demo = translator("id", "demo")
+const words = (r: object) => ("error" in r ? say(demo, (r as { error: Msg }).error) : null)
 
 // A flat EURUSD segment around 1.1700: 40 H4 candles, the first 30 shown.
 const H4 = 4 * 3600
@@ -17,7 +25,7 @@ function state(over: Partial<TradingState> = {}, candles: Record<number, Partial
     account: { id: "acc", number: 1, balance: 200, startingBalance: 200, version: 3, candlesPlayed: 0 },
     stage: 1,
     session: { id: "ses", segmentId: "eurusd-1", pair: "EURUSD", cursor: 29, lastIndex: 39, status: "active" },
-    segment: { pair: "EURUSD", digits: 5, timeframe: "H4", period: "Jan 2000" },
+    segment: { pair: "EURUSD", digits: 5, timeframe: "H4", start: T0 },
     segmentCandles: Array.from({ length: 40 }, (_, i) => ({ ...flat(i), ...candles[i] })),
     open: [],
     sessionClosed: [],
@@ -80,25 +88,25 @@ function rowFrom(t: NewTrade, over: Partial<TradeRow> = {}): TradeRow {
 
 function open(s: TradingState, input: OrderInput = plan, over: Partial<TradeRow> = {}) {
   const r = planOrder(s, input)
-  if ("error" in r) throw new Error(r.error)
+  if ("error" in r) throw new Error(r.error.key)
   return rowFrom(r.trade, over)
 }
 
-const settled = (r: SettlePlan | { error: string }) => {
-  if ("error" in r) throw new Error(r.error)
+const settled = (r: SettlePlan | { error: Msg }) => {
+  if ("error" in r) throw new Error(r.error.key)
   return r
 }
 
 describe("planOrder", () => {
   it("won't confirm a Stage 1 trade without reasons, SL and TP", () => {
-    expect(planOrder(state(), { ...plan, reasons: [], slPips: null, tpPips: null })).toEqual({ error: "Pilih minimal 1 alasan." })
-    expect(planOrder(state(), { ...plan, slPips: null })).toEqual({ error: "Pasang stop loss." })
-    expect(planOrder(state(), { ...plan, tpPips: null })).toEqual({ error: "Pasang take profit." })
+    expect(words(planOrder(state(), { ...plan, reasons: [], slPips: null, tpPips: null }))).toBe("Pilih minimal 1 alasan.")
+    expect(words(planOrder(state(), { ...plan, slPips: null }))).toBe("Pasang stop loss.")
+    expect(words(planOrder(state(), { ...plan, tpPips: null }))).toBe("Pasang take profit.")
   })
 
   it("books the order at the current close with the panel's numbers", () => {
     const r = planOrder(state(), plan)
-    if ("error" in r) throw new Error(r.error)
+    if ("error" in r) throw new Error(r.error.key)
     expect(r.trade).toMatchObject({
       entry_price: 1.17,
       sl: 1.167,
@@ -115,14 +123,14 @@ describe("planOrder", () => {
 
   it("refuses when the segment has ended", () => {
     const s = state({ session: { id: "ses", segmentId: "eurusd-1", pair: "EURUSD", cursor: 39, lastIndex: 39, status: "ended" } })
-    expect(planOrder(s, plan)).toEqual({ error: "Mulai chart dulu." })
+    expect(words(planOrder(s, plan))).toBe("Mulai chart dulu.")
   })
 
   it("flags a bigger lot within 3 candles of a loss as revenge", () => {
     const loss: ClosedSummary = { accountId: "acc", stage: 2, counted: true, disiplin: 100, net: -3.1, swap: 0, lot: 0.01, closedClock: 5 }
     const s = state({ stage: 2, history: [loss], account: { ...state().account, candlesPlayed: 7 } })
     const r = planOrder(s, { ...plan, lot: 0.03 })
-    if ("error" in r) throw new Error(r.error)
+    if ("error" in r) throw new Error(r.error.key)
     expect(r.trade.revenge).toBe(true)
     expect(r.events[0]).toMatchObject({ kind: "opened", revenge: true })
     const calm = planOrder(state({ ...s, account: { ...s.account, candlesPlayed: 9 } }), { ...plan, lot: 0.03 })
@@ -181,7 +189,7 @@ describe("planStep", () => {
 
   it("won't step past the end", () => {
     const s = state({ session: { id: "ses", segmentId: "eurusd-1", pair: "EURUSD", cursor: 39, lastIndex: 39, status: "active" } })
-    expect(planStep(s)).toEqual({ error: "Segmen ini sudah habis. Ganti chart." })
+    expect(words(planStep(s))).toBe("Segmen ini sudah habis. Ganti chart.")
   })
 
   it("opens Stage 2 after the tenth counted trade at 80%", () => {
@@ -280,7 +288,7 @@ describe("planModify", () => {
     ["no change", "tp", 45, "Tidak ada perubahan."],
     ["a TP on the losing side", "tp", -10, "Jarak TP tidak valid."],
   ] as const)("refuses %s", (_name, field, pips, error) => {
-    expect(planModify(withTrade, "trade-1", field, pips)).toEqual({ error })
+    expect(words(planModify(withTrade, "trade-1", field, pips))).toBe(error)
   })
 
   it("a widened SL fails its Disiplin check at close", () => {
@@ -301,9 +309,9 @@ describe("planStart", () => {
 
   it("refuses to change the chart with a trade open", () => {
     const s = state()
-    expect(planStart(state({ open: [open(s)] }), pool, new Map(), () => 0)).toEqual({
-      error: "Tutup trade yang terbuka dulu sebelum ganti chart.",
-    })
+    expect(words(planStart(state({ open: [open(s)] }), pool, new Map(), () => 0))).toBe(
+      "Tutup trade yang terbuka dulu sebelum ganti chart.",
+    )
   })
 
   it("always gives a different chart", () => {
@@ -328,7 +336,7 @@ describe("buildView never sends a candle past the cursor", () => {
     const v = buildView(state({ session: null, segment: null }))
     expect(v.account.figures).toMatchObject({ balance: 200, equity: 200, openPnl: 0, marginUsed: 0, freeMargin: 200 })
     expect(v.account.bust).toBe(false)
-    expect(v.stage.label).toBe("0/10 trade · Disiplin — (butuh 80%)")
+    expect(progressLabel(v.stage.progress, id)).toBe("0/10 trade · Disiplin — (butuh 80%)")
     expect(v.guide).toBe(true)
   })
 })
@@ -440,7 +448,7 @@ describe("a reset never wipes the record: stages, Disiplin and graduation count 
 
   it("stage progress keeps the old account's trades", () => {
     const v = buildView(fresh(1, past("old", 1, [40, 40, 40, 40, 40, 40, 40])))
-    expect(v.stage.label).toBe("7/10 trade · Disiplin 40% (butuh 80%)")
+    expect(progressLabel(v.stage.progress, id)).toBe("7/10 trade · Disiplin 40% (butuh 80%)")
   })
 
   it("the Disiplin average keeps them too", () => {

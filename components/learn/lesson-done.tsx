@@ -1,12 +1,14 @@
 "use client"
 
 import { Check, CircleCheck, Circle } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { Skeleton } from "@/components/progress/skeleton"
 import { setLessonDone, useLessonsDone } from "@/lib/learn/progress"
 
 /** The "mark as finished" toggle at the foot of a lesson. */
 export function LessonDoneButton({ slug }: { slug: string }) {
   const done = useLessonsDone()
+  const t = useTranslations("learn.done")
   if (!done) return <Skeleton className="h-[52px] w-48 rounded-xl" />
   const finished = done.includes(slug)
 
@@ -20,7 +22,7 @@ export function LessonDoneButton({ slug }: { slug: string }) {
       <span key={String(finished)} className="pop-in flex">
         {finished ? <CircleCheck className="h-4 w-4 text-primary" /> : <Check className="h-4 w-4" />}
       </span>
-      {finished ? "Sudah selesai" : "Tandai selesai"}
+      {finished ? t("finished") : t("mark")}
     </button>
   )
 }
@@ -28,11 +30,12 @@ export function LessonDoneButton({ slug }: { slug: string }) {
 /** Small status dot beside a lesson in lists. */
 export function LessonStatus({ slug }: { slug: string }) {
   const done = useLessonsDone()
+  const t = useTranslations("learn.done")
   if (!done) return <Skeleton className="h-5 w-5 rounded-full" />
   return done.includes(slug) ? (
-    <CircleCheck className="pop-in h-5 w-5 shrink-0 text-primary" aria-label="Selesai" />
+    <CircleCheck className="pop-in h-5 w-5 shrink-0 text-primary" aria-label={t("doneLabel")} />
   ) : (
-    <Circle className="h-5 w-5 shrink-0 text-faint" aria-label="Belum" />
+    <Circle className="h-5 w-5 shrink-0 text-faint" aria-label={t("notDone")} />
   )
 }
 
@@ -44,6 +47,7 @@ export function LearnProgressRing({ total, slugs }: { total: number; slugs?: str
   const stroke = 7
   const r = (size - stroke) / 2
   const circ = 2 * Math.PI * r
+  const t = useTranslations("learn.done")
 
   return (
     <div className="flex items-center gap-4">
@@ -74,7 +78,7 @@ export function LearnProgressRing({ total, slugs }: { total: number; slugs?: str
         )}
       </div>
       <p className="text-sm text-muted-foreground">
-        {done && count === 0 ? "Belum ada materi selesai." : "materi selesai di perangkat ini"}
+        {done && count === 0 ? t("none") : t("onDevice")}
       </p>
     </div>
   )

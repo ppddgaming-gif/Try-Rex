@@ -1,11 +1,13 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { ArrowLeft, ArrowRight, Clock, LineChart } from "lucide-react"
+import { ArrowLeft, ArrowRight, Clock, Languages, LineChart } from "lucide-react"
+import { getLocale, getTranslations } from "next-intl/server"
 import { DraftNote, SourceList } from "@/components/learn/draft-note"
 import { LessonBlocks } from "@/components/learn/lesson-blocks"
 import { LessonDoneButton } from "@/components/learn/lesson-done"
-import { LESSONS, lessonBySlug, neighbours, trackById } from "@/lib/learn/content"
+import type { Locale } from "@/lib/i18n/locale"
+import { LESSONS, bodyAvailableIn, lessonBySlug, neighbours, trackById } from "@/lib/learn/content"
 
 export function generateStaticParams() {
   return LESSONS.map((l) => ({ slug: l.slug }))
@@ -14,7 +16,8 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
   const lesson = lessonBySlug.get(slug)
-  return { title: lesson ? lesson.title : "Materi" }
+  const t = await getTranslations("learn")
+  return { title: lesson ? t(`lessons.${lesson.slug}.title`) : t("lesson.fallbackTitle") }
 }
 
 export default async function LessonPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -24,6 +27,11 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
 
   const track = trackById.get(lesson.track)
   const { prev, next } = neighbours(slug)
+  const [t, locale] = await Promise.all([getTranslations("learn"), getLocale() as Promise<Locale>])
+  // The body is Indonesian until it's translated: shown as is, labelled, and
+  // marked lang="id" so screen readers pronounce it right.
+  const translated = bodyAvailableIn(lesson, locale)
+  const bodyLang: Locale = translated ? locale : "id"
 
   return (
     <article className="mx-auto max-w-3xl px-5 py-6 lg:px-8">
@@ -31,20 +39,20 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
         href="/belajar"
         className="enter inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
       >
-        <ArrowLeft className="h-4 w-4" /> Belajar 101
+        <ArrowLeft className="h-4 w-4" /> {t("lesson.back")}
       </Link>
 
       <header className="mt-2">
-        <p className="eyebrow enter">{track?.title}</p>
-        <h1 className="enter-focus mt-3 text-3xl font-extrabold leading-tight sm:text-[40px]">{lesson.title}</h1>
+        <p className="eyebrow enter">{track && t(`tracks.${track.id}.title`)}</p>
+        <h1 className="enter-focus mt-3 text-3xl font-extrabold leading-tight sm:text-[40px]">{t(`lessons.${lesson.slug}.title`)}</h1>
         <p className="enter mt-3 text-lg text-muted-foreground" style={{ "--enter-delay": "80ms" } as React.CSSProperties}>
-          {lesson.summary}
+          {t(`lessons.${lesson.slug}.summary`)}
         </p>
         <p className="enter mt-4 flex items-center gap-4 text-sm text-faint" style={{ "--enter-delay": "120ms" } as React.CSSProperties}>
           <span className="flex items-center gap-1.5">
-            <Clock className="h-4 w-4" aria-hidden="true" /> {lesson.minutes} menit baca
+            <Clock className="h-4 w-4" aria-hidden="true" /> {t("lesson.readMinutes", { n: lesson.minutes })}
           </span>
-          <span className="capitalize">Tingkat {lesson.level}</span>
+          <span>{t("lesson.level", { level: t(`level.${lesson.level}`) })}</span>
         </p>
       </header>
 
@@ -54,16 +62,29 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
         </div>
       )}
 
-      <p className="mt-6 text-xs text-faint">Ketuk kata bergaris untuk melihat artinya.</p>
-      <div className="mt-3">
-        <LessonBlocks blocks={lesson.blocks} />
+      {!translated && (
+        <p
+          role="note"
+          className="mt-6 flex items-start gap-3 rounded-2xl border border-wait/30 bg-wait/10 px-4 py-3 text-sm leading-relaxed"
+        >
+          <Languages className="mt-0.5 h-4 w-4 shrink-0 text-wait" aria-hidden="true" />
+          <span>
+            <strong>{t("lesson.notTranslated")}</strong>{" "}
+            <span className="text-muted-foreground">{t("lesson.notTranslatedBody")}</span>
+          </span>
+        </p>
+      )}
+
+      <p className="mt-6 text-xs text-faint">{t("lesson.tapHint")}</p>
+      <div className="mt-3" lang={bodyLang}>
+        <LessonBlocks blocks={lesson.blocks} lang={bodyLang} />
       </div>
 
       <div className="mt-10 flex flex-wrap items-center gap-3">
         <LessonDoneButton slug={lesson.slug} />
         {lesson.practice && (
           <Link href={lesson.practice.href} className="btn btn-ghost">
-            <LineChart className="h-4 w-4" /> {lesson.practice.label}
+            <LineChart className="h-4 w-4" /> {t(`practice.${lesson.practice.key}`)}
           </Link>
         )}
       </div>
@@ -72,13 +93,13 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
         <SourceList sources={lesson.sources} />
       </div>
 
-      <nav aria-label="Materi lain" className="mt-8 grid gap-3 sm:grid-cols-2">
+      <nav aria-label={t("lesson.others")} className="mt-8 grid gap-3 sm:grid-cols-2">
         {prev ? (
           <Link href={`/belajar/${prev.slug}`} className="lift rounded-2xl border border-border bg-card p-4 hover:border-primary/40">
             <p className="flex items-center gap-1 text-xs text-faint">
-              <ArrowLeft className="h-3 w-3" /> Sebelumnya
+              <ArrowLeft className="h-3 w-3" /> {t("lesson.prev")}
             </p>
-            <p className="mt-1 font-semibold">{prev.title}</p>
+            <p className="mt-1 font-semibold">{t(`lessons.${prev.slug}.title`)}</p>
           </Link>
         ) : (
           <span />
@@ -89,9 +110,9 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
             className="lift rounded-2xl border border-border bg-card p-4 text-right hover:border-primary/40"
           >
             <p className="flex items-center justify-end gap-1 text-xs text-faint">
-              Berikutnya <ArrowRight className="h-3 w-3" />
+              {t("lesson.next")} <ArrowRight className="h-3 w-3" />
             </p>
-            <p className="mt-1 font-semibold">{next.title}</p>
+            <p className="mt-1 font-semibold">{t(`lessons.${next.slug}.title`)}</p>
           </Link>
         )}
       </nav>

@@ -1,6 +1,7 @@
 import { closeAccount, openAccount } from "@/lib/demo/accounts"
-import { authed, json } from "@/lib/demo/route"
+import { authed, errorJson, json } from "@/lib/demo/route"
 import { getAccess } from "@/lib/demo/server"
+import { msg } from "@/lib/i18n/translator"
 
 /**
  * POST { action }:
@@ -16,7 +17,7 @@ export async function POST(request: Request) {
   if (!auth.ok) return auth.response
 
   const access = await getAccess(auth.userId)
-  if (!access.open) return json({ error: access.unlock.hint }, 403)
+  if (!access.open) return errorJson(msg("unlock.hint", { needed: access.unlock.needed, sessions: access.unlock.sessions }), 403)
 
   const action = auth.body.action ?? "open"
   const result =
@@ -27,6 +28,6 @@ export async function POST(request: Request) {
         : action === "reset"
           ? await closeAccount(auth.userId, "reset")
           : null
-  if (!result) return json({ error: "Permintaan tidak valid." }, 400)
-  return "error" in result ? json({ error: result.error }, result.status) : json(result)
+  if (!result) return errorJson(msg("errors.invalid"), 400)
+  return "error" in result ? errorJson(result.error, result.status) : json(result)
 }

@@ -18,29 +18,37 @@ export function safeNext(value: FormDataEntryValue | string | null | undefined, 
   return value
 }
 
-export const EMAIL_TAKEN = "Email ini sudah terdaftar. Coba masuk, atau reset password kalau lupa."
-const TOO_MANY = "Terlalu banyak percobaan. Tunggu beberapa menit, lalu coba lagi."
+/** Message keys under auth.errors (messages/<locale>/auth.json). */
+export type AuthErrorKey =
+  | "invalidCredentials"
+  | "emailNotConfirmed"
+  | "emailTaken"
+  | "tooShort"
+  | "samePassword"
+  | "tooMany"
+  | "invalidEmail"
+  | "generic"
 
-/** Supabase auth errors as plain Indonesian. Unknown errors get a generic line. */
-export function authErrorMessage(error: Pick<AuthError, "code" | "status" | "message">) {
+/** Supabase auth errors as a message key. Unknown errors get the generic line. */
+export function authErrorKey(error: Pick<AuthError, "code" | "status" | "message">): AuthErrorKey {
   switch (error.code) {
     case "invalid_credentials":
-      return "Email atau password salah."
+      return "invalidCredentials"
     case "email_not_confirmed":
-      return "Email kamu belum dikonfirmasi. Cek kotak masuk untuk link konfirmasi."
+      return "emailNotConfirmed"
     case "user_already_exists":
     case "email_exists":
-      return EMAIL_TAKEN
+      return "emailTaken"
     case "weak_password":
-      return `Password terlalu pendek. Minimal ${MIN_PASSWORD} karakter.`
+      return "tooShort"
     case "same_password":
-      return "Password baru harus berbeda dari password lama."
+      return "samePassword"
     case "over_request_rate_limit":
     case "over_email_send_rate_limit":
-      return TOO_MANY
+      return "tooMany"
     case "validation_failed":
-      return "Format email tidak valid."
+      return "invalidEmail"
   }
-  if (error.status === 429) return TOO_MANY
-  return "Terjadi kesalahan. Coba lagi sebentar lagi."
+  if (error.status === 429) return "tooMany"
+  return "generic"
 }

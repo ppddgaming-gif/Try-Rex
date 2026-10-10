@@ -2,6 +2,7 @@
 
 import { useEffect, useEffectEvent, useState } from "react"
 import Link from "next/link"
+import { useLocale, useTranslations } from "next-intl"
 import {
   AlertTriangle,
   ArrowRight,
@@ -20,7 +21,7 @@ import { AccountPanel, StageCard } from "@/components/akun-latihan/account-panel
 import { FirstTradeGuide, type GuideProgress } from "@/components/akun-latihan/first-trade-guide"
 import { OpenTrades } from "@/components/akun-latihan/open-trades"
 import { OrderPanel, quoteFor, sideStyle, type Draft } from "@/components/akun-latihan/order-panel"
-import { postJson } from "@/components/akun-latihan/post-json"
+import { usePostJson } from "@/components/akun-latihan/post-json"
 import { RexTipCard, useTipQueue } from "@/components/akun-latihan/rex-tip"
 import { TradeChart } from "@/components/akun-latihan/trade-chart"
 import { ClosedTrades } from "@/components/akun-latihan/trade-result"
@@ -30,6 +31,8 @@ import { instrument } from "@/lib/demo/instruments"
 import type { Side } from "@/lib/demo/money"
 import type { ReviewAnswer } from "@/lib/demo/state"
 import type { DemoView } from "@/lib/demo/view"
+import { periodLabel } from "@/lib/challenge-text"
+import type { Locale } from "@/lib/i18n/locale"
 import { addServerXp } from "@/lib/progress/use-progress"
 
 type Speed = (typeof REPLAY.SPEEDS)[number]
@@ -57,6 +60,9 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
   const [stageUp, setStageUp] = useState<number | null>(null)
   const [graduated, setGraduated] = useState(false)
   const tips = useTipQueue(initial.tipsSeen)
+  const postJson = usePostJson()
+  const t = useTranslations("demo.ui.screen")
+  const locale = useLocale() as Locale
 
   const session = view.session
   // "Akun habis", decided on the server: no candle, order or new chart.
@@ -189,14 +195,11 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
     return (
       <div className="glass-card flex flex-col items-center rounded-2xl px-6 py-12 text-center">
         <ChartIcon className="h-10 w-10 text-primary" aria-hidden="true" />
-        <h2 className="mt-4 font-display text-xl font-bold">Siap trading?</h2>
-        <p className="mt-2 max-w-md text-sm text-muted-foreground">
-          Rex memilih chart H4 historis dari pair di stage-mu. Kamu melihat {REPLAY.HISTORY_CANDLES} candle, lalu memutar maju
-          candle demi candle.
-        </p>
+        <h2 className="mt-4 font-display text-xl font-bold">{t("readyTitle")}</h2>
+        <p className="mt-2 max-w-md text-sm text-muted-foreground">{t("readyBody", { n: REPLAY.HISTORY_CANDLES })}</p>
         {error && <p className="mt-3 text-sm text-primary">{error}</p>}
         <button type="button" onClick={() => void changeChart()} disabled={busy} className="btn mt-6">
-          Mulai chart
+          {t("startChart")}
         </button>
       </div>
     )
@@ -208,11 +211,11 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
           list and `order` interleaves them: chart, controls, the order
           panel and Rex right under them, then the rest. */}
       <div className="contents lg:flex lg:min-w-0 lg:flex-col lg:gap-4">
-        <section aria-label="Chart" className="glass-card order-1 rounded-2xl p-3 sm:p-4 lg:order-none">
+        <section aria-label={t("chartLabel")} className="glass-card order-1 rounded-2xl p-3 sm:p-4 lg:order-none">
           <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-2 px-1">
             <p className="font-display text-lg font-bold">{session.pair}</p>
             <p className="text-xs text-muted-foreground">
-              {session.timeframe} · {session.period} · data historis
+              {t("meta", { timeframe: session.timeframe, period: periodLabel(session.start, locale) })}
             </p>
             <div className="ml-auto flex items-center gap-2">
               <button
@@ -225,16 +228,16 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
                   drawing ? "border-primary bg-primary/15 text-primary" : "border-border text-muted-foreground hover:text-foreground",
                 ].join(" ")}
               >
-                <PencilLine className="h-3.5 w-3.5" aria-hidden="true" /> Garis
+                <PencilLine className="h-3.5 w-3.5" aria-hidden="true" /> {t("lines")}
               </button>
               <button
                 type="button"
                 onClick={() => void changeChart()}
                 disabled={busy || hasOpen || bust}
-                title={hasOpen ? "Tutup trade yang terbuka dulu" : undefined}
+                title={hasOpen ? t("closeOpenFirst") : undefined}
                 className="flex min-h-10 items-center gap-1.5 rounded-lg border border-border px-3 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
               >
-                <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" /> Ganti chart
+                <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" /> {t("changeChart")}
               </button>
             </div>
           </div>
@@ -252,7 +255,7 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
           {(drawing || lines.length > 0) && (
             <div className="mt-2 flex flex-wrap items-center gap-1.5 px-1">
               {drawing && (
-                <p className="mr-1 text-xs text-muted-foreground">Ketuk chart untuk menaruh garis, geser untuk memindahkan.</p>
+                <p className="mr-1 text-xs text-muted-foreground">{t("drawHint")}</p>
               )}
               {lines.map((p, i) => (
                 <span key={i} className="flex items-center gap-1 rounded-full border border-primary/40 bg-primary/10 py-0.5 pl-2.5 pr-1 font-mono text-xs text-primary">
@@ -261,7 +264,7 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
                     type="button"
                     onClick={() => saveLines(lines.filter((_, j) => j !== i))}
                     disabled={switching}
-                    aria-label={`Hapus garis ${price(session.pair, p)}`}
+                    aria-label={t("removeLine", { price: price(session.pair, p) })}
                     className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-primary/20"
                   >
                     <X className="h-3.5 w-3.5" aria-hidden="true" />
@@ -272,7 +275,7 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
           )}
         </section>
 
-        <section aria-label="Kontrol replay" className="glass-card order-2 rounded-2xl p-3 sm:p-4 lg:order-none">
+        <section aria-label={t("controls")} className="glass-card order-2 rounded-2xl p-3 sm:p-4 lg:order-none">
           {error && (
             <p role="alert" className="mb-3 flex items-start gap-2 rounded-xl border border-primary/40 bg-primary/10 px-3 py-2 text-sm">
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" /> {error}
@@ -282,22 +285,24 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <Rex size={44} mood="thinking" className="shrink-0" />
               <div className="min-w-0 flex-1">
-                <p className="font-semibold">Akun #{view.account.number} habis</p>
+                <p className="font-semibold">{t("bustTitle", { n: view.account.number })}</p>
                 <p className="text-sm text-muted-foreground">
-                  Saldo {usd(view.account.figures.balance)} di bawah batas akun habis Stage {view.stage.current} (
-                  {usd(view.account.bustLine)}) dan tidak ada trade terbuka. Tidak ada tombol tambah saldo: Rex sudah
-                  menyiapkan review akunmu.
+                  {t("bustBody", {
+                    balance: usd(view.account.figures.balance),
+                    stage: view.stage.current,
+                    line: usd(view.account.bustLine),
+                  })}
                 </p>
               </div>
               <Link href="/akun-latihan" className="btn btn-sm shrink-0">
-                Lihat review Rex <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                {t("seeReview")} <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
           ) : live ? (
             <>
               <div className="flex flex-wrap items-center gap-2">
                 <button type="button" onClick={next} disabled={busy} className="btn btn-ghost btn-sm">
-                  <SkipForward className="h-4 w-4" aria-hidden="true" /> Candle berikutnya
+                  <SkipForward className="h-4 w-4" aria-hidden="true" /> {t("next")}
                 </button>
                 <button
                   type="button"
@@ -306,9 +311,9 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
                   className="btn btn-ghost btn-sm"
                 >
                   {playing ? <Pause className="h-4 w-4" aria-hidden="true" /> : <Play className="h-4 w-4" aria-hidden="true" />}
-                  {playing ? "Jeda" : "Putar"}
+                  {playing ? t("pause") : t("play")}
                 </button>
-                <div role="radiogroup" aria-label="Kecepatan" className="flex gap-1 rounded-xl bg-inset p-1">
+                <div role="radiogroup" aria-label={t("speed")} className="flex gap-1 rounded-xl bg-inset p-1">
                   {REPLAY.SPEEDS.map((s) => (
                     <button
                       key={s}
@@ -326,7 +331,7 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
                   ))}
                 </div>
                 <p className="ml-auto font-mono text-xs text-muted-foreground" aria-live="polite">
-                  {session.remaining} candle tersisa
+                  {t("remaining", { n: session.remaining })}
                 </p>
               </div>
               <div className="mt-3 grid grid-cols-3 gap-2">
@@ -361,19 +366,19 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
                 </button>
               </div>
               <p className="mt-2 text-[11px] text-faint">
-                WAIT memajukan satu candle tanpa trading.
-                {full && ` Stage ${view.stage.current}: maksimal ${view.stage.maxOpenTrades} trade terbuka.`} Tombol: N candle
-                berikutnya, P putar/jeda.
+                {t("waitHelp")}
+                {full && t("fullHelp", { stage: view.stage.current, max: view.stage.maxOpenTrades })}
+                {t("keysHelp")}
               </p>
             </>
           ) : (
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className="font-semibold">Segmen selesai</p>
-                <p className="text-sm text-muted-foreground">Semua candle chart ini sudah diputar. Lanjut ke chart lain.</p>
+                <p className="font-semibold">{t("segmentDone")}</p>
+                <p className="text-sm text-muted-foreground">{t("segmentDoneBody")}</p>
               </div>
               <button type="button" onClick={() => void changeChart()} disabled={busy} className="btn btn-sm">
-                Chart baru
+                {t("newChart")}
               </button>
             </div>
           )}
@@ -402,14 +407,12 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
             <div className="flex items-center gap-3">
               <Rex size={40} mood="happy" className="shrink-0" />
               <div className="min-w-0 flex-1">
-                <p className="font-display font-bold">Kamu lulus Akun Latihan!</p>
-                <p className="text-sm text-muted-foreground">
-                  Disiplinmu konsisten di Stage {view.stage.current}. Latihan tetap terbuka.
-                </p>
+                <p className="font-display font-bold">{t("graduatedTitle")}</p>
+                <p className="text-sm text-muted-foreground">{t("graduatedBody", { n: view.stage.current })}</p>
               </div>
             </div>
             <Link href="/akun-latihan/lulus" className="btn btn-sm mt-3 w-full">
-              <GraduationCap className="h-4 w-4" aria-hidden="true" /> Lihat ringkasan
+              <GraduationCap className="h-4 w-4" aria-hidden="true" /> {t("summary")}
             </Link>
           </section>
         )}
@@ -419,13 +422,13 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
             <div className="flex items-center gap-3">
               <Rex size={40} mood="happy" className="shrink-0" />
               <div className="min-w-0 flex-1">
-                <p className="font-display font-bold">Stage {stageUp} terbuka!</p>
-                <p className="text-sm text-muted-foreground">Aturan baru berlaku untuk trade berikutnya. Lihat kartu Stage.</p>
+                <p className="font-display font-bold">{t("stageUpTitle", { n: stageUp })}</p>
+                <p className="text-sm text-muted-foreground">{t("stageUpBody")}</p>
               </div>
               <button
                 type="button"
                 onClick={() => setStageUp(null)}
-                aria-label="Tutup"
+                aria-label={t("close")}
                 className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted"
               >
                 <X className="h-4 w-4" />

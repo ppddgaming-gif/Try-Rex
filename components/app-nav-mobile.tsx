@@ -2,7 +2,9 @@
 
 import { useState } from "react"
 import { Menu, X } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { BrandMark } from "@/components/brand-mark"
+import { LocaleSwitcher } from "@/components/locale-switcher"
 import { NavLinks, type NavLocks } from "@/components/nav-links"
 import { ProfileCard, type ProfileSummary } from "@/components/profile-card"
 
@@ -11,14 +13,17 @@ import { ProfileCard, type ProfileSummary } from "@/components/profile-card"
 export function AppNavMobile({ profile, locks }: { profile: ProfileSummary | null; locks: NavLocks }) {
   const [open, setOpen] = useState(false)
   const close = () => setOpen(false)
+  const t = useTranslations("nav")
 
   return (
     <header className="glass-bar sticky top-0 z-40 border-b border-border lg:hidden" style={{ viewTransitionName: "app-header" }}>
       <div className="flex h-16 items-center justify-between px-5">
         <BrandMark onNavigate={close} />
+        <div className="flex items-center gap-2">
+          <LocaleSwitcher />
         <button
           onClick={() => setOpen((v) => !v)}
-          aria-label={open ? "Tutup menu" : "Buka menu"}
+          aria-label={open ? t("closeMenu") : t("openMenu")}
           aria-expanded={open}
           aria-controls="app-nav-menu"
           className="flex h-11 w-11 items-center justify-center rounded-xl border border-border text-muted-foreground transition-colors hover:text-foreground"
@@ -28,6 +33,7 @@ export function AppNavMobile({ profile, locks }: { profile: ProfileSummary | nul
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </span>
         </button>
+        </div>
       </div>
 
       {/* Stays mounted so the drawer animates closed as well as open. */}

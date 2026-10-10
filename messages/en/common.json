@@ -1,0 +1,34 @@
+{
+  "meta": {
+    "description": "Learn trading through daily practice on real price data, AI evaluation and measurable progress with TRY-REX, your AI trading mentor."
+  },
+  "language": {
+    "label": "Language",
+    "id": "Bahasa Indonesia",
+    "en": "English"
+  },
+  "levels": {
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard"
+  },
+  "dash": "—",
+  "list": {
+    "two": "{a} and {b}",
+    "many": "{head}, and {last}"
+  },
+  "reasons": {
+    "trend-naik": "Uptrend",
+    "trend-turun": "Downtrend",
+    "pantulan-support": "Bounce off support",
+    "penolakan-resistance": "Rejection at resistance",
+    "breakout": "Breakout",
+    "menunggu-konfirmasi": "Waiting for confirmation",
+    "risk-reward-bagus": "Good risk:reward",
+    "ikut-feeling": "Gut feeling"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again in a moment.",
+    "network": "Can't connect. Check your connection."
+  }
+}

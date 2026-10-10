@@ -4,6 +4,7 @@ import type { ProfileSummary } from "@/components/profile-card"
 import { LevelUpToast } from "@/components/progress/level-up-toast"
 import { ProgressAccount } from "@/components/progress/progress-account"
 import { Sidebar } from "@/components/sidebar"
+import { getTranslations } from "next-intl/server"
 import { getCurrentUser } from "@/lib/auth"
 import { getAccess } from "@/lib/demo/server"
 import type { NavLocks } from "@/components/nav-links"
@@ -23,8 +24,13 @@ export default async function AppLayout({
   // Akun Latihan opens after the Trading Game sessions; the sidebar says how
   // far along the player is. Counted on the server.
   const access = user ? await getAccess(user.id) : null
+  const [tNav, tDemo] = await Promise.all([getTranslations("nav"), getTranslations("demo")])
   const locks: NavLocks = {
-    "/akun-latihan": !user ? "Masuk untuk membuka" : access && !access.open ? (access.unlock.hint ?? undefined) : undefined,
+    "/akun-latihan": !user
+      ? tNav("signInToOpen")
+      : access && !access.open
+        ? tDemo("unlock.hint", { needed: access.unlock.needed, sessions: access.unlock.sessions })
+        : undefined,
   }
 
   return (

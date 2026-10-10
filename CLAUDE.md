@@ -62,7 +62,7 @@ Routing splits into four surfaces:
 
 Every page that reads the session is **dynamic** (server-rendered per request), which now includes `/` and everything under `app/(app)/`. `/dashboard` has no filters. Its server page resolves only the user's name and today's challenge; everything else is `DashboardView`, a client component reading the player's progress. `/ai-evaluation` takes `?c=<dataset id, e.g. eurusd-1>&a=<decision>&t=<seconds>` — the Trading Game handoff — and falls back to a representative example when the params are absent or invalid, so the page still stands alone. The fallback shows a banner that labels it as an example, so it never passes as the player's own result. `/trading-game` takes `?c=<dataset id>`: the round opens on that question at its level. The dashboard's "Mulai Tantangan" uses this to start the daily challenge. The game keeps a per-question `results` array, which drives the segmented progress bar and the end-of-round `RoundSummary`, and it can be played from the keyboard (B / S / W, Enter, N).
 
-Page titles are short (`"Dashboard"`); the root layout's `title.template` appends `| TRY-REX`. `app/not-found.tsx` is the branded 404. `<html lang="id">`.
+Page titles are short (`"Dashboard"`); the root layout's `title.template` appends `| TRY-REX`. `app/not-found.tsx` is the branded 404. `<html lang>` follows the chosen language (see **Languages** below).
 
 Adding a product page means creating it under `app/(app)/` (it inherits the shell automatically) and registering it in the `navItems` array in `components/nav-items.ts` — the single source both nav surfaces read. `match: "prefix"` keeps an item highlighted on its sub-pages.
 
@@ -75,10 +75,10 @@ The shell's chrome is split into small shared pieces so the desktop and mobile s
 The Trading Game runs on **real H4 forex candles**, not generated series. Three layers:
 
 1. **`lib/game-data.ts` — GENERATED, do not hand-edit.** 39 datasets (8 pairs across `easy`/`medium`/`hard`), each `{ id, pair, level, timeframe, period, digits, candles }` with candles as `{t,o,h,l,c,v}` (`t` = unix seconds UTC). Regenerate with `node scripts/generate-game-data.mjs`, which reads `Game-data-main/src/data/pairs/**/*.js`.
-2. **`lib/game-logic.ts`** — the game rules, ported to typed TS from `Game-data-main/src/utils/*`: `sliceGame` (30 history + 15 future), `outcomeOf` (their ±0.1% threshold), `detectSupportResistance` (swing points clustered, top 3 by touches), `trendSlope`, `xpForLevel` (their `EXP_TABLE`: 25/75/150), plus `timeLabelsFor` and `pipSize`.
+2. **`lib/game-logic.ts`** — the game rules, ported to typed TS from `Game-data-main/src/utils/*`: `sliceGame` (30 history + 15 future), `outcomeOf` (their ±0.1% threshold), `detectSupportResistance` (swing points clustered, top 3 by touches), `trendSlope`, `xpForLevel` (their `EXP_TABLE`: 25/75/150), plus `pipSize`.
 3. **`lib/mock-data.ts`** — despite the name, it now holds no fake content. It assembles `challenges` from the datasets via `buildChallenge`, plus `frameOf`, `scoreFor` and `tradePlanFor`. The old dashboard mocks (`aspectMetrics`, `recentActivities`, `recommendations`, `dataAsOf` …) were removed, so don't bring them back. Player stats come from `lib/progress/` (below).
 
-**The correct answer is derived, never authored.** It is whatever price actually did over the 15 hidden candles. Every explanation string (`situation`, `reasons`, `suggestion`, `feedback`) is likewise computed from the candles — trend slope in pips, detected level distances, position in range, real change % — so the prose can never contradict the chart. Do not hand-write per-dataset narrative.
+**The correct answer is derived, never authored.** It is whatever price actually did over the 15 hidden candles. Every explanation is likewise computed from the candles: `buildChallenge` stores the numbers in `challenge.facts` (trend, slope in pips, detected level distances, position in range, real change %), and `challengeText(challenge, t, locale)` in `lib/challenge-text.ts` turns them into the situation, reasons, suggestion, feedback, period and time-axis labels in either language, so the prose can never contradict the chart. Do not hand-write per-dataset narrative.
 
 **188 questions from 39 datasets.** Each dataset holds ~65 candles and a question needs 45, so `challenges` slides the window along in steps of `WINDOW_STRIDE` (5): starts 30, 35, 40, 45, 50. A dataset's first window keeps the bare dataset id (`eurusd-1`) so older attempts and links still resolve; later ones are `eurusd-1@35`. Each window's `period` comes from its own first candle. Across the windows the answers are far better balanced than the old 27/9/3 (easy 33/30/7, medium 36/33/6, hard 29/9/5). Never add synthetic or mirrored candles to grow the pool.
 
@@ -137,6 +137,19 @@ Cookie sessions via `@supabase/ssr`, email + password only. Env: `NEXT_PUBLIC_SU
 - **Functions run in `icn1` (Seoul)** (`vercel.json` `regions`), next to the Supabase project in `ap-northeast-2`. From the default `iad1` each database call cost about 0.6 s, and an Akun Latihan action makes several in a row.
 - The Supabase MCP server is configured at user scope (plain `https://mcp.supabase.com/mcp`). A project-scoped URL with `?project_ref=…&features=…` failed OAuth with "Resource must be a valid MCP endpoint", so pass the project id (`dfcnpbnnmgaspjodxete`) per call instead.
 
+### Languages: Indonesian (default) and English
+
+`next-intl` 4.4.0, pinned (later 4.x loads `@swc/core` in its plugin, whose install script npm's `allowScripts` blocks here), with `use-intl` pinned to match through `overrides`. **No locale in the URL**: `i18n/request.ts` reads the `NEXT_LOCALE` cookie and loads one JSON file per namespace from `messages/<locale>/` (the list is `NAMESPACES` in `lib/i18n/locale.ts`). Reading the cookie makes every page dynamic.
+
+- **Switching**: `components/locale-switcher.tsx` (ID | EN: sidebar, mobile bar, landing nav, auth pages, Settings > Tampilan) calls `setLocale()` in `lib/i18n/actions.ts`, which writes the cookie and, when signed in, `profiles.locale`, then `router.refresh()`. Login copies `profiles.locale` back into the cookie; the email callback copies the guest's cookie into a new account.
+- **Pure modules never build sentences.** They return facts or messages and take a `t` (`lib/i18n/translator.ts`: `T`, `Msg`/`msg`/`say`, `joinList`). Refusals from `lib/demo` planners and routes are `Msg`s, put into words by `errorJson()`/`respond()` in `lib/demo/route.ts`. Rex's comments are data (`RexComment`), worded by `rexCommentText()`. Tips are ids plus paragraph counts (`tips.<id>.*`). Server actions translate with `getTranslations`.
+- **Catalogues**: every key exists in both languages with the same placeholders and tags; `lib/i18n/messages.test.ts` enforces it and parses every message as ICU. English counts use ICU plurals (`{n, plural, one {# day} other {# days}}`). Pass numbers, not pre-formatted strings, to plurals and `{x, number}`.
+- **Kept in English in both**: BUY, SELL, WAIT, SL, TP, pip, lot, ATR, support, resistance, spread, and the feature names Trading Game, AI Evaluation, Disiplin, Stage.
+- **Formatting**: dates and grouped numbers use `INTL_LOCALE` (id-ID / en-US); prices keep dot decimals in both. Chart month labels come from `lib/challenge-text.ts` (`timeLabel`, `periodLabel`), UTC.
+- **Not translated yet**: lesson bodies in `lib/learn/content.ts` (titles and summaries are in `learn.lessons.*`; `bodyAvailableIn()` decides the "Not yet available in English" label) and the legal documents. Future content authored per language uses `LocalizedText` / `pickText()` (`lib/i18n/localized-text.ts`). Open questions for the owner live in `docs/i18n-review.md`.
+- **LLM calls** (none yet): put `languageInstruction(locale)` from `lib/i18n/llm.ts` in the system prompt.
+- In `next dev`, edits to `messages/*.json` can stay cached; restart the dev server if a change doesn't show.
+
 ### Display preferences (Settings > Tampilan)
 
 Theme (`dark` default, `light`, `system`), reading font (`default`, `dyslexic` = OpenDyslexic self-hosted from `@fontsource/opendyslexic`, `readable` = Atkinson Hyperlegible), text size (`normal`/`large`/`xlarge` = 100/112.5/125% root size), motion (`system` or `reduce`), sidebar (`expanded`/`collapsed`). They belong to the **device**, not the account: localStorage `tryrex:prefs:v1`, applied as `data-theme`, `data-font`, `data-size`, `data-motion` and `data-sidebar` on `<html>`.
@@ -148,7 +161,7 @@ Theme (`dark` default, `light`, `system`), reading font (`default`, `dyslexic` =
 
 ### Glossary: tap-to-explain terms
 
-`lib/glossary.ts` holds ~44 entries (`slug`, `term`, `aliases`, `category`, `short`, optional `example` and `lesson`). `splitTerms(text, seen)` finds aliases as whole words, longest first, linking each term once per `seen` set. `components/glossary/glossary-text.tsx`:
+`lib/glossary.ts` holds ~44 entries (`slug`, `category`, `aliases` per language, optional `example` flag and `lesson`); the words are in the glossary catalogue (`entries.<slug>.term/short/example`). `splitTerms(text, locale, seen)` finds that language's aliases as whole words, longest first, linking each term once per `seen` set. Lesson bodies are Indonesian, so they are split with `"id"` even when the page is in English. `components/glossary/glossary-text.tsx`:
 
 - `<GlossaryText text>` for one string, or `<GlossaryParts parts>` when a server component splits a whole article with one shared `seen` (see `LessonBlocks`).
 - `<Term>` is a dotted-underline button (`.term`) opening a portal popover (`glass-card glass-strong`), placed by writing to the DOM in a layout effect and flipped above when there's no room. One is open at a time; Escape, an outside click and scrolling close it. It links to the lesson and to `/belajar/kamus#slug` (`.term-card:target` flashes).
@@ -165,7 +178,7 @@ Theme (`dark` default, `light`, `system`), reading font (`default`, `dyslexic` =
 
 ### Akun Latihan (`/akun-latihan`): virtual trading on historical data
 
-Signed-in players only. It opens after 3 Trading Game sessions. Virtual money, historical candles, no live prices, no payments, and **no broker names, links, referral codes or "buka akun real" prompts, ever**. Every screen carries `DISCLAIMER` (the section layout renders it). It is built in phases on `feat/akun-latihan`: phase A is accounts, the required lesson and Rex tips; phase B is the trading screen (`/akun-latihan/trading`); phase C is the journal, the account dashboard, the Kalkulator page, running out and resetting (Rex's review, the risk lesson, Akun #n), Riwayat akun and graduation.
+Signed-in players only. It opens after 3 Trading Game sessions. Virtual money, historical candles, no live prices, no payments, and **no broker names, links, referral codes or "buka akun real" prompts, ever**. Every screen carries the disclaimer (`demo.disclaimer`; the section layout renders it). It is built in phases on `feat/akun-latihan`: phase A is accounts, the required lesson and Rex tips; phase B is the trading screen (`/akun-latihan/trading`); phase C is the journal, the account dashboard, the Kalkulator page, running out and resetting (Rex's review, the risk lesson, Akun #n), Riwayat akun and graduation.
 
 The tabs (`DemoTabs`): Akun (the dashboard, or the end-of-account flow), Trading, Jurnal (`?akun=<n>`), Riwayat, Kalkulator, Tips Rex, plus `/akun-latihan/lulus` once graduated.
 
@@ -200,7 +213,7 @@ The tabs (`DemoTabs`): Akun (the dashboard, or the end-of-account flow), Trading
 
 ### Onboarding: `/start`
 
-Five questions (`lib/onboarding.ts` `QUESTIONS`): why trading (question 1 is verbatim from the design PDF), experience, chart skill, focus pairs, daily time. **No answer is wrong**: every option is a preference or a self-assessment, never a test. `planFrom(record)` turns answers into a `Plan`: experience + skill (0–6) picks the starting level (≤2 Mudah, ≤4 Menengah, else Sulit), focus picks `focusPairs` for the shuffle, time sets `dailyGoal` (5/15/30 or none), and motivation picks Rex's line (`MOTIVATION_LINES`). "Lewati" stores `skipped: true` and the defaults apply.
+Five questions (`lib/onboarding.ts` `QUESTIONS`): why trading (question 1 is verbatim from the design PDF), experience, chart skill, focus pairs, daily time. **No answer is wrong**: every option is a preference or a self-assessment, never a test. `planFrom(record)` turns answers into a `Plan`: experience + skill (0–6) picks the starting level (≤2 Mudah, ≤4 Menengah, else Sulit), focus picks `focusPairs` for the shuffle, time sets `dailyGoal` (5/15/30 or none), and motivation picks Rex's line (`onboarding.motivationLines.<value>`). "Lewati" stores `skipped: true` and the defaults apply.
 
 - **Storage**: an `OnboardingRecord` (`version`, `answers`, `skipped`, `completedAt`) goes in `profiles.onboarding` (existing jsonb, size-capped) for accounts, and always in localStorage `tryrex:onboarding:v1`. `parseRecord()` validates both ways, so only known question/option keys are ever stored. Guest answers are copied to the account on the first visit to `/start` after signing up.
 - **Gate**: `/dashboard` and `/trading-game` redirect signed-in players without a record to `/start?next=…` on the server; the game sends guests there from the browser (`useOnboarding()` reads the device via `useSyncExternalStore`). `/start?ulang=1` retakes the quiz.
@@ -271,7 +284,7 @@ All motion is CSS plus React's built-in `<ViewTransition>`, with no animation li
 - **No dead controls.** Every `<button>` either does something or is not a button. Decorative product shots in `components/landing/showcase.tsx` use `<div>` for what look like buttons, and "show more" affordances use the shared `Disclosure` rather than linking nowhere.
 - **Focus rings are global.** `app/globals.css` defines one `:focus-visible` outline for the whole app, so individual controls should *not* re-declare `focus-visible:outline-*` — only override it where the ring sits on a tinted surface (see the decision buttons' `outline-success` / `outline-danger` / `outline-wait`).
 - **Icons** come from `lucide-react` exclusively. Never use an emoji as an icon; `SelectMenu`'s `prefix` takes a lucide element.
-- **UI copy is Indonesian** (headings, descriptions, button labels), while code identifiers and types are English. Match this when adding user-facing strings.
+- **UI copy goes through the message catalogues** (`messages/id` and `messages/en`), never into components. Indonesian is the default and the source; code identifiers and types are English. See **Languages**.
 - Conditional class names are composed with array `.join(" ")` — there is no `clsx`/`cn` helper.
 - `components/card.tsx` is the shared surface primitive (`rounded-2xl border border-border bg-card p-[22px]`); prefer it over re-declaring that class string.
 - Files use kebab-case; components are named exports (pages are default exports per App Router).

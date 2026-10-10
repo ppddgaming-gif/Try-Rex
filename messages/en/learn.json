@@ -1,0 +1,183 @@
+{
+  "tracks": {
+    "dasar": {
+      "title": "Trading Basics",
+      "description": "What trading is, what gets traded, and the three decisions you always have."
+    },
+    "chart": {
+      "title": "Reading Charts",
+      "description": "Candlesticks, trends, support and resistance: the language every chart speaks."
+    },
+    "risiko": {
+      "title": "Risk Management",
+      "description": "How to last long enough to learn: stop losses, risk ratios and leverage."
+    },
+    "crypto": {
+      "title": "Crypto 101",
+      "description": "Blockchain, Bitcoin, stablecoins, and how to keep your digital assets yours."
+    },
+    "psikologi": {
+      "title": "Trading Psychology",
+      "description": "A trader's biggest enemy is often not the market but their own habits."
+    }
+  },
+  "lessons": {
+    "apa-itu-trading": {
+      "title": "What is trading?",
+      "summary": "Buying and selling to profit from price changes, and why that's different from saving."
+    },
+    "pasar-dan-instrumen": {
+      "title": "Markets and instruments",
+      "summary": "Forex, stocks, commodities and crypto: what gets traded and how to read a pair."
+    },
+    "buy-sell-wait": {
+      "title": "BUY, SELL and WAIT",
+      "summary": "The three decisions in every question, and why not trading is often the best choice."
+    },
+    "anatomi-candlestick": {
+      "title": "Anatomy of a candlestick",
+      "summary": "Body, wicks and colour: one candle tells the story of a fight between buyers and sellers."
+    },
+    "trend": {
+      "title": "Trends: up, down, sideways",
+      "summary": "Highs and lows tell you the direction. Learn to tell the three apart on real charts."
+    },
+    "support-resistance": {
+      "title": "Support and resistance",
+      "summary": "Areas where price keeps stopping, and why they matter for your entry and stop loss."
+    },
+    "timeframe": {
+      "title": "Timeframes: what is H4?",
+      "summary": "The same chart looks different on M15, H4 or D1. Pick one that suits how you practice."
+    },
+    "stop-loss-take-profit": {
+      "title": "Stop loss and take profit",
+      "summary": "Decide your exits before you get in. Two numbers that separate a plan from a guess."
+    },
+    "risk-reward": {
+      "title": "Risk-reward ratio",
+      "summary": "Why you can be right less than half the time and still stay in the game."
+    },
+    "leverage": {
+      "title": "Leverage: a double-edged sword",
+      "summary": "Leverage grows profits and losses by the same multiple. Understand it before it tempts you."
+    },
+    "apa-itu-crypto": {
+      "title": "What are crypto and blockchain?",
+      "summary": "Digital money with no central bank, recorded on a ledger copied across many computers."
+    },
+    "bitcoin-altcoin-stablecoin": {
+      "title": "Bitcoin, altcoins and stablecoins",
+      "summary": "Not all crypto is the same. Get to know the three big groups and the risks of each."
+    },
+    "keamanan-crypto": {
+      "title": "Security: wallets and exchanges",
+      "summary": "Whoever holds the keys holds the assets. How to avoid the most common scams."
+    },
+    "fomo-overtrading": {
+      "title": "FOMO and overtrading",
+      "summary": "Fear of missing out and wanting to win back losses: two habits that slowly drain an account."
+    },
+    "jurnal-trading": {
+      "title": "Trading journal",
+      "summary": "A simple record that turns mistakes into lessons instead of repeats."
+    }
+  },
+  "practice": {
+    "game": "Practice in the Trading Game",
+    "evaluation": "See an example in AI Evaluation"
+  },
+  "level": {
+    "pemula": "beginner",
+    "menengah": "intermediate"
+  },
+  "hub": {
+    "title": "Learn 101",
+    "eyebrow": "Learn 101",
+    "heading": "All the trading basics, in one place.",
+    "body": "From reading a candle to keeping your crypto safe. Short lessons, examples from real charts, and one question at the end of each chapter.",
+    "kamus": "Trading Glossary",
+    "kamusBody": "<num>{n}</num> terms, each explained in a sentence or two. The same terms can be tapped in the Trading Game.",
+    "chapter": "Chapter {n}",
+    "minutes": "{n} min",
+    "practiceTitle": "Theory done, time to practice.",
+    "practiceBody": "Every Trading Game question is a real chart. Try reading the trend and levels yourself.",
+    "openGame": "Open the Trading Game"
+  },
+  "lesson": {
+    "fallbackTitle": "Lesson",
+    "back": "Learn 101",
+    "readMinutes": "{n} min read",
+    "level": "Level: {level}",
+    "tapHint": "Tap an underlined word to see what it means.",
+    "others": "More lessons",
+    "prev": "Previous",
+    "next": "Next",
+    "notTranslated": "Not yet available in English",
+    "notTranslatedBody": "This lesson's content is shown in its original language, Indonesian."
+  },
+  "kamusPage": {
+    "title": "Trading Glossary",
+    "eyebrow": "Glossary",
+    "body": "Terms that come up often on charts and in questions, explained briefly. In the Trading Game, underlined terms can be tapped to open the same explanation."
+  },
+  "draft": {
+    "title": "Sample content.",
+    "body": "This content is still a draft and is being checked against trusted sources. Use it as an overview, not as financial advice.",
+    "sources": "Sources",
+    "accessed": ", {publisher}. Accessed {date}."
+  },
+  "quiz": {
+    "eyebrow": "Check your understanding",
+    "right": "Correct answer",
+    "picked": "Your pick",
+    "correct": "Correct!",
+    "wrong": "Not yet, but that's part of learning.",
+    "retry": "Try again"
+  },
+  "done": {
+    "finished": "Finished",
+    "mark": "Mark as finished",
+    "doneLabel": "Finished",
+    "notDone": "Not finished",
+    "none": "No lessons finished yet.",
+    "onDevice": "lessons finished on this device"
+  },
+  "next": {
+    "title": "Keep learning",
+    "count": "<num>{count}</num> of <num>{total}</num> lessons finished · {minutes} min",
+    "first": "Start the first lesson",
+    "continue": "Continue",
+    "allDone": "You've finished every Learn 101 lesson."
+  },
+  "chart": {
+    "real": "{period} · real price data"
+  },
+  "diagrams": {
+    "high": "High",
+    "open": "Open",
+    "close": "Close",
+    "low": "Low",
+    "anatomyTitle": "Anatomy of a candle: the body (thick) and wicks (thin). Green closed higher, red closed lower.",
+    "upperWick": "upper wick",
+    "body": "body",
+    "lowerWick": "lower wick",
+    "up": "Up",
+    "upSub": "higher highs & lows",
+    "down": "Down",
+    "downSub": "lower highs & lows",
+    "flat": "Sideways",
+    "flatSub": "back and forth in a range",
+    "trendTitle": "Three trend shapes. Look at the direction of the highs and lows, not a single candle.",
+    "rrTitle": "A BUY position at 1:2: 20 pips of risk to the stop loss, a 40-pip target to the take profit.",
+    "plus40": "+40 pips",
+    "minus20": "−20 pips",
+    "ratio": "Ratio 1:2",
+    "levTitle": "1:100 leverage. A 1% move on a 100 million position = 1 million: all the capital in this example.",
+    "capital": "Capital",
+    "capitalValue": "Rp1 million",
+    "size": "Position size",
+    "sizeValue": "Rp100 million",
+    "against": "1% against you = −Rp1 million"
+  }
+}

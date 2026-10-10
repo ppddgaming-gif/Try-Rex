@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Lock } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { navItems } from "@/components/nav-items"
 
 /** Locked nav items: href → the line explaining how to open it. */
@@ -23,6 +24,7 @@ export function NavLinks({
   locks?: NavLocks
 }) {
   const pathname = usePathname()
+  const t = useTranslations("nav")
 
   return (
     <nav className={`flex flex-col gap-1 ${className}`}>
@@ -31,14 +33,15 @@ export function NavLinks({
           pathname === item.href || ("match" in item && item.match === "prefix" && pathname.startsWith(item.href + "/"))
         const Icon = item.icon
         const lock = locks[item.href]
+        const label = t(`items.${item.key}`)
         return (
           <Link
             key={item.href}
             href={item.href}
             onClick={onNavigate}
             aria-current={active ? "page" : undefined}
-            aria-label={lock ? `${item.label}, terkunci. ${lock}` : item.label}
-            data-tip={lock ? `${item.label} · terkunci` : item.label}
+            aria-label={lock ? t("locked", { label, reason: lock }) : label}
+            data-tip={lock ? t("lockedTip", { label }) : label}
             className={[
               "group relative flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
               active ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -49,7 +52,7 @@ export function NavLinks({
             )}
             <Icon className="h-[18px] w-[18px] shrink-0 transition-transform duration-300 ease-spring group-hover:scale-110" />
             <span className="sb-label min-w-0 flex-1 leading-tight">
-              <span className="block">{item.label}</span>
+              <span className="block">{label}</span>
               {lock && <span className="mt-0.5 block whitespace-normal text-[11px] font-normal text-faint">{lock}</span>}
             </span>
             {lock && <Lock className="sb-label h-3.5 w-3.5 shrink-0 text-faint" aria-hidden="true" />}

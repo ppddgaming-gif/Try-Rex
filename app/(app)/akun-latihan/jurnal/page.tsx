@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { getLocale, getTranslations } from "next-intl/server"
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import { NotebookPen } from "lucide-react"
@@ -7,22 +8,25 @@ import { DemoTabs } from "@/components/akun-latihan/demo-tabs"
 import { JournalList, type JournalItem } from "@/components/akun-latihan/journal-list"
 import { EmptyState } from "@/components/progress/empty-state"
 import { getCurrentUser } from "@/lib/auth"
-import { ACCOUNT_STATUS } from "@/lib/demo/format"
+import { accountStatus } from "@/lib/demo/format"
 import { loadJournal } from "@/lib/demo/history"
 import { sectionState } from "@/lib/demo/server"
+import { INTL_LOCALE, type Locale } from "@/lib/i18n/locale"
 
-export const metadata: Metadata = { title: "Jurnal · Akun Latihan" }
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getTranslations("demo.ui.meta"))("jurnal") }
+}
 
 // Candle times are historical and in UTC, like the chart's data.
-const candleFmt = new Intl.DateTimeFormat("id-ID", {
-  day: "numeric",
-  month: "short",
-  year: "numeric",
-  hour: "2-digit",
-  minute: "2-digit",
-  timeZone: "UTC",
-})
-const candleLabel = (t: number | null) => (t === null ? null : `${candleFmt.format(new Date(t * 1000))} UTC`)
+const candleFormat = (locale: Locale) =>
+  new Intl.DateTimeFormat(INTL_LOCALE[locale], {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "UTC",
+  })
 
 /**
  * The Trading Journal of one account (`?akun=<n>`; the active or latest one
@@ -35,6 +39,9 @@ export default async function JurnalPage({ searchParams }: { searchParams: Promi
   if (!state) redirect("/akun-latihan")
 
   const { akun } = await searchParams
+  const [t, root, locale] = await Promise.all([getTranslations("demo.ui.journal"), getTranslations(), getLocale()])
+  const candleFmt = candleFormat(locale as Locale)
+  const candleLabel = (s: number | null) => (s === null ? null : t("utc", { time: candleFmt.format(new Date(s * 1000)) }))
   const account = state.accounts.find((a) => String(a.number) === akun) ?? state.account ?? state.accounts[0]
   const rows: JournalItem[] = (await loadJournal(user.id, account.id)).map((r) => ({
     ...r,
@@ -46,13 +53,10 @@ export default async function JurnalPage({ searchParams }: { searchParams: Promi
     <div className="flex flex-col gap-5">
       <DemoTabs />
       <Card className="sm:p-7">
-        <h2 className="text-base font-semibold">Jurnal trading · Akun #{account.number}</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Setiap trade yang ditutup tercatat otomatis: rencananya, hasilnya, pemeriksaan Disiplin dan komentar Rex. Ketuk
-          satu baris untuk melihat semuanya.
-        </p>
+        <h2 className="text-base font-semibold">{t("title", { n: account.number })}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t("body")}</p>
         {state.accounts.length > 1 && (
-          <nav aria-label="Pilih akun" className="mt-4 flex flex-wrap gap-1.5">
+          <nav aria-label={t("pickAccount")} className="mt-4 flex flex-wrap gap-1.5">
             {state.accounts.map((a) => {
               const on = a.id === account.id
               return (
@@ -65,7 +69,7 @@ export default async function JurnalPage({ searchParams }: { searchParams: Promi
                     on ? "border-primary bg-primary/15 text-primary" : "border-border text-muted-foreground hover:text-foreground",
                   ].join(" ")}
                 >
-                  Akun #{a.number} · {ACCOUNT_STATUS[a.status]}
+                  {t("accountChip", { n: a.number, status: accountStatus(a.status, root) })}
                 </Link>
               )
             })}
@@ -77,12 +81,8 @@ export default async function JurnalPage({ searchParams }: { searchParams: Promi
         <Card>
           <EmptyState
             icon={NotebookPen}
-            title="Jurnal masih kosong"
-            body={
-              account.status === "active"
-                ? "Belum ada trade. Trade pertamamu akan tercatat di sini otomatis."
-                : `Akun #${account.number} ditutup sebelum ada trade.`
-            }
+            title={t("emptyTitle")}
+            body={account.status === "active" ? t("emptyActive") : t("emptyClosed", { n: account.number })}
           />
         </Card>
       ) : (

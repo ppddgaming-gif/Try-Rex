@@ -1,9 +1,12 @@
 import type { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
 import { OnboardingFlow } from "@/components/onboarding/onboarding-flow"
 import { getCurrentUser } from "@/lib/auth"
 import { safeNext } from "@/lib/auth-rules"
 
-export const metadata: Metadata = { title: "Mulai" }
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getTranslations("onboarding"))("title") }
+}
 
 // The onboarding quiz (build spec ticket 1.12). Open to guests: their answers
 // stay on the device and move to the account when they sign up.

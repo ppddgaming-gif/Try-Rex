@@ -10,8 +10,6 @@ import { gameDatasets } from "@/lib/game-data"
 // bundled into the browser (non-negotiable #1). lib/demo/view.ts cuts what
 // the player may see at the cursor.
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"]
-
 const sources = gameDatasets.map((d) => ({ id: d.id, pair: d.pair, length: d.candles.length }))
 const byId = new Map(sources.flatMap((s) => segmentsOf(s)).map((s) => [s.id, s]))
 const datasets = new Map(gameDatasets.map((d) => [d.id, d]))
@@ -30,13 +28,12 @@ export function loadSegment(id: string): { info: SegmentInfo; candles: Bar[] } |
   const candles = dataset.candles
     .slice(segment.offset, segment.offset + segment.length)
     .map(({ t, o, h, l, c }) => ({ t, o, h, l, c }))
-  const first = new Date(candles[0].t * 1000)
   return {
     info: {
       pair: dataset.pair,
       digits: dataset.digits,
       timeframe: dataset.timeframe,
-      period: `${MONTHS[first.getUTCMonth()]} ${first.getUTCFullYear()}`,
+      start: candles[0].t,
     },
     candles,
   }

@@ -1,5 +1,6 @@
-import { authed, isUuid, json, numberOrNull, respond } from "@/lib/demo/route"
+import { authed, errorJson, isUuid, numberOrNull, respond } from "@/lib/demo/route"
 import { modifyTrade } from "@/lib/demo/trading"
+import { msg } from "@/lib/i18n/translator"
 
 /**
  * POST { trade, field: "sl" | "tp", pips }: move SL or TP, in pips from
@@ -11,7 +12,7 @@ export async function POST(request: Request) {
   const { trade, field, pips } = auth.body
   const distance = numberOrNull(pips)
   if (!isUuid(trade) || (field !== "sl" && field !== "tp") || distance === undefined) {
-    return json({ error: "Format perubahan tidak valid." }, 400)
+    return errorJson(msg("errors.badModify"), 400)
   }
   return respond(await modifyTrade(auth.userId, trade, field, distance))
 }

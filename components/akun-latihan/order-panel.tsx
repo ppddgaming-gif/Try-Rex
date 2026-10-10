@@ -1,12 +1,14 @@
 "use client"
 
 import { AlertTriangle, Check, Info, X } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { Stepper } from "@/components/akun-latihan/stepper"
 import { ACCOUNT, DISIPLIN, PLAN, REPLAY } from "@/lib/demo/config"
 import { lot as fmtLot, pct, price as fmtPrice, usd } from "@/lib/demo/format"
 import type { Side } from "@/lib/demo/money"
 import { fewCandlesLeft, orderProblems, quoteOrder } from "@/lib/demo/orders"
 import type { DemoView } from "@/lib/demo/view"
+import { say, type T } from "@/lib/i18n/translator"
 import { TRADE_REASONS, type ReasonId } from "@/lib/reasons"
 
 export type Draft = { lot: number; slPips: number | null; tpPips: number | null; reasons: ReasonId[] }
@@ -74,29 +76,32 @@ export function OrderPanel({
   const set = (patch: Partial<Draft>) => onDraft({ ...draft, ...patch })
   const toggleReason = (id: ReasonId) =>
     set({ reasons: draft.reasons.includes(id) ? draft.reasons.filter((r) => r !== id) : [...draft.reasons, id] })
+  const t = useTranslations("demo.ui.order")
+  const td = useTranslations("demo")
+  const root = useTranslations()
 
   return (
     <section aria-labelledby="order-title" className="glass-card glass-strong pop-in flex flex-col gap-4 rounded-2xl p-4 sm:p-5">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h2 id="order-title" className="font-display text-lg font-bold">
-            Rencana trade · {pair}
+            {t("title", { pair })}
           </h2>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            Masuk di close candle terakhir, <span className="font-mono">{fmtPrice(pair, entry)}</span>
+            {t.rich("entryAt", { price: fmtPrice(pair, entry), mono: (c) => <span className="font-mono">{c}</span> })}
           </p>
         </div>
         <button
           type="button"
           onClick={onCancel}
-          aria-label="Tutup panel order"
+          aria-label={t("closePanel")}
           className="-m-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground"
         >
           <X className="h-4 w-4" />
         </button>
       </div>
 
-      <div role="radiogroup" aria-label="Arah trade" className="grid grid-cols-2 gap-2">
+      <div role="radiogroup" aria-label={t("direction")} className="grid grid-cols-2 gap-2">
         {(["buy", "sell"] as const).map((s) => {
           const on = side === s
           const tone = s === "buy" ? "success" : "danger"
@@ -125,30 +130,30 @@ export function OrderPanel({
 
       {/* Lot */}
       <div>
-        <p className="mb-1.5 text-xs font-semibold text-muted-foreground">Lot</p>
+        <p className="mb-1.5 text-xs font-semibold text-muted-foreground">{t("lot")}</p>
         {fixedLot !== null ? (
           <p className="rounded-lg bg-inset px-3 py-2.5 text-sm">
             <span className="font-mono font-semibold">{fmtLot(fixedLot)}</span>
-            <span className="text-muted-foreground"> · tetap di Stage {view.stage.current}</span>
+            <span className="text-muted-foreground">{t("fixedLot", { n: view.stage.current })}</span>
           </p>
         ) : (
           <Stepper
             id="order-lot"
-            label="lot"
+            label={t("lotUnit")}
             value={draft.lot}
             onChange={(v) => set({ lot: v })}
             step={ACCOUNT.LOT_STEP}
             min={ACCOUNT.MIN_LOT}
             max={ACCOUNT.MAX_LOT}
             decimals={2}
-            unit="lot"
+            unit={t("lotUnit")}
           />
         )}
       </div>
 
       <LevelField
         id="order-sl"
-        name="Stop loss"
+        name={t("stopLoss")}
         short="SL"
         pips={draft.slPips}
         level={quote.sl}
@@ -159,7 +164,7 @@ export function OrderPanel({
       />
       <LevelField
         id="order-tp"
-        name="Take profit"
+        name={t("takeProfit")}
         short="TP"
         pips={draft.tpPips}
         level={quote.tp}
@@ -172,7 +177,7 @@ export function OrderPanel({
       {/* Reasons */}
       <fieldset>
         <legend className="mb-1.5 text-xs font-semibold text-muted-foreground">
-          Alasan ({PLAN.MIN_REASONS}–{PLAN.MAX_REASONS}) · {draft.reasons.length} dipilih
+          {t("reasons", { min: PLAN.MIN_REASONS, max: PLAN.MAX_REASONS, n: draft.reasons.length })}
         </legend>
         <div className="flex flex-wrap gap-1.5">
           {TRADE_REASONS.map((r) => {
@@ -192,7 +197,7 @@ export function OrderPanel({
                 ].join(" ")}
               >
                 {on && <Check className="-ml-0.5 mr-1 inline h-3 w-3" aria-hidden="true" />}
-                {r.label}
+                {root(`common.reasons.${r.id}`)}
               </button>
             )
           })}
@@ -201,29 +206,27 @@ export function OrderPanel({
 
       {/* The calculator */}
       <dl className="grid grid-cols-[1fr_auto] gap-x-3 gap-y-1.5 rounded-xl bg-inset p-3.5 text-sm">
-        <Row term="Nilai 1 pip" value={usd(quote.pipValue)} />
-        <Row term="Margin dibutuhkan" value={usd(quote.margin)} />
-        <Row term="Margin bebas setelah trade" value={usd(quote.freeMarginAfter)} />
+        <Row term={t("pipValue")} value={usd(quote.pipValue)} />
+        <Row term={t("marginNeeded")} value={usd(quote.margin)} />
+        <Row term={t("freeAfter")} value={usd(quote.freeMarginAfter)} />
         <Divider />
         <Row
-          term="Jika SL kena"
-          value={quote.loss === null ? "Tanpa batas" : `${usd(-quote.loss)} (${pct(quote.lossPct!)})`}
+          term={t("ifSl")}
+          value={quote.loss === null ? t("unlimited") : `${usd(-quote.loss)} (${pct(quote.lossPct!)})`}
           tone={quote.loss === null ? undefined : "danger"}
         />
         <Row
-          term="Jika TP kena"
+          term={t("ifTp")}
           value={quote.gain === null ? "—" : `${usd(quote.gain, { signed: true })} (${pct(quote.gainPct!)})`}
           tone={quote.gain === null ? undefined : quote.gain >= 0 ? "success" : "danger"}
         />
-        <Row term="Reward : risk" value={quote.rewardRisk === null ? "—" : `1 : ${quote.rewardRisk.toFixed(2)}`} />
+        <Row term={t("rr")} value={quote.rewardRisk === null ? "—" : `1 : ${quote.rewardRisk.toFixed(2)}`} />
         <Divider />
-        <Row term={`Spread (perkiraan, ${quote.costs.spreadPips} pip)`} value={usd(quote.costs.spread)} muted />
-        <Row term="Komisi" value={usd(quote.costs.commission)} muted />
-        <Row term="Swap per malam (perkiraan)" value={usd(quote.swapPerNight)} muted />
+        <Row term={t("spread", { pips: quote.costs.spreadPips })} value={usd(quote.costs.spread)} muted />
+        <Row term={t("commission")} value={usd(quote.costs.commission)} muted />
+        <Row term={t("swap")} value={usd(quote.swapPerNight)} muted />
         {quote.approximate && (
-          <p className="col-span-2 mt-1 text-[11px] leading-snug text-faint">
-            Nilai dolar pair silang memakai kurs konversi tetap (perkiraan).
-          </p>
+          <p className="col-span-2 mt-1 text-[11px] leading-snug text-faint">{t("approx")}</p>
         )}
       </dl>
 
@@ -235,6 +238,7 @@ export function OrderPanel({
         hasTp={draft.tpPips !== null}
         candlesLeft={session.remaining}
         revenge={revenge ? view.lossWindow : null}
+        t={t}
       />
 
       <div className="flex flex-col gap-2">
@@ -242,7 +246,7 @@ export function OrderPanel({
           <ul className="flex flex-col gap-1 text-xs text-muted-foreground" aria-live="polite">
             {problems.map((p) => (
               <li key={p.field} className="flex items-center gap-1.5">
-                <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-primary" /> {p.message}
+                <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-primary" /> {say(td, p.message)}
               </li>
             ))}
           </ul>
@@ -254,7 +258,7 @@ export function OrderPanel({
           className="btn w-full"
           style={sideStyle(side)}
         >
-          Konfirmasi {side.toUpperCase()} {fmtLot(quote.lot)} lot
+          {t("confirm", { side: side.toUpperCase(), lot: fmtLot(quote.lot) })}
         </button>
       </div>
     </section>
@@ -282,6 +286,8 @@ function LevelField({
   suggested: number
   onChange: (pips: number | null) => void
 }) {
+  const t = useTranslations("demo.ui.order")
+  const to = useTranslations("demo.ui.open")
   return (
     <div>
       <div className="mb-1.5 flex items-center justify-between gap-2 text-xs">
@@ -290,21 +296,21 @@ function LevelField({
       </div>
       {pips === null ? (
         <button type="button" onClick={() => onChange(suggested)} className="btn btn-ghost btn-sm w-full">
-          Pasang {short}
+          {t("set", { short })}
         </button>
       ) : (
         <div className="flex items-center gap-2">
           <div className="min-w-0 flex-1">
             <Stepper
               id={id}
-              label={`jarak ${short} dalam pip`}
+              label={t("distance", { short })}
               value={pips}
               onChange={onChange}
               step={1}
               min={0.1}
               max={PLAN.MAX_DISTANCE_PIPS}
               decimals={1}
-              unit="pip"
+              unit={to("unit")}
             />
           </div>
           {optional && (
@@ -313,7 +319,7 @@ function LevelField({
               onClick={() => onChange(null)}
               className="h-11 shrink-0 rounded-lg px-2.5 text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-foreground"
             >
-              Tanpa {short}
+              {t("without", { short })}
             </button>
           )}
         </div>
@@ -348,6 +354,7 @@ function Warnings({
   hasTp,
   candlesLeft,
   revenge,
+  t,
 }: {
   risk: "none" | "ok" | "above" | "danger"
   lossPct: number | null
@@ -356,29 +363,31 @@ function Warnings({
   hasTp: boolean
   candlesLeft: number
   revenge: { lot: number; candlesAgo: number } | null
+  /** demo.ui.order */
+  t: T
 }) {
   const items: { strong?: boolean; text: string }[] = []
   if (risk === "danger") {
     items.push({
       strong: true,
-      text: `Risiko ${pct(lossPct!)} saldo dalam satu trade, jauh di atas batas ${DISIPLIN.MAX_RISK_PCT}%. Beberapa kekalahan seperti ini bisa menghabiskan akun.`,
+      text: t("warnDanger", { risk: pct(lossPct!), max: DISIPLIN.MAX_RISK_PCT }),
     })
   } else if (risk === "above") {
-    items.push({ text: `Risiko ${pct(lossPct!)} saldo, di atas batas ${DISIPLIN.MAX_RISK_PCT}%. Perkecil lot atau dekatkan SL.` })
+    items.push({ text: t("warnAbove", { risk: pct(lossPct!), max: DISIPLIN.MAX_RISK_PCT }) })
   } else if (risk === "none" && optional) {
-    items.push({ text: "Tanpa SL, kerugian trade ini tidak dibatasi sampai stop out." })
+    items.push({ text: t("warnNoSl") })
   }
-  if (optional && !hasTp) items.push({ text: "Tanpa TP, reward:risk tidak bisa diperiksa." })
+  if (optional && !hasTp) items.push({ text: t("warnNoTp") })
   if (rewardRisk !== null && rewardRisk < DISIPLIN.MIN_REWARD_RISK) {
-    items.push({ text: `Target baru ${rewardRisk.toFixed(2)}× risiko. Disiplin meminta minimal ${DISIPLIN.MIN_REWARD_RISK}×.` })
+    items.push({ text: t("warnLowRR", { rr: rewardRisk.toFixed(2), min: DISIPLIN.MIN_REWARD_RISK }) })
   }
   if (revenge) {
     items.push({
-      text: `Kamu rugi ${revenge.candlesAgo} candle lalu dengan lot ${fmtLot(revenge.lot)}. Lot lebih besar dalam ${DISIPLIN.REVENGE_WINDOW_CANDLES} candle setelah rugi dihitung revenge trade.`,
+      text: t("warnRevenge", { ago: revenge.candlesAgo, lot: fmtLot(revenge.lot), window: DISIPLIN.REVENGE_WINDOW_CANDLES }),
     })
   }
   if (candlesLeft > 0 && fewCandlesLeft(candlesLeft)) {
-    items.push({ text: `Hanya ${candlesLeft} candle tersisa di chart ini (kurang dari ${REPLAY.LOW_CANDLES_WARNING}). Trade yang masih terbuka ditutup saat segmen habis.` })
+    items.push({ text: t("warnFewCandles", { n: candlesLeft, min: REPLAY.LOW_CANDLES_WARNING }) })
   }
   if (items.length === 0) return null
 

@@ -1,0 +1,159 @@
+{
+  "title": "Mulai",
+  "questions": {
+    "motivation": {
+      "title": "Apa yang bikin kamu penasaran sama trading?",
+      "options": {
+        "social": {
+          "label": "Lihat konten di sosial media",
+          "sub": "TikTok, YouTube, Instagram"
+        },
+        "circle": {
+          "label": "Teman atau keluarga trading",
+          "sub": "Penasaran mereka ngapain"
+        },
+        "income": {
+          "label": "Mau tambah penghasilan",
+          "sub": "Cari pemasukan di luar gaji"
+        },
+        "lost": {
+          "label": "Sudah coba, dan rugi",
+          "sub": "Mau paham di mana salahnya"
+        }
+      }
+    },
+    "experience": {
+      "title": "Sejauh mana kamu sudah mencoba trading?",
+      "options": {
+        "none": {
+          "label": "Belum pernah sama sekali",
+          "sub": "Baru mau mulai dari nol"
+        },
+        "demo": {
+          "label": "Pernah pakai akun demo",
+          "sub": "Uang virtual, belum uang sungguhan"
+        },
+        "real": {
+          "label": "Pernah pakai uang sungguhan",
+          "sub": "Beberapa kali, belum rutin"
+        },
+        "regular": {
+          "label": "Rutin trading",
+          "sub": "Hampir setiap minggu"
+        }
+      }
+    },
+    "skill": {
+      "title": "Seberapa nyaman kamu membaca chart candlestick?",
+      "options": {
+        "unknown": {
+          "label": "Belum tahu",
+          "sub": "Candlestick itu apa, ya?"
+        },
+        "basics": {
+          "label": "Tahu dasarnya",
+          "sub": "Body, sumbu, warna naik dan turun"
+        },
+        "levels": {
+          "label": "Bisa menandai level",
+          "sub": "Support, resistance, arah trend"
+        },
+        "patterns": {
+          "label": "Pakai pola dan konfirmasi",
+          "sub": "Pin bar, breakout, retest"
+        }
+      }
+    },
+    "focus": {
+      "title": "Pair mana yang paling ingin kamu latih?",
+      "options": {
+        "majors": {
+          "label": "Pair utama dengan USD",
+          "sub": "EURUSD, GBPUSD, AUDUSD, USDCAD"
+        },
+        "yen": {
+          "label": "Pair yen",
+          "sub": "USDJPY, EURJPY"
+        },
+        "cross": {
+          "label": "Cross pair",
+          "sub": "EURAUD, GBPCAD. Geraknya lebih liar"
+        },
+        "all": {
+          "label": "Belum tahu, campur saja",
+          "sub": "Rex pilihkan dari semua pair"
+        }
+      }
+    },
+    "time": {
+      "title": "Berapa lama kamu mau latihan setiap hari?",
+      "options": {
+        "5": {
+          "label": "5 menit",
+          "sub": "1 ronde, 5 soal"
+        },
+        "15": {
+          "label": "15 menit",
+          "sub": "3 ronde, 15 soal"
+        },
+        "30": {
+          "label": "30 menit atau lebih",
+          "sub": "6 ronde, 30 soal"
+        },
+        "free": {
+          "label": "Belum tahu",
+          "sub": "Tanpa target dulu"
+        }
+      }
+    }
+  },
+  "motivationLines": {
+    "social": "Konten trading di sosial media jarang menunjukkan kalahnya. Di sini kamu lihat semuanya, termasuk saat analisis yang bagus tetap meleset.",
+    "circle": "Sekarang kamu bisa lihat sendiri apa yang mereka lakukan, tanpa mempertaruhkan uang siapa pun.",
+    "income": "Sebelum uang sungguhan, latih dulu keputusannya. Target harianmu membangun kebiasaan, bukan janji keuntungan.",
+    "lost": "Setelah setiap soal, buka “Bedah soal ini”. Di situ kelihatan di mana keputusan meleset dan kenapa."
+  },
+  "stepOf": "{n} dari {total}",
+  "done": "Selesai",
+  "railTitle": "Lima pertanyaan, lalu kita mulai.",
+  "railBody": "Jawabannya menentukan jalur latihan dan tingkat kesulitan soal pertamamu. Tidak ada jawaban salah — termasuk “belum tahu”.",
+  "progressLabel": "Progres kuis",
+  "skip": "Lewati kuis, pakai pengaturan standar",
+  "carried": "Jawaban kuismu sebelumnya sudah disimpan ke akunmu.",
+  "profile": {
+    "eyebrow": "Satu langkah lagi",
+    "title": "Kenalan dulu, yuk.",
+    "body": "Foto dan username tampil di profilmu. Semuanya bisa diubah kapan saja di halaman Akun.",
+    "save": "Simpan dan lanjut",
+    "later": "Nanti saja"
+  },
+  "question": "Pertanyaan {n}",
+  "finish": "Selesai",
+  "next": "Lanjut",
+  "back": "Kembali",
+  "result": {
+    "startLevel": "Mulai di tingkat",
+    "focus": "Fokus pair",
+    "allPairs": "Semua pair",
+    "dailyGoal": "Target harian",
+    "goalCount": "{n} soal",
+    "noGoal": "Tanpa target",
+    "experience": "Pengalaman",
+    "defaultEyebrow": "Pengaturan standar",
+    "readyEyebrow": "Jalurmu siap",
+    "defaultTitle": "Oke, kita mulai dari dasar.",
+    "readyTitle": "Ini jalur latihanmu.",
+    "start": "Mulai soal pertama",
+    "signUp": "Buat akun untuk simpan profil",
+    "redo": "Ulangi kuis"
+  },
+  "plan": {
+    "title": "Jalur latihan",
+    "lead": "Diatur dari jawaban kuis awalmu.",
+    "skipped": "Kamu melewati kuis awal, jadi latihan memakai pengaturan standar.",
+    "notTaken": "Kamu belum mengisi kuis awal.",
+    "retake": "Ulangi kuis awal",
+    "dataTitle": "Data latihan",
+    "dataLead": "Menghapus XP, streak, dan riwayat jawabanmu."
+  }
+}

@@ -1,4 +1,5 @@
 import { Check, X } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { type Decision } from "@/lib/mock-data"
 
 // Idle options sit on a neutral line so none of them looks pre-selected.
@@ -9,7 +10,6 @@ const actions = [
   {
     id: "buy" as const,
     label: "BUY",
-    sub: "Harga naik",
     text: "text-success",
     selected: "border-success bg-success/13 shadow-[0_4px_0_color-mix(in_srgb,var(--success)_20%,transparent)]",
     outline: "focus-visible:outline-success",
@@ -17,7 +17,6 @@ const actions = [
   {
     id: "sell" as const,
     label: "SELL",
-    sub: "Harga turun",
     text: "text-danger",
     selected: "border-danger bg-danger/13 shadow-[0_4px_0_color-mix(in_srgb,var(--danger)_20%,transparent)]",
     outline: "focus-visible:outline-danger",
@@ -25,7 +24,6 @@ const actions = [
   {
     id: "wait" as const,
     label: "WAIT",
-    sub: "Tunggu dulu",
     text: "text-wait",
     selected: "border-wait bg-wait/13 shadow-[0_4px_0_color-mix(in_srgb,var(--wait)_20%,transparent)]",
     outline: "focus-visible:outline-wait",
@@ -52,9 +50,10 @@ export function DecisionButtons({
   answer?: Decision
 }) {
   const revealed = answer !== undefined
+  const t = useTranslations("game.decisions")
 
   return (
-    <div role="radiogroup" aria-label="Keputusan trading" className="grid grid-cols-3 gap-2.5">
+    <div role="radiogroup" aria-label={t("label")} className="grid grid-cols-3 gap-2.5">
       {actions.map((a) => {
         const selected = value === a.id
         const isAnswer = answer === a.id
@@ -91,13 +90,13 @@ export function DecisionButtons({
             {a.label}
             <span className="mt-0.5 font-sans text-[11px] font-medium tracking-normal text-muted-foreground">
               <span className="sr-only">, </span>
-              {a.sub}
+              {t(a.id)}
             </span>
             {isAnswer && (
-              <Check className="absolute right-1.5 top-1.5 h-4 w-4" strokeWidth={2.2} aria-label="Jawaban benar" />
+              <Check className="absolute right-1.5 top-1.5 h-4 w-4" strokeWidth={2.2} aria-label={t("right")} />
             )}
             {wrongPick && (
-              <X className="absolute right-1.5 top-1.5 h-4 w-4" strokeWidth={2.2} aria-label="Pilihanmu salah" />
+              <X className="absolute right-1.5 top-1.5 h-4 w-4" strokeWidth={2.2} aria-label={t("wrongPick")} />
             )}
           </button>
         )

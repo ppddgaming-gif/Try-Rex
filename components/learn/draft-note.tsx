@@ -1,4 +1,5 @@
 import { FlaskConical } from "lucide-react"
+import { useTranslations } from "next-intl"
 import type { Source } from "@/lib/learn/types"
 
 /**
@@ -6,6 +7,7 @@ import type { Source } from "@/lib/learn/types"
  * says so on every page, the way the legal drafts carry [PERLU DIISI].
  */
 export function DraftNote() {
+  const t = useTranslations("learn.draft")
   return (
     <p
       role="note"
@@ -13,11 +15,7 @@ export function DraftNote() {
     >
       <FlaskConical className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
       <span>
-        <strong>Materi contoh.</strong>{" "}
-        <span className="text-muted-foreground">
-          Isi ini masih draf dan sedang dicocokkan dengan sumber terpercaya. Gunakan sebagai gambaran, bukan saran
-          finansial.
-        </span>
+        <strong>{t("title")}</strong> <span className="text-muted-foreground">{t("body")}</span>
       </span>
     </p>
   )
@@ -25,10 +23,11 @@ export function DraftNote() {
 
 /** The sources section at the foot of a lesson, with needed ones flagged. */
 export function SourceList({ sources }: { sources: Source[] }) {
+  const t = useTranslations("learn.draft")
   return (
     <section aria-labelledby="sumber" className="rounded-2xl border border-border bg-card p-5">
       <h2 id="sumber" className="font-display text-base font-bold">
-        Sumber
+        {t("sources")}
       </h2>
       <ul className="mt-3 flex flex-col gap-2 text-sm">
         {sources.map((s, i) =>
@@ -37,7 +36,7 @@ export function SourceList({ sources }: { sources: Source[] }) {
               <a href={s.url} target="_blank" rel="noreferrer" className="font-semibold text-primary hover:text-primary-hi">
                 {s.title}
               </a>
-              , {s.publisher}. Diakses {s.accessed}.
+              {t("accessed", { publisher: s.publisher, date: s.accessed })}
             </li>
           ) : (
             <li key={i}>

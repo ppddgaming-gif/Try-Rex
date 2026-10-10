@@ -2,6 +2,7 @@ import { Card } from "@/components/card"
 import { GlossaryText } from "@/components/glossary/glossary-text"
 import { RexMascot } from "@/components/rex-mascot"
 import { CheckCircle2, Lightbulb, XCircle } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { decisionLabels, type Decision } from "@/lib/mock-data"
 
 export function Explanation({
@@ -17,10 +18,11 @@ export function Explanation({
 }) {
   const tone = correct ? "text-success" : "text-danger"
   const dot = correct ? "bg-success" : "bg-danger"
+  const t = useTranslations("evaluation.explanation")
 
   return (
     <Card className="relative flex h-full flex-col overflow-hidden">
-      <h2 className="text-base font-semibold">Penjelasan TRY-REX</h2>
+      <h2 className="text-base font-semibold">{t("title")}</h2>
 
       <div className="mt-4 rounded-xl border border-border bg-muted/40 p-4">
         <p className="flex items-center gap-2 text-sm font-semibold">
@@ -31,7 +33,7 @@ export function Explanation({
           )}
           <span>
             <span className={tone}>{decisionLabels[decision]}</span>{" "}
-            {correct ? "tepat karena:" : "kurang tepat karena:"}
+            {correct ? t("rightBecause") : t("wrongBecause")}
           </span>
         </p>
         <ul className="mt-3 flex flex-col gap-2.5">
@@ -48,7 +50,7 @@ export function Explanation({
 
       <div className="mt-4 rounded-xl border border-primary/30 bg-primary/10 p-4">
         <p className="flex items-center gap-2 text-sm font-semibold text-primary">
-          <Lightbulb className="h-4 w-4" /> Saran TRY-REX
+          <Lightbulb className="h-4 w-4" /> {t("suggestion")}
         </p>
         {/* Right padding keeps the text clear of Rex in the corner. */}
         <p className="mt-2 pr-16 text-sm leading-relaxed text-foreground/90 sm:pr-20">

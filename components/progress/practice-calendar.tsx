@@ -1,6 +1,8 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useMemo, useRef } from "react"
+import { useLocale, useTranslations } from "next-intl"
+import { INTL_LOCALE, type Locale } from "@/lib/i18n/locale"
 import { attemptsPerDay, localDateKey } from "@/lib/progress/derive"
 import { useProgress, useToday } from "@/lib/progress/use-progress"
 import { Card } from "@/components/card"
@@ -15,8 +17,17 @@ const MONTH_H = 18
 // Weekday label column ("Sen") plus the 8px gap before the squares.
 const LABEL_W = 28
 
-const monthFmt = new Intl.DateTimeFormat("id-ID", { month: "short" })
-const tipFmt = new Intl.DateTimeFormat("id-ID", { weekday: "short", day: "numeric", month: "short" })
+/** Local time on purpose (no timeZone): a practice day is the player's day. */
+function useFormats() {
+  const locale = INTL_LOCALE[useLocale() as Locale]
+  return useMemo(
+    () => ({
+      month: new Intl.DateTimeFormat(locale, { month: "short" }),
+      tip: new Intl.DateTimeFormat(locale, { weekday: "short", day: "numeric", month: "short" }),
+    }),
+    [locale],
+  )
+}
 
 function shade(n: number) {
   if (n === 0) return "bg-muted"
@@ -54,14 +65,16 @@ export function PracticeCalendar() {
   const ready = progress && today
   const perDay = ready ? attemptsPerDay(progress.attempts) : null
   const activeDays = perDay ? [...perDay.values()].length : 0
+  const t = useTranslations("progress.calendar")
+  const num = (c: React.ReactNode) => <span className="font-mono tabular-nums">{c}</span>
 
   return (
     <Card>
       <div className="flex items-baseline justify-between gap-3">
-        <h2 className="text-base font-semibold">Kalender Latihan</h2>
+        <h2 className="text-base font-semibold">{t("title")}</h2>
         {ready ? (
           <p className="text-xs text-muted-foreground">
-            <span className="font-mono tabular-nums">{activeDays}</span> hari latihan
+            {t.rich("days", { n: activeDays, num })}
           </p>
         ) : (
           <Skeleton className="h-4 w-20" />
@@ -78,11 +91,11 @@ export function PracticeCalendar() {
       </div>
 
       <div className="mt-3 flex items-center justify-end gap-1.5 text-[11px] text-muted-foreground">
-        Sedikit
+        {t("less")}
         {["bg-muted", "bg-primary/30", "bg-primary/60", "bg-primary"].map((c) => (
           <span key={c} className={`h-3 w-3 rounded-[2px] ${c}`} aria-hidden="true" />
         ))}
-        Banyak
+        {t("more")}
       </div>
     </Card>
   )
@@ -90,15 +103,17 @@ export function PracticeCalendar() {
 
 function CalendarGrid({ weeks, perDay, today }: { weeks: Date[][]; perDay: Map<string, number>; today: string }) {
   const total = [...perDay.entries()].filter(([k]) => k >= localDateKey(weeks[0][0])).reduce((s, [, n]) => s + n, 0)
+  const t = useTranslations("progress.calendar")
+  const fmt = useFormats()
 
   return (
-    <div className="inline-flex gap-2" role="img" aria-label={`${total} soal dijawab dalam 12 minggu terakhir`}>
+    <div className="inline-flex gap-2" role="img" aria-label={t("aria", { n: total })}>
       {/* Weekday labels on alternate rows, like GitHub's. */}
       <div
         className="flex flex-col text-[10px] leading-none text-muted-foreground"
         style={{ gap: GAP, width: LABEL_W - 8, paddingTop: MONTH_H }}
       >
-        {["Sen", "", "Rab", "", "Jum", "", ""].map((l, i) => (
+        {[t("mon"), "", t("wed"), "", t("fri"), "", ""].map((l, i) => (
           <span key={i} className="flex items-center" style={{ height: CELL }}>
             {l}
           </span>
@@ -114,7 +129,7 @@ function CalendarGrid({ weeks, perDay, today }: { weeks: Date[][]; perDay: Map<s
             if (prev && prev.getMonth() === first.getMonth()) return null
             return (
               <span key={w} className="absolute top-0" style={{ left: w * (CELL + GAP) }}>
-                {monthFmt.format(first)}
+                {fmt.month.format(first)}
               </span>
             )
           })}
@@ -131,7 +146,7 @@ function CalendarGrid({ weeks, perDay, today }: { weeks: Date[][]; perDay: Map<s
                 return (
                   <span
                     key={key}
-                    title={`${n} soal · ${tipFmt.format(day)}`}
+                    title={t("tip", { n, date: fmt.tip.format(day) })}
                     className={`block rounded-[2px] ${shade(n)} ${key === today ? "ring-1 ring-foreground/70" : ""}`}
                     style={{ width: CELL, height: CELL }}
                   />

@@ -9,8 +9,11 @@ import {
   Pause,
   Sparkles,
 } from "lucide-react"
+import { useLocale, useTranslations } from "next-intl"
 import { CandlestickChart } from "@/components/candlestick-chart"
 import { Rex } from "@/components/rex-mascot"
+import { challengeText } from "@/lib/challenge-text"
+import type { Locale } from "@/lib/i18n/locale"
 import { challenges, decisionLabels, frameOf, type Challenge } from "@/lib/mock-data"
 
 /**
@@ -39,6 +42,7 @@ export function GlowPanel({
 
 /** Mockup: AI evaluation / aspect breakdown list (Dashboard nuance) */
 export function AspectMockup() {
+  const t = useTranslations("landing.showcase")
   const rows = [
     { icon: TrendingUp, label: "Trend Reading", val: 72, tone: "text-success" },
     { icon: Clock, label: "Entry Timing", val: 64, tone: "text-warning" },
@@ -47,9 +51,9 @@ export function AspectMockup() {
   return (
     <div className="glass-card w-full max-w-md rounded-2xl p-5">
       <div className="mb-4 flex items-center justify-between">
-        <p className="text-sm font-semibold">Pemahaman Berdasarkan Aspek</p>
+        <p className="text-sm font-semibold">{t("aspects")}</p>
         <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary">
-          Contoh
+          {t("example")}
         </span>
       </div>
       <div className="flex flex-col gap-4">
@@ -81,7 +85,7 @@ export function AspectMockup() {
 }
 
 /** Pair, timeframe and period pills, as the game shows them. */
-function ChallengeTags({ challenge }: { challenge: Challenge }) {
+function ChallengeTags({ challenge, period }: { challenge: Challenge; period: string }) {
   return (
     <>
       <span className="rounded-md border border-border bg-muted/40 px-2 py-1 text-xs font-semibold">{challenge.pair}</span>
@@ -89,17 +93,24 @@ function ChallengeTags({ challenge }: { challenge: Challenge }) {
         {challenge.timeframe}
       </span>
       <span className="hidden rounded-md border border-border bg-muted/40 px-2 py-1 text-[11px] text-muted-foreground sm:inline">
-        {challenge.period}
+        {period}
       </span>
     </>
   )
 }
 
+// Subtitles: game.decisions.<id>, the same words as the game's buttons.
 const decisionTiles = [
-  { label: "BUY", sub: "Harga naik", icon: ArrowUpRight, tone: "text-success" },
-  { label: "SELL", sub: "Harga turun", icon: ArrowDownRight, tone: "text-danger" },
-  { label: "WAIT", sub: "Tunggu dulu", icon: Pause, tone: "text-wait" },
-]
+  { id: "buy", label: "BUY", icon: ArrowUpRight, tone: "text-success" },
+  { id: "sell", label: "SELL", icon: ArrowDownRight, tone: "text-danger" },
+  { id: "wait", label: "WAIT", icon: Pause, tone: "text-wait" },
+] as const
+
+/** A question's words in the reader's language (lib/challenge-text.ts). */
+function useChallengeText(challenge: Challenge) {
+  const tc = useTranslations("game.challenge")
+  return challengeText(challenge, tc, useLocale() as Locale)
+}
 
 /**
  * Hero product shot: a real question from the game, with Rex quoting that
@@ -109,13 +120,16 @@ const decisionTiles = [
 export function HeroShowcase() {
   const challenge = challenges[0]
   const frame = frameOf(challenge.candles)
+  const text = useChallengeText(challenge)
+  const t = useTranslations("landing.showcase")
+  const td = useTranslations("game.decisions")
 
   return (
     <div className="flex w-full max-w-5xl flex-col gap-3 lg:flex-row lg:items-start lg:gap-5">
       <div className="glass-card min-w-0 rounded-2xl p-4 sm:p-5 lg:flex-1">
         <div className="flex items-center gap-2">
-          <ChallengeTags challenge={challenge} />
-          <span className="ml-auto font-mono text-xs text-muted-foreground">Soal 1 / 5</span>
+          <ChallengeTags challenge={challenge} period={text.period} />
+          <span className="ml-auto font-mono text-xs text-muted-foreground">{t("question")}</span>
         </div>
         <div className="mt-3 h-[190px] sm:h-[300px]">
           <CandlestickChart
@@ -123,7 +137,7 @@ export function HeroShowcase() {
             min={frame.min}
             max={frame.max}
             priceTicks={frame.priceTicks}
-            timeLabels={challenge.timeLabels}
+            timeLabels={text.timeLabels}
             zones={challenge.zones}
             currentPrice={challenge.currentPrice}
             digits={challenge.digits}
@@ -136,7 +150,7 @@ export function HeroShowcase() {
               className={`flex flex-col items-center rounded-xl border border-border bg-inset py-2.5 font-display text-base font-extrabold ${d.tone}`}
             >
               {d.label}
-              <span className="font-sans text-[10px] font-medium text-muted-foreground">{d.sub}</span>
+              <span className="font-sans text-[10px] font-medium text-muted-foreground">{td(d.id)}</span>
             </div>
           ))}
         </div>
@@ -146,8 +160,8 @@ export function HeroShowcase() {
       <div className="glass-card flex items-start gap-3 rounded-2xl p-4 text-left lg:mt-12 lg:w-64 lg:flex-col">
         <Rex size={36} mood="thinking" />
         <p className="text-xs leading-relaxed text-muted-foreground">
-          <span className="font-semibold text-foreground">Situasinya begini: </span>
-          {challenge.situation} Kamu pilih apa?
+          <span className="font-semibold text-foreground">{t("situation")}</span>
+          {text.situation} {t("pick")}
         </p>
       </div>
     </div>
@@ -163,11 +177,13 @@ export function RevealMockup() {
   const candles = [...challenge.candles, ...challenge.future]
   const frame = frameOf(candles)
   const up = challenge.changePercent > 0
+  const text = useChallengeText(challenge)
+  const t = useTranslations("landing.showcase")
 
   return (
     <div className="glass-card w-full max-w-md rounded-2xl p-4 sm:p-5">
       <div className="flex items-center gap-2">
-        <ChallengeTags challenge={challenge} />
+        <ChallengeTags challenge={challenge} period={text.period} />
         <span
           className={`ml-auto rounded-md px-2 py-1 font-mono text-[11px] font-bold ${up ? "bg-success/15 text-success" : "bg-danger/15 text-danger"}`}
         >
@@ -190,7 +206,10 @@ export function RevealMockup() {
       <div className="mt-3 flex items-center gap-2 rounded-xl border border-border bg-muted/40 px-3 py-2.5 text-xs">
         <CheckCircle2 className="h-4 w-4 shrink-0 text-success" aria-hidden="true" />
         <span className="text-muted-foreground">
-          Jawaban yang tepat: <span className="font-bold text-foreground">{decisionLabels[challenge.answer]}</span>
+          {t.rich("rightAnswer", {
+            answer: decisionLabels[challenge.answer],
+            b: (c) => <span className="font-bold text-foreground">{c}</span>,
+          })}
         </span>
       </div>
     </div>
@@ -199,12 +218,13 @@ export function RevealMockup() {
 
 /** Mockup: TRY-REX AI chat feedback */
 export function ChatMockup() {
+  const t = useTranslations("landing.showcase")
   return (
     <div className="glass-card w-full max-w-md rounded-2xl p-4">
       {/* user bubble */}
       <div className="mb-3 flex justify-end">
         <div className="max-w-[80%] rounded-2xl rounded-br-sm bg-muted px-3.5 py-2 text-xs">
-          Kenapa keputusan SELL aku kurang tepat?
+          {t("chatUser")}
         </div>
       </div>
       {/* assistant */}
@@ -212,21 +232,21 @@ export function ChatMockup() {
         <Rex size={28} />
         <div className="min-w-0 flex-1">
           <p className="text-xs leading-relaxed text-muted-foreground">
-            Aku cek chart kamu dulu, lalu jelasin alasannya.
+            {t("chatIntro")}
           </p>
           <div className="mt-2 flex flex-col gap-1.5">
             <div className="flex items-center gap-2 rounded-lg bg-muted px-3 py-2 text-[11px]">
-              <Sparkles className="h-3.5 w-3.5 text-primary" /> Menganalisis struktur market
+              <Sparkles className="h-3.5 w-3.5 text-primary" /> {t("chatStep1")}
             </div>
             <div className="flex items-center gap-2 rounded-lg bg-success/10 px-3 py-2 text-[11px] text-success">
-              <CheckCircle2 className="h-3.5 w-3.5" /> Harga masih di area resistance 1.0920
+              <CheckCircle2 className="h-3.5 w-3.5" /> {t("chatStep2")}
             </div>
             <div className="flex items-center gap-2 rounded-lg bg-danger/10 px-3 py-2 text-[11px] text-danger">
-              <XCircle className="h-3.5 w-3.5" /> Belum ada konfirmasi reversal
+              <XCircle className="h-3.5 w-3.5" /> {t("chatStep3")}
             </div>
           </div>
           <p className="mt-2 text-xs leading-relaxed">
-            Entry terlalu cepat. Tunggu rejection seperti pin bar di resistance dulu, baru ambil SELL.
+            {t("chatAnswer")}
           </p>
         </div>
       </div>

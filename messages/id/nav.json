@@ -1,0 +1,28 @@
+{
+  "items": {
+    "dashboard": "Dashboard",
+    "tradingGame": "Trading Game",
+    "akunLatihan": "Akun Latihan",
+    "aiEvaluation": "AI Evaluation",
+    "belajar": "Belajar 101",
+    "pengaturan": "Pengaturan"
+  },
+  "locked": "{label}, terkunci. {reason}",
+  "lockedTip": "{label} · terkunci",
+  "signInToOpen": "Masuk untuk membuka",
+  "openMenu": "Buka menu",
+  "closeMenu": "Tutup menu",
+  "home": "TRY-REX beranda",
+  "expandSidebar": "Buka sidebar",
+  "collapseSidebar": "Ciutkan sidebar",
+  "profile": {
+    "settingsOf": "Pengaturan akun {name}",
+    "signIn": "Masuk",
+    "guest": "Tamu",
+    "setUpProfile": "Atur profil",
+    "notSignedIn": "Belum masuk",
+    "signOut": "Keluar",
+    "guestNote": "Progres tersimpan di perangkat ini. Masuk untuk menyimpannya ke akunmu.",
+    "signUp": "Daftar gratis"
+  }
+}

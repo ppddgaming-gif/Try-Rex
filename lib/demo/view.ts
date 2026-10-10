@@ -5,7 +5,7 @@ import { accountFigures, bustLine, roundMoney, type AccountFigures, type Side } 
 import { levelPips } from "@/lib/demo/orders"
 import { commentsFor } from "@/lib/demo/journal"
 import type { RexComment } from "@/lib/demo/rex-comments"
-import { progressLabel, stageProgress, type StageProgress } from "@/lib/demo/stages"
+import { stageProgress, type StageProgress } from "@/lib/demo/stages"
 import { accountBust, toOpenTrade, type ReviewAnswer, type TradeRow, type TradingState } from "@/lib/demo/state"
 import type { TipId } from "@/lib/demo/tips"
 import type { ReasonId } from "@/lib/reasons"
@@ -83,15 +83,16 @@ export type DemoView = {
     fixedLot: number | null
     maxOpenTrades: number
     slTpRequired: boolean
+    /** In words: lib/demo/stages.ts progressLabel. */
     progress: StageProgress
-    label: string
   }
   session: {
     id: string
     pair: string
     digits: number
     timeframe: string
-    period: string
+    /** Unix seconds of the segment's first candle: its period, in words at the edge. */
+    start: number
     /** Up to and including the current candle. Never beyond. */
     candles: ViewCandle[]
     /** Candles left to play. */
@@ -200,7 +201,6 @@ export function buildView(state: TradingState, events: DemoEvent[] = []): DemoVi
       maxOpenTrades: stageCfg.maxOpenTrades,
       slTpRequired: stageCfg.slTpRequired,
       progress,
-      label: progressLabel(progress),
     },
     session:
       session && segment && current
@@ -209,7 +209,7 @@ export function buildView(state: TradingState, events: DemoEvent[] = []): DemoVi
             pair: segment.pair,
             digits: segment.digits,
             timeframe: segment.timeframe,
-            period: segment.period,
+            start: segment.start,
             candles: state.segmentCandles.slice(0, session.cursor + 1).map(({ t, o, h, l, c }) => ({ t, o, h, l, c })),
             remaining: session.lastIndex - session.cursor,
             ended: session.status === "ended",

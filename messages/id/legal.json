@@ -1,0 +1,12 @@
+{
+  "titles": {
+    "privacy": "Kebijakan Privasi",
+    "terms": "Syarat & Ketentuan",
+    "disclaimer": "Disclaimer"
+  },
+  "draftTitle": "Draf, belum final.",
+  "draftBody": "Dokumen ini belum ditinjau ahli hukum dan belum berlaku sebagai teks hukum resmi. Bagian bertanda [PERLU DIISI] atau [PERLU DITINJAU] masih harus dilengkapi.",
+  "draftDate": "Draf per {date}",
+  "notTranslated": "Belum tersedia dalam bahasa Inggris",
+  "notTranslatedBody": "Dokumen ini ditampilkan dalam bahasa aslinya, Bahasa Indonesia, sampai versi Inggrisnya ditinjau."
+}

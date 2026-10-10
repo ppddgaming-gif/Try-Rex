@@ -1,0 +1,30 @@
+{
+  "quoted": "“{text}”",
+  "comments": {
+    "revenge": "This trade was opened within {window} candles of a loss, with a bigger lot. That's the revenge trading pattern: pause first, then ask whether the setup is really there.",
+    "slWidened": "You moved your SL further away or removed it while the trade was running. Your original plan already decided when your idea was wrong; moving the SL away adds risk after you're in.",
+    "noSl": "This trade was opened without an SL, so its downside had no limit short of a stop out. Decide where you're wrong before you get in.",
+    "riskAbove": "Risk was {risk} of your balance, above the {max}% limit. Cut the lot size until the hit at your SL is at most {max}% of your balance.",
+    "reasonContradicts": "You went {side} because of {reasons}, but that reason points the other way. Take another look at what you actually saw on the chart.",
+    "slTooClose": "Your SL was only {sl} pips from entry, closer than the average candle length ({range} pips) over the last {candles} candles. Ordinary movement alone can reach it.",
+    "feeling": "One of your reasons was {reason}. Being honest about that is good. Before you get in, find one thing on the chart that backs the feeling up."
+  },
+  "good": {
+    "sl": "your SL was set from the start and never moved away",
+    "risk": "risk of {risk} of your balance",
+    "target": "a target of {rr}× the risk",
+    "aligned": "reasons that match the {side} direction",
+    "lead": "What went well: {items}. Plans like this are what gets scored, whatever happens next.",
+    "addTp": "One more thing: set a TP at least {min}× your SL distance.",
+    "lowTarget": "One more thing: your target was only {rr}× the risk; Disiplin asks for at least {min}×."
+  },
+  "advice": {
+    "none": "Your plans followed the Disiplin rules. A run of losses can still happen with a sound plan; that's part of trading.",
+    "lead": "{check} failed most often. {advice}",
+    "slAtEntry": "Set your SL before you get in. Without one, a single trade can wipe out the account.",
+    "riskWithinLimit": "Start from risk: decide your SL first, then pick a lot size that keeps the hit at your SL to {max}% of your balance at most.",
+    "rewardRisk": "Set your TP at least {min}× your SL distance, so one right trade covers more than one wrong one.",
+    "slNotWidened": "Leave your SL where it is. Moving it away changes the plan halfway through, right when your head is hot.",
+    "notRevenge": "After a loss, pause. A bigger lot to win it back is an emotional decision, not a chart decision."
+  }
+}

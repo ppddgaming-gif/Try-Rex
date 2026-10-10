@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState } from "react"
 import { AtSign, Check, LoaderCircle, X } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { EmailSent, Field, FormError } from "@/components/auth/form-parts"
 import { MIN_PASSWORD } from "@/lib/auth-rules"
 import {
@@ -33,7 +34,7 @@ export function ProfileForm({
   name,
   username,
   disabledUsername = false,
-  submitLabel = "Simpan profil",
+  submitLabel,
   onSaved,
 }: {
   name: string
@@ -44,6 +45,7 @@ export function ProfileForm({
   onSaved?: () => void
 }) {
   const [state, action, pending] = useActionState<ProfileFormState, FormData>(updateProfile, {})
+  const t = useTranslations("settings.profile")
   const [value, setValue] = useState(username ?? "")
   // Only the server's answer is state; "checking" and "invalid" are derived.
   const [checked, setChecked] = useState<{ name: string; free: boolean | null } | null>(null)
@@ -87,32 +89,32 @@ export function ProfileForm({
   }, [candidate, needsCheck])
 
   const hint: Record<Availability, React.ReactNode> = {
-    idle: "3–20 karakter: huruf kecil, angka, atau garis bawah.",
+    idle: t("usernameIdle"),
     checking: (
       <span className="flex items-center gap-1.5">
-        <LoaderCircle className="h-3 w-3 animate-spin" /> Mengecek…
+        <LoaderCircle className="h-3 w-3 animate-spin" /> {t("checking")}
       </span>
     ),
     free: (
       <span className="flex items-center gap-1.5 text-success">
-        <Check className="h-3 w-3" /> Tersedia
+        <Check className="h-3 w-3" /> {t("free")}
       </span>
     ),
     taken: (
       <span className="flex items-center gap-1.5 text-danger">
-        <X className="h-3 w-3" /> Sudah dipakai
+        <X className="h-3 w-3" /> {t("taken")}
       </span>
     ),
-    invalid: "Hanya huruf kecil, angka, dan garis bawah. 3–20 karakter.",
+    invalid: t("invalid"),
   }
 
   return (
     <form action={action} className="flex flex-col gap-5" noValidate>
       <FormError message={state.error} />
-      <Field id="name" name="name" label="Nama tampilan" autoComplete="name" required maxLength={60} defaultValue={name} />
+      <Field id="name" name="name" label={t("displayName")} autoComplete="name" required maxLength={60} defaultValue={name} />
       <div className="flex flex-col gap-2">
         <label htmlFor="username" className="text-sm font-semibold">
-          Username
+          {t("username")}
         </label>
         <div className="relative">
           <AtSign className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-faint" aria-hidden="true" />
@@ -133,14 +135,14 @@ export function ProfileForm({
           />
         </div>
         <p id="username-hint" aria-live="polite" className="text-xs text-faint">
-          {disabledUsername ? "Username bisa diatur setelah fitur akun diaktifkan di server." : hint[availability]}
+          {disabledUsername ? t("usernameDisabled") : hint[availability]}
         </p>
       </div>
       <div className="flex flex-wrap items-center gap-4">
         <button type="submit" className="btn" disabled={pending || availability === "taken" || availability === "invalid"}>
-          {pending ? "Menyimpan…" : submitLabel}
+          {pending ? t("saving") : (submitLabel ?? t("save"))}
         </button>
-        <FormSaved show={Boolean(state.ok) && !pending}>Tersimpan</FormSaved>
+        <FormSaved show={Boolean(state.ok) && !pending}>{t("saved")}</FormSaved>
       </div>
     </form>
   )
@@ -148,15 +150,13 @@ export function ProfileForm({
 
 export function EmailForm({ current }: { current: string | undefined }) {
   const [state, action, pending] = useActionState<ProfileFormState, FormData>(changeEmail, {})
+  const t = useTranslations("settings.emailForm")
+  const bold = (c: React.ReactNode) => <strong className="text-foreground">{c}</strong>
 
   if (state.sent) {
     return (
-      <EmailSent title="Konfirmasi email barumu">
-        <p>
-          Kami mengirim link ke <strong className="text-foreground">{state.email}</strong>. Emailmu baru berganti
-          setelah link itu dibuka. Cek juga email lamamu: demi keamanan, perubahan ini mungkin perlu dikonfirmasi dari
-          sana juga.
-        </p>
+      <EmailSent title={t("sentTitle")}>
+        <p>{t.rich("sentBody", { email: state.email ?? "", b: bold })}</p>
       </EmailSent>
     )
   }
@@ -164,21 +164,21 @@ export function EmailForm({ current }: { current: string | undefined }) {
   return (
     <form action={action} className="flex flex-col gap-5" noValidate>
       <p className="text-sm text-muted-foreground">
-        Email sekarang: <span className="font-semibold text-foreground">{current ?? "—"}</span>
+        {t.rich("current", { email: current ?? "—", b: (c) => <span className="font-semibold text-foreground">{c}</span> })}
       </p>
       <FormError message={state.error} />
       <Field
         id="email"
         name="email"
         type="email"
-        label="Email baru"
+        label={t("newEmail")}
         autoComplete="email"
         inputMode="email"
         required
         defaultValue={state.email}
       />
       <button type="submit" className="btn btn-ghost self-start" disabled={pending}>
-        {pending ? "Mengirim…" : "Kirim link konfirmasi"}
+        {pending ? t("sending") : t("submit")}
       </button>
     </form>
   )
@@ -187,27 +187,29 @@ export function EmailForm({ current }: { current: string | undefined }) {
 export function PasswordForm() {
   // React clears the uncontrolled fields itself once the action finishes.
   const [state, action, pending] = useActionState<ProfileFormState, FormData>(changePassword, {})
+  const t = useTranslations("settings.passwordForm")
+  const tf = useTranslations("auth.fields")
 
   return (
     <form action={action} className="flex flex-col gap-5" noValidate>
       <FormError message={state.error} />
-      <Field id="current" name="current" type="password" label="Password lama" autoComplete="current-password" required />
+      <Field id="current" name="current" type="password" label={t("current")} autoComplete="current-password" required />
       <Field
         id="new-password"
         name="password"
         type="password"
-        label="Password baru"
+        label={t("new")}
         autoComplete="new-password"
         required
         minLength={MIN_PASSWORD}
-        hint={`Minimal ${MIN_PASSWORD} karakter.`}
+        hint={tf("minLength", { min: MIN_PASSWORD })}
       />
-      <Field id="confirm" name="confirm" type="password" label="Ulangi password baru" autoComplete="new-password" required />
+      <Field id="confirm" name="confirm" type="password" label={t("repeat")} autoComplete="new-password" required />
       <div className="flex flex-wrap items-center gap-4">
         <button type="submit" className="btn btn-ghost" disabled={pending}>
-          {pending ? "Menyimpan…" : "Ganti password"}
+          {pending ? t("saving") : t("submit")}
         </button>
-        <FormSaved show={Boolean(state.ok) && !pending}>Password diganti</FormSaved>
+        <FormSaved show={Boolean(state.ok) && !pending}>{t("saved")}</FormSaved>
       </div>
     </form>
   )

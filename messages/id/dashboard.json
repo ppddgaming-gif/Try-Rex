@@ -1,0 +1,21 @@
+{
+  "title": "Dashboard",
+  "accountSettings": "Pengaturan akun",
+  "welcomeBack": "Halo lagi, {name}!",
+  "welcome": "Selamat datang, {name}!",
+  "lead": "Latihan sedikit tiap hari lebih berguna daripada banyak sekali.",
+  "continue": "Lanjutkan latihan",
+  "skills": "Kemampuan",
+  "skillsHint": "Terisi setelah soal mulai menguji tiap kemampuan secara terpisah.",
+  "recent": "Aktivitas Terbaru",
+  "noActivity": "Belum ada aktivitas",
+  "noActivityBody": "Jawaban pertamamu akan muncul di sini.",
+  "firstSession": "Mulai sesi pertama",
+  "daily": {
+    "title": "Tantangan Hari Ini",
+    "badge": "Daily Challenge",
+    "reward": "Hadiah",
+    "difficulty": "Kesulitan",
+    "start": "Mulai Tantangan"
+  }
+}

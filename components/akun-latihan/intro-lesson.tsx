@@ -3,11 +3,12 @@
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { ArrowRight, BookOpen, CheckCircle2, LoaderCircle, XCircle } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { Card } from "@/components/card"
 import { Confetti } from "@/components/confetti"
 import { GlossaryText } from "@/components/glossary/glossary-text"
 import { Rex } from "@/components/rex-mascot"
-import { postJson } from "@/components/akun-latihan/post-json"
+import { usePostJson } from "@/components/akun-latihan/post-json"
 import type { PublicLesson } from "@/lib/demo/lessons"
 
 /**
@@ -18,7 +19,7 @@ import type { PublicLesson } from "@/lib/demo/lessons"
 export function RequiredLesson({
   lesson,
   optional = false,
-  doneLabel = "Lanjut ke akunku",
+  doneLabel,
 }: {
   lesson: PublicLesson
   optional?: boolean
@@ -31,6 +32,8 @@ export function RequiredLesson({
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [, startTransition] = useTransition()
+  const postJson = usePostJson()
+  const t = useTranslations("demo.ui.lesson")
 
   async function submit() {
     if (picked === null) return
@@ -49,7 +52,7 @@ export function RequiredLesson({
     <article className="flex flex-col gap-5">
       <Card className="sm:p-8">
         <p className="eyebrow flex items-center gap-2">
-          <BookOpen className="h-4 w-4" aria-hidden="true" /> {optional ? "Materi opsional" : "Materi wajib"}
+          <BookOpen className="h-4 w-4" aria-hidden="true" /> {optional ? t("optional") : t("required")}
         </p>
         <h2 className="mt-3 text-2xl font-bold sm:text-3xl">{lesson.title}</h2>
         <p className="mt-2 text-muted-foreground">{lesson.summary}</p>
@@ -96,7 +99,7 @@ export function RequiredLesson({
       <Card className="glow-card relative border-primary/30 sm:p-8">
         {result?.correct && <Confetti pieces={20} />}
         <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-          {optional ? "Cek pemahaman" : "Cek pemahaman · wajib benar"}
+          {optional ? t("checkOptional") : t("checkRequired")}
         </p>
         <p className="mt-2 font-display text-lg font-bold leading-snug">{lesson.question}</p>
 
@@ -152,13 +155,13 @@ export function RequiredLesson({
           {result?.correct ? (
             !optional && (
               <button type="button" onClick={() => startTransition(() => router.refresh())} className="btn">
-                {doneLabel} <ArrowRight className="h-4 w-4" />
+                {doneLabel ?? t("done")} <ArrowRight className="h-4 w-4" />
               </button>
             )
           ) : (
             <button type="button" onClick={submit} disabled={picked === null || busy} className="btn">
               {busy && <LoaderCircle className="h-4 w-4 animate-spin" />}
-              {result && !result.correct ? "Coba jawaban lain" : "Periksa jawaban"}
+              {result && !result.correct ? t("tryAgain") : t("check")}
             </button>
           )}
         </div>

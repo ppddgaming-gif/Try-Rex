@@ -1,0 +1,53 @@
+{
+  "stop-loss": {
+    "title": "What's a stop loss?",
+    "when": "The first time you open the order panel",
+    "body": {
+      "p1": "A stop loss is the price where your trade closes automatically if you turn out to be wrong. You choose it before you get in, while your head is still cool.",
+      "p2": "Put your SL where your idea is proven wrong, for example just beyond support or resistance, not at a number that feels comfortable.",
+      "p3": "In Stage 1, every trade must have an SL and a TP. After that you can trade without them, but Disiplin still checks."
+    }
+  },
+  "risk-per-trade": {
+    "title": "Why risk per trade matters",
+    "when": "The first time your risk goes above {max}% of your balance",
+    "body": {
+      "p1": "Risk per trade is the share of your balance you lose if your SL is hit. The limit here is {max}%.",
+      "p2": "At {max}% risk, ten losses in a row still leave you about 80% of your balance. At 10% risk, five losses already take almost half of it.",
+      "p3": "Cut the lot size or move your SL somewhere that makes sense. Don't stretch your risk for one trade that feels certain."
+    }
+  },
+  "reward-risk": {
+    "title": "Reward : risk",
+    "when": "Your first trade without a take profit (Stage 2 and up)",
+    "body": {
+      "p1": "Reward:risk compares the distance to your TP with the distance to your SL. A minimum of {minRR} means your target is at least {minRR}× your risk.",
+      "p2": "Without a TP you can't tell whether the trade is worth it. A good ratio keeps you going even when you're right less than half the time."
+    }
+  },
+  "revenge-trading": {
+    "title": "Revenge trading",
+    "when": "The first time a trade is flagged as revenge",
+    "body": {
+      "p1": "Revenge trading is getting back in with a bigger lot soon after a loss, here within {window} candles, to “win back” the loss.",
+      "p2": "That decision comes from emotion, not from the chart. After a loss, pause for a candle or two, then ask: is the setup really there?"
+    }
+  },
+  "stop-out": {
+    "title": "What just happened: stop out",
+    "when": "The first time your account hits a stop out",
+    "body": {
+      "p1": "Your equity fell to {stopOut}% of the margin in use, so every trade was closed automatically to keep your balance from going negative.",
+      "p2": "It's a sign your position was too big for your balance. A smaller lot gives you room to be wrong without losing control."
+    }
+  },
+  "disiplin-score": {
+    "title": "How the Disiplin score works",
+    "when": "When your first Disiplin result comes in",
+    "body": {
+      "p1": "Every closed trade is checked: SL set at entry, risk under the limit, a TP with enough reward, SL not moved away, and not a revenge trade.",
+      "p2": "A trade's score = checks passed divided by the number of checks. Your account's Disiplin is the average of your last {rolling} trades.",
+      "p3": "XP only comes from Disiplin. Profit or loss adds no XP: a losing trade that followed its plan still counts."
+    }
+  }
+}

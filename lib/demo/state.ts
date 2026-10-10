@@ -87,7 +87,8 @@ export type ClosedSummary = {
   closedClock: number
 }
 
-export type SegmentInfo = { pair: string; digits: number; timeframe: string; period: string }
+/** `start`: unix seconds of the first candle. */
+export type SegmentInfo = { pair: string; digits: number; timeframe: string; start: number }
 
 export type TradingState = {
   account: AccountRow

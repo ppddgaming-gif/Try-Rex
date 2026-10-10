@@ -1,0 +1,118 @@
+{
+  "title": "Settings",
+  "lead": "Set up how the app looks, your profile, security and your practice plan. Display settings are saved on this device.",
+  "tabs": {
+    "label": "Settings sections",
+    "tampilan": "Display",
+    "profil": "Profile",
+    "keamanan": "Security",
+    "latihan": "Practice"
+  },
+  "photoAndName": "Photo and name",
+  "email": "Email",
+  "password": "Password",
+  "signIn": {
+    "title": "Sign in first",
+    "body": "You need an account to {what}. It's free, and your progress is saved too.",
+    "profile": "set your photo, name and username",
+    "security": "change your email and password",
+    "signIn": "Sign in",
+    "signUp": "Sign up free"
+  },
+  "language": {
+    "title": "Language",
+    "hint": "When you're signed in, this is saved to your account. Otherwise it's saved on this device."
+  },
+  "theme": {
+    "title": "Theme",
+    "hint": "System follows your device's light/dark setting.",
+    "dark": "Dark",
+    "light": "Light",
+    "system": "System"
+  },
+  "font": {
+    "title": "Font",
+    "hint": "OpenDyslexic weights the bottom of each letter so letters don't flip around. Atkinson Hyperlegible makes look-alike characters (I, l, 1) easy to tell apart.",
+    "default": "Standard",
+    "dyslexic": "Dyslexia-friendly",
+    "readable": "Easy to read"
+  },
+  "size": {
+    "title": "Text size",
+    "normal": "Normal",
+    "large": "Large",
+    "xlarge": "Larger"
+  },
+  "motion": {
+    "title": "Motion",
+    "hint": "Reduce turns off animation on this site only, without changing your device settings.",
+    "system": "Follow system",
+    "systemSub": "Full animation, unless your device asks for less",
+    "reduce": "Reduce",
+    "reduceSub": "No animations or transitions"
+  },
+  "sidebar": {
+    "title": "Sidebar",
+    "hint": "Wide screens only. You can also use the button at the top of the sidebar.",
+    "expanded": "Wide",
+    "expandedSub": "Icons and menu names",
+    "collapsed": "Compact",
+    "collapsedSub": "Icons only, more room"
+  },
+  "profile": {
+    "save": "Save profile",
+    "displayName": "Display name",
+    "username": "Username",
+    "usernameIdle": "3–20 characters: lowercase letters, numbers or underscores.",
+    "checking": "Checking…",
+    "free": "Available",
+    "taken": "Already taken",
+    "invalid": "Lowercase letters, numbers and underscores only. 3–20 characters.",
+    "usernameDisabled": "Usernames can be set once account features are enabled on the server.",
+    "saving": "Saving…",
+    "saved": "Saved"
+  },
+  "emailForm": {
+    "sentTitle": "Confirm your new email",
+    "sentBody": "We sent a link to <b>{email}</b>. Your email only changes once you open it. Check your old inbox too: for security, the change may need confirming from there as well.",
+    "current": "Current email: <b>{email}</b>",
+    "newEmail": "New email",
+    "sending": "Sending…",
+    "submit": "Send confirmation link"
+  },
+  "passwordForm": {
+    "current": "Current password",
+    "new": "New password",
+    "repeat": "Repeat new password",
+    "saving": "Saving…",
+    "submit": "Change password",
+    "saved": "Password changed"
+  },
+  "avatar": {
+    "change": "Change profile photo",
+    "replace": "Change photo",
+    "upload": "Upload photo",
+    "remove": "Remove",
+    "formats": "JPG, PNG or WebP. Cropped to a square automatically.",
+    "notImage": "Choose an image file (JPG, PNG or WebP).",
+    "tooBig": "Photos can be up to 10 MB.",
+    "failed": "Couldn't upload the photo. Please try again."
+  },
+  "errors": {
+    "notReady": "This feature isn't enabled on the server yet. Try again later.",
+    "fillName": "Enter your display name.",
+    "nameTooLong": "Names can be up to 60 characters.",
+    "usernameRule": "Usernames are 3–20 characters: lowercase letters, numbers or underscores (_).",
+    "sessionEnded": "Your session ended. Please sign in again.",
+    "usernameTaken": "That username is taken. Try another one.",
+    "saveFailed": "Couldn't save. Please try again in a moment.",
+    "invalidPhoto": "That photo isn't valid.",
+    "photoSaveFailed": "Couldn't save the photo.",
+    "invalidEmail": "Enter a valid new email.",
+    "sameEmail": "That's already your account email.",
+    "fillCurrent": "Enter your current password.",
+    "newTooShort": "Your new password is too short. Use at least {min} characters.",
+    "newMismatch": "The two new passwords don't match.",
+    "wrongCurrent": "Your current password is wrong."
+  }
+}

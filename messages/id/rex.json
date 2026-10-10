@@ -1,0 +1,30 @@
+{
+  "quoted": "“{text}”",
+  "comments": {
+    "revenge": "Trade ini dibuka dalam {window} candle setelah rugi, dengan lot lebih besar. Itu pola revenge trading: jeda dulu, lalu tanya apakah setup-nya benar-benar ada.",
+    "slWidened": "SL kamu jauhkan atau hapus saat trade berjalan. Rencana awal sudah menentukan kapan idemu salah; menggeser SL menjauh menambah risiko setelah masuk.",
+    "noSl": "Trade ini dibuka tanpa SL, jadi kerugiannya tidak punya batas sampai stop out. Tentukan titik salahmu sebelum masuk.",
+    "riskAbove": "Risiko {risk} saldo, di atas batas {max}%. Perkecil lot sampai kerugian di SL paling banyak {max}% saldo.",
+    "reasonContradicts": "Kamu {side} dengan alasan {reasons}, padahal alasan itu menunjuk ke arah sebaliknya. Cek lagi apa yang sebenarnya kamu lihat di chart.",
+    "slTooClose": "SL hanya {sl} pip dari entry, lebih dekat dari rata-rata panjang candle ({range} pip) dalam {candles} candle terakhir. Gerakan biasa saja sudah bisa menyentuhnya.",
+    "feeling": "Salah satu alasanmu {reason}. Jujur itu bagus. Sebelum masuk, cari satu hal di chart yang mendukung feeling itu."
+  },
+  "good": {
+    "sl": "SL dipasang sejak awal dan tidak dijauhkan",
+    "risk": "risiko {risk} saldo",
+    "target": "target {rr}× risiko",
+    "aligned": "alasan sejalan dengan arah {side}",
+    "lead": "Yang sudah baik: {items}. Rencana seperti ini yang dinilai, apa pun hasilnya.",
+    "addTp": "Satu lagi: pasang TP, minimal {min}× jarak SL.",
+    "lowTarget": "Satu lagi: target baru {rr}× risiko, Disiplin meminta minimal {min}×."
+  },
+  "advice": {
+    "none": "Rencanamu sudah mengikuti aturan Disiplin. Kerugian beruntun tetap bisa terjadi walau rencananya benar; itu bagian dari trading.",
+    "lead": "{check} paling sering tidak lolos. {advice}",
+    "slAtEntry": "Pasang SL sebelum masuk. Tanpa SL, satu trade bisa menghabiskan akun.",
+    "riskWithinLimit": "Mulai dari risiko: tentukan SL dulu, lalu pilih lot yang membuat kerugian di SL paling banyak {max}% saldo.",
+    "rewardRisk": "Pasang TP setidaknya {min}× jarak SL, supaya satu trade yang benar menutup lebih dari satu yang salah.",
+    "slNotWidened": "Biarkan SL di tempatnya. Menjauhkannya mengubah rencana di tengah jalan, tepat saat kepala sedang panas.",
+    "notRevenge": "Setelah rugi, jeda dulu. Lot lebih besar untuk membalas kerugian adalah keputusan emosi, bukan keputusan chart."
+  }
+}

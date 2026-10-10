@@ -16,11 +16,13 @@
     "@supabase/supabase-js": "^2.117.2",
     "lucide-react": "^0.456.0",
     "next": "^16.0.0",
+    "next-intl": "4.4.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "server-only": "^0.0.1"
   },
   "devDependencies": {
+    "@formatjs/icu-messageformat-parser": "^3.5.21",
     "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
@@ -31,5 +33,8 @@
     "tailwindcss": "^4.0.0",
     "typescript": "^5.6.0",
     "vitest": "^5.0.2"
+  },
+  "overrides": {
+    "use-intl": "4.4.0"
   }
 }

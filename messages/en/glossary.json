@@ -1,0 +1,205 @@
+{
+  "entries": {
+    "pair": {
+      "term": "Pair",
+      "short": "Two currencies traded against each other. In EURUSD, you buy or sell euros with US dollars.",
+      "example": "If EURUSD rises from 1.0800 to 1.0850, the euro has strengthened against the dollar."
+    },
+    "buy": {
+      "term": "BUY",
+      "short": "Opening a position because you expect price to rise. You profit if it rises and lose if it falls."
+    },
+    "sell": {
+      "term": "SELL",
+      "short": "Opening a position because you expect price to fall. You profit if it falls and lose if it rises."
+    },
+    "wait": {
+      "term": "WAIT",
+      "short": "Deliberately not opening a position because there's no clear edge yet. Not trading is a decision too."
+    },
+    "entry": {
+      "term": "Entry",
+      "short": "The price at which you open a position. Every profit and loss is measured from here."
+    },
+    "pip": {
+      "term": "Pip",
+      "short": "The smallest standard price move in forex: 0.0001 for most pairs, 0.01 for yen pairs.",
+      "example": "EURUSD going from 1.0800 to 1.0842 is a 42-pip rise."
+    },
+    "posisi": {
+      "term": "Position",
+      "short": "A trade that's currently open, buy or sell, until you close it."
+    },
+    "spread": {
+      "term": "Spread",
+      "short": "The gap between the buy and sell price a broker offers. It's a cost you pay every time you open a position."
+    },
+    "volatilitas": {
+      "term": "Volatility",
+      "short": "How far and how fast price moves. High volatility means bigger opportunities and bigger risks alike."
+    },
+    "likuiditas": {
+      "term": "Liquidity",
+      "short": "How easily something can be bought or sold without moving the price much. Major pairs like EURUSD are very liquid."
+    },
+    "candlestick": {
+      "term": "Candlestick",
+      "short": "One bar on the chart that sums up the open, close, high and low price for one period.",
+      "example": "On the H4 timeframe, one candle represents 4 hours of price movement."
+    },
+    "body": {
+      "term": "Candle body",
+      "short": "The thick part of a candle, from the open to the close. A long body means one side clearly won that period."
+    },
+    "sumbu": {
+      "term": "Wick",
+      "short": "The thin lines above and below the body: price reached there but didn't hold until the candle closed."
+    },
+    "timeframe": {
+      "term": "Timeframe",
+      "short": "How much time one candle represents. M15 = 15 minutes, H1 = 1 hour, H4 = 4 hours, D1 = 1 day."
+    },
+    "h4": {
+      "term": "H4",
+      "short": "The 4-hour timeframe: each candle sums up 4 hours of price. Every Trading Game question uses H4."
+    },
+    "trend": {
+      "term": "Trend",
+      "short": "The general direction of price over a stretch of time: up (higher highs and lows), down, or sideways."
+    },
+    "menyamping": {
+      "term": "Sideways",
+      "short": "Price moving back and forth between two limits with no clear direction. Often the best time to WAIT."
+    },
+    "kemiringan": {
+      "term": "Trend slope",
+      "short": "How steep a trend is, measured as average pips per candle. Positive means up, negative means down."
+    },
+    "support": {
+      "term": "Support",
+      "short": "A price area where declines have stalled and bounced several times. The more often it's touched, the more the market watches it.",
+      "example": "In the Trading Game, support is drawn as a dashed green band."
+    },
+    "resistance": {
+      "term": "Resistance",
+      "short": "A price area where rallies have stalled and turned down several times. The opposite of support.",
+      "example": "In the Trading Game, resistance is drawn as a dashed red band."
+    },
+    "rentang": {
+      "term": "Price range",
+      "short": "The distance between the lowest and highest price over a period. “At 80% of the range” means near the top."
+    },
+    "breakout": {
+      "term": "Breakout",
+      "short": "When price pushes convincingly through support or resistance. A false breakout (fakeout) quickly falls back inside."
+    },
+    "konfirmasi": {
+      "term": "Confirmation",
+      "short": "An extra sign that backs your idea before you get in, for example a candle closing above resistance after a breakout."
+    },
+    "pin-bar": {
+      "term": "Pin bar",
+      "short": "A candle with a small body and a long wick on one side: a sign price was rejected from that area."
+    },
+    "penolakan": {
+      "term": "Rejection",
+      "short": "Price touches a level and is quickly pushed back, leaving a long wick."
+    },
+    "bullish": {
+      "term": "Bullish",
+      "short": "Leaning up. A bullish candle closes higher than it opened."
+    },
+    "bearish": {
+      "term": "Bearish",
+      "short": "Leaning down. A bearish candle closes lower than it opened."
+    },
+    "stop-loss": {
+      "term": "Stop loss",
+      "short": "A price limit that closes a losing position automatically. You decide how big a loss you'll accept before you get in."
+    },
+    "take-profit": {
+      "term": "Take profit",
+      "short": "A target price that closes a winning position automatically."
+    },
+    "risk-reward": {
+      "term": "Risk-reward ratio",
+      "short": "The distance to your stop loss compared with the distance to your take profit. 1:2 means risking 20 pips for a 40-pip target."
+    },
+    "leverage": {
+      "term": "Leverage",
+      "short": "Borrowing from a broker to make a position bigger. Profits and losses grow by the same multiple."
+    },
+    "margin": {
+      "term": "Margin",
+      "short": "The deposit a broker holds while a leveraged position is open."
+    },
+    "diversifikasi": {
+      "term": "Diversification",
+      "short": "Spreading risk across several assets or ideas so one mistake doesn't take everything."
+    },
+    "crypto": {
+      "term": "Crypto",
+      "short": "Digital assets recorded on a blockchain rather than issued by a central bank. Examples: Bitcoin and Ethereum."
+    },
+    "blockchain": {
+      "term": "Blockchain",
+      "short": "A transaction ledger copied across many computers at once, so it's hard to change quietly."
+    },
+    "bitcoin": {
+      "term": "Bitcoin",
+      "short": "The first crypto (2009), with a maximum supply of 21 million coins set in its network rules."
+    },
+    "altcoin": {
+      "term": "Altcoin",
+      "short": "Any crypto other than Bitcoin. Generally more volatile and riskier."
+    },
+    "stablecoin": {
+      "term": "Stablecoin",
+      "short": "A crypto designed to track the value of another asset, usually the US dollar. How stable it is depends on its issuer's reserves."
+    },
+    "wallet": {
+      "term": "Wallet",
+      "short": "Where you keep the keys to your crypto. Whoever holds the keys (the seed phrase) controls the assets."
+    },
+    "seed-phrase": {
+      "term": "Seed phrase",
+      "short": "A set of 12 or 24 words that restores a wallet. Never share it with anyone, including an “admin”."
+    },
+    "exchange": {
+      "term": "Exchange",
+      "short": "A platform for buying and selling crypto. Choose one that's officially registered in your country."
+    },
+    "fomo": {
+      "term": "FOMO",
+      "short": "Fear of missing out: rushing in after price has already run a long way."
+    },
+    "overtrading": {
+      "term": "Overtrading",
+      "short": "Opening too many positions, usually out of boredom or to win back a loss. Costs and mistakes pile up."
+    },
+    "jurnal-trading": {
+      "term": "Trading journal",
+      "short": "A record of every decision: why you got in, what happened, and the lesson. The simplest way to stop repeating mistakes."
+    }
+  },
+  "categories": {
+    "dasar": "Basics",
+    "chart": "Reading charts",
+    "risiko": "Risk management",
+    "crypto": "Crypto",
+    "psikologi": "Psychology"
+  },
+  "seeMeaning": "{term}: see meaning",
+  "close": "Close",
+  "example": "Example: ",
+  "lesson": "Read the lesson",
+  "openKamus": "Open in Glossary",
+  "search": "Search terms",
+  "searchPlaceholder": "Search: support, leverage, stablecoin…",
+  "clear": "Clear search",
+  "category": "Category",
+  "all": "All",
+  "count": "{n, plural, one {<num>#</num> term} other {<num>#</num> terms}}",
+  "noneTitle": "Nothing found",
+  "noneBody": "No term for \"{query}\" yet. Try another word."
+}

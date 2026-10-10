@@ -1,6 +1,7 @@
 "use client"
 
 import { Lock, Sparkles } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { INSIGHT_UNLOCK, insightLine, totalChallenges } from "@/lib/progress/derive"
 import { useProgress } from "@/lib/progress/use-progress"
 import { Card } from "@/components/card"
@@ -14,12 +15,13 @@ import { Rex } from "@/components/rex-mascot"
  */
 export function AiInsight() {
   const progress = useProgress()
+  const t = useTranslations("progress.insight")
 
   return (
     <Card>
       <h2 className="flex items-center gap-2 text-base font-semibold">
         <Sparkles className="h-4 w-4 text-primary" aria-hidden="true" />
-        AI Insight
+        {t("title")}
       </h2>
 
       {!progress ? (
@@ -32,7 +34,7 @@ export function AiInsight() {
         <Locked done={totalChallenges(progress)} />
       ) : (
         <div className="mt-4 flex items-center gap-4 rounded-xl border border-border bg-muted/40 p-4">
-          <p className="flex-1 text-sm leading-relaxed">{insightLine(progress)}</p>
+          <p className="flex-1 text-sm leading-relaxed">{insightLine(progress, t)}</p>
           <Rex size={48} mood="thinking" />
         </div>
       )}
@@ -41,8 +43,9 @@ export function AiInsight() {
 }
 
 function Locked({ done }: { done: number }) {
+  const t = useTranslations("progress.insight")
   return (
-    <EmptyState icon={Lock} title="Insight terkunci" body={`Selesaikan ${INSIGHT_UNLOCK} soal, nanti Rex kasih insight.`}>
+    <EmptyState icon={Lock} title={t("lockedTitle")} body={t("lockedBody", { n: INSIGHT_UNLOCK })}>
       <div className="mt-4 flex w-40 items-center gap-2">
         <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted" aria-hidden="true">
           <div className="h-full rounded-full bg-primary" style={{ width: `${(done / INSIGHT_UNLOCK) * 100}%` }} />

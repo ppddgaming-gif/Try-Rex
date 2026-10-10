@@ -1,36 +1,38 @@
 import type { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
 import Link from "next/link"
 import { LoginForm } from "@/components/auth/login-form"
 import { safeNext } from "@/lib/auth-rules"
 
-export const metadata: Metadata = { title: "Masuk" }
-
-const LINK_ERROR = "Link konfirmasi atau reset tidak valid, sudah dipakai, atau kedaluwarsa. Coba lagi."
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getTranslations("auth.login"))("title") }
+}
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string; error?: string }> }) {
   const { next, error } = await searchParams
+  const t = await getTranslations("auth.login")
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-extrabold">Masuk</h1>
-        <p className="text-sm text-muted-foreground">Lanjutkan latihanmu.</p>
+        <h1 className="text-2xl font-extrabold">{t("title")}</h1>
+        <p className="text-sm text-muted-foreground">{t("lead")}</p>
       </div>
-      <LoginForm next={safeNext(next)} initialError={error === "link" ? LINK_ERROR : undefined} />
+      <LoginForm next={safeNext(next)} initialError={error === "link" ? t("linkError") : undefined} />
       <p className="text-center text-sm text-muted-foreground">
-        Belum punya akun?{" "}
+        {t("noAccount")}{" "}
         <Link href="/signup" className="inline-flex min-h-11 items-center font-semibold text-primary hover:text-primary-hi">
-          Daftar gratis
+          {t("signUp")}
         </Link>
       </p>
       {/* The game is open to guests, so an account is never a wall. */}
       <div className="flex items-center gap-3 text-xs text-faint">
         <span className="h-px flex-1 bg-border" />
-        atau
+        {t("or")}
         <span className="h-px flex-1 bg-border" />
       </div>
       <Link href="/trading-game" className="btn btn-ghost w-full">
-        Main dulu tanpa akun
+        {t("playAsGuest")}
       </Link>
     </div>
   )

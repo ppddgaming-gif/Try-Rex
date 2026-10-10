@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { useTranslations } from "next-intl"
 import { levelFromXp } from "@/lib/progress/derive"
 import { useProgress, useProgressEvents } from "@/lib/progress/use-progress"
 import { Skeleton } from "@/components/progress/skeleton"
@@ -19,6 +20,7 @@ const prefersReducedMotion = () =>
 export function LevelXp() {
   const progress = useProgress()
   const { level, into, needed } = levelFromXp(progress?.xp ?? 0)
+  const t = useTranslations("progress")
 
   const [chips, setChips] = useState<{ id: number; xp: number }[]>([])
   // Where the count-up starts; null when not animating.
@@ -80,7 +82,7 @@ export function LevelXp() {
   return (
     <div>
       <div className="flex items-center justify-between text-sm">
-        <span className="font-semibold text-primary">Level {level}</span>
+        <span className="font-semibold text-primary">{t("level", { level })}</span>
         <span className="relative font-mono tabular-nums text-muted-foreground">
           <span className="text-foreground">{value}</span> / {needed} XP
           {/* Positioned out of flow so the chip never nudges the layout. */}
@@ -98,11 +100,11 @@ export function LevelXp() {
       <div
         className="mt-2 h-2 w-full overflow-hidden rounded-full bg-muted"
         role="progressbar"
-        aria-label={`Level ${level}`}
+        aria-label={t("level", { level })}
         aria-valuemin={0}
         aria-valuemax={needed}
         aria-valuenow={into}
-        aria-valuetext={`${into} dari ${needed} XP`}
+        aria-valuetext={t("xpOf", { into, needed })}
       >
         <div
           className="h-full rounded-full bg-primary transition-[width] duration-[400ms] ease-out"

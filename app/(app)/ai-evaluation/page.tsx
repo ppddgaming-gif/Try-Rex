@@ -1,9 +1,12 @@
 import type { Metadata } from "next"
+import { getLocale, getTranslations } from "next-intl/server"
 import Link from "next/link"
 import { Card } from "@/components/card"
 import { CandlestickChart } from "@/components/candlestick-chart"
 import { EvalStatCards } from "@/components/evaluation/stat-cards"
 import { Explanation } from "@/components/evaluation/explanation"
+import { challengeText } from "@/lib/challenge-text"
+import type { Locale } from "@/lib/i18n/locale"
 import {
   challengeById,
   challenges,
@@ -26,7 +29,9 @@ import {
   RotateCcw,
 } from "lucide-react"
 
-export const metadata: Metadata = { title: "AI Evaluation" }
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getTranslations("evaluation"))("title") }
+}
 
 type Search = { c?: string; a?: string; t?: string }
 
@@ -42,6 +47,12 @@ export default async function AiEvaluationPage({
   searchParams: Promise<Search>
 }) {
   const sp = await searchParams
+  const [t, tc, tp, locale] = await Promise.all([
+    getTranslations("evaluation"),
+    getTranslations("game.challenge"),
+    getTranslations("game.plan"),
+    getLocale(),
+  ])
 
   // Driven by the Trading Game handoff (?c=id&a=decision&t=seconds), with a
   // representative fallback so the page still stands alone.
@@ -60,18 +71,17 @@ export default async function AiEvaluationPage({
   const revealed = [...challenge.candles, ...challenge.future]
   const frame = frameOf(revealed)
   const DecisionIcon = decisionIcons[decision]
+  const text = challengeText(challenge, tc, locale as Locale)
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-6 lg:px-8">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">AI Evaluation</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Evaluasi keputusan tradingmu oleh TRY-REX AI Mentor
-          </p>
+          <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{t("lead")}</p>
         </div>
         <Link href="/trading-game" className="btn btn-ghost btn-sm self-start">
-          <ArrowLeft className="h-4 w-4" /> Kembali ke Trading Game
+          <ArrowLeft className="h-4 w-4" /> {t("back")}
         </Link>
       </header>
 
@@ -82,14 +92,13 @@ export default async function AiEvaluationPage({
         >
           <Info className="h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
           <p className="flex-1 text-sm leading-relaxed">
-            <strong>Ini contoh evaluasi.</strong>{" "}
-            <span className="text-muted-foreground">
-              Jawab satu soal di Trading Game, lalu pilih &ldquo;Bedah soal ini&rdquo; untuk melihat evaluasi
-              jawabanmu sendiri.
-            </span>
+            {t.rich("example", {
+              b: (c) => <strong>{c}</strong>,
+              muted: (c) => <span className="text-muted-foreground">{c}</span>,
+            })}
           </p>
           <Link href="/trading-game" className="btn btn-sm shrink-0">
-            Main sekarang
+            {t("playNow")}
           </Link>
         </div>
       )}
@@ -108,7 +117,7 @@ export default async function AiEvaluationPage({
       <div className="mt-4 grid grid-cols-1 items-start gap-4 lg:grid-cols-[1fr_360px]">
         <Card className="flex flex-col">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h2 className="text-base font-semibold">Review Keputusanmu</h2>
+            <h2 className="text-base font-semibold">{t("review")}</h2>
             <span
               className={[
                 "rounded-md px-2 py-0.5 text-xs font-bold",
@@ -119,8 +128,9 @@ export default async function AiEvaluationPage({
                     : "bg-muted text-muted-foreground",
               ].join(" ")}
             >
-              {challenge.changePercent > 0 ? "+" : ""}
-              {challenge.changePercent.toFixed(2)}% setelah entry
+              {t("afterEntry", {
+                change: `${challenge.changePercent > 0 ? "+" : ""}${challenge.changePercent.toFixed(2)}%`,
+              })}
             </span>
           </div>
           {/* Fixed height: the SVG stretches to its box, so a tall box would
@@ -131,22 +141,22 @@ export default async function AiEvaluationPage({
               min={frame.min}
               max={frame.max}
               priceTicks={frame.priceTicks}
-              timeLabels={challenge.revealTimeLabels}
+              timeLabels={text.revealTimeLabels}
               dividerAt={challenge.candles.length}
               zones={challenge.zones}
-              markers={tradePlanFor(challenge, decision)}
+              markers={tradePlanFor(challenge, decision, tp)}
               digits={challenge.digits}
             />
           </div>
 
           {/* Trade meta row */}
           <div className="mt-4 grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-4">
-            <Meta icon={GitCommitHorizontal} label="Pair" value={challenge.pair} />
-            <Meta icon={Clock} label="Timeframe" value={challenge.timeframe} />
-            <Meta icon={Calendar} label="Periode" value={challenge.period} />
+            <Meta icon={GitCommitHorizontal} label={t("meta.pair")} value={challenge.pair} />
+            <Meta icon={Clock} label={t("meta.timeframe")} value={challenge.timeframe} />
+            <Meta icon={Calendar} label={t("meta.period")} value={text.period} />
             <div className="bg-card p-3">
               <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <DecisionIcon className="h-3.5 w-3.5" /> Keputusanmu
+                <DecisionIcon className="h-3.5 w-3.5" /> {t("meta.decision")}
               </p>
               <p
                 className={`mt-1 flex items-center gap-1 text-sm font-bold ${correct ? "text-success" : "text-danger"}`}
@@ -162,18 +172,16 @@ export default async function AiEvaluationPage({
             <Explanation
               decision={decision}
               correct={correct}
-              reasons={challenge.reasons}
-              suggestion={challenge.suggestion}
+              reasons={text.reasons}
+              suggestion={text.suggestion}
             />
           </div>
 
           <Card>
-            <h2 className="text-base font-semibold">Langkah Selanjutnya</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Terapkan sarannya di ronde berikutnya: 5 soal baru dari data harga asli.
-            </p>
+            <h2 className="text-base font-semibold">{t("nextTitle")}</h2>
+            <p className="mt-2 text-sm text-muted-foreground">{t("nextBody")}</p>
             <Link href="/trading-game" className="btn mt-4 w-full">
-              <RotateCcw className="h-4 w-4" /> Main ronde baru
+              <RotateCcw className="h-4 w-4" /> {t("newRound")}
             </Link>
           </Card>
         </div>

@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { ArrowRight, BookOpen, Wallet } from "lucide-react"
 import { Card } from "@/components/card"
 import { Disclosure } from "@/components/disclosure"
@@ -6,7 +7,7 @@ import { Rex } from "@/components/rex-mascot"
 import { AccountActionButton } from "@/components/akun-latihan/account-actions"
 import { RequiredLesson } from "@/components/akun-latihan/intro-lesson"
 import { DISIPLIN } from "@/lib/demo/config"
-import { CHECK_LABELS } from "@/lib/demo/disiplin"
+import { checkLabel } from "@/lib/demo/disiplin"
 import { lot, pct, usd } from "@/lib/demo/format"
 import type { PublicLesson } from "@/lib/demo/lessons"
 import { reviewAdvice } from "@/lib/demo/rex-comments"
@@ -39,12 +40,14 @@ export function AccountEnd({
   startingBalance: string
 }) {
   const next = number + 1
+  const t = useTranslations("demo.ui.end")
+  const root = useTranslations()
   const title =
     ending === "habis"
-      ? `Akun #${number} habis dalam ${review.trades} trade`
+      ? t("titleHabis", { n: number, trades: review.trades })
       : review.trades === 0
-        ? `Akun #${number} direset sebelum trade pertama`
-        : `Akun #${number} direset setelah ${review.trades} trade`
+        ? t("titleResetNone", { n: number })
+        : t("titleReset", { n: number, trades: review.trades })
 
   return (
     <div className="flex flex-col gap-5">
@@ -52,68 +55,68 @@ export function AccountEnd({
         <div className="flex items-start gap-4">
           <Rex size={64} mood="thinking" className="hidden shrink-0 sm:block" />
           <div className="min-w-0 flex-1">
-            <p className="eyebrow">Review Rex</p>
+            <p className="eyebrow">{t("eyebrow")}</p>
             <h2 className="mt-2 text-2xl font-bold">{title}</h2>
             <p className="mt-2 text-muted-foreground">
-              {ending === "habis"
-                ? "Saldo turun di bawah batas akun habis tanpa trade terbuka, jadi trading berhenti. Tidak ada tombol tambah saldo. Ini review dari data akunmu sendiri."
-                : "Kamu menutup akun ini sendiri. Ini review dari data akunmu sendiri."}
+              {ending === "habis" ? t("bodyHabis") : t("bodyReset")}
             </p>
           </div>
         </div>
 
         {review.trades === 0 ? (
-          <p className="mt-5 rounded-xl bg-inset px-4 py-3 text-sm text-muted-foreground">
-            Belum ada trade di akun ini, jadi belum ada yang bisa ditinjau.
-          </p>
+          <p className="mt-5 rounded-xl bg-inset px-4 py-3 text-sm text-muted-foreground">{t("noTrades")}</p>
         ) : (
           <>
             <dl className="mt-6 grid gap-3 sm:grid-cols-2">
-              <Item label="Kerugian terbesar">
+              <Item label={t("biggestLoss")}>
                 {review.biggestLoss ? (
                   <>
                     <span className="font-mono text-lg font-bold text-danger">{usd(review.biggestLoss.amount)}</span>
                     <span className="block text-xs text-muted-foreground">
-                      Trade #{review.biggestLoss.number} · {review.biggestLoss.side.toUpperCase()} {review.biggestLoss.pair}{" "}
-                      {lot(review.biggestLoss.lot)} lot
+                      {t("lossTrade", {
+                        n: review.biggestLoss.number,
+                        side: review.biggestLoss.side.toUpperCase(),
+                        pair: review.biggestLoss.pair,
+                        lot: lot(review.biggestLoss.lot),
+                      })}
                     </span>
                   </>
                 ) : (
-                  <span className="text-sm text-muted-foreground">Tidak ada trade yang rugi</span>
+                  <span className="text-sm text-muted-foreground">{t("noLoss")}</span>
                 )}
               </Item>
-              <Item label="Rata-rata risiko per trade">
+              <Item label={t("avgRisk")}>
                 <span className="font-mono text-lg font-bold">
-                  {review.avgRiskPct === null ? "—" : `${pct(review.avgRiskPct)} saldo`}
+                  {review.avgRiskPct === null ? "—" : t("riskValue", { risk: pct(review.avgRiskPct) })}
                 </span>
                 <span className="block text-xs text-muted-foreground">
-                  Batas {DISIPLIN.MAX_RISK_PCT}%
-                  {review.withoutSl > 0 && ` · ${review.withoutSl} trade tanpa SL, risikonya tanpa batas`}
+                  {t("limit", { n: DISIPLIN.MAX_RISK_PCT })}
+                  {review.withoutSl > 0 && t("noSlUnlimited", { n: review.withoutSl })}
                 </span>
               </Item>
-              <Item label="Paling sering tidak lolos">
+              <Item label={t("mostFailed")}>
                 {review.failed.length === 0 ? (
-                  <span className="text-sm text-muted-foreground">Semua pemeriksaan Disiplin lolos</span>
+                  <span className="text-sm text-muted-foreground">{t("allPassed")}</span>
                 ) : (
                   <ul className="flex flex-col gap-1 text-sm">
                     {review.failed.map((f) => (
                       <li key={f.id}>
-                        {CHECK_LABELS[f.id]}{" "}
+                        {checkLabel(f.id, root)}{" "}
                         <span className="font-mono text-xs text-muted-foreground">
-                          · {f.count} dari {review.trades} trade
+                          {t("failedCount", { count: f.count, trades: review.trades })}
                         </span>
                       </li>
                     ))}
                   </ul>
                 )}
               </Item>
-              <Item label="Revenge trade">
-                <span className="font-mono text-lg font-bold">{review.revenge === 0 ? "Tidak ada" : `${review.revenge} trade`}</span>
+              <Item label={t("revenge")}>
+                <span className="font-mono text-lg font-bold">{review.revenge === 0 ? t("none") : t("revengeCount", { n: review.revenge })}</span>
               </Item>
             </dl>
             <div className="mt-4 flex items-start gap-3 rounded-xl border border-primary/30 bg-primary/10 p-4">
               <Rex size={36} mood="neutral" className="shrink-0" />
-              <p className="text-sm leading-relaxed">{reviewAdvice(review.failed[0]?.id ?? null)}</p>
+              <p className="text-sm leading-relaxed">{reviewAdvice(review.failed[0]?.id ?? null, root)}</p>
             </div>
           </>
         )}
@@ -122,43 +125,38 @@ export function AccountEnd({
           href={`/akun-latihan/jurnal?akun=${number}`}
           className="mt-5 inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
         >
-          Lihat jurnal Akun #{number} <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          {t("viewJournal", { n: number })} <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </Link>
       </Card>
 
       {step === "close" && (
         <Card className="sm:p-8">
-          <h2 className="text-lg font-bold">Langkah berikutnya</h2>
-          <p className="mt-2 text-muted-foreground">
-            Satu materi singkat tentang ukuran posisi, lalu Akun #{next} dengan saldo {startingBalance}. Stage dan XP-mu
-            tetap.
-          </p>
+          <h2 className="text-lg font-bold">{t("nextTitle")}</h2>
+          <p className="mt-2 text-muted-foreground">{t("nextBody", { next, balance: startingBalance })}</p>
           <div className="mt-5">
-            <AccountActionButton action="close" label="Lanjut ke materi risiko" icon={<BookOpen className="h-5 w-5" aria-hidden="true" />} />
+            <AccountActionButton action="close" label={t("toLesson")} icon={<BookOpen className="h-5 w-5" aria-hidden="true" />} />
           </div>
         </Card>
       )}
 
-      {step === "lesson" && <RequiredLesson lesson={lesson} doneLabel="Lanjut ke akun baru" />}
+      {step === "lesson" && <RequiredLesson lesson={lesson} doneLabel={t("toNewAccount")} />}
 
       {step === "open" && (
         <>
           <Card className="flex flex-col items-center py-10 text-center sm:p-10">
             <Rex size={80} mood="happy" className="float" />
-            <h2 className="mt-4 text-2xl font-bold">Akun #{next} siap dibuka</h2>
-            <p className="mt-2 max-w-md text-muted-foreground">
-              Saldo awal {startingBalance}, stage-mu tetap. Akun #{number} dan jurnalnya tersimpan di Riwayat akun.
-            </p>
+            <h2 className="mt-4 text-2xl font-bold">{t("readyTitle", { next })}</h2>
+            <p className="mt-2 max-w-md text-muted-foreground">{t("readyBody", { balance: startingBalance, n: number })}</p>
             <div className="mt-6">
-              <AccountActionButton action="open" label={`Buka Akun #${next}`} icon={<Wallet className="h-5 w-5" aria-hidden="true" />} large />
+              <AccountActionButton action="open" label={t("open", { next })} icon={<Wallet className="h-5 w-5" aria-hidden="true" />} large />
             </div>
           </Card>
           {ending === "reset" && (
             // One flex child: a closed Disclosure has no height, but a gap would still reserve its slot.
             <div className="flex flex-col">
               <Disclosure
-                label="Pelajari materi risiko (opsional)"
-                closeLabel="Tutup materi risiko"
+                label={t("optionalLesson")}
+                closeLabel={t("closeLesson")}
                 className="pb-5"
                 triggerClassName=""
               >

@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
 import Link from "next/link"
 import { ArrowRight, BookA, BookOpen, Bitcoin, Brain, CandlestickChart, Clock, ShieldCheck } from "lucide-react"
 import { Card } from "@/components/card"
@@ -9,7 +10,9 @@ import { GLOSSARY } from "@/lib/glossary"
 import { LESSONS, TRACKS, lessonBySlug } from "@/lib/learn/content"
 import type { TrackId } from "@/lib/learn/types"
 
-export const metadata: Metadata = { title: "Belajar 101" }
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getTranslations("learn.hub"))("title") }
+}
 
 const TRACK_ICONS: Record<TrackId, React.ElementType> = {
   dasar: BookOpen,
@@ -19,18 +22,16 @@ const TRACK_ICONS: Record<TrackId, React.ElementType> = {
   psikologi: Brain,
 }
 
-export default function LearnPage() {
+export default async function LearnPage() {
+  const t = await getTranslations("learn")
   return (
     <div className="mx-auto max-w-5xl px-5 py-6 lg:px-8">
       <header className="glow-card enter relative overflow-hidden rounded-3xl border border-border p-6 sm:p-10">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
           <div className="min-w-0 flex-1">
-            <p className="eyebrow">Belajar 101</p>
-            <h1 className="enter-focus mt-3 text-3xl font-extrabold sm:text-4xl">Semua dasar trading, satu tempat.</h1>
-            <p className="mt-3 max-w-xl text-muted-foreground">
-              Dari cara membaca candle sampai menjaga aset crypto. Materi singkat, contoh dari chart asli, dan satu
-              pertanyaan di akhir tiap bab.
-            </p>
+            <p className="eyebrow">{t("hub.eyebrow")}</p>
+            <h1 className="enter-focus mt-3 text-3xl font-extrabold sm:text-4xl">{t("hub.heading")}</h1>
+            <p className="mt-3 max-w-xl text-muted-foreground">{t("hub.body")}</p>
             <div className="mt-5">
               <LearnProgressRing total={LESSONS.length} />
             </div>
@@ -51,10 +52,9 @@ export default function LearnPage() {
           <BookA className="h-6 w-6 text-primary" aria-hidden="true" />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="font-display text-lg font-bold">Kamus Trading</p>
+          <p className="font-display text-lg font-bold">{t("hub.kamus")}</p>
           <p className="text-sm text-muted-foreground">
-            <span className="font-mono">{GLOSSARY.length}</span> istilah, dijelaskan dalam satu atau dua kalimat. Istilah
-            yang sama bisa diketuk di Trading Game.
+            {t.rich("hub.kamusBody", { n: GLOSSARY.length, num: (c) => <span className="font-mono">{c}</span> })}
           </p>
         </div>
         <ArrowRight className="h-5 w-5 text-primary" aria-hidden="true" />
@@ -71,11 +71,11 @@ export default function LearnPage() {
                   <Icon className="h-5 w-5 text-primary" aria-hidden="true" />
                 </span>
                 <div className="min-w-0">
-                  <p className="font-mono text-xs text-faint">Bab {ti + 1}</p>
+                  <p className="font-mono text-xs text-faint">{t("hub.chapter", { n: ti + 1 })}</p>
                   <h2 id={`track-${track.id}`} className="text-xl font-bold">
-                    {track.title}
+                    {t(`tracks.${track.id}.title`)}
                   </h2>
-                  <p className="mt-1 text-sm text-muted-foreground">{track.description}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{t(`tracks.${track.id}.description`)}</p>
                 </div>
               </div>
 
@@ -88,13 +88,13 @@ export default function LearnPage() {
                   >
                     <LessonStatus slug={l.slug} />
                     <div className="min-w-0 flex-1">
-                      <p className="font-semibold leading-snug group-hover:text-primary">{l.title}</p>
-                      <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{l.summary}</p>
+                      <p className="font-semibold leading-snug group-hover:text-primary">{t(`lessons.${l.slug}.title`)}</p>
+                      <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{t(`lessons.${l.slug}.summary`)}</p>
                       <p className="mt-2 flex items-center gap-3 text-xs text-faint">
                         <span className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" aria-hidden="true" /> {l.minutes} menit
+                          <Clock className="h-3 w-3" aria-hidden="true" /> {t("hub.minutes", { n: l.minutes })}
                         </span>
-                        <span className="capitalize">{l.level}</span>
+                        <span className="capitalize">{t(`level.${l.level}`)}</span>
                       </p>
                     </div>
                   </Link>
@@ -106,12 +106,10 @@ export default function LearnPage() {
       </div>
 
       <Card className="glow-card mt-12 flex flex-col items-center gap-4 text-center sm:p-10">
-        <p className="font-display text-2xl font-bold">Teori sudah, saatnya praktik.</p>
-        <p className="max-w-md text-sm text-muted-foreground">
-          Setiap soal di Trading Game adalah chart asli. Coba baca trend dan levelnya sendiri.
-        </p>
+        <p className="font-display text-2xl font-bold">{t("hub.practiceTitle")}</p>
+        <p className="max-w-md text-sm text-muted-foreground">{t("hub.practiceBody")}</p>
         <Link href="/trading-game" className="btn">
-          Buka Trading Game <ArrowRight className="h-4 w-4" />
+          {t("hub.openGame")} <ArrowRight className="h-4 w-4" />
         </Link>
       </Card>
     </div>

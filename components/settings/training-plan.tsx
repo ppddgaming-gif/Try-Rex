@@ -2,10 +2,11 @@
 
 import Link from "next/link"
 import { RotateCcw } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { Card } from "@/components/card"
 import { ResetProgress } from "@/components/progress/reset-progress"
 import { Skeleton } from "@/components/progress/skeleton"
-import { LEVEL_LABELS, answerLabel, planFrom, type OnboardingRecord } from "@/lib/onboarding"
+import { answerLabelKey, planFrom, type OnboardingRecord } from "@/lib/onboarding"
 import { useOnboarding } from "@/lib/use-onboarding"
 
 /**
@@ -15,12 +16,15 @@ import { useOnboarding } from "@/lib/use-onboarding"
 export function TrainingPlan({ serverRecord }: { serverRecord?: OnboardingRecord | null }) {
   const record = useOnboarding(serverRecord)
   const plan = planFrom(record ?? null)
+  const t = useTranslations("onboarding")
+  const tl = useTranslations("common.levels")
+  const label = (key: string | null, fallback: string) => (key ? t(key) : fallback)
 
   return (
     <>
       <Card className="sm:p-7">
-        <h2 className="text-base font-semibold">Jalur latihan</h2>
-        <p className="mt-1 text-sm text-muted-foreground">Diatur dari jawaban kuis awalmu.</p>
+        <h2 className="text-base font-semibold">{t("plan.title")}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t("plan.lead")}</p>
         {record === undefined ? (
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
             {[0, 1, 2, 3].map((i) => (
@@ -29,26 +33,27 @@ export function TrainingPlan({ serverRecord }: { serverRecord?: OnboardingRecord
           </div>
         ) : record && !record.skipped ? (
           <dl className="mt-5 grid gap-3 sm:grid-cols-2">
-            <Item label="Mulai di tingkat" value={LEVEL_LABELS[plan.level]} />
-            <Item label="Target harian" value={plan.dailyGoal ? `${plan.dailyGoal} soal` : "Tanpa target"} />
-            <Item label="Fokus pair" value={answerLabel("focus", record.answers.focus) ?? "Semua pair"} />
-            <Item label="Pengalaman" value={answerLabel("experience", record.answers.experience) ?? "—"} />
+            <Item label={t("result.startLevel")} value={tl(plan.level)} />
+            <Item
+              label={t("result.dailyGoal")}
+              value={plan.dailyGoal ? t("result.goalCount", { n: plan.dailyGoal }) : t("result.noGoal")}
+            />
+            <Item label={t("result.focus")} value={label(answerLabelKey("focus", record.answers.focus), t("result.allPairs"))} />
+            <Item label={t("result.experience")} value={label(answerLabelKey("experience", record.answers.experience), "—")} />
           </dl>
         ) : (
           <p className="mt-5 text-sm text-muted-foreground">
-            {record?.skipped
-              ? "Kamu melewati kuis awal, jadi latihan memakai pengaturan standar."
-              : "Kamu belum mengisi kuis awal."}
+            {record?.skipped ? t("plan.skipped") : t("plan.notTaken")}
           </p>
         )}
         <Link href="/start?ulang=1&next=/pengaturan%23latihan" className="btn btn-ghost btn-sm mt-5">
-          <RotateCcw className="h-4 w-4" /> Ulangi kuis awal
+          <RotateCcw className="h-4 w-4" /> {t("plan.retake")}
         </Link>
       </Card>
 
       <Card className="sm:p-7">
-        <h2 className="text-base font-semibold">Data latihan</h2>
-        <p className="mt-1 text-sm text-muted-foreground">Menghapus XP, streak, dan riwayat jawabanmu.</p>
+        <h2 className="text-base font-semibold">{t("plan.dataTitle")}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t("plan.dataLead")}</p>
         <div className="mt-3">
           <ResetProgress />
         </div>

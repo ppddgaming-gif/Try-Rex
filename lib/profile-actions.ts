@@ -2,14 +2,21 @@
 
 import { headers } from "next/headers"
 import { revalidatePath } from "next/cache"
-import { MIN_PASSWORD, authErrorMessage } from "@/lib/auth-rules"
+import { getTranslations } from "next-intl/server"
+import { MIN_PASSWORD, authErrorKey } from "@/lib/auth-rules"
 import { parseRecord } from "@/lib/onboarding"
 import { USERNAME_RULE, normalizeUsername } from "@/lib/profile-rules"
 import { createClient } from "@/lib/supabase/server"
 
 export type ProfileFormState = { error?: string; ok?: boolean; sent?: boolean; email?: string }
 
-const NOT_READY = "Fitur ini belum aktif di server. Coba lagi nanti."
+/** Error lines in the player's language (settings.errors, and auth.errors for Supabase's). */
+async function errors() {
+  const [t, auth] = await Promise.all([getTranslations("settings.errors"), getTranslations("auth.errors")])
+  return Object.assign((key: string) => t(key, { min: MIN_PASSWORD }), {
+    auth: (error: Parameters<typeof authErrorKey>[0]) => auth(authErrorKey(error), { min: MIN_PASSWORD }),
+  })
+}
 
 const text = (fd: FormData, key: string) => {
   const v = fd.get(key)
@@ -46,24 +53,25 @@ export async function saveOnboarding(input: unknown): Promise<{ ok: boolean }> {
 export async function updateProfile(_: ProfileFormState, fd: FormData): Promise<ProfileFormState> {
   const name = text(fd, "name")
   const username = normalizeUsername(text(fd, "username"))
+  const e = await errors()
 
-  if (!name) return { error: "Isi nama tampilanmu." }
-  if (name.length > 60) return { error: "Nama maksimal 60 karakter." }
+  if (!name) return { error: e("fillName") }
+  if (name.length > 60) return { error: e("nameTooLong") }
   if (username && !USERNAME_RULE.test(username)) {
-    return { error: "Username 3–20 karakter: huruf kecil, angka, atau garis bawah (_)." }
+    return { error: e("usernameRule") }
   }
 
   const { supabase, user } = await signedIn()
-  if (!user) return { error: "Sesi berakhir. Masuk lagi." }
+  if (!user) return { error: e("sessionEnded") }
 
   const { error } = await supabase
     .from("profiles")
     .update({ display_name: name, username: username || null })
     .eq("id", user.id)
   if (error) {
-    if (error.code === "23505") return { error: "Username itu sudah dipakai. Coba yang lain." }
-    if (missingColumn(error.code)) return { error: NOT_READY }
-    return { error: "Gagal menyimpan. Coba lagi sebentar lagi." }
+    if (error.code === "23505") return { error: e("usernameTaken") }
+    if (missingColumn(error.code)) return { error: e("notReady") }
+    return { error: e("saveFailed") }
   }
 
   revalidatePath("/", "layout")
@@ -88,14 +96,15 @@ export async function checkUsername(candidate: string): Promise<boolean | null> 
  */
 export async function setAvatar(path: string | null): Promise<{ error?: string }> {
   const { supabase, user } = await signedIn()
-  if (!user) return { error: "Sesi berakhir. Masuk lagi." }
+  const e = await errors()
+  if (!user) return { error: e("sessionEnded") }
   if (path !== null && (!path.startsWith(`${user.id}/`) || path.length > 200 || path.includes(".."))) {
-    return { error: "Foto tidak valid." }
+    return { error: e("invalidPhoto") }
   }
 
   const { data: before } = await supabase.from("profiles").select("avatar_path").eq("id", user.id).maybeSingle()
   const { error } = await supabase.from("profiles").update({ avatar_path: path }).eq("id", user.id)
-  if (error) return { error: missingColumn(error.code) ? NOT_READY : "Gagal menyimpan foto." }
+  if (error) return { error: missingColumn(error.code) ? e("notReady") : e("photoSaveFailed") }
 
   const old = before?.avatar_path
   if (old && old !== path) await supabase.storage.from("avatars").remove([old])
@@ -120,17 +129,18 @@ async function origin() {
  */
 export async function changeEmail(_: ProfileFormState, fd: FormData): Promise<ProfileFormState> {
   const email = text(fd, "email").toLowerCase()
-  if (!email || !email.includes("@")) return { error: "Isi email baru yang valid.", email }
+  const e = await errors()
+  if (!email || !email.includes("@")) return { error: e("invalidEmail"), email }
 
   const { supabase, user } = await signedIn()
-  if (!user) return { error: "Sesi berakhir. Masuk lagi." }
-  if (email === user.email?.toLowerCase()) return { error: "Itu sudah email akunmu.", email }
+  if (!user) return { error: e("sessionEnded") }
+  if (email === user.email?.toLowerCase()) return { error: e("sameEmail"), email }
 
   const { error } = await supabase.auth.updateUser(
     { email },
     { emailRedirectTo: `${await origin()}/auth/callback?next=/pengaturan%23keamanan` },
   )
-  if (error) return { error: authErrorMessage(error), email }
+  if (error) return { error: e.auth(error), email }
   return { sent: true, email }
 }
 
@@ -142,19 +152,20 @@ export async function changePassword(_: ProfileFormState, fd: FormData): Promise
   const current = fd.get("current")
   const password = fd.get("password")
   const confirm = fd.get("confirm")
-  if (typeof current !== "string" || !current) return { error: "Isi password lamamu." }
+  const e = await errors()
+  if (typeof current !== "string" || !current) return { error: e("fillCurrent") }
   if (typeof password !== "string" || password.length < MIN_PASSWORD) {
-    return { error: `Password baru terlalu pendek. Minimal ${MIN_PASSWORD} karakter.` }
+    return { error: e("newTooShort") }
   }
-  if (password !== confirm) return { error: "Kedua password baru tidak sama." }
+  if (password !== confirm) return { error: e("newMismatch") }
 
   const { supabase, user } = await signedIn()
-  if (!user?.email) return { error: "Sesi berakhir. Masuk lagi." }
+  if (!user?.email) return { error: e("sessionEnded") }
 
   const check = await supabase.auth.signInWithPassword({ email: user.email, password: current })
-  if (check.error) return { error: "Password lama salah." }
+  if (check.error) return { error: e("wrongCurrent") }
 
   const { error } = await supabase.auth.updateUser({ password })
-  if (error) return { error: authErrorMessage(error) }
+  if (error) return { error: e.auth(error) }
   return { ok: true }
 }

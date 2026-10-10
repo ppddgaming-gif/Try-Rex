@@ -2,6 +2,7 @@
 
 import { useState, type InputHTMLAttributes, type ReactNode } from "react"
 import { CircleAlert, Eye, EyeOff, MailCheck } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 /**
  * Labelled text input. 48px tall so it clears the 44px tap target, and 16px
@@ -17,6 +18,7 @@ export function Field({
 }: { label: string; hint?: string; id: string } & InputHTMLAttributes<HTMLInputElement>) {
   const [reveal, setReveal] = useState(false)
   const password = type === "password"
+  const t = useTranslations("auth.fields")
 
   return (
     <div className="flex flex-col gap-2">
@@ -38,7 +40,7 @@ export function Field({
           <button
             type="button"
             onClick={() => setReveal((v) => !v)}
-            aria-label={reveal ? "Sembunyikan password" : "Tampilkan password"}
+            aria-label={reveal ? t("hide") : t("show")}
             aria-pressed={reveal}
             aria-controls={id}
             className="absolute inset-y-0 right-0 flex w-12 items-center justify-center rounded-r-xl text-muted-foreground transition-colors hover:text-foreground"

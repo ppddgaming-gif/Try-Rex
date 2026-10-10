@@ -1,6 +1,7 @@
 "use client"
 
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { setPreference, usePreferences } from "@/lib/use-preferences"
 
 /**
@@ -11,14 +12,16 @@ import { setPreference, usePreferences } from "@/lib/use-preferences"
 export function SidebarToggle() {
   const { sidebar } = usePreferences()
   const collapsed = sidebar === "collapsed"
+  const t = useTranslations("nav")
+  const label = collapsed ? t("expandSidebar") : t("collapseSidebar")
 
   return (
     <button
       type="button"
       onClick={() => setPreference("sidebar", collapsed ? "expanded" : "collapsed")}
-      aria-label={collapsed ? "Buka sidebar" : "Ciutkan sidebar"}
+      aria-label={label}
       aria-expanded={!collapsed}
-      data-tip={collapsed ? "Buka sidebar" : "Ciutkan sidebar"}
+      data-tip={label}
       className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
     >
       <span key={sidebar} className="icon-swap flex">

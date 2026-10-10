@@ -16,7 +16,7 @@ function subscribe(onChange: () => void) {
  * mounted (the server shows the first). Arrow keys move between tabs, as a
  * tablist should.
  */
-export function SettingsTabs({ tabs }: { tabs: SettingsTab[] }) {
+export function SettingsTabs({ tabs, label }: { tabs: SettingsTab[]; label: string }) {
   const hash = useSyncExternalStore(
     subscribe,
     () => window.location.hash.slice(1),
@@ -39,7 +39,7 @@ export function SettingsTabs({ tabs }: { tabs: SettingsTab[] }) {
       <div
         ref={list}
         role="tablist"
-        aria-label="Bagian pengaturan"
+        aria-label={label}
         className="glass-card glass-strong sticky top-[4.5rem] z-10 flex gap-1 overflow-x-auto rounded-2xl p-1.5 lg:top-4"
       >
         {tabs.map((t, i) => {

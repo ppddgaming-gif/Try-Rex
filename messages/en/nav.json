@@ -1,0 +1,28 @@
+{
+  "items": {
+    "dashboard": "Dashboard",
+    "tradingGame": "Trading Game",
+    "akunLatihan": "Practice Account",
+    "aiEvaluation": "AI Evaluation",
+    "belajar": "Learn 101",
+    "pengaturan": "Settings"
+  },
+  "locked": "{label}, locked. {reason}",
+  "lockedTip": "{label} · locked",
+  "signInToOpen": "Sign in to unlock",
+  "openMenu": "Open menu",
+  "closeMenu": "Close menu",
+  "home": "TRY-REX home",
+  "expandSidebar": "Expand sidebar",
+  "collapseSidebar": "Collapse sidebar",
+  "profile": {
+    "settingsOf": "Account settings for {name}",
+    "signIn": "Sign in",
+    "guest": "Guest",
+    "setUpProfile": "Set up your profile",
+    "notSignedIn": "Not signed in",
+    "signOut": "Sign out",
+    "guestNote": "Your progress is saved on this device. Sign in to keep it in your account.",
+    "signUp": "Sign up free"
+  }
+}

@@ -3,8 +3,9 @@
 import type { ReactNode } from "react"
 import Link from "next/link"
 import { ArrowRight, Inbox } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { recentAttempts, totalChallenges } from "@/lib/progress/derive"
-import { COMPETENCIES, COMPETENCY_LABELS } from "@/lib/progress/types"
+import { COMPETENCIES } from "@/lib/progress/types"
 import { useProgress } from "@/lib/progress/use-progress"
 import { Avatar } from "@/components/avatar"
 import { Card } from "@/components/card"
@@ -44,23 +45,25 @@ export function DashboardView({
 }) {
   const progress = useProgress()
   const started = progress !== null && totalChallenges(progress) > 0
+  const t = useTranslations("dashboard")
+  const tp = useTranslations("progress")
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-6 lg:px-8">
       <header className="enter flex flex-wrap items-center justify-between gap-4">
         <div className="flex min-w-0 items-center gap-4">
-          <Link href="/pengaturan#profil" aria-label="Pengaturan akun" className="rounded-full transition-transform duration-300 ease-spring hover:scale-105">
+          <Link href="/pengaturan#profil" aria-label={t("accountSettings")} className="rounded-full transition-transform duration-300 ease-spring hover:scale-105">
             <Avatar src={avatarUrl} name={name} size={52} />
           </Link>
           <div className="min-w-0">
             {progress ? (
               <h1 className="text-2xl font-bold tracking-tight">
-                {started ? `Halo lagi, ${name}!` : `Selamat datang, ${name}!`}
+                {started ? t("welcomeBack", { name }) : t("welcome", { name })}
               </h1>
             ) : (
               <Skeleton className="h-8 w-56" />
             )}
-            <p className="mt-1 text-sm text-muted-foreground">Latihan sedikit tiap hari lebih berguna daripada banyak sekali.</p>
+            <p className="mt-1 text-sm text-muted-foreground">{t("lead")}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -69,7 +72,7 @@ export function DashboardView({
           </div>
           {started && (
             <Link href="/trading-game" className="btn btn-sm">
-              Lanjutkan latihan <ArrowRight className="h-4 w-4" />
+              {t("continue")} <ArrowRight className="h-4 w-4" />
             </Link>
           )}
         </div>
@@ -97,20 +100,18 @@ export function DashboardView({
 
         {/* 4. */}
         <Card>
-          <h2 className="text-base font-semibold">Kemampuan</h2>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Terisi setelah soal mulai menguji tiap kemampuan secara terpisah.
-          </p>
+          <h2 className="text-base font-semibold">{t("skills")}</h2>
+          <p className="mt-1 text-xs text-muted-foreground">{t("skillsHint")}</p>
           <div className="mt-5 flex flex-col gap-5">
             {COMPETENCIES.map((key) => (
-              <CompetencyMeter key={key} label={COMPETENCY_LABELS[key]} value={progress?.competencies[key] ?? null} />
+              <CompetencyMeter key={key} label={tp(`competencies.${key}`)} value={progress?.competencies[key] ?? null} />
             ))}
           </div>
         </Card>
 
         {/* 5. */}
         <Card>
-          <h2 className="text-base font-semibold">Aktivitas Terbaru</h2>
+          <h2 className="text-base font-semibold">{t("recent")}</h2>
           {!progress ? (
             <div className="mt-3 flex flex-col">
               {[0, 1, 2].map((i) => (
@@ -131,11 +132,11 @@ export function DashboardView({
           ) : (
             <EmptyState
               icon={Inbox}
-              title="Belum ada aktivitas"
-              body="Jawaban pertamamu akan muncul di sini."
+              title={t("noActivity")}
+              body={t("noActivityBody")}
               action={
                 <Link href="/trading-game" className="btn btn-sm">
-                  Mulai sesi pertama
+                  {t("firstSession")}
                 </Link>
               }
             />

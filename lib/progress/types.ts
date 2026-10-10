@@ -6,12 +6,7 @@ export const PROGRESS_VERSION = 1
 export const COMPETENCIES = ["trend_reading", "entry_timing", "risk_management", "market_structure"] as const
 export type CompetencyKey = (typeof COMPETENCIES)[number]
 
-export const COMPETENCY_LABELS: Record<CompetencyKey, string> = {
-  trend_reading: "Membaca tren",
-  entry_timing: "Timing entry",
-  risk_management: "Manajemen risiko",
-  market_structure: "Struktur pasar",
-}
+// Labels: progress.competencies.<key> in the message catalogues.
 
 /** One answered question. */
 export type Attempt = {

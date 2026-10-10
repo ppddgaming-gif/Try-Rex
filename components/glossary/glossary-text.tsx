@@ -4,17 +4,21 @@ import { useEffect, useId, useLayoutEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import Link from "next/link"
 import { BookOpen, X } from "lucide-react"
-import { CATEGORY_LABELS, glossaryBySlug, splitTerms, type TextPart } from "@/lib/glossary"
+import { useLocale, useTranslations } from "next-intl"
+import type { Locale } from "@/lib/i18n/locale"
+import { glossaryBySlug, splitTerms, type TextPart } from "@/lib/glossary"
 
 // One popover open at a time across the page.
 const OPEN_EVENT = "tryrex:glossary-open"
 
 /**
  * Text with its trading terms underlined. Tapping one explains it in a small
- * card, without leaving the page.
+ * card, without leaving the page. `lang` is the language the text is written
+ * in (default: the page's), which decides which spellings are matched.
  */
-export function GlossaryText({ text }: { text: string }) {
-  return <GlossaryParts parts={splitTerms(text)} />
+export function GlossaryText({ text, lang }: { text: string; lang?: Locale }) {
+  const locale = useLocale() as Locale
+  return <GlossaryParts parts={splitTerms(text, lang ?? locale)} />
 }
 
 /**
@@ -43,6 +47,7 @@ const GAP = 8
 
 export function Term({ slug, children }: { slug: string; children: string }) {
   const entry = glossaryBySlug.get(slug)
+  const t = useTranslations("glossary")
   const [open, setOpen] = useState(false)
   const button = useRef<HTMLButtonElement>(null)
   const card = useRef<HTMLDivElement>(null)
@@ -115,7 +120,7 @@ export function Term({ slug, children }: { slug: string; children: string }) {
         }}
         aria-expanded={open}
         aria-controls={open ? id : undefined}
-        aria-label={`${children}: lihat arti`}
+        aria-label={t("seeMeaning", { term: children })}
         className="term inline font-[inherit] text-[length:inherit] leading-[inherit]"
       >
         {children}
@@ -126,7 +131,7 @@ export function Term({ slug, children }: { slug: string; children: string }) {
             ref={card}
             id={id}
             role="dialog"
-            aria-label={entry.term}
+            aria-label={t(`entries.${slug}.term`)}
             className="glass-card glass-strong pop fixed z-[80] rounded-2xl p-4 text-left"
             // Hidden until the layout effect has placed it.
             style={{ width: WIDTH, left: 0, top: 0, visibility: "hidden" }}
@@ -134,34 +139,34 @@ export function Term({ slug, children }: { slug: string; children: string }) {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-primary">
-                  {CATEGORY_LABELS[entry.category]}
+                  {t(`categories.${entry.category}`)}
                 </p>
-                <p className="mt-0.5 font-display text-lg font-bold leading-tight">{entry.term}</p>
+                <p className="mt-0.5 font-display text-lg font-bold leading-tight">{t(`entries.${slug}.term`)}</p>
               </div>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                aria-label="Tutup"
+                aria-label={t("close")}
                 className="-m-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <p className="mt-2 text-sm leading-relaxed text-foreground/90">{entry.short}</p>
+            <p className="mt-2 text-sm leading-relaxed text-foreground/90">{t(`entries.${slug}.short`)}</p>
             {entry.example && (
               <p className="mt-2 rounded-lg bg-inset px-3 py-2 text-xs leading-relaxed text-muted-foreground">
-                <span className="font-semibold text-foreground">Contoh: </span>
-                {entry.example}
+                <span className="font-semibold text-foreground">{t("example")}</span>
+                {t(`entries.${slug}.example`)}
               </p>
             )}
             <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs font-semibold">
               {entry.lesson && (
                 <Link href={`/belajar/${entry.lesson}`} className="inline-flex min-h-8 items-center gap-1 text-primary hover:text-primary-hi">
-                  <BookOpen className="h-3.5 w-3.5" /> Pelajari materinya
+                  <BookOpen className="h-3.5 w-3.5" /> {t("lesson")}
                 </Link>
               )}
               <Link href={`/belajar/kamus#${entry.slug}`} className="inline-flex min-h-8 items-center text-muted-foreground hover:text-foreground">
-                Buka di Kamus
+                {t("openKamus")}
               </Link>
             </div>
           </div>,

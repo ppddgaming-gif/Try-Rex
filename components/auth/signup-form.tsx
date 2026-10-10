@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { signup, type FormState } from "@/lib/auth-actions"
 import { MIN_PASSWORD } from "@/lib/auth-rules"
 import { EmailSent, Field, FormError } from "@/components/auth/form-parts"
@@ -9,15 +10,13 @@ import { EmailSent, Field, FormError } from "@/components/auth/form-parts"
 export function SignupForm() {
   const [state, action, pending] = useActionState<FormState, FormData>(signup, {})
   const [agreed, setAgreed] = useState(false)
+  const t = useTranslations("auth")
 
   if (state.sent) {
     return (
-      <EmailSent title="Cek email kamu untuk konfirmasi">
-        <p>
-          Kami mengirim link konfirmasi ke <strong className="text-foreground">{state.email}</strong>. Buka link itu
-          di browser ini untuk mengaktifkan akunmu.
-        </p>
-        <p className="mt-3 text-faint">Tidak ada di kotak masuk? Cek folder spam atau promosi.</p>
+      <EmailSent title={t("signup.sentTitle")}>
+        <p>{t.rich("signup.sentBody", { email: state.email ?? "", b: (c) => <strong className="text-foreground">{c}</strong> })}</p>
+        <p className="mt-3 text-faint">{t("signup.sentSpam")}</p>
       </EmailSent>
     )
   }
@@ -25,12 +24,12 @@ export function SignupForm() {
   return (
     <form action={action} className="flex flex-col gap-5" noValidate>
       <FormError message={state.error} />
-      <Field id="name" name="name" label="Nama" autoComplete="name" required maxLength={60} />
+      <Field id="name" name="name" label={t("signup.name")} autoComplete="name" required maxLength={60} />
       <Field
         id="email"
         name="email"
         type="email"
-        label="Email"
+        label={t("fields.email")}
         autoComplete="email"
         inputMode="email"
         required
@@ -40,11 +39,11 @@ export function SignupForm() {
         id="password"
         name="password"
         type="password"
-        label="Password"
+        label={t("fields.password")}
         autoComplete="new-password"
         required
         minLength={MIN_PASSWORD}
-        hint={`Minimal ${MIN_PASSWORD} karakter.`}
+        hint={t("fields.minLength", { min: MIN_PASSWORD })}
       />
 
       {/* The whole row is the tap target, not just the 20px box. */}
@@ -57,19 +56,23 @@ export function SignupForm() {
           className="mt-0.5 h-5 w-5 shrink-0 accent-primary"
         />
         <span>
-          Saya setuju dengan{" "}
-          <Link href="/privacy" target="_blank" className="font-semibold text-primary underline-offset-2 hover:underline">
-            Kebijakan Privasi
-          </Link>{" "}
-          dan{" "}
-          <Link href="/terms" target="_blank" className="font-semibold text-primary underline-offset-2 hover:underline">
-            Syarat &amp; Ketentuan
-          </Link>
+          {t.rich("signup.agree", {
+            privacy: (c) => (
+              <Link href="/privacy" target="_blank" className="font-semibold text-primary underline-offset-2 hover:underline">
+                {c}
+              </Link>
+            ),
+            terms: (c) => (
+              <Link href="/terms" target="_blank" className="font-semibold text-primary underline-offset-2 hover:underline">
+                {c}
+              </Link>
+            ),
+          })}
         </span>
       </label>
 
       <button type="submit" className="btn w-full" disabled={!agreed || pending}>
-        {pending ? "Memproses…" : "Daftar"}
+        {pending ? t("signup.submitting") : t("signup.submit")}
       </button>
     </form>
   )

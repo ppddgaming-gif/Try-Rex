@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react"
 import { PartyPopper } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { useProgressEvents } from "@/lib/progress/use-progress"
 import { Confetti } from "@/components/confetti"
 
@@ -17,6 +18,7 @@ export function LevelUpToast() {
   const [toast, setToast] = useState<{ id: number; level: number } | null>(null)
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const nextId = useRef(0)
+  const t = useTranslations("progress")
 
   useProgressEvents((event) => {
     if (event.leveledUpTo === null) return
@@ -34,7 +36,7 @@ export function LevelUpToast() {
         >
           <Confetti pieces={22} />
           <PartyPopper className="h-5 w-5 text-primary" aria-hidden="true" />
-          Naik ke Level <span className="font-mono tabular-nums">{toast.level}</span>!
+          <span>{t.rich("levelUp", { level: toast.level, num: (c) => <span className="font-mono tabular-nums">{c}</span> })}</span>
         </div>
       )}
     </div>

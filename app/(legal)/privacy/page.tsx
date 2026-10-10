@@ -1,13 +1,16 @@
 import type { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
 import Link from "next/link"
 import { Isi, LegalDoc, Section, Tinjau } from "@/components/legal-doc"
 
-export const metadata: Metadata = { title: "Kebijakan Privasi" }
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getTranslations("legal.titles"))("privacy") }
+}
 
 export default function PrivacyPage() {
   return (
     <LegalDoc
-      title="Kebijakan Privasi"
+      doc="privacy"
       intro={
         <p>
           Halaman ini menjelaskan data apa yang dikumpulkan TRY-REX, untuk apa, di mana data itu disimpan, dan

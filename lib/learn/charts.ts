@@ -7,9 +7,9 @@ import type { ChartPick } from "@/lib/learn/types"
 // and are deterministic.
 
 const byPick: Record<ChartPick, (c: Challenge) => boolean> = {
-  uptrend: (c) => c.situation.includes("cenderung naik") && c.answer === "buy",
-  downtrend: (c) => c.situation.includes("cenderung turun") && c.answer === "sell",
-  sideways: (c) => c.situation.includes("cenderung menyamping"),
+  uptrend: (c) => c.facts.trend === "up" && c.answer === "buy",
+  downtrend: (c) => c.facts.trend === "down" && c.answer === "sell",
+  sideways: (c) => c.facts.trend === "flat",
   levels: (c) => c.zones.some((z) => z.variant === "support") && c.zones.some((z) => z.variant === "resistance"),
 }
 

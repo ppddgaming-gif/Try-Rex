@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
 import { redirect } from "next/navigation"
 import { DailyChallenge } from "@/components/dashboard/daily-challenge"
 import { DashboardView } from "@/components/dashboard/dashboard-view"
@@ -6,7 +7,9 @@ import { getCurrentUser } from "@/lib/auth"
 import { challenges } from "@/lib/mock-data"
 import { planFrom } from "@/lib/onboarding"
 
-export const metadata: Metadata = { title: "Dashboard" }
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getTranslations("dashboard"))("title") }
+}
 
 /**
  * Today's challenge rotates through the real datasets once a day, on Jakarta

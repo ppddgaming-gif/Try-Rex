@@ -1,0 +1,12 @@
+{
+  "titles": {
+    "privacy": "Privacy Policy",
+    "terms": "Terms & Conditions",
+    "disclaimer": "Disclaimer"
+  },
+  "draftTitle": "Draft, not final.",
+  "draftBody": "This document hasn't been reviewed by a lawyer and isn't yet an official legal text. Sections marked [PERLU DIISI] or [PERLU DITINJAU] still need to be completed.",
+  "draftDate": "Draft as of {date}",
+  "notTranslated": "Not yet available in English",
+  "notTranslatedBody": "This document is shown in its original language, Indonesian, until an English version has been reviewed."
+}

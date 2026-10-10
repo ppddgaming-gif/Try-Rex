@@ -1,0 +1,133 @@
+{
+  "nav": {
+    "product": "Product",
+    "how": "Cara Kerja",
+    "features": "Fitur",
+    "dashboard": "Dashboard",
+    "signIn": "Masuk",
+    "start": "Mulai Sekarang",
+    "openMenu": "Buka menu",
+    "closeMenu": "Tutup menu"
+  },
+  "hero": {
+    "badge": "AI Trading Mentor untuk trader pemula",
+    "title": "Belajar trading dengan mentor AI yang tak pernah tidur",
+    "body": "TRY-REX mengevaluasi setiap keputusanmu, melatihmu lewat simulasi market nyata, dan membuatmu jadi trader yang konsisten—satu challenge setiap hari.",
+    "cta": "Mulai latihan gratis",
+    "how": "Lihat cara kerjanya",
+    "note": "Tanpa daftar, tanpa uang sungguhan. Langsung main."
+  },
+  "showcase": {
+    "aspects": "Pemahaman Berdasarkan Aspek",
+    "example": "Contoh",
+    "question": "Soal 1 / 5",
+    "situation": "Situasinya begini: ",
+    "pick": "Kamu pilih apa?",
+    "rightAnswer": "Jawaban yang tepat: <b>{answer}</b>",
+    "chatUser": "Kenapa keputusan SELL aku kurang tepat?",
+    "chatIntro": "Aku cek chart kamu dulu, lalu jelasin alasannya.",
+    "chatStep1": "Menganalisis struktur market",
+    "chatStep2": "Harga masih di area resistance 1.0920",
+    "chatStep3": "Belum ada konfirmasi reversal",
+    "chatAnswer": "Entry terlalu cepat. Tunggu rejection seperti pin bar di resistance dulu, baru ambil SELL."
+  },
+  "stats": {
+    "beta": "Beta terbuka",
+    "players": "<num>{players, number}</num> trader sudah bergabung",
+    "answers": ", <num>{answers, number}</num> soal sudah dijawab",
+    "end": ".",
+    "first": " — jadi trader pertama yang mencoba.",
+    "dash": " — "
+  },
+  "surfaces": {
+    "eyebrow": "Produk",
+    "title": "Satu mentor, di setiap langkah belajarmu",
+    "body": "Empat ruang yang saling terhubung untuk membentuk kebiasaan trading yang sehat.",
+    "dashboard": {
+      "title": "Dashboard",
+      "body": "Lihat ringkasan pemahaman, akurasi, dan tantangan harianmu dalam satu tempat.",
+      "cta": "Buka Dashboard"
+    },
+    "game": {
+      "title": "Trading Game",
+      "body": "Uji keputusanmu di simulasi market dan kumpulkan XP di setiap soal.",
+      "cta": "Main sekarang"
+    },
+    "evaluation": {
+      "title": "AI Evaluation",
+      "body": "Dapatkan feedback mendetail dari TRY-REX untuk setiap keputusan trading.",
+      "cta": "Lihat evaluasi"
+    },
+    "learn": {
+      "title": "Belajar 101",
+      "body": "Materi singkat dari dasar sampai crypto, dengan kamus istilah yang bisa diketuk langsung dari soal.",
+      "cta": "Mulai belajar"
+    }
+  },
+  "features": {
+    "evaluation": {
+      "eyebrow": "AI Evaluation",
+      "title": "Setiap keputusan dievaluasi secara mendalam",
+      "body": "TRY-REX membedah entry, timing, dan manajemen risikomu lalu memberi skor, alasan yang jelas, dan saran konkret—seperti punya mentor pribadi di setiap trade."
+    },
+    "game": {
+      "eyebrow": "Trading Game",
+      "title": "Latih insting lewat simulasi market nyata",
+      "body": "Setiap soal adalah chart forex historis asli dengan 15 candle berikutnya disembunyikan. Pilih BUY, SELL, atau WAIT, lalu lihat apa yang benar-benar terjadi. 5 soal per sesi, tanpa risiko uang."
+    },
+    "progress": {
+      "eyebrow": "Progress Tracking",
+      "title": "Pantau perkembangan di setiap aspek trading",
+      "body": "Dari trend reading sampai market structure, lihat kekuatan dan kelemahanmu dalam grafik yang mudah dibaca, dan naik level seiring konsistensimu."
+    }
+  },
+  "how": {
+    "eyebrow": "Cara kerja",
+    "title": "Belajar lewat siklus latihan yang terbukti",
+    "body": "Praktik, feedback, perbaikan—berulang setiap hari sampai jadi kebiasaan.",
+    "s1": {
+      "title": "Ambil keputusan",
+      "body": "Hadapi situasi market di Trading Game dan tentukan BUY, SELL, atau WAIT."
+    },
+    "s2": {
+      "title": "Dievaluasi AI",
+      "body": "TRY-REX menilai keputusanmu, memberi skor, dan menjelaskan alasannya."
+    },
+    "s3": {
+      "title": "Naik level",
+      "body": "Perbaiki kelemahan, kumpulkan XP, dan jadi trader yang makin konsisten."
+    }
+  },
+  "cta": {
+    "title": "Mulai jadi trader yang konsisten hari ini",
+    "body": "Gratis untuk memulai. Latih satu challenge setiap hari dan biarkan TRY-REX memandumu.",
+    "start": "Mulai latihan gratis",
+    "dashboard": "Buka Dashboard",
+    "signUp": "Buat akun gratis"
+  },
+  "footer": {
+    "tagline": "AI Trading Mentor yang membantumu belajar trading dengan cara yang aman, terukur, dan menyenangkan.",
+    "product": "Produk",
+    "resources": "Sumber",
+    "legal": "Legal",
+    "dashboard": "Dashboard",
+    "game": "Trading Game",
+    "evaluation": "AI Evaluation",
+    "learn": "Belajar 101",
+    "glossary": "Kamus Trading",
+    "how": "Cara Kerja",
+    "features": "Fitur",
+    "privacy": "Kebijakan Privasi",
+    "terms": "Syarat & Ketentuan",
+    "disclaimer": "Disclaimer",
+    "rights": "© {year} TRY-REX. Semua hak dilindungi.",
+    "risk": "Trading mengandung risiko. Konten bersifat edukasi, bukan saran finansial."
+  },
+  "notFound": {
+    "title": "Halaman tidak ditemukan",
+    "heading": "Halaman ini tidak ada",
+    "body": "Link-nya mungkin salah ketik atau halamannya sudah dipindah. Chart-nya masih menunggumu.",
+    "game": "Buka Trading Game",
+    "home": "Ke beranda"
+  }
+}

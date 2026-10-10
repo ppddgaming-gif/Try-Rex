@@ -1,4 +1,5 @@
 import { AlertTriangle, Lightbulb, Quote } from "lucide-react"
+import { useLocale, useTranslations } from "next-intl"
 import { CandlestickChart } from "@/components/candlestick-chart"
 import { GlossaryParts } from "@/components/glossary/glossary-text"
 import { DIAGRAMS } from "@/components/learn/diagrams"
@@ -6,6 +7,8 @@ import { Quiz } from "@/components/learn/quiz"
 import { splitTerms } from "@/lib/glossary"
 import { chartFor } from "@/lib/learn/charts"
 import type { Block } from "@/lib/learn/types"
+import { challengeText } from "@/lib/challenge-text"
+import type { Locale } from "@/lib/i18n/locale"
 import { frameOf } from "@/lib/mock-data"
 
 // Red and green mean price direction only, so warnings are amber and tips
@@ -16,12 +19,18 @@ const calloutStyle = {
   example: { icon: Quote, box: "border-border bg-inset", title: "text-foreground" },
 } as const
 
-/** Renders a lesson's content blocks, top to bottom, with tappable terms. */
-export function LessonBlocks({ blocks }: { blocks: Block[] }) {
+/**
+ * Renders a lesson's content blocks, top to bottom, with tappable terms.
+ * `lang` is the language the blocks are written in.
+ */
+export function LessonBlocks({ blocks, lang }: { blocks: Block[]; lang: Locale }) {
   // One set for the whole lesson: each term is underlined where it first
   // appears, not again in every paragraph.
   const seen = new Set<string>()
-  const terms = (text: string) => <GlossaryParts parts={splitTerms(text, seen)} />
+  const terms = (text: string) => <GlossaryParts parts={splitTerms(text, lang, seen)} />
+  const t = useTranslations("learn.chart")
+  const tc = useTranslations("game.challenge")
+  const locale = useLocale() as Locale
 
   return (
     <div className="flex flex-col gap-6">
@@ -81,12 +90,13 @@ export function LessonBlocks({ blocks }: { blocks: Block[] }) {
             const c = chartFor(b.pick)
             const candles = b.reveal ? [...c.candles, ...c.future] : c.candles
             const frame = frameOf(candles)
+            const text = challengeText(c, tc, locale)
             return (
               <figure key={i} className="reveal rounded-2xl border border-border bg-card p-4">
                 <div className="mb-2 flex flex-wrap items-center gap-2 text-xs">
                   <span className="rounded-md border border-border bg-muted/40 px-2 py-1 font-semibold">{c.pair}</span>
                   <span className="rounded-md border border-border bg-muted/40 px-2 py-1 font-semibold">{c.timeframe}</span>
-                  <span className="text-muted-foreground">{c.period} · data harga asli</span>
+                  <span className="text-muted-foreground">{t("real", { period: text.period })}</span>
                 </div>
                 {/* Fixed height: the chart stretches to its box, text included. */}
                 <div className="h-[220px] sm:h-[280px]">
@@ -95,7 +105,7 @@ export function LessonBlocks({ blocks }: { blocks: Block[] }) {
                     min={frame.min}
                     max={frame.max}
                     priceTicks={frame.priceTicks}
-                    timeLabels={b.reveal ? c.revealTimeLabels : c.timeLabels}
+                    timeLabels={b.reveal ? text.revealTimeLabels : text.timeLabels}
                     zones={c.zones}
                     digits={c.digits}
                     currentPrice={b.reveal ? undefined : c.currentPrice}

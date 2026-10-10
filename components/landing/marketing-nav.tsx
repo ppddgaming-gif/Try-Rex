@@ -3,12 +3,15 @@
 import { useState } from "react"
 import Link from "next/link"
 import { Menu, X, ArrowUpRight } from "lucide-react"
+import { useTranslations } from "next-intl"
+import { LocaleSwitcher } from "@/components/locale-switcher"
 import { Rex } from "@/components/rex-mascot"
 
+// Labels: landing.nav.<key>.
 const links = [
-  { label: "Product", href: "/#product" },
-  { label: "Cara Kerja", href: "/#how" },
-  { label: "Fitur", href: "/#features" },
+  { key: "product", href: "/#product" },
+  { key: "how", href: "/#how" },
+  { key: "features", href: "/#features" },
 ]
 
 /**
@@ -17,7 +20,8 @@ const links = [
  */
 export function MarketingNav({ signedIn }: { signedIn: boolean }) {
   const [open, setOpen] = useState(false)
-  const account = signedIn ? { href: "/dashboard", label: "Dashboard" } : { href: "/login", label: "Masuk" }
+  const t = useTranslations("landing.nav")
+  const account = signedIn ? { href: "/dashboard", label: t("dashboard") } : { href: "/login", label: t("signIn") }
 
   return (
     <header
@@ -39,13 +43,14 @@ export function MarketingNav({ signedIn }: { signedIn: boolean }) {
               href={l.href}
               className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
-              {l.label}
+              {t(l.key)}
             </a>
           ))}
         </nav>
 
         {/* Actions */}
         <div className="hidden items-center gap-3 md:flex">
+          <LocaleSwitcher />
           <Link
             href={account.href}
             className="inline-flex min-h-11 items-center px-2 text-sm font-semibold text-foreground transition-colors hover:text-primary"
@@ -53,16 +58,18 @@ export function MarketingNav({ signedIn }: { signedIn: boolean }) {
             {account.label}
           </Link>
           <Link href="/trading-game" className="btn btn-sm">
-            Mulai Sekarang
+            {t("start")}
             <ArrowUpRight className="h-4 w-4" />
           </Link>
         </div>
 
-        {/* Mobile toggle */}
+        {/* Mobile: the language switch stays in the bar, next to the menu. */}
+        <div className="flex items-center gap-2 md:hidden">
+        <LocaleSwitcher />
         <button
           className="flex h-11 w-11 items-center justify-center rounded-lg border border-border md:hidden"
           onClick={() => setOpen((v) => !v)}
-          aria-label={open ? "Tutup menu" : "Buka menu"}
+          aria-label={open ? t("closeMenu") : t("openMenu")}
           aria-expanded={open}
           aria-controls="marketing-menu"
         >
@@ -71,6 +78,7 @@ export function MarketingNav({ signedIn }: { signedIn: boolean }) {
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </span>
         </button>
+        </div>
       </div>
 
       {/* Mobile menu: stays mounted so it can animate closed as well as open. */}
@@ -87,7 +95,7 @@ export function MarketingNav({ signedIn }: { signedIn: boolean }) {
                 onClick={() => setOpen(false)}
                 className="rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
-                {l.label}
+                {t(l.key)}
               </a>
             ))}
             <Link
@@ -98,7 +106,7 @@ export function MarketingNav({ signedIn }: { signedIn: boolean }) {
               {account.label}
             </Link>
             <Link href="/trading-game" onClick={() => setOpen(false)} className="btn btn-sm mt-2">
-              Mulai Sekarang
+              {t("start")}
               <ArrowUpRight className="h-4 w-4" />
             </Link>
           </nav>

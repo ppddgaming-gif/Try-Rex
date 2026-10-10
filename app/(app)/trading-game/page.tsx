@@ -1,9 +1,12 @@
 import type { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
 import { redirect } from "next/navigation"
 import { TradingGame } from "@/components/trading-game/trading-game"
 import { getCurrentUser } from "@/lib/auth"
 
-export const metadata: Metadata = { title: "Trading Game" }
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getTranslations("game"))("title") }
+}
 
 // `?c=<dataset id>` opens the round on that question (the dashboard's daily
 // challenge). Signed-in players who haven't done /start go there first;

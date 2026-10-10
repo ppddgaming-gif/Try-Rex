@@ -1,5 +1,6 @@
 import type { LucideIcon } from "lucide-react"
 import { Star, Target, Trophy } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { accuracy, totalChallenges } from "@/lib/progress/derive"
 import type { Progress } from "@/lib/progress/types"
 import { Card } from "@/components/card"
@@ -12,24 +13,25 @@ import { Skeleton } from "@/components/progress/skeleton"
 export function StatRow({ progress }: { progress: Progress | null }) {
   const total = progress ? totalChallenges(progress) : 0
   const acc = progress ? accuracy(progress) : null
+  const t = useTranslations("progress.stats")
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-      <Stat icon={Trophy} label="Soal selesai" loading={!progress} value={total > 0 ? String(total) : null} hint="Jawab soal pertamamu" />
+      <Stat icon={Trophy} label={t("done")} loading={!progress} value={total > 0 ? String(total) : null} hint={t("doneHint")} />
       <Stat
         icon={Target}
-        label="Akurasi"
+        label={t("accuracy")}
         loading={!progress}
         value={acc !== null && acc > 0 ? `${Math.round(acc * 100)}%` : null}
-        hint={acc === null ? "Belum ada jawaban" : "Belum ada jawaban tepat"}
-        sub={acc !== null && acc > 0 ? "dari semua jawabanmu" : undefined}
+        hint={acc === null ? t("noAnswers") : t("noCorrect")}
+        sub={acc !== null && acc > 0 ? t("ofAll") : undefined}
       />
       <Stat
         icon={Star}
-        label="Total XP"
+        label={t("xp")}
         loading={!progress}
         value={progress && progress.xp > 0 ? String(progress.xp) : null}
-        hint="Jawaban tepat memberi XP"
+        hint={t("xpHint")}
       />
     </div>
   )
