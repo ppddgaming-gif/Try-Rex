@@ -1,18 +1,19 @@
 import "server-only"
-import { createHmac } from "node:crypto"
 import { readFile } from "node:fs/promises"
 import { join } from "node:path"
 import { gunzipSync } from "node:zlib"
-import { closedBefore, decodeChunk, provisionalNow, yearsFor, type LiveBar, type Manifest, type RawChunk } from "@/lib/live/chunk"
-import { CHART, TIMEFRAME_SECONDS, type LivePair, type Timeframe } from "@/lib/live/config"
+import { decodeChunk, monthsBetween, type LiveBar, type Manifest, type RawChunk } from "@/lib/live/chunk"
+import { CHART, M15, MARKET, TIMEFRAME_SECONDS, type LivePair, type Timeframe } from "@/lib/live/config"
+import { chartAt, marketStatus } from "@/lib/live/market"
 import { toRelative, weekPosition } from "@/lib/live/time"
 import { createAdminClient } from "@/lib/supabase/admin"
 
-// The only module that reads the candle data. Chunks live in the private
-// Storage bucket `live-data` (scripts/upload-live-data.mjs); with
-// LIVE_DATA_DIR set (local development) they are read from that folder
-// instead. Whole chunks never leave the server: chartSlice() returns the
-// closed candles before the account's "now", with relative times only.
+// The only module that reads the candle data: M15 chunks, one per pair and
+// month, in the private Storage bucket `live-data`
+// (scripts/upload-live-data.mjs). With LIVE_DATA_DIR set (local development)
+// they are read from that folder instead. Whole chunks never leave the
+// server: chartSlice() returns candles up to the account's "now" only, with
+// relative times.
 
 const BUCKET = "live-data"
 
@@ -31,12 +32,12 @@ export function loadManifest(): Promise<Manifest> {
   return manifest
 }
 
-// Recently used chunks. A year of M15 is about 25,000 candles.
+// Recently used months. A month of M15 is about 2,000 candles.
 const chunks = new Map<string, Promise<LiveBar[] | null>>()
-const MAX_CHUNKS = 48
+const MAX_CHUNKS = 96
 
-function loadChunk(pair: string, tf: string, year: number): Promise<LiveBar[] | null> {
-  const key = `${pair}/${tf}/${year}`
+function loadMonth(pair: string, month: string): Promise<LiveBar[] | null> {
+  const key = `${pair}/M15/${month}`
   const hit = chunks.get(key)
   if (hit) {
     chunks.delete(key)
@@ -51,22 +52,20 @@ function loadChunk(pair: string, tf: string, year: number): Promise<LiveBar[] | 
   return p
 }
 
-/** 0..1 from the account id, keyed with a server secret, so the moment can't be worked out from the id. */
-function seedFor(accountId: string) {
-  const secret = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "dev"
-  const h = createHmac("sha256", secret).update(`live-now:${accountId}`).digest()
-  return h.readUInt32BE(0) / 2 ** 32
+/** M15 candles of `pair` with from <= t <= to (data time), ascending. Server side only. */
+export async function m15Between(pair: string, from: number, to: number): Promise<LiveBar[]> {
+  const m = await loadManifest()
+  const info = m.pairs[pair]
+  if (!info) return []
+  const months = monthsBetween(from, to).filter((mo) => info.months.includes(mo))
+  const loaded = await Promise.all(months.map((mo) => loadMonth(pair, mo)))
+  return loaded.flatMap((b) => b ?? []).filter((b) => b.t >= from && b.t <= to)
 }
 
-/**
- * The account's "now": a provisional fixed moment until the live engine keeps
- * a real clock. Server side only; the browser gets its week position.
- */
-export async function accountNow(accountId: string) {
-  const m = await loadManifest()
-  const history = CHART.BARS * TIMEFRAME_SECONDS.H4 * 2
-  return provisionalNow(m, seedFor(accountId), history)
-}
+export const digitsOf = (pair: string) => (pair.endsWith("JPY") ? 3 : 5)
+
+/** How far back a chart of `step` reads: its candles plus weekends and holidays. */
+const lookback = (step: number) => Math.ceil(CHART.BARS * step * 1.6) + 6 * 86_400
 
 export type RelBar = { t: number; o: number; h: number; l: number; c: number }
 
@@ -75,38 +74,57 @@ export type ChartSlice = {
   timeframe: Timeframe
   digits: number
   step: number
-  /** Where "now" falls in its week (seconds since Monday 00:00), for day/hour labels. */
+  /** Where "now" falls in its week on the display clock (WIB), for day/hour labels. */
   nowWeek: number
+  /**
+   * Real unix seconds of this "now". Relative times are relative to it; the
+   * browser shifts its drawings by the difference between two anchors. It is
+   * the real clock, so it says nothing about the data's period.
+   */
+  anchor: number
   /** Closed candles, oldest first; `t` is seconds relative to now (negative). */
   candles: RelBar[]
+  /** The candle still forming: open, high and low so far, and the current price as its close. */
+  forming: RelBar | null
+  /** Seconds until the forming M15 candle closes (the countdown); null while the market is closed. */
+  closesIn: number | null
+  market: { open: boolean; opensIn: number | null }
 }
 
-/** The chart for one pair and timeframe, or null when the data for it is missing. */
-export async function chartSlice(now: number, pair: LivePair, timeframe: Timeframe): Promise<ChartSlice | null> {
-  const m = await loadManifest()
-  const info = m.pairs[pair]?.timeframes[timeframe]
-  if (!info) return null
+/**
+ * The chart for one pair and timeframe at data time `now` (real time `real`),
+ * or null when the data for it is missing. Nothing after `now` is included:
+ * closed candles end before it and the forming one only goes as far as it.
+ */
+export async function chartSlice(now: number, real: number, pair: LivePair, timeframe: Timeframe): Promise<ChartSlice | null> {
   const step = TIMEFRAME_SECONDS[timeframe]
-  const years = yearsFor(now, step, CHART.BARS).filter((y) => info.years.includes(y)).reverse()
-  const loaded = await Promise.all(years.map((y) => loadChunk(pair, timeframe, y)))
-  const bars = loaded.flatMap((b) => b ?? [])
-  const slice = closedBefore(bars, now, step, CHART.BARS)
-  if (slice.length === 0) return null
+  const digits = digitsOf(pair)
+  // Look one gap ahead too, only to tell when the market opens again; those candles are never returned.
+  const bars = await m15Between(pair, now - lookback(step), now + MARKET.CLOSE_GAP_SECONDS + 4 * 86_400)
+  const past = bars.filter((b) => b.t <= now)
+  if (past.length === 0) return null
+  const { closed, forming } = chartAt(pair, past, now, step, CHART.BARS, digits)
+  const status = marketStatus(bars, now)
+  const rel = (b: LiveBar): RelBar => ({ t: toRelative(b.t, now), o: b.o, h: b.h, l: b.l, c: b.c })
   return {
     pair,
     timeframe,
-    digits: m.pairs[pair].digits,
+    digits,
     step,
-    nowWeek: weekPosition(now),
-    candles: slice.map((b) => ({ t: toRelative(b.t, now), o: b.o, h: b.h, l: b.l, c: b.c })),
+    nowWeek: weekPosition(real + MARKET.DISPLAY_UTC_OFFSET_HOURS * 3600),
+    anchor: real,
+    candles: closed.map(rel),
+    forming: forming ? rel(forming) : null,
+    closesIn: status.open ? M15 - (((now % M15) + M15) % M15) : null,
+    market: status,
   }
 }
 
-/** Pairs whose data covers every timeframe, for the picker. */
+/** Pairs whose data exists, for the picker. */
 export async function availablePairs(): Promise<string[]> {
   const m = await loadManifest().catch(() => null)
   if (!m) return []
   return Object.entries(m.pairs)
-    .filter(([, p]) => Object.keys(p.timeframes).length === Object.keys(TIMEFRAME_SECONDS).length)
+    .filter(([, p]) => p.months.length > 0)
     .map(([pair]) => pair)
 }

@@ -32,14 +32,15 @@ export type LosingTrade = { lot: number; closedClock: number; result: number }
 /**
  * A revenge trade: opened within REVENGE_WINDOW_CANDLES of a losing trade's
  * close, with a bigger lot than that trade. Clocks count candles played on
- * the account, so switching charts doesn't reset the window.
+ * the account, so switching charts doesn't reset the window. The live chart
+ * passes its own window, in M15 candles.
  */
-export function isRevenge(lot: number, openedClock: number, closed: LosingTrade[]) {
+export function isRevenge(lot: number, openedClock: number, closed: LosingTrade[], window: number = DISIPLIN.REVENGE_WINDOW_CANDLES) {
   return closed.some(
     (t) =>
       t.result < 0 &&
       openedClock >= t.closedClock &&
-      openedClock - t.closedClock <= DISIPLIN.REVENGE_WINDOW_CANDLES &&
+      openedClock - t.closedClock <= window &&
       lot > t.lot + 1e-9,
   )
 }

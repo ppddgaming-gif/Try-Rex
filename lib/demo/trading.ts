@@ -1,11 +1,9 @@
 import "server-only"
-import { planClose, planModify, planOrder, planStart, planStep, type SettlePlan } from "@/lib/demo/actions"
-import { loadSegment, poolFor } from "@/lib/demo/candles"
+import { loadSegment } from "@/lib/demo/candles"
 import { LINES, REVIEW, type StageNumber } from "@/lib/demo/config"
 import type { Checks, SlChange } from "@/lib/demo/disiplin"
 import type { ExitReason } from "@/lib/demo/fills"
 import { roundPrice } from "@/lib/demo/money"
-import type { OrderInput } from "@/lib/demo/orders"
 import type { ClosedSummary, ReviewAnswer, TradeRow, TradingState } from "@/lib/demo/state"
 import { isTipId, type TipId } from "@/lib/demo/tips"
 import { buildView, type DemoEvent, type DemoView } from "@/lib/demo/view"
@@ -14,11 +12,10 @@ import type { ReasonId } from "@/lib/reasons"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { createClient } from "@/lib/supabase/server"
 
-// Akun Latihan's trading, server side. Reads go through the player's own
-// session, so RLS limits them to their rows. Each action is planned by a pure
-// function in lib/demo/actions.ts and written by one database function in
-// one transaction; the account's version makes a write built on stale state
-// fail instead of acting twice.
+// Akun Latihan's trading state, server side. Reads go through the player's
+// own session, so RLS limits them to their rows. Orders, closes and SL/TP
+// moves now run on the live chart (lib/live/engine.ts); what stays here is
+// loading the state and the self-written review and notes.
 
 export const TRADE_COLUMNS =
   "id, number, session_id, pair, side, lot, stage, reasons, entry_price, entry_index, opened_clock, " +
@@ -34,7 +31,7 @@ export function toTradeRow(r: Row): TradeRow {
   return {
     id: String(r.id),
     number: num(r.number),
-    sessionId: String(r.session_id),
+    sessionId: r.session_id === null || r.session_id === undefined ? null : String(r.session_id),
     pair: String(r.pair),
     side: r.side === "sell" ? "sell" : "buy",
     lot: num(r.lot),
@@ -206,28 +203,6 @@ export type ActionResult = { view: DemoView } | Failure
 type Failure = { error: Msg; status: number; view?: DemoView }
 const fail = (error: Msg, status = 409, view?: DemoView): Failure => ({ error, status, view })
 
-/** Database refusals, in words. 'demo_stale' is a double tap or a second tab. */
-async function refused(userId: string, message: string | undefined): Promise<ActionResult> {
-  const loaded = await loadTrading(userId)
-  const view = loaded ? buildView(loaded.state) : undefined
-  if (message?.includes("demo_stale")) return fail(msg("errors.stale"), 409, view)
-  if (message?.includes("demo_open_trades")) return fail(msg("errors.openTrades"), 409, view)
-  if (message?.includes("demo_no_session")) return fail(msg("errors.noSession"), 409, view)
-  if (message?.includes("demo_trade_missing")) return fail(msg("errors.tradeClosed"), 409, view)
-  console.error("Akun Latihan: write failed", message)
-  return fail(msg("errors.saveFailed"), 500, view)
-}
-
-/** Loads the state for a write: an account and the required lesson first. */
-async function ready(userId: string): Promise<TradingState | ActionResult> {
-  const loaded = await loadTrading(userId)
-  if (!loaded) return fail(msg("errors.noAccount"), 403)
-  if (!loaded.lessonPassed) return fail(msg("errors.lessonFirst"), 403)
-  return loaded.state
-}
-
-const isResult = (v: TradingState | ActionResult): v is ActionResult => "error" in v || "view" in v
-
 async function viewAfter(userId: string, events: DemoEvent[]): Promise<ActionResult> {
   const loaded = await loadTrading(userId)
   if (!loaded) return fail(msg("errors.accountMissing"), 404)
@@ -236,117 +211,6 @@ async function viewAfter(userId: string, events: DemoEvent[]): Promise<ActionRes
 
 /** The screen's current state, for the page and after a refused write. */
 export async function currentView(userId: string): Promise<ActionResult> {
-  return viewAfter(userId, [])
-}
-
-async function settle(userId: string, state: TradingState, plan: SettlePlan): Promise<ActionResult> {
-  const { error } = await createAdminClient().rpc("demo_settle", {
-    p_user: userId,
-    p_account: state.account.id,
-    p_version: state.account.version,
-    p_session: state.session!.id,
-    p_advance: plan.advance,
-    p_updates: plan.updates,
-    p_ledger: plan.ledger,
-    p_balance: plan.balance,
-    p_end_session: plan.endSession,
-    p_stage: plan.stage,
-  })
-  if (error) return refused(userId, error.message)
-  if (plan.graduated) {
-    // Recorded once; the summary page reads it. If this write fails, the next
-    // settle tries again, so the player still sees the moment.
-    const { error: gradError } = await createAdminClient()
-      .from("demo_profile")
-      .update({ graduated_at: new Date().toISOString() })
-      .eq("user_id", userId)
-      .is("graduated_at", null)
-    if (gradError) console.error("Akun Latihan: could not record graduation", gradError.message)
-  }
-  return viewAfter(userId, plan.events)
-}
-
-/** A new chart: the segment this player has seen least at their stage. */
-export async function startSession(userId: string): Promise<ActionResult> {
-  const state = await ready(userId)
-  if (isResult(state)) return state
-  const supabase = await createClient()
-  const { data, error } = await supabase.from("demo_sessions").select("segment_id").eq("user_id", userId)
-  if (error) return fail(msg("errors.chartLoadFailed"), 500)
-  const seen = new Map<string, number>()
-  for (const r of data ?? []) seen.set(String(r.segment_id), (seen.get(String(r.segment_id)) ?? 0) + 1)
-
-  const segment = planStart(state, poolFor(state.stage), seen, Math.random)
-  if ("error" in segment) return fail(segment.error, 409, buildView(state))
-  const rpc = await createAdminClient().rpc("demo_start_session", {
-    p_user: userId,
-    p_account: state.account.id,
-    p_version: state.account.version,
-    p_segment: segment.id,
-    p_pair: segment.pair,
-    p_cursor: segment.startCursor,
-    p_last: segment.lastIndex,
-  })
-  if (rpc.error) return refused(userId, rpc.error.message)
-  return viewAfter(userId, [])
-}
-
-/** Next candle, or WAIT. */
-export async function step(userId: string): Promise<ActionResult> {
-  const state = await ready(userId)
-  if (isResult(state)) return state
-  const plan = planStep(state)
-  if ("error" in plan) return fail(plan.error, 409, buildView(state))
-  return settle(userId, state, plan)
-}
-
-export async function closeTrade(userId: string, tradeId: string): Promise<ActionResult> {
-  const state = await ready(userId)
-  if (isResult(state)) return state
-  const plan = planClose(state, tradeId)
-  if ("error" in plan) return fail(plan.error, 409, buildView(state))
-  return settle(userId, state, plan)
-}
-
-export async function placeOrder(userId: string, input: OrderInput): Promise<ActionResult> {
-  const state = await ready(userId)
-  if (isResult(state)) return state
-  const plan = planOrder(state, input)
-  if ("error" in plan) return fail(plan.error, 422, buildView(state))
-  const { data, error } = await createAdminClient().rpc("demo_open_trade", {
-    p_user: userId,
-    p_account: state.account.id,
-    p_version: state.account.version,
-    p_trade: plan.trade,
-  })
-  if (error) return refused(userId, error.message)
-  const number = num((data as Row | null)?.number ?? 0)
-  return viewAfter(
-    userId,
-    plan.events.map((e) => (e.kind === "opened" ? { ...e, number } : e)),
-  )
-}
-
-export async function modifyTrade(
-  userId: string,
-  tradeId: string,
-  field: "sl" | "tp",
-  pips: number | null,
-): Promise<ActionResult> {
-  const state = await ready(userId)
-  if (isResult(state)) return state
-  const plan = planModify(state, tradeId, field, pips)
-  if ("error" in plan) return fail(plan.error, 422, buildView(state))
-  const { error } = await createAdminClient().rpc("demo_modify_trade", {
-    p_user: userId,
-    p_account: state.account.id,
-    p_version: state.account.version,
-    p_trade: plan.tradeId,
-    p_field: plan.field,
-    p_price: plan.price,
-    p_at: plan.atIndex,
-  })
-  if (error) return refused(userId, error.message)
   return viewAfter(userId, [])
 }
 
@@ -365,7 +229,7 @@ export async function reviewTrade(userId: string, tradeId: string, answer: Revie
     .select("id")
   if (error) return fail(msg("errors.saveFailedShort"), 500)
   if (!data?.length) return fail(msg("errors.tradeMissing"), 404)
-  return viewAfter(userId, [])
+  return { ok: true as const }
 }
 
 /**

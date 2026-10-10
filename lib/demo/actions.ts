@@ -60,9 +60,12 @@ export type SettlePlan = {
 
 const sideLabel = (side: string) => side.toUpperCase()
 
-/** Book `closures` (and the swap of trades still open) against the state. */
-function settle(
-  state: TradingState,
+/**
+ * Book `closures` (and the swap of trades still open) against the state.
+ * The live engine (lib/live/engine.ts) books through this too.
+ */
+export function settle(
+  state: Pick<TradingState, "account" | "open" | "history" | "slChanges" | "stage" | "graduated">,
   closures: Closure[],
   stillOpen: OpenTrade[],
   at: { advance: boolean; clock: number; index: number; endSession: boolean; stopOut: { price: number } | null },

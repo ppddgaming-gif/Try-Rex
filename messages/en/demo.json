@@ -67,7 +67,12 @@
     "badModify": "Invalid change format.",
     "badNote": "Invalid note format.",
     "badOrder": "Invalid order format.",
-    "badReview": "Invalid answer format."
+    "badReview": "Invalid answer format.",
+    "marketClosed": "The market is closed. Orders open again when the market opens.",
+    "pairNotQuoted": "Trading costs for {pair} aren't set yet, so orders on this pair can't open.",
+    "onePosition": "Only one position can be open. Close the current one first.",
+    "slTpRequiredLive": "SL and TP stay required while a position is open; move them, don't remove them.",
+    "liveNotReady": "The live chart isn't ready yet. Try again in a moment."
   },
   "problems": {
     "pairClosed": "{pair} isn't open yet in Stage {stage}.",
@@ -360,7 +365,8 @@
       "saveNote": "Save note",
       "cancel": "Cancel",
       "editNote": "Edit note",
-      "addNote": "Add a note"
+      "addNote": "Add a note",
+      "wib": "{time} WIB"
     },
     "review": {
       "ya": "Yes",
@@ -372,7 +378,8 @@
       "tp": "TP hit",
       "manual": "Closed manually",
       "stop_out": "Stop out",
-      "segment_end": "Segment ended"
+      "segment_end": "Segment ended",
+      "market_close": "Closed automatically (market closed)"
     },
     "checksList": {
       "pass": "Passed",
@@ -434,7 +441,9 @@
       "warnNoTp": "Without a TP, reward:risk can't be checked.",
       "warnLowRR": "Your target is only {rr}× the risk. Disiplin asks for at least {min}×.",
       "warnRevenge": "You took a loss {ago, plural, one {# candle ago} other {# candles ago}} with a {lot} lot. A bigger lot within {window} candles of a loss counts as a revenge trade.",
-      "warnFewCandles": "Only {n, plural, one {# candle} other {# candles}} left on this chart (fewer than {min}). Any trade still open is closed when the segment ends."
+      "warnFewCandles": "Only {n, plural, one {# candle} other {# candles}} left on this chart (fewer than {min}). Any trade still open is closed when the segment ends.",
+      "spreadInPrice": "Spread {pips} pips (in the price)",
+      "entryAtLive": "Price now <mono>{price}</mono> (BUY at the ask, SELL at the bid). The final price is set by the server when the order arrives."
     },
     "result": {
       "exitSlGap": "Price opened the candle beyond your stop loss, so it filled at that candle's open: {price}.",
@@ -558,8 +567,32 @@
       "posRr": "RR 1 : {rr}",
       "orderLabel": "Order",
       "noWait": "Waiting means not pressing a button. SL and TP are required before a position opens; risk at most {risk}% of your balance.",
-      "engineSoon": "Opening positions turns on when the live engine is done (next stage). The calculator already works.",
-      "costsMissing": "Trading costs for {pair} aren't set yet, so the order calculator can't work them out."
+      "costsMissing": "Trading costs for {pair} aren't set yet, so the order calculator can't work them out.",
+      "bustTitle": "Account #{n} has run out",
+      "bustBody": "Your {balance} balance is below the Stage {stage} run-out line ({line}) and no trade is open. There's no button to add money: Rex has your account review ready.",
+      "seeReview": "See Rex's review",
+      "graduatedTitle": "You've graduated from the Demo Account!",
+      "graduatedBody": "Your Disiplin held steady in Stage {n}. Practice stays open.",
+      "summary": "See the summary",
+      "stageUpTitle": "Stage {n} unlocked!",
+      "stageUpBody": "New rules apply from your next trade. See the Stage card.",
+      "marketOpen": "Market open",
+      "marketClosed": "Market closed",
+      "opensIn": "Opens again in {time}",
+      "closesIn": "15-minute candle closes in {time}",
+      "bidAsk": "Bid {bid} · Ask {ask}",
+      "liveNote": "The chart runs on real time, Monday to Friday. Your position is still checked while you're offline.",
+      "rulesNote": "One open position. If SL and TP are both reached in the same 15-minute candle, SL counts as hit first. A position still open closes automatically at the last price before the market closes.",
+      "positionOn": "Your position is open on {pair}.",
+      "showPair": "Open the {pair} chart",
+      "closeFirst": "Close the open position first to open a new one.",
+      "closedWhileAway": "Trade #{number} closed: {reason}.",
+      "levelEntry": "Entry",
+      "dur": {
+        "days": "{d}d {h}h",
+        "hours": "{h}h {m}m",
+        "minutes": "{m} min"
+      }
     },
     "video": {
       "eyebrow": "Tutorial",

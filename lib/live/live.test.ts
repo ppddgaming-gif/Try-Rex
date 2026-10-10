@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { closedBefore, decodeChunk, provisionalNow, yearsFor, type LiveBar, type Manifest } from "@/lib/live/chunk"
+import { closedBefore, decodeChunk, monthsBetween, type LiveBar } from "@/lib/live/chunk"
 import { TIMEFRAME_SECONDS } from "@/lib/live/config"
 import { parseDrawing, parseDrawings, positionStats, shiftDrawing, type Drawing } from "@/lib/live/drawings"
 import { dayTimeLabel, indexToTime, timeToIndex, toAbsolute, toRelative, weekPosition } from "@/lib/live/time"
@@ -85,28 +85,9 @@ describe("chunks and slices", () => {
     expect(slice.every((b) => b.t + H <= now)).toBe(true)
   })
 
-  it("asks for the previous year when the slice can cross New Year", () => {
-    const jan2 = Date.UTC(2021, 0, 2) / 1000
-    expect(yearsFor(jan2, 4 * H, 120)).toEqual([2021, 2020])
-    expect(yearsFor(Date.UTC(2021, 6, 1) / 1000, 900, 120)).toEqual([2021])
-  })
-
-  it("picks a provisional now inside every series, on a weekday, on the hour", () => {
-    const tf = (first: number, last: number) => ({ seconds: H, first, last, bars: 0, years: [] })
-    const m: Manifest = {
-      version: 1,
-      pairs: {
-        EURUSD: { digits: 5, timeframes: { H1: tf(MON, MON + 400 * 86_400) } },
-        GBPUSD: { digits: 5, timeframes: { H4: tf(MON + 10 * 86_400, MON + 380 * 86_400) } },
-      },
-    }
-    for (const seed of [0, 0.25, 0.5, 0.999]) {
-      const now = provisionalNow(m, seed, 30 * 86_400)
-      expect(now).toBeGreaterThanOrEqual(MON + 40 * 86_400 - 2 * 86_400)
-      expect(now).toBeLessThanOrEqual(MON + 380 * 86_400)
-      expect(now % H).toBe(0)
-      expect(weekPosition(now)).toBeLessThanOrEqual(4 * 86_400 + 20 * H)
-    }
+  it("asks for every month a span touches, across New Year", () => {
+    expect(monthsBetween(Date.UTC(2020, 10, 20) / 1000, Date.UTC(2021, 1, 3) / 1000)).toEqual(["2020-11", "2020-12", "2021-01", "2021-02"])
+    expect(monthsBetween(Date.UTC(2021, 6, 1) / 1000, Date.UTC(2021, 6, 31) / 1000)).toEqual(["2021-07"])
   })
 })
 

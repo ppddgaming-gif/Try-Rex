@@ -22,8 +22,15 @@ export const sideStyle = (side: Side) =>
     "--btn-fg": "var(--primary-foreground)",
   }) as React.CSSProperties
 
-/** Where an order would go in: the pair, the price it fills at, and how much chart is left. */
-export type Market = { pair: string; price: number; candlesLeft: number }
+/**
+ * Where an order would go in: the pair, the price it fills at, and how much
+ * chart is left. On the live chart `price` is the bid and `ask` the BUY fill:
+ * the spread is in the price, not a separate cost.
+ */
+export type Market = { pair: string; price: number; candlesLeft: number; ask?: number }
+
+/** The price a `side` order fills at. */
+export const entryFor = (market: Market, side: Side) => (side === "buy" && market.ask !== undefined ? market.ask : market.price)
 
 /** The plan and its numbers, before every trade. Same functions the server books with. */
 export function quoteFor(view: DemoView, market: Market, side: Side, draft: Draft, requireSlTp = false) {
@@ -32,7 +39,8 @@ export function quoteFor(view: DemoView, market: Market, side: Side, draft: Draf
     pair: market.pair,
     side,
     lot: draft.lot,
-    entry: market.price,
+    entry: entryFor(market, side),
+    spreadInPrice: market.ask !== undefined,
     slPips: draft.slPips,
     tpPips: draft.tpPips,
     balance: f.balance,
@@ -77,7 +85,7 @@ export function OrderPanel({
   busy: boolean
 }) {
   const pair = market.pair
-  const entry = market.price
+  const entry = entryFor(market, side)
   const { quote, problems } = quoteFor(view, market, side, draft, requireSlTp)
   const fixedLot = view.stage.fixedLot
   const optional = !requireSlTp && !view.stage.slTpRequired
@@ -97,7 +105,7 @@ export function OrderPanel({
             {t("title", { pair })}
           </h2>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            {t.rich("entryAt", { price: fmtPrice(pair, entry), mono: (c) => <span className="font-mono">{c}</span> })}
+            {t.rich(market.ask !== undefined ? "entryAtLive" : "entryAt", { price: fmtPrice(pair, entry), mono: (c) => <span className="font-mono">{c}</span> })}
           </p>
         </div>
         <button
@@ -231,7 +239,11 @@ export function OrderPanel({
         />
         <Row term={t("rr")} value={quote.rewardRisk === null ? "—" : `1 : ${quote.rewardRisk.toFixed(2)}`} />
         <Divider />
-        <Row term={t("spread", { pips: quote.costs.spreadPips })} value={usd(quote.costs.spread)} muted />
+        {market.ask !== undefined ? (
+          <Row term={t("spreadInPrice", { pips: quote.costs.spreadPips })} value="—" muted />
+        ) : (
+          <Row term={t("spread", { pips: quote.costs.spreadPips })} value={usd(quote.costs.spread)} muted />
+        )}
         <Row term={t("commission")} value={usd(quote.costs.commission)} muted />
         <Row term={t("swap")} value={usd(quote.swapPerNight)} muted />
         {quote.approximate && (

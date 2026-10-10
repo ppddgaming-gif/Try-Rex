@@ -21,6 +21,8 @@ export type JournalRow = {
   /** Unix seconds of the entry and exit candles; null if the data no longer has the chart. */
   entryTime: number | null
   exitTime: number | null
+  /** The times are real (a live-chart trade, shown in WIB), not the data's (a replay trade, UTC). */
+  realTime: boolean
   entry: number
   exit: number
   exitReason: ExitReason
@@ -60,6 +62,7 @@ export function journalRow(t: TradeRow, times: { entry: number | null; exit: num
     stage: t.stage,
     entryTime: times.entry,
     exitTime: times.exit,
+    realTime: t.sessionId === null,
     entry: t.entryPrice,
     exit: t.exitPrice,
     exitReason: t.exitReason,

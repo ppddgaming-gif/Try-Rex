@@ -76,10 +76,16 @@ export function quoteOrder(input: {
   tpPips: number | null
   balance: number
   freeMargin: number
+  /**
+   * The live chart fills BUY at the ask (bid + spread) and closes SELL on the
+   * ask, so the spread is already in the prices: no separate spread cost.
+   */
+  spreadInPrice?: boolean
 }): OrderQuote {
   const { pair, side, entry, balance } = input
   const lot = normalizeLot(input.lot)
-  const costs = openingCosts(pair, lot, entry)
+  const opening = openingCosts(pair, lot, entry)
+  const costs = input.spreadInPrice ? { ...opening, spread: 0, total: opening.commission } : opening
   const margin = marginFor(pair, lot, entry)
   const sl = input.slPips === null ? null : levelPrice(pair, side, entry, "sl", input.slPips)
   const tp = input.tpPips === null ? null : levelPrice(pair, side, entry, "tp", input.tpPips)

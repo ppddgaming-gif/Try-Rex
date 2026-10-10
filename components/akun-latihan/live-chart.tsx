@@ -13,6 +13,9 @@ import { dayTimeLabel, indexToTime, timeToIndex } from "@/lib/live/time"
 /** A candle as the browser has it: `t` in seconds relative to now. */
 export type ChartCandle = { t: number; o: number; h: number; l: number; c: number }
 
+/** A level of the open position, drawn across the plot with its price on the axis. */
+export type ChartLevel = { kind: "entry" | "sl" | "tp"; price: number; label: string }
+
 /** "select" or a drawing kind; positions come as buy and sell. */
 export type Tool = "select" | Exclude<DrawingKind, "position"> | "position-buy" | "position-sell"
 
@@ -21,7 +24,10 @@ type Props = {
   digits: number
   step: number
   nowWeek: number
+  /** Closed candles, then the forming one last (its close is the current price). */
   candles: ChartCandle[]
+  /** The open position's entry, SL and TP; placed with the candles' own scale. */
+  levels?: ChartLevel[]
   drawings: Drawing[]
   tool: Tool
   selected: string | null
@@ -50,7 +56,7 @@ const newId = () => `d${Date.now().toString(36)}${(uid++).toString(36)}`
  * and every drawing. Drawings are (time, price), so they stay put when the
  * timeframe changes. They are a thinking aid: nothing here scores or advises.
  */
-export function LiveChart({ pair, digits, step, nowWeek, candles, drawings, tool, selected, onSelect, onCommit, onToolDone }: Props) {
+export function LiveChart({ pair, digits, step, nowWeek, candles, levels = [], drawings, tool, selected, onSelect, onCommit, onToolDone }: Props) {
   const t = useTranslations("demo.ui.desk")
   const locale = useLocale() as Locale
   const box = useRef<HTMLDivElement>(null)
@@ -77,7 +83,7 @@ export function LiveChart({ pair, digits, step, nowWeek, candles, drawings, tool
   }, [])
 
   const times = useMemo(() => candles.map((c) => c.t), [candles])
-  const frame = useMemo(() => frameOf(candles), [candles])
+  const frame = useMemo(() => frameOf(candles, levels.map((l) => l.price)), [candles, levels])
   const count = candles.length + CHART.RIGHT_SLOTS
   const scale: Scale = makeScale(size.w || 1, size.h || 1, count, frame.min, frame.max)
   const pip = instrument(pair).pipSize
@@ -370,6 +376,31 @@ export function LiveChart({ pair, digits, step, nowWeek, candles, drawings, tool
                 <rect x={0} y={0} width={scale.plotW} height={size.h - PAD.bottom} />
               </clipPath>
             </defs>
+
+            {/* The open position: entry, SL and TP across the plot, prices on the axis. */}
+            {levels.map((l) => {
+              const y = scale.priceToY(l.price)
+              return (
+                <g key={`level-${l.kind}`} pointerEvents="none">
+                  <line
+                    x1={0}
+                    x2={scale.plotW}
+                    y1={y}
+                    y2={y}
+                    stroke={l.kind === "entry" ? "var(--foreground)" : "var(--primary)"}
+                    strokeWidth={1.5}
+                    strokeDasharray={l.kind === "sl" ? "5 4" : l.kind === "entry" ? "2 3" : undefined}
+                  />
+                  <text x={6} y={y - 5} fontSize={11} fontWeight={700} fill="var(--foreground)" fontFamily="var(--font-mono)">
+                    {l.label}
+                  </text>
+                  <rect x={scale.plotW} y={y - 9} width={PAD.right} height={18} fill={l.kind === "entry" ? "var(--foreground)" : "var(--primary)"} />
+                  <text x={scale.plotW + 6} y={y + 4} fontSize={11} fill={l.kind === "entry" ? "var(--background)" : "var(--primary-foreground)"} fontFamily="var(--font-mono)">
+                    {l.price.toFixed(digits)}
+                  </text>
+                </g>
+              )
+            })}
 
             {/* Horizontal lines' prices, on the axis (outside the plot's clip). */}
             {shown.map(

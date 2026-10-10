@@ -1,5 +1,5 @@
 // The stored candle chunks (scripts/build-live-data.mjs writes them to the
-// `live-data` bucket) and the slice a chart receives. Pure: the server-only
+// `live-data` bucket): M15 only, one per pair and month. Pure: the server-only
 // loader (lib/live/store.ts) fetches and gunzips, these functions only shape.
 
 /** One candle, absolute unix seconds (server side only). */
@@ -19,10 +19,8 @@ export type RawChunk = {
 
 export type Manifest = {
   version: number
-  pairs: Record<
-    string,
-    { digits: number; timeframes: Record<string, { seconds: number; first: number; last: number; bars: number; years: number[] }> }
-  >
+  /** Per pair: M15 only, one chunk per calendar month ("2019-03"). */
+  pairs: Record<string, { digits: number; first: number; last: number; bars: number; months: string[] }>
 }
 
 export function decodeChunk(raw: RawChunk): LiveBar[] {
@@ -47,35 +45,14 @@ export function closedBefore(bars: readonly LiveBar[], now: number, step: number
   return bars.slice(Math.max(0, end - count), end)
 }
 
-/** Calendar years whose chunks a slice ending at `now` can need, newest first. */
-export function yearsFor(now: number, step: number, count: number) {
-  const from = new Date((now - step * count * 3) * 1000).getUTCFullYear()
-  const to = new Date(now * 1000).getUTCFullYear()
-  const years: number[] = []
-  for (let y = to; y >= from; y--) years.push(y)
-  return years
-}
-
-/**
- * The "now" an account sees until the live engine runs a real clock: a fixed
- * moment picked from `seed` (0..1) inside the span every pair and timeframe
- * covers, leaving `history` seconds before it. Rounded to the hour, and moved
- * off the weekend to the previous Friday 20:00.
- */
-export function provisionalNow(manifest: Manifest, seed: number, history: number) {
-  let first = -Infinity
-  let last = Infinity
-  for (const p of Object.values(manifest.pairs)) {
-    for (const tf of Object.values(p.timeframes)) {
-      first = Math.max(first, tf.first)
-      last = Math.min(last, tf.last)
-    }
+/** Calendar months ("2019-03") from `from` to `to` (unix seconds), oldest first. */
+export function monthsBetween(from: number, to: number) {
+  const out: string[] = []
+  const d = new Date(Date.UTC(new Date(from * 1000).getUTCFullYear(), new Date(from * 1000).getUTCMonth(), 1))
+  const last = new Date(to * 1000)
+  while (d.getUTCFullYear() < last.getUTCFullYear() || (d.getUTCFullYear() === last.getUTCFullYear() && d.getUTCMonth() <= last.getUTCMonth())) {
+    out.push(d.toISOString().slice(0, 7))
+    d.setUTCMonth(d.getUTCMonth() + 1)
   }
-  const lo = first + history
-  if (!(last > lo)) throw new Error("Live data too short for the chart's history")
-  let now = Math.floor((lo + (last - lo) * Math.min(Math.max(seed, 0), 0.999999)) / 3600) * 3600
-  const pos = (((now + 3 * 86_400) % (7 * 86_400)) + 7 * 86_400) % (7 * 86_400)
-  const friday20 = 4 * 86_400 + 20 * 3600
-  if (pos >= friday20) now -= pos - friday20
-  return now
+  return out
 }

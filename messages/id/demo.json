@@ -67,7 +67,12 @@
     "badModify": "Format perubahan tidak valid.",
     "badNote": "Format catatan tidak valid.",
     "badOrder": "Format order tidak valid.",
-    "badReview": "Format jawaban tidak valid."
+    "badReview": "Format jawaban tidak valid.",
+    "marketClosed": "Pasar sedang tutup. Order bisa dibuka lagi saat pasar buka.",
+    "pairNotQuoted": "Biaya trading untuk {pair} belum diatur, jadi order di pair ini belum bisa dibuka.",
+    "onePosition": "Hanya satu posisi boleh terbuka. Tutup posisi yang ada dulu.",
+    "slTpRequiredLive": "SL dan TP wajib ada selama posisi terbuka; geser saja, jangan dihapus.",
+    "liveNotReady": "Mesin chart live belum siap. Coba lagi sebentar lagi."
   },
   "problems": {
     "pairClosed": "{pair} belum terbuka di Stage {stage}.",
@@ -360,7 +365,8 @@
       "saveNote": "Simpan catatan",
       "cancel": "Batal",
       "editNote": "Ubah catatan",
-      "addNote": "Tambah catatan"
+      "addNote": "Tambah catatan",
+      "wib": "{time} WIB"
     },
     "review": {
       "ya": "Ya",
@@ -372,7 +378,8 @@
       "tp": "TP kena",
       "manual": "Ditutup manual",
       "stop_out": "Stop out",
-      "segment_end": "Segmen habis"
+      "segment_end": "Segmen habis",
+      "market_close": "Ditutup otomatis (pasar tutup)"
     },
     "checksList": {
       "pass": "Lolos",
@@ -434,7 +441,9 @@
       "warnNoTp": "Tanpa TP, reward:risk tidak bisa diperiksa.",
       "warnLowRR": "Target baru {rr}× risiko. Disiplin meminta minimal {min}×.",
       "warnRevenge": "Kamu rugi {ago} candle lalu dengan lot {lot}. Lot lebih besar dalam {window} candle setelah rugi dihitung revenge trade.",
-      "warnFewCandles": "Hanya {n} candle tersisa di chart ini (kurang dari {min}). Trade yang masih terbuka ditutup saat segmen habis."
+      "warnFewCandles": "Hanya {n} candle tersisa di chart ini (kurang dari {min}). Trade yang masih terbuka ditutup saat segmen habis.",
+      "spreadInPrice": "Spread {pips} pip (sudah di harga)",
+      "entryAtLive": "Harga sekarang <mono>{price}</mono> (BUY di ask, SELL di bid). Harga final ditentukan server saat order diterima."
     },
     "result": {
       "exitSlGap": "Harga membuka candle melewati stop loss, jadi terisi di open candle itu: {price}.",
@@ -558,8 +567,32 @@
       "posRr": "RR 1 : {rr}",
       "orderLabel": "Order",
       "noWait": "Menunggu berarti tidak menekan tombol. SL dan TP wajib sebelum posisi dibuka; risiko maksimal {risk}% saldo.",
-      "engineSoon": "Membuka posisi aktif saat mesin live selesai (tahap berikutnya). Kalkulatornya sudah bisa dipakai.",
-      "costsMissing": "Biaya trading untuk {pair} belum diatur, jadi kalkulator order belum bisa menghitungnya."
+      "costsMissing": "Biaya trading untuk {pair} belum diatur, jadi kalkulator order belum bisa menghitungnya.",
+      "bustTitle": "Akun #{n} habis",
+      "bustBody": "Saldo {balance} di bawah batas akun habis Stage {stage} ({line}) dan tidak ada trade terbuka. Tidak ada tombol tambah saldo: Rex sudah menyiapkan review akunmu.",
+      "seeReview": "Lihat review Rex",
+      "graduatedTitle": "Kamu lulus Akun Demo!",
+      "graduatedBody": "Disiplinmu konsisten di Stage {n}. Latihan tetap terbuka.",
+      "summary": "Lihat ringkasan",
+      "stageUpTitle": "Stage {n} terbuka!",
+      "stageUpBody": "Aturan baru berlaku untuk trade berikutnya. Lihat kartu Stage.",
+      "marketOpen": "Pasar buka",
+      "marketClosed": "Pasar tutup",
+      "opensIn": "Buka lagi dalam {time}",
+      "closesIn": "Candle 15 menit tutup dalam {time}",
+      "bidAsk": "Bid {bid} · Ask {ask}",
+      "liveNote": "Chart berjalan mengikuti jam nyata, Senin sampai Jumat. Posisimu tetap dicek walau kamu offline.",
+      "rulesNote": "Satu posisi terbuka. Kalau SL dan TP tersentuh di candle 15 menit yang sama, SL dihitung kena lebih dulu. Posisi yang masih terbuka ditutup otomatis di harga terakhir sebelum pasar tutup.",
+      "positionOn": "Posisimu terbuka di {pair}.",
+      "showPair": "Buka chart {pair}",
+      "closeFirst": "Tutup posisi yang ada dulu untuk membuka yang baru.",
+      "closedWhileAway": "Trade #{number} ditutup: {reason}.",
+      "levelEntry": "Entry",
+      "dur": {
+        "days": "{d} hari {h} jam",
+        "hours": "{h} jam {m} menit",
+        "minutes": "{m} menit"
+      }
     },
     "video": {
       "eyebrow": "Tutorial",

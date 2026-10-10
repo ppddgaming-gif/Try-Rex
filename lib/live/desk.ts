@@ -1,32 +1,23 @@
 import "server-only"
+import { dataTime } from "@/lib/live/clock"
 import { DEFAULT_PAIR, DEFAULT_TIMEFRAME, isLivePair, isTimeframe, type LivePair, type Timeframe } from "@/lib/live/config"
 import { parseDrawings, shiftDrawing, type Drawing } from "@/lib/live/drawings"
-import { accountNow, chartSlice, type ChartSlice } from "@/lib/live/store"
+import type { Synced } from "@/lib/live/engine"
+import { chartSlice, type ChartSlice } from "@/lib/live/store"
 import { createAdminClient } from "@/lib/supabase/admin"
 
 // The trading screen's own state, server side: the chart the player last had
-// open, their drawings, and the candles. Drawings are stored with absolute
-// times in demo_drawings (no RLS policy: the browser can't read it) and sent
-// with times relative to the account's "now". Writes use the service role,
-// always scoped to the player's own active account.
+// open, their drawings, and the candles up to the account's "now". Drawings
+// are stored with absolute data times in demo_drawings (no RLS policy: the
+// browser can't read it) and sent with times relative to "now". Writes use
+// the service role, always scoped to the player's own active account.
 
 export type Desk = {
   pair: LivePair
   timeframe: Timeframe
   chart: ChartSlice | null
-  /** Relative times, like the candles. */
-  drawings: Drawing[]
-}
-
-/** The player's active account id, or null. */
-async function activeAccount(userId: string) {
-  const { data } = await createAdminClient()
-    .from("demo_accounts")
-    .select("id, last_pair, last_timeframe")
-    .eq("user_id", userId)
-    .eq("status", "active")
-    .maybeSingle()
-  return data as { id: string; last_pair: string | null; last_timeframe: string | null } | null
+  /** Relative times, like the candles; null when not asked for (a poll). */
+  drawings: Drawing[] | null
 }
 
 async function drawingsFor(accountId: string, pair: LivePair, now: number): Promise<Drawing[]> {
@@ -43,29 +34,47 @@ async function drawingsFor(accountId: string, pair: LivePair, now: number): Prom
  * The chart to show. `pair` / `timeframe` from the request win; otherwise the
  * account's last ones; otherwise the defaults. A requested chart is remembered.
  */
-export async function loadDesk(userId: string, pair?: unknown, timeframe?: unknown): Promise<Desk | null> {
-  const account = await activeAccount(userId)
-  if (!account) return null
-  const p = isLivePair(pair) ? pair : isLivePair(account.last_pair) ? account.last_pair : DEFAULT_PAIR
-  const tf = isTimeframe(timeframe) ? timeframe : isTimeframe(account.last_timeframe) ? account.last_timeframe : DEFAULT_TIMEFRAME
-  const now = await accountNow(account.id)
-  const [chart, drawings] = await Promise.all([chartSlice(now, p, tf), drawingsFor(account.id, p, now)])
-  if (p !== account.last_pair || tf !== account.last_timeframe) {
-    await createAdminClient().from("demo_accounts").update({ last_pair: p, last_timeframe: tf }).eq("id", account.id)
+export async function loadDesk(
+  userId: string,
+  synced: Synced,
+  options: { pair?: unknown; timeframe?: unknown; drawings: boolean },
+): Promise<Desk> {
+  const admin = createAdminClient()
+  const { data: account } = await admin
+    .from("demo_accounts")
+    .select("last_pair, last_timeframe")
+    .eq("id", synced.state.account.id)
+    .eq("user_id", userId)
+    .maybeSingle()
+  const last = account as { last_pair: string | null; last_timeframe: string | null } | null
+  const p = isLivePair(options.pair) ? options.pair : isLivePair(last?.last_pair) ? last.last_pair : DEFAULT_PAIR
+  const tf = isTimeframe(options.timeframe) ? options.timeframe : isTimeframe(last?.last_timeframe) ? last.last_timeframe : DEFAULT_TIMEFRAME
+  const now = dataTime(synced.real, synced.clock.offsetWeeks)
+  const [chart, drawings] = await Promise.all([
+    chartSlice(now, synced.real, p, tf),
+    options.drawings ? drawingsFor(synced.state.account.id, p, now) : null,
+  ])
+  if (last && (p !== last.last_pair || tf !== last.last_timeframe)) {
+    await admin.from("demo_accounts").update({ last_pair: p, last_timeframe: tf }).eq("id", synced.state.account.id)
   }
   return { pair: p, timeframe: tf, chart, drawings }
 }
 
-/** Replaces the drawings of one pair. `drawings` arrive with relative times. */
-export async function saveDrawings(userId: string, pair: LivePair, drawings: unknown) {
-  const account = await activeAccount(userId)
-  if (!account) return { ok: false as const, status: 404 }
-  const now = await accountNow(account.id)
-  const absolute = parseDrawings(drawings).map((d) => shiftDrawing(d, now))
+/** How far a drawing's anchor may be from now: a tab left open over a weekend still saves. */
+const MAX_ANCHOR_AGE = 4 * 86_400
+
+/**
+ * Replaces the drawings of one pair. `drawings` arrive with times relative to
+ * `anchor`, the real time of the chart they were drawn on.
+ */
+export async function saveDrawings(userId: string, synced: Synced, pair: LivePair, drawings: unknown, anchor: unknown) {
+  const at = typeof anchor === "number" && Number.isFinite(anchor) && Math.abs(anchor - synced.real) <= MAX_ANCHOR_AGE ? Math.floor(anchor) : synced.real
+  const base = dataTime(at, synced.clock.offsetWeeks)
+  const absolute = parseDrawings(drawings).map((d) => shiftDrawing(d, base))
   const { error } = await createAdminClient()
     .from("demo_drawings")
     .upsert(
-      { account_id: account.id, user_id: userId, pair, drawings: absolute, updated_at: new Date().toISOString() },
+      { account_id: synced.state.account.id, user_id: userId, pair, drawings: absolute, updated_at: new Date().toISOString() },
       { onConflict: "account_id,pair" },
     )
   return error ? { ok: false as const, status: 500 } : { ok: true as const }

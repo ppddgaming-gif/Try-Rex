@@ -168,10 +168,18 @@ function guided(state: TradingState) {
   return state.open.length === 1 || (state.sessionClosed.length === 1 && state.sessionClosed[0].review === null)
 }
 
-export function buildView(state: TradingState, events: DemoEvent[] = []): DemoView {
+/**
+ * The live chart's inputs to the view: the price the open position closes on
+ * now (null with none open), the real M15 clock, and its revenge window.
+ */
+export type LiveViewInput = { price: number | null; clock: number; revengeWindow: number; maxOpenTrades: number }
+
+export function buildView(state: TradingState, events: DemoEvent[] = [], live?: LiveViewInput): DemoView {
   const { account, session, segment } = state
   const current = session ? state.segmentCandles[session.cursor] : undefined
-  const price = current ? current.c : null
+  const price = live ? live.price : current ? current.c : null
+  const clock = live ? live.clock : account.candlesPlayed
+  const window = live ? live.revengeWindow : DISIPLIN.REVENGE_WINDOW_CANDLES
   const open = state.open.map(toOpenTrade)
   const figures = price === null ? accountFigures(account.balance, []) : figuresAt(account.balance, open, price)
 
@@ -181,10 +189,7 @@ export function buildView(state: TradingState, events: DemoEvent[] = []): DemoVi
   const stageCfg = STAGES[state.stage]
 
   const windowLosses = mine.filter(
-    (h) =>
-      h.net + h.swap < 0 &&
-      account.candlesPlayed >= h.closedClock &&
-      account.candlesPlayed - h.closedClock <= DISIPLIN.REVENGE_WINDOW_CANDLES,
+    (h) => h.net + h.swap < 0 && clock >= h.closedClock && clock - h.closedClock <= window,
   )
 
   return {
@@ -200,8 +205,8 @@ export function buildView(state: TradingState, events: DemoEvent[] = []): DemoVi
       current: state.stage,
       pairs: [...stageCfg.pairs],
       fixedLot: stageCfg.fixedLot,
-      maxOpenTrades: stageCfg.maxOpenTrades,
-      slTpRequired: stageCfg.slTpRequired,
+      maxOpenTrades: live ? Math.min(live.maxOpenTrades, stageCfg.maxOpenTrades) : stageCfg.maxOpenTrades,
+      slTpRequired: live ? true : stageCfg.slTpRequired,
       progress,
     },
     session:
@@ -224,7 +229,7 @@ export function buildView(state: TradingState, events: DemoEvent[] = []): DemoVi
         ? null
         : {
             lot: Math.min(...windowLosses.map((h) => h.lot)),
-            candlesAgo: account.candlesPlayed - Math.max(...windowLosses.map((h) => h.closedClock)),
+            candlesAgo: clock - Math.max(...windowLosses.map((h) => h.closedClock)),
           },
     lines: state.lines,
     tipsSeen: state.tipsSeen,
