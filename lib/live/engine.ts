@@ -1,6 +1,7 @@
 import "server-only"
 import { settle, type SettlePlan } from "@/lib/demo/actions"
 import type { OrderInput } from "@/lib/demo/orders"
+import { closeAt } from "@/lib/demo/fills"
 import { toOpenTrade, type TradingState } from "@/lib/demo/state"
 import { TRADE_COLUMNS, loadTrading, toTradeRow, type Row } from "@/lib/demo/trading"
 import { buildView, type DemoEvent, type DemoView } from "@/lib/demo/view"
@@ -86,10 +87,52 @@ async function marketAt(pair: string, clock: LiveClock, real: number) {
 
 type Loaded = { state: TradingState; lessonPassed: boolean }
 
+/**
+ * A trade still open from the replay engine (before the live chart) closes
+ * where its replay chart stands, as "segmen habis", through the replay's own
+ * database function. Its times are replay candles, so the live replay must
+ * never see it. Returns true when it booked something.
+ */
+async function closeReplayLeftovers(userId: string, state: TradingState): Promise<boolean> {
+  const left = state.open.filter((t) => t.sessionId !== null)
+  if (left.length === 0) return false
+  const s = state.session
+  const bar = s ? state.segmentCandles[s.cursor] : undefined
+  if (!s || !bar) {
+    console.error("Akun Latihan: replay trade open without its chart", left.map((t) => t.id))
+    return false
+  }
+  const mine = left.filter((t) => t.sessionId === s.id)
+  const plan = settle(
+    state,
+    mine.map((t) => closeAt(toOpenTrade(t), bar.c, "segment_end")),
+    state.open.filter((t) => !mine.includes(t)).map(toOpenTrade),
+    { advance: false, clock: state.account.candlesPlayed, index: s.cursor, endSession: true, stopOut: null },
+  )
+  const { error } = await createAdminClient().rpc("demo_settle", {
+    p_user: userId,
+    p_account: state.account.id,
+    p_version: state.account.version,
+    p_session: s.id,
+    p_advance: false,
+    p_updates: plan.updates,
+    p_ledger: plan.ledger,
+    p_balance: plan.balance,
+    p_end_session: mine.length === left.length,
+    p_stage: plan.stage,
+  })
+  if (error && !error.message.includes("demo_stale")) throw new Error(`Akun Latihan: could not close replay trades: ${error.message}`)
+  return true
+}
+
 /** The trading state for the live chart: the account's own closed live trades, no replay session. */
 async function loadLiveState(userId: string): Promise<Loaded | null> {
-  const loaded = await loadTrading(userId)
+  let loaded = await loadTrading(userId)
   if (!loaded) return null
+  if (await closeReplayLeftovers(userId, loaded.state)) {
+    loaded = await loadTrading(userId)
+    if (!loaded) return null
+  }
   const supabase = await createClient()
   const recent = await supabase
     .from("demo_trades")
@@ -107,6 +150,8 @@ async function loadLiveState(userId: string): Promise<Loaded | null> {
       session: null,
       segment: null,
       segmentCandles: [],
+      // Only live trades: a replay leftover that couldn't be closed stays out of the live replay.
+      open: loaded.state.open.filter((t) => t.sessionId === null),
       sessionClosed: ((recent.data ?? []) as unknown as Row[]).map(toTradeRow).reverse(),
     },
   }
