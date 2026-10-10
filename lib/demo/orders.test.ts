@@ -116,3 +116,13 @@ describe("orderProblems", () => {
     expect(problems(input as Partial<OrderInput>, over as Partial<typeof ctx>)).toEqual(fields)
   })
 })
+
+describe("GBPNZD", () => {
+  it("is quoted with the approved spread and the approximate NZD rate", () => {
+    const q = quoteOrder({ pair: "GBPNZD", side: "buy", lot: 0.01, entry: 2.0, slPips: 30, tpPips: 45, balance: 200, freeMargin: 200 })
+    expect(q.costs.spreadPips).toBe(3.5)
+    expect(q.approximate).toBe(true)
+    // 1 pip on 0.01 lot = 0.0001 × 1,000 NZD × 0.70 USD.
+    expect(q.pipValue).toBe(0.07)
+  })
+})

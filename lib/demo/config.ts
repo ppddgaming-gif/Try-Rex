@@ -39,6 +39,8 @@ export const COSTS = {
     EURJPY: 2.0,
     EURAUD: 2.5,
     GBPCAD: 3.0,
+    // GBPNZD: an estimate the owner approved (crosses with NZD usually trade wider than GBPCAD).
+    GBPNZD: 3.5,
   } as Record<string, number>,
   /** Per 1.00 lot, per trade. */
   COMMISSION_PER_LOT: 0,
@@ -197,6 +199,8 @@ export const APPROX_USD_RATE: Record<string, number> = {
   AUD: 0.9,
   CAD: 0.97,
   JPY: 1 / 85,
+  // The median of GBPUSD ÷ GBPNZD over the live data's H4 closes (0.6988), rounded.
+  NZD: 0.7,
 }
 
 // The screen line every Akun Latihan page carries: demo.disclaimer in the
