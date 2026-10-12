@@ -12,9 +12,9 @@
       "title": "Risk Management",
       "description": "How to last long enough to learn: stop losses, risk ratios and leverage."
     },
-    "crypto": {
-      "title": "Crypto 101",
-      "description": "Blockchain, Bitcoin, stablecoins, and how to keep your digital assets yours."
+    "forex": {
+      "title": "Forex 101",
+      "description": "The currency market up close: pairs, pips, lots, spreads, market sessions, margin, and the news that moves prices."
     },
     "psikologi": {
       "title": "Trading Psychology",
@@ -28,7 +28,7 @@
     },
     "pasar-dan-instrumen": {
       "title": "Markets and instruments",
-      "summary": "Forex, stocks, commodities and crypto: what gets traded and how to read a pair."
+      "summary": "Forex, stocks and commodities: what gets traded and how to read a pair."
     },
     "buy-sell-wait": {
       "title": "BUY, SELL and WAIT",
@@ -62,17 +62,37 @@
       "title": "Leverage: a double-edged sword",
       "summary": "Leverage grows profits and losses by the same multiple. Understand it before it tempts you."
     },
-    "apa-itu-crypto": {
-      "title": "What are crypto and blockchain?",
-      "summary": "Digital money with no central bank, recorded on a ledger copied across many computers."
+    "apa-itu-forex": {
+      "title": "What is forex?",
+      "summary": "The market where currencies are exchanged, and how to read a pair."
     },
-    "bitcoin-altcoin-stablecoin": {
-      "title": "Bitcoin, altcoins and stablecoins",
-      "summary": "Not all crypto is the same. Get to know the three big groups and the risks of each."
+    "major-minor-cross": {
+      "title": "Majors, crosses and exotics",
+      "summary": "Three groups of pairs and why each one feels different."
     },
-    "keamanan-crypto": {
-      "title": "Security: wallets and exchanges",
-      "summary": "Whoever holds the keys holds the assets. How to avoid the most common scams."
+    "pip-lot-nilai-pip": {
+      "title": "Pips, lots and pip value",
+      "summary": "The unit of price movement, position size, and what one pip is worth."
+    },
+    "bid-ask-spread-swap": {
+      "title": "Bid, ask, spread and swap",
+      "summary": "Two prices on every pair, the cost of getting in, and the cost of holding overnight."
+    },
+    "jenis-order": {
+      "title": "Order types",
+      "summary": "Market, limit and stop: when an order runs."
+    },
+    "sesi-pasar-forex": {
+      "title": "Forex market sessions",
+      "summary": "Sydney, Tokyo, London and New York in WIB hours, and why weekends are closed."
+    },
+    "margin-dan-margin-call": {
+      "title": "Margin and margin calls",
+      "summary": "The deposit, the margin level, and when positions are closed for you."
+    },
+    "berita-dan-fundamental": {
+      "title": "News and fundamentals",
+      "summary": "Interest rates, inflation and the economic calendar: why prices can jump."
     },
     "fomo-overtrading": {
       "title": "FOMO and overtrading",
@@ -95,7 +115,7 @@
     "title": "Learn 101",
     "eyebrow": "Learn 101",
     "heading": "All the trading basics, in one place.",
-    "body": "From reading a candle to keeping your crypto safe. Short lessons, examples from real charts, and one question at the end of each chapter.",
+    "body": "From reading a candle to the ins and outs of the forex market. Short lessons, examples from real charts, and one question at the end of each chapter.",
     "kamus": "Trading Glossary",
     "kamusBody": "<num>{n}</num> terms, each explained in a sentence or two. The same terms can be tapped in the Trading Game.",
     "chapter": "Chapter {n}",
@@ -178,6 +198,14 @@
     "capitalValue": "Rp1 million",
     "size": "Position size",
     "sizeValue": "Rp100 million",
-    "against": "1% against you = −Rp1 million"
+    "against": "1% against you = −Rp1 million",
+    "pairTitle": "One rate, two prices",
+    "base": "base",
+    "quote": "quote",
+    "bidLabel": "Bid · sell price",
+    "askLabel": "Ask · buy price",
+    "spreadLabel": "Spread 1 pip",
+    "sessionsTitle": "Forex market sessions in WIB hours (approximate)",
+    "overlap": "London and New York overlap"
   }
 }

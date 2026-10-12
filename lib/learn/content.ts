@@ -1,4 +1,5 @@
 import type { Locale } from "@/lib/i18n/locale"
+import { FOREX_LESSONS } from "@/lib/learn/forex"
 import type { Lesson, Track } from "@/lib/learn/types"
 
 // Belajar 101: MOCK CONTENT. Track and lesson titles and summaries live in the
@@ -23,8 +24,17 @@ export const TRACKS: Track[] = [
     lessons: ["stop-loss-take-profit", "risk-reward", "leverage"],
   },
   {
-    id: "crypto",
-    lessons: ["apa-itu-crypto", "bitcoin-altcoin-stablecoin", "keamanan-crypto"],
+    id: "forex",
+    lessons: [
+      "apa-itu-forex",
+      "major-minor-cross",
+      "pip-lot-nilai-pip",
+      "bid-ask-spread-swap",
+      "jenis-order",
+      "sesi-pasar-forex",
+      "margin-dan-margin-call",
+      "berita-dan-fundamental",
+    ],
   },
   {
     id: "psikologi",
@@ -47,7 +57,7 @@ export const LESSONS: Lesson[] = [
     blocks: [
       {
         kind: "p",
-        text: "Trading adalah membeli dan menjual aset untuk mengambil untung dari perubahan harganya. Aset itu bisa mata uang, saham, komoditas, atau crypto.",
+        text: "Trading adalah membeli dan menjual aset untuk mengambil untung dari perubahan harganya. Aset itu bisa mata uang, saham, atau komoditas. Di TRY-REX yang dipelajari adalah forex: pasar mata uang.",
       },
       {
         kind: "p",
@@ -91,7 +101,7 @@ export const LESSONS: Lesson[] = [
     blocks: [
       {
         kind: "p",
-        text: "Setiap pasar punya karakter sendiri. Forex memperdagangkan mata uang berpasangan, saham adalah kepemilikan sebagian perusahaan, komoditas mencakup emas dan minyak, dan crypto adalah aset digital di atas blockchain.",
+        text: "Setiap pasar punya karakter sendiri. Forex memperdagangkan mata uang berpasangan, saham adalah kepemilikan sebagian perusahaan, dan komoditas mencakup emas dan minyak. TRY-REX berfokus pada forex; track Forex 101 membahasnya lebih dalam.",
       },
       { kind: "heading", text: "Membaca pair forex" },
       {
@@ -414,113 +424,8 @@ export const LESSONS: Lesson[] = [
     ],
   },
 
-  // -------------------------------------------------------------------------
-  // Crypto
-  {
-    slug: "apa-itu-crypto",
-    track: "crypto",
-    minutes: 6,
-    level: "pemula",
-    draft: true,
-    blocks: [
-      {
-        kind: "p",
-        text: "Crypto adalah aset digital yang transaksinya dicatat di blockchain: buku catatan bersama yang disalin di banyak komputer. Tidak ada satu bank atau pemerintah yang mengendalikan catatan itu.",
-      },
-      {
-        kind: "points",
-        title: "Cara kerja blockchain, disederhanakan",
-        items: [
-          "Transaksi dikumpulkan dalam blok.",
-          "Setiap blok menyimpan sidik jari (hash) blok sebelumnya, membentuk rantai.",
-          "Mengubah satu blok lama berarti mengubah semua blok sesudahnya di sebagian besar salinan, yang sangat sulit.",
-        ],
-      },
-      {
-        kind: "callout",
-        tone: "warning",
-        title: "Volatilitas tinggi",
-        text: "Harga crypto bisa bergerak jauh lebih besar dalam sehari dibanding pair forex utama. Prinsip manajemen risiko berlaku, bahkan lebih ketat.",
-      },
-      {
-        kind: "quiz",
-        question: "Apa yang membuat catatan blockchain sulit diubah diam-diam?",
-        options: [
-          "Disimpan di satu server bank",
-          "Setiap blok terhubung ke blok sebelumnya dan catatannya disalin di banyak komputer",
-          "Dilindungi password admin",
-        ],
-        answer: 1,
-        explain: "Rantai hash dan banyaknya salinan membuat perubahan diam-diam hampir mustahil.",
-      },
-    ],
-    sources: [
-      needed("Whitepaper Bitcoin (Satoshi Nakamoto, 2008) sebagai sumber primer."),
-      needed("Materi edukasi aset kripto dari regulator Indonesia, dengan tanggal akses."),
-    ],
-  },
-  {
-    slug: "bitcoin-altcoin-stablecoin",
-    track: "crypto",
-    minutes: 5,
-    level: "pemula",
-    draft: true,
-    blocks: [
-      {
-        kind: "points",
-        items: [
-          "Bitcoin: crypto pertama, dengan pasokan maksimum 21 juta koin dalam aturan jaringannya.",
-          "Altcoin: semua crypto selain Bitcoin. Sebagian punya kegunaan jelas, banyak yang tidak.",
-          "Stablecoin: dirancang mengikuti nilai aset lain, biasanya dolar AS. Stabilnya bergantung pada cadangan dan kepercayaan pada penerbitnya.",
-        ],
-      },
-      {
-        kind: "callout",
-        tone: "warning",
-        title: "Hati-hati dengan janji",
-        text: "Proyek yang menjanjikan keuntungan pasti atau “pasti naik” adalah tanda bahaya. Periksa apakah aset itu terdaftar di bursa resmi negaramu.",
-      },
-      {
-        kind: "quiz",
-        question: "Nilai stablecoin bergantung pada…",
-        options: ["Cadangan dan kepercayaan pada penerbitnya", "Jumlah penggunanya saja", "Harga Bitcoin"],
-        answer: 0,
-        explain: "Stablecoin mencoba mengikuti nilai aset acuan; stabilitasnya bergantung pada cadangan dan kredibilitas penerbit.",
-      },
-    ],
-    sources: [needed("Sumber resmi tentang pasokan Bitcoin dan risiko stablecoin (bank sentral atau regulator).")],
-  },
-  {
-    slug: "keamanan-crypto",
-    track: "crypto",
-    minutes: 5,
-    level: "pemula",
-    draft: true,
-    blocks: [
-      {
-        kind: "p",
-        text: "Wallet menyimpan kunci akses ke crypto-mu. Di exchange, kunci dipegang platform. Di wallet pribadi, kunci dipegang kamu lewat seed phrase.",
-      },
-      {
-        kind: "points",
-        title: "Aturan yang tidak bisa ditawar",
-        items: [
-          "Jangan pernah membagikan seed phrase, kepada siapa pun, termasuk yang mengaku admin.",
-          "Aktifkan verifikasi dua langkah di exchange.",
-          "Periksa alamat situs dan aplikasi; penipu sering meniru tampilan platform resmi.",
-          "Gunakan exchange yang terdaftar resmi di negaramu.",
-        ],
-      },
-      {
-        kind: "quiz",
-        question: "Seseorang mengaku support exchange dan meminta seed phrase untuk “verifikasi”. Kamu…",
-        options: ["Memberikannya supaya cepat selesai", "Menolak: support resmi tidak pernah meminta seed phrase", "Memberikan setengahnya saja"],
-        answer: 1,
-        explain: "Seed phrase memberi kendali penuh atas asetmu. Tidak ada alasan sah untuk membagikannya.",
-      },
-    ],
-    sources: [needed("Panduan keamanan aset kripto dari regulator atau lembaga keamanan siber, dengan tanggal akses.")],
-  },
+  // Forex 101 lives in lib/learn/forex.ts.
+  ...FOREX_LESSONS,
 
   // -------------------------------------------------------------------------
   // Psikologi

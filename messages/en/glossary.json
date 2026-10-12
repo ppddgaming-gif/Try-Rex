@@ -137,38 +137,6 @@
       "term": "Diversification",
       "short": "Spreading risk across several assets or ideas so one mistake doesn't take everything."
     },
-    "crypto": {
-      "term": "Crypto",
-      "short": "Digital assets recorded on a blockchain rather than issued by a central bank. Examples: Bitcoin and Ethereum."
-    },
-    "blockchain": {
-      "term": "Blockchain",
-      "short": "A transaction ledger copied across many computers at once, so it's hard to change quietly."
-    },
-    "bitcoin": {
-      "term": "Bitcoin",
-      "short": "The first crypto (2009), with a maximum supply of 21 million coins set in its network rules."
-    },
-    "altcoin": {
-      "term": "Altcoin",
-      "short": "Any crypto other than Bitcoin. Generally more volatile and riskier."
-    },
-    "stablecoin": {
-      "term": "Stablecoin",
-      "short": "A crypto designed to track the value of another asset, usually the US dollar. How stable it is depends on its issuer's reserves."
-    },
-    "wallet": {
-      "term": "Wallet",
-      "short": "Where you keep the keys to your crypto. Whoever holds the keys (the seed phrase) controls the assets."
-    },
-    "seed-phrase": {
-      "term": "Seed phrase",
-      "short": "A set of 12 or 24 words that restores a wallet. Never share it with anyone, including an “admin”."
-    },
-    "exchange": {
-      "term": "Exchange",
-      "short": "A platform for buying and selling crypto. Choose one that's officially registered in your country."
-    },
     "fomo": {
       "term": "FOMO",
       "short": "Fear of missing out: rushing in after price has already run a long way."
@@ -180,13 +148,74 @@
     "jurnal-trading": {
       "term": "Trading journal",
       "short": "A record of every decision: why you got in, what happened, and the lesson. The simplest way to stop repeating mistakes."
+    },
+    "base-currency": {
+      "term": "Base currency",
+      "short": "The first currency in a pair. The rate shows the price of one unit of it in the second currency."
+    },
+    "quote-currency": {
+      "term": "Quote currency",
+      "short": "The second currency in a pair: the unit of the price, and the currency profit or loss is counted in."
+    },
+    "major-pair": {
+      "term": "Major pair",
+      "short": "A pair holding the US dollar and one other major currency, such as EURUSD or USDJPY."
+    },
+    "cross-pair": {
+      "term": "Cross pair",
+      "short": "A pair of two major currencies without the US dollar, such as EURJPY or GBPCAD."
+    },
+    "lot": {
+      "term": "Lot",
+      "short": "Position size. 1 standard lot = 100,000 units of the base currency; 0.01 lot = 1,000 units.",
+      "example": "0.01 lot of EURUSD is worth about $0.10 per pip."
+    },
+    "pipette": {
+      "term": "Pipette",
+      "short": "A tenth of a pip: the last digit of a five-decimal rate (or three decimals for yen pairs)."
+    },
+    "bid": {
+      "term": "Bid",
+      "short": "The price you sell at. A BUY position closes at this price."
+    },
+    "ask": {
+      "term": "Ask",
+      "short": "The price you buy at. Always a little above the bid; the difference is the spread."
+    },
+    "swap": {
+      "term": "Swap",
+      "short": "A cost or credit for a position left open past the change of day."
+    },
+    "pending-order": {
+      "term": "Pending order",
+      "short": "An order that waits for price to reach a level: buy limit, sell limit, buy stop, sell stop."
+    },
+    "slippage": {
+      "term": "Slippage",
+      "short": "The difference between the price asked for and the price actually filled, common when price moves fast."
+    },
+    "sesi-pasar": {
+      "term": "Market session",
+      "short": "The hours when a financial centre (Sydney, Tokyo, London, New York) is actively trading."
+    },
+    "margin-call": {
+      "term": "Margin call",
+      "short": "A warning when the margin level falls to a set line: the deposit is almost not enough."
+    },
+    "stop-out": {
+      "term": "Stop out",
+      "short": "Positions closed for you when the margin level falls to the lowest line, so the balance cannot go negative."
+    },
+    "kalender-ekonomi": {
+      "term": "Economic calendar",
+      "short": "The schedule of economic data releases and central bank announcements that can move exchange rates."
     }
   },
   "categories": {
     "dasar": "Basics",
     "chart": "Reading charts",
     "risiko": "Risk management",
-    "crypto": "Crypto",
+    "forex": "Forex",
     "psikologi": "Psychology"
   },
   "seeMeaning": "{term}: see meaning",
