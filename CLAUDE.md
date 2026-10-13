@@ -292,7 +292,7 @@ All motion is CSS plus React's built-in `<ViewTransition>`, with no animation li
 
 ### Images
 
-`next.config.mjs` whitelists exactly one remote host for `next/image`: `hebbkx1anhila5yf.public.blob.vercel-storage.com` (Vercel Blob). Any new remote image domain must be added to `images.remotePatterns` or the build will reject it. There is no `public/` directory.
+`next.config.mjs` whitelists exactly one remote host for `next/image`: `hebbkx1anhila5yf.public.blob.vercel-storage.com` (Vercel Blob). Any new remote image domain must be added to `images.remotePatterns` or the build will reject it. `public/` holds only `maskot/`: Rex's illustrated expressions as 600×600 transparent WebP (`rexy-senang`, `rexy-sedih`, `rexy-marah`, `rexy-berpikir`, `rexy-pusing`, `rexy-lelah`, `rexy-menjelaskan`), served at `/maskot/<name>.webp`. They aren't wired into the UI yet; `components/rex-mascot.tsx` (SVG) is still what the app renders.
 
 <!-- BEGIN:nextjs-agent-rules -->
 
