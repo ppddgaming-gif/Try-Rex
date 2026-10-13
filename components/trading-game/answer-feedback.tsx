@@ -1,7 +1,7 @@
 import { CheckCircle2, Star, XCircle } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { GlossaryText } from "@/components/glossary/glossary-text"
-import { Rex } from "@/components/rex-mascot"
+import { RexArt } from "@/components/rex-mascot"
 
 /**
  * The verdict after an answer. Rex reacts (happy or grimacing) and the
@@ -30,7 +30,7 @@ export function AnswerFeedback({
       ].join(" ")}
     >
       <div className="flex items-start gap-3">
-        <Rex size={44} mood={correct ? "happy" : "grimace"} className="pop-in -ml-1 shrink-0" />
+        <RexArt size={56} mood={correct ? "happy" : "sad"} className="pop-in -ml-1 shrink-0" />
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-3">
             <p className={`flex items-center gap-2 text-sm font-bold ${correct ? "text-success" : "text-danger"}`}>

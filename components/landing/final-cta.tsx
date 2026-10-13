@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { ArrowUpRight } from "lucide-react"
 import { useTranslations } from "next-intl"
-import { Rex } from "@/components/rex-mascot"
+import { RexArt } from "@/components/rex-mascot"
 
 // Primary is always "play now"; the second button saves progress for guests
 // and goes back to the dashboard for players who already have an account.
@@ -19,7 +19,7 @@ export function FinalCta({ signedIn }: { signedIn: boolean }) {
         }}
       >
         <div className="relative mx-auto max-w-2xl">
-          <Rex size={60} mood="happy" className="float mx-auto" />
+          <RexArt size={80} mood="happy" className="float mx-auto" />
           <h2 className="mt-4 text-balance text-3xl font-extrabold tracking-tight sm:text-5xl">
             {t("title")}
           </h2>

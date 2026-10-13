@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl"
 import { Card } from "@/components/card"
 import { Confetti } from "@/components/confetti"
 import { GlossaryText } from "@/components/glossary/glossary-text"
-import { Rex } from "@/components/rex-mascot"
+import { RexArt } from "@/components/rex-mascot"
 import { usePostJson } from "@/components/akun-latihan/post-json"
 import type { PublicLesson } from "@/lib/demo/lessons"
 
@@ -134,7 +134,7 @@ export function RequiredLesson({
 
         {result && (
           <div role="status" className="enter mt-4 flex items-start gap-3 rounded-xl bg-inset p-4 text-sm leading-relaxed">
-            <Rex size={36} mood={result.correct ? "happy" : "thinking"} />
+            <RexArt size={48} mood={result.correct ? "happy" : "thinking"} />
             <p className="flex-1">
               {result.correct ? (
                 <CheckCircle2 className="mr-1 inline h-4 w-4 text-primary" aria-hidden="true" />

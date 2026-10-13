@@ -6,7 +6,7 @@ import { getTranslations } from "next-intl/server"
 import { AvatarUploader } from "@/components/account/avatar-uploader"
 import { EmailForm, PasswordForm, ProfileForm } from "@/components/account/account-forms"
 import { Card } from "@/components/card"
-import { Rex } from "@/components/rex-mascot"
+import { RexArt } from "@/components/rex-mascot"
 import { AppearanceSettings } from "@/components/settings/appearance-settings"
 import { SettingsTabs } from "@/components/settings/settings-tabs"
 import { TrainingPlan } from "@/components/settings/training-plan"
@@ -93,7 +93,7 @@ function SignInPrompt({ what }: { what: string }) {
   const t = useTranslations("settings.signIn")
   return (
     <Card className="glow-card flex flex-col items-center py-10 text-center sm:p-10">
-      <Rex size={72} mood="thinking" className="float" />
+      <RexArt size={96} mood="thinking" className="float" />
       <h2 className="mt-4 text-lg font-bold">{t("title")}</h2>
       <p className="mt-1 max-w-sm text-sm text-muted-foreground">{t("body", { what })}</p>
       <div className="mt-5 flex flex-wrap justify-center gap-3">

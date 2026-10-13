@@ -5,7 +5,7 @@ import { ArrowRight, BookA, BookOpen, Bitcoin, Brain, CandlestickChart, Clock, S
 import { Card } from "@/components/card"
 import { DraftNote } from "@/components/learn/draft-note"
 import { LearnProgressRing, LessonStatus } from "@/components/learn/lesson-done"
-import { Rex } from "@/components/rex-mascot"
+import { RexArt } from "@/components/rex-mascot"
 import { GLOSSARY } from "@/lib/glossary"
 import { LESSONS, TRACKS, lessonBySlug } from "@/lib/learn/content"
 import type { TrackId } from "@/lib/learn/types"
@@ -36,7 +36,7 @@ export default async function LearnPage() {
               <LearnProgressRing total={LESSONS.length} />
             </div>
           </div>
-          <Rex size={140} mood="thinking" className="float hidden sm:block" />
+          <RexArt size={180} mood="explain" priority className="float hidden sm:block" />
         </div>
       </header>
 
