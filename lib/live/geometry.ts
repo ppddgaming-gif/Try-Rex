@@ -18,12 +18,20 @@ export type Scale = {
   max: number
   priceToY: (price: number) => number
   yToPrice: (y: number) => number
+  /** Candle index at the plot's left edge (the zoom/pan window's start). */
+  offset: number
   /** Centre x of fractional candle index `i` (candle i is centred on i). */
   indexToX: (i: number) => number
   xToIndex: (x: number) => number
 }
 
-export function makeScale(width: number, height: number, count: number, min: number, max: number): Scale {
+/**
+ * The one scale of a chart. `count` candle slots fit across the plot,
+ * starting at candle index `offset` (0 = the first candle at the left edge),
+ * so zooming and panning move this window and nothing else: candles,
+ * drawings and position lines all go through the same indexToX / priceToY.
+ */
+export function makeScale(width: number, height: number, count: number, min: number, max: number, offset = 0): Scale {
   const plotW = Math.max(1, width - PAD.right)
   const plotH = Math.max(1, height - PAD.bottom - PAD.top)
   const slot = plotW / Math.max(1, count)
@@ -37,11 +45,68 @@ export function makeScale(width: number, height: number, count: number, min: num
     slot,
     min,
     max,
+    offset,
     priceToY: (p) => PAD.top + ((max - p) / span) * plotH,
     yToPrice: (y) => max - ((y - PAD.top) / plotH) * span,
-    indexToX: (i) => (i + 0.5) * slot,
-    xToIndex: (x) => x / slot - 0.5,
+    indexToX: (i) => (i - offset + 0.5) * slot,
+    xToIndex: (x) => x / slot - 0.5 + offset,
   }
+}
+
+/**
+ * The zoom/pan window: `span` candle slots on screen, the first at index
+ * `offset`. `offset: null` follows the latest candle (it stays pinned to the
+ * right edge as new candles arrive); a number holds a place in history.
+ */
+export type ChartView = { span: number; offset: number | null }
+
+export type ViewLimits = { min: number; max: number; right: number }
+
+/**
+ * Empty slots kept right of the latest candle: about a tenth of the window
+ * (room to draw into the future), never more than `max` nor fewer than 2, so
+ * a close zoom isn't half empty.
+ */
+export const rightSlots = (span: number, max: number) => Math.min(max, Math.max(2, Math.round(span / 10)))
+
+/** The left-edge index when the view follows the latest candle: the last candle plus the empty slots end the plot. */
+export const pinnedOffset = (candles: number, span: number, max: number) => Math.max(0, candles + rightSlots(span, max) - span)
+
+/**
+ * The window as it can actually be shown: span within [min, max] and no
+ * wider than the data plus the empty slots, offset between the first candle
+ * and the pinned position. Reaching the pinned position follows the latest
+ * candle again.
+ */
+export function clampView(view: ChartView, candles: number, limits: ViewLimits): { span: number; offset: number; pinned: boolean } {
+  const most = Math.max(limits.min, Math.min(limits.max, candles + limits.right))
+  const span = Math.min(most, Math.max(limits.min, view.span))
+  const pinnedAt = pinnedOffset(candles, span, limits.right)
+  if (view.offset === null) return { span, offset: pinnedAt, pinned: true }
+  const offset = Math.min(pinnedAt, Math.max(0, view.offset))
+  return { span, offset, pinned: offset >= pinnedAt - 1e-6 }
+}
+
+/**
+ * Zoom by `factor` (> 1 shows more candles) keeping candle index `anchor`
+ * where it is on screen, under the cursor or between the fingers.
+ */
+export function zoomView(view: ChartView, candles: number, limits: ViewLimits, factor: number, anchor: number): ChartView {
+  const cur = clampView(view, candles, limits)
+  const next = clampView({ span: cur.span * factor, offset: 0 }, candles, limits).span
+  // Candle i is centred half a slot into its slot: keep that point's share of the width.
+  const at = (anchor - cur.offset + 0.5) / cur.span
+  const offset = anchor + 0.5 - at * next
+  const out = clampView({ span: next, offset }, candles, limits)
+  // Zooming while following the latest candle keeps following it.
+  return { span: out.span, offset: cur.pinned || out.pinned ? null : out.offset }
+}
+
+/** Pan by `slots` candles (positive = toward older candles). */
+export function panView(view: ChartView, candles: number, limits: ViewLimits, slots: number): ChartView {
+  const cur = clampView(view, candles, limits)
+  const out = clampView({ span: cur.span, offset: cur.offset - slots }, candles, limits)
+  return { span: out.span, offset: out.pinned ? null : out.offset }
 }
 
 type XY = { x: number; y: number }

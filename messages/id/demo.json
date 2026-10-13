@@ -592,7 +592,11 @@
         "days": "{d} hari {h} jam",
         "hours": "{h} jam {m} menit",
         "minutes": "{m} menit"
-      }
+      },
+      "zoomIn": "Perbesar",
+      "zoomOut": "Perkecil",
+      "toLatest": "Ke harga terkini",
+      "zoomHint": "Scroll atau cubit dua jari untuk zoom. Geser chart (mode Pilih) untuk melihat candle lama."
     },
     "video": {
       "eyebrow": "Tutorial",

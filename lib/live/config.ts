@@ -17,8 +17,14 @@ export const isLivePair = (v: unknown): v is LivePair => typeof v === "string" &
 export const isTimeframe = (v: unknown): v is Timeframe => typeof v === "string" && (TIMEFRAMES as readonly string[]).includes(v)
 
 export const CHART = {
-  /** Closed candles sent for one chart. */
-  BARS: 120,
+  /** Closed candles sent for one chart: the most the player can zoom out to. */
+  BARS: 240,
+  /** Candles on screen when a chart opens. */
+  DEFAULT_VISIBLE: 120,
+  /** The closest the player can zoom in, in candles. */
+  MIN_VISIBLE: 20,
+  /** One wheel notch or button press zooms by this factor. */
+  ZOOM_STEP: 1.2,
   /** Empty candle slots kept right of the last candle, room to draw into the future. */
   RIGHT_SLOTS: 14,
 } as const

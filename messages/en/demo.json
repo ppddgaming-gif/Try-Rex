@@ -592,7 +592,11 @@
         "days": "{d}d {h}h",
         "hours": "{h}h {m}m",
         "minutes": "{m} min"
-      }
+      },
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "toLatest": "Back to latest",
+      "zoomHint": "Scroll or pinch with two fingers to zoom. Drag the chart (Select mode) to see older candles."
     },
     "video": {
       "eyebrow": "Tutorial",

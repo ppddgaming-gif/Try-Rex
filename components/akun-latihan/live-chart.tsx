@@ -1,13 +1,14 @@
 "use client"
 
-import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useEffectEvent, useId, useLayoutEffect, useMemo, useRef, useState } from "react"
 import { useLocale, useTranslations } from "next-intl"
+import { ChevronsRight, ZoomIn, ZoomOut } from "lucide-react"
 import { frameOf } from "@/lib/chart-geometry"
 import { instrument } from "@/lib/demo/instruments"
 import type { Locale } from "@/lib/i18n/locale"
 import { CHART, DRAWINGS } from "@/lib/live/config"
 import { positionStats, type Drawing, type DrawingKind, type Point } from "@/lib/live/drawings"
-import { PAD, hitTest, makeScale, moveDrawing, timeTicks, type Scale } from "@/lib/live/geometry"
+import { PAD, clampView, hitTest, makeScale, moveDrawing, panView, timeTicks, zoomView, type ChartView, type Scale } from "@/lib/live/geometry"
 import { dayTimeLabel, indexToTime, timeToIndex } from "@/lib/live/time"
 
 /** A candle as the browser has it: `t` in seconds relative to now. */
@@ -64,6 +65,14 @@ export function LiveChart({ pair, digits, step, nowWeek, candles, levels = [], d
   const [size, setSize] = useState({ w: 0, h: 0 })
   const [draft, setDraft] = useState<Draft | null>(null)
   // A new tool or chart drops an unfinished drawing (reset during render, React's pattern for this).
+  const defaultView: ChartView = { span: CHART.DEFAULT_VISIBLE + CHART.RIGHT_SLOTS, offset: null }
+  const [view, setView] = useState<ChartView>(defaultView)
+  const chartKey = `${pair}|${step}`
+  const [viewFor, setViewFor] = useState(chartKey)
+  if (viewFor !== chartKey) {
+    setViewFor(chartKey)
+    setView(defaultView)
+  }
   const draftKey = `${tool}|${pair}|${step}`
   const [draftFor, setDraftFor] = useState(draftKey)
   if (draftFor !== draftKey) {
@@ -83,9 +92,24 @@ export function LiveChart({ pair, digits, step, nowWeek, candles, levels = [], d
   }, [])
 
   const times = useMemo(() => candles.map((c) => c.t), [candles])
-  const frame = useMemo(() => frameOf(candles, levels.map((l) => l.price)), [candles, levels])
-  const count = candles.length + CHART.RIGHT_SLOTS
-  const scale: Scale = makeScale(size.w || 1, size.h || 1, count, frame.min, frame.max)
+  // The zoom/pan window, and the candles inside it (the price axis fits those).
+  const limits = { min: CHART.MIN_VISIBLE, max: CHART.BARS + CHART.RIGHT_SLOTS, right: CHART.RIGHT_SLOTS }
+  const win = clampView(view, candles.length, limits)
+  const lo = Math.max(0, Math.floor(win.offset - 0.5))
+  const hi = Math.min(candles.length - 1, Math.ceil(win.offset + win.span))
+  const visible = useMemo(() => candles.slice(lo, hi + 1), [candles, lo, hi])
+  const frame = useMemo(
+    () => frameOf(visible.length ? visible : candles, levels.map((l) => l.price)),
+    [visible, candles, levels],
+  )
+  const scale: Scale = makeScale(size.w || 1, size.h || 1, win.span, frame.min, frame.max, win.offset)
+  // A pan in progress (one finger or the mouse on empty chart), and the fingers on the chart for a pinch.
+  const pan = useRef<{ x: number; base: ChartView } | null>(null)
+  const fingers = useRef(new Map<number, { x: number; y: number }>())
+  const pinch = useRef<{ dist: number; base: ChartView; anchor: number } | null>(null)
+
+  const zoomBy = (factor: number, anchor: number) => setView((v) => zoomView(v, candles.length, limits, factor, anchor))
+  const centre = () => win.offset + win.span / 2 - 0.5
   const pip = instrument(pair).pipSize
 
   const project = (pt: Point) => ({ x: scale.indexToX(timeToIndex(times, step, pt.t)), y: scale.priceToY(pt.p) })
@@ -147,6 +171,17 @@ export function LiveChart({ pair, digits, step, nowWeek, candles, levels = [], d
   function onPointerDown(e: React.PointerEvent) {
     touch.current = e.pointerType !== "mouse"
     const { x, y } = local(e)
+    if (e.pointerType === "touch") {
+      fingers.current.set(e.pointerId, { x, y })
+      if (fingers.current.size === 2) {
+        // A second finger: pinch to zoom, and drop whatever the first one started.
+        const [a, b] = [...fingers.current.values()]
+        pan.current = null
+        setDraft(null)
+        pinch.current = { dist: Math.hypot(a.x - b.x, a.y - b.y) || 1, base: view, anchor: scale.xToIndex((a.x + b.x) / 2) }
+        return
+      }
+    }
     if (x > scale.plotW) return
     try {
       // Keeps a drag going when the finger leaves the chart. Can throw for a pointer that isn't active.
@@ -184,6 +219,9 @@ export function LiveChart({ pair, digits, step, nowWeek, candles, levels = [], d
         if (id) {
           const d = drawings.find((x) => x.id === id)!
           setDraft({ mode: "drag", id, handle: "move", from: pt, original: d, current: d })
+        } else {
+          // Empty chart: drag to look at older candles.
+          pan.current = { x, base: view }
         }
         return
       }
@@ -216,6 +254,20 @@ export function LiveChart({ pair, digits, step, nowWeek, candles, levels = [], d
 
   function onPointerMove(e: React.PointerEvent) {
     const { x, y } = local(e)
+    if (fingers.current.has(e.pointerId)) fingers.current.set(e.pointerId, { x, y })
+    if (pinch.current && fingers.current.size >= 2) {
+      const [a, b] = [...fingers.current.values()]
+      const dist = Math.hypot(a.x - b.x, a.y - b.y) || 1
+      const p = pinch.current
+      setView(zoomView(p.base, candles.length, limits, p.dist / dist, p.anchor))
+      return
+    }
+    if (pan.current) {
+      const p = pan.current
+      setView(panView(p.base, candles.length, limits, (x - p.x) / scale.slot))
+      setHover(null)
+      return
+    }
     setHover(x <= scale.plotW && y <= scale.height - PAD.bottom ? { x, y } : null)
     if (!draft) return
     const pt = toPoint(x, y)
@@ -254,7 +306,14 @@ export function LiveChart({ pair, digits, step, nowWeek, candles, levels = [], d
     }
   }
 
-  function onPointerUp() {
+  function endPointer(e: React.PointerEvent) {
+    fingers.current.delete(e.pointerId)
+    if (fingers.current.size < 2) pinch.current = null
+    pan.current = null
+  }
+
+  function onPointerUp(e: React.PointerEvent) {
+    endPointer(e)
     if (!draft) return
     if (draft.mode === "create") {
       // A drag made the line; a plain tap waits for the second tap.
@@ -271,6 +330,38 @@ export function LiveChart({ pair, digits, step, nowWeek, candles, levels = [], d
     }
   }
 
+  const onWheel = useEffectEvent((e: WheelEvent) => {
+    const r = box.current!.getBoundingClientRect()
+    const x = e.clientX - r.left
+    if (x > scale.plotW) return
+    e.preventDefault()
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+      setView((v) => panView(v, candles.length, limits, -e.deltaX / scale.slot))
+    } else if (e.deltaY !== 0) {
+      zoomBy(e.deltaY > 0 ? CHART.ZOOM_STEP : 1 / CHART.ZOOM_STEP, scale.xToIndex(x))
+    }
+  })
+  useEffect(() => {
+    const el = box.current
+    if (!el) return
+    const handler = (e: WheelEvent) => onWheel(e)
+    el.addEventListener("wheel", handler, { passive: false })
+    return () => el.removeEventListener("wheel", handler)
+  }, [])
+
+  // + and − zoom from the keyboard (not while typing).
+  const onZoomKey = useEffectEvent((e: KeyboardEvent) => {
+    const target = e.target as HTMLElement | null
+    if (e.metaKey || e.ctrlKey || e.altKey || target?.closest("input, textarea, select, [contenteditable]")) return
+    if (e.key === "+" || e.key === "=") zoomBy(1 / CHART.ZOOM_STEP, centre())
+    else if (e.key === "-" || e.key === "_") zoomBy(CHART.ZOOM_STEP, centre())
+  })
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => onZoomKey(e)
+    window.addEventListener("keydown", handler)
+    return () => window.removeEventListener("keydown", handler)
+  }, [])
+
   // Escape cancels a drawing in progress; Enter finishes a path.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -285,7 +376,7 @@ export function LiveChart({ pair, digits, step, nowWeek, candles, levels = [], d
   })
 
 
-  const ticks = timeTicks(candles.length, scale.slot)
+  const ticks = timeTicks(candles.length, scale.slot).filter((i) => i >= lo && i <= hi)
   const last = candles[candles.length - 1]
   const hoverIndex = hover ? Math.round(scale.xToIndex(hover.x)) : null
   const hoverCandle = hoverIndex !== null && hoverIndex >= 0 && hoverIndex < candles.length ? candles[hoverIndex] : null
@@ -301,7 +392,10 @@ export function LiveChart({ pair, digits, step, nowWeek, candles, levels = [], d
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
-        onPointerCancel={() => setDraft(null)}
+        onPointerCancel={(e) => {
+          endPointer(e)
+          setDraft(null)
+        }}
         onPointerLeave={() => setHover(null)}
         onDoubleClick={() => draft?.mode === "path" && finishPath(draft.points.slice(0, -1))}
         className={[
@@ -339,6 +433,7 @@ export function LiveChart({ pair, digits, step, nowWeek, candles, levels = [], d
 
             {/* Candles */}
             {candles.map((c, i) => {
+              if (i < lo || i > hi) return null
               const x = scale.indexToX(i)
               const up = c.c >= c.o
               const color = up ? "var(--success)" : "var(--danger)"
@@ -449,6 +544,39 @@ export function LiveChart({ pair, digits, step, nowWeek, candles, levels = [], d
             )}
           </svg>
         )}
+      </div>
+
+      {/* Zoom controls. "Back to latest" shows only while looking at older candles. */}
+      <div className="absolute flex gap-1" style={{ right: PAD.right + 6, bottom: PAD.bottom + 6 }}>
+        {!win.pinned && (
+          <button
+            type="button"
+            onClick={() => setView((v) => ({ span: v.span, offset: null }))}
+            className="glass-card glass-strong flex h-11 items-center gap-1 rounded-lg px-2.5 text-xs font-semibold text-foreground"
+          >
+            <ChevronsRight className="h-4 w-4" aria-hidden="true" /> {t("toLatest")}
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={() => zoomBy(1 / CHART.ZOOM_STEP, centre())}
+          disabled={win.span <= CHART.MIN_VISIBLE}
+          aria-label={t("zoomIn")}
+          title={t("zoomIn")}
+          className="glass-card glass-strong flex h-11 w-11 items-center justify-center rounded-lg text-foreground disabled:opacity-40"
+        >
+          <ZoomIn className="h-4 w-4" aria-hidden="true" />
+        </button>
+        <button
+          type="button"
+          onClick={() => zoomBy(CHART.ZOOM_STEP, centre())}
+          disabled={win.span >= Math.min(limits.max, candles.length + CHART.RIGHT_SLOTS)}
+          aria-label={t("zoomOut")}
+          title={t("zoomOut")}
+          className="glass-card glass-strong flex h-11 w-11 items-center justify-center rounded-lg text-foreground disabled:opacity-40"
+        >
+          <ZoomOut className="h-4 w-4" aria-hidden="true" />
+        </button>
       </div>
 
       {/* Readout: the candle under the crosshair, or the last one. Weekday and hour only. */}

@@ -501,7 +501,8 @@ export function TradingDesk({
                 <p className="flex h-[320px] items-center justify-center rounded-xl bg-inset text-sm text-muted-foreground">{t("noData")}</p>
               )}
             </div>
-            <p className="mt-2 text-[11px] text-faint">{t("liveNote")}</p>
+            <p className="mt-2 text-[11px] text-faint">{t("zoomHint")}</p>
+            <p className="mt-1 text-[11px] text-faint">{t("liveNote")}</p>
             <p className="mt-1 text-[11px] text-faint">{t("toolsNote")}</p>
           </section>
 
