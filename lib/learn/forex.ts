@@ -93,8 +93,8 @@ export const FOREX_LESSONS: Lesson[] = [
       },
       {
         kind: "points",
-        title: "Sembilan pair di Akun Demo",
-        items: ["Major: EURUSD, GBPUSD, USDJPY, AUDUSD, USDCAD.", "Cross: EURJPY, GBPCAD, EURAUD, GBPNZD."],
+        title: "Enam pair di Akun Demo",
+        items: ["Major: EURUSD, GBPUSD, USDJPY, AUDUSD, USDCAD.", "Cross: EURJPY."],
       },
       {
         kind: "quiz",
@@ -178,7 +178,7 @@ export const FOREX_LESSONS: Lesson[] = [
         kind: "callout",
         tone: "example",
         title: "Di Akun Demo",
-        text: `Spread EURUSD ditetapkan ${COSTS.SPREAD_PIPS.EURUSD} pip. Pair yang lebih jarang diperdagangkan diberi spread lebih lebar, misalnya GBPCAD ${COSTS.SPREAD_PIPS.GBPCAD} pip.`,
+        text: `Spread EURUSD ditetapkan ${COSTS.SPREAD_PIPS.EURUSD} pip. Pair cross diberi spread lebih lebar, misalnya EURJPY ${COSTS.SPREAD_PIPS.EURJPY} pip.`,
       },
       { kind: "heading", text: "Swap: biaya menginap" },
       {
