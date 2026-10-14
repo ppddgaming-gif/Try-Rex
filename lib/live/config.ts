@@ -1,8 +1,15 @@
 // The trading screen's data: which pairs and timeframes exist, how much of
 // each the chart shows, and the limits on drawings. Pure and client-safe.
 
-/** The nine pairs, in the order the picker lists them. */
-export const LIVE_PAIRS = ["EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "USDCAD", "EURJPY", "GBPCAD", "EURAUD", "GBPNZD"] as const
+/**
+ * The pairs on the live chart, in the order the picker lists them. Only pairs
+ * with real historical data: EURAUD, GBPCAD and GBPNZD were left out because
+ * their "DATA FOR LIVE" files are computed or synthetic (the owner's call).
+ * Add a pair back here, in ALL_PAIRS (lib/demo/config.ts), in
+ * scripts/build-live-data.mjs and in the demo_accounts / demo_drawings checks
+ * once real data for it exists.
+ */
+export const LIVE_PAIRS = ["EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "USDCAD", "EURJPY"] as const
 export type LivePair = (typeof LIVE_PAIRS)[number]
 
 export const TIMEFRAMES = ["M15", "M30", "H1", "H4"] as const

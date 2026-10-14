@@ -1,5 +1,5 @@
 -- ===========================================================================
--- Trading screen: nine pairs, four timeframes, drawing tools.
+-- Trading screen: six pairs, four timeframes, drawing tools.
 --   1. demo_accounts.last_pair / last_timeframe: the chart reopens where the
 --      player left it.
 --   2. demo_drawings: the player's drawings per account and pair.
@@ -15,7 +15,7 @@ alter table public.demo_accounts
 
 alter table public.demo_accounts drop constraint if exists demo_accounts_last_pair_check;
 alter table public.demo_accounts add constraint demo_accounts_last_pair_check
-  check (last_pair is null or last_pair in ('GBPNZD', 'EURAUD', 'GBPCAD', 'USDCAD', 'EURJPY', 'AUDUSD', 'USDJPY', 'GBPUSD', 'EURUSD'));
+  check (last_pair is null or last_pair in ('USDCAD', 'EURJPY', 'AUDUSD', 'USDJPY', 'GBPUSD', 'EURUSD'));
 
 alter table public.demo_accounts drop constraint if exists demo_accounts_last_timeframe_check;
 alter table public.demo_accounts add constraint demo_accounts_last_timeframe_check
@@ -30,7 +30,7 @@ alter table public.demo_accounts add constraint demo_accounts_last_timeframe_che
 create table if not exists public.demo_drawings (
   account_id uuid not null,
   user_id    uuid not null references auth.users on delete cascade,
-  pair       text not null check (pair in ('GBPNZD', 'EURAUD', 'GBPCAD', 'USDCAD', 'EURJPY', 'AUDUSD', 'USDJPY', 'GBPUSD', 'EURUSD')),
+  pair       text not null check (pair in ('USDCAD', 'EURJPY', 'AUDUSD', 'USDJPY', 'GBPUSD', 'EURUSD')),
   drawings   jsonb not null default '[]'::jsonb
     check (jsonb_typeof(drawings) = 'array' and jsonb_array_length(drawings) <= 60 and pg_column_size(drawings) <= 65536),
   updated_at timestamptz not null default now(),

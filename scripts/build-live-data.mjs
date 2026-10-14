@@ -21,7 +21,9 @@ import { join } from "node:path"
 import { createInterface } from "node:readline"
 import { gzipSync } from "node:zlib"
 
-const PAIRS = ["GBPNZD", "EURAUD", "GBPCAD", "USDCAD", "EURJPY", "AUDUSD", "USDJPY", "GBPUSD", "EURUSD"]
+// The live chart's pairs (LIVE_PAIRS in lib/live/config.ts). EURAUD, GBPCAD and
+// GBPNZD are left out: their exports are computed or synthetic, not real data.
+const PAIRS = ["USDCAD", "EURJPY", "AUDUSD", "USDJPY", "GBPUSD", "EURUSD"]
 const CHECK = { M30: 1800, H1: 3600, H4: 14400 }
 
 const [, , src, out = "live-data-out"] = process.argv
