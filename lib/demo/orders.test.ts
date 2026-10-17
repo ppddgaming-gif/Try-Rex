@@ -108,12 +108,22 @@ describe("orderProblems", () => {
     ["a third open trade in Stage 3", {}, { stage: 3, openTrades: 2 }, []],
     ["a fourth open trade in Stage 3", {}, { stage: 3, openTrades: 3 }, ["trades"]],
     ["a cross in Stage 1 is open (every pair is, from the start)", {}, { pair: "EURJPY" }, []],
-    ["a pair outside the six", {}, { pair: "AUDCAD" }, ["pair"]],
-    ["a computed cross left off the live chart", {}, { pair: "EURAUD" }, ["pair"]],
+    ["a pair outside the nine", {}, { pair: "AUDCAD" }, ["pair"]],
+    ["an FXCM cross is open from the start", {}, { pair: "GBPNZD" }, []],
     ["SL and TP required by the trading screen in Stage 2", { slPips: null, tpPips: null }, { stage: 2, requireSlTp: true }, ["sl", "tp"]],
     ["no candles left", {}, { candlesLeft: 0 }, ["candles"]],
     ["a zero SL", { slPips: 0 }, { stage: 2 }, ["sl"]],
   ] as const)("%s", (_name, input, over, fields) => {
     expect(problems(input as Partial<OrderInput>, over as Partial<typeof ctx>)).toEqual(fields)
+  })
+})
+
+describe("GBPNZD", () => {
+  it("is quoted with the approved spread and the approximate NZD rate", () => {
+    const q = quoteOrder({ pair: "GBPNZD", side: "buy", lot: 0.01, entry: 2.0, slPips: 30, tpPips: 45, balance: 200, freeMargin: 200 })
+    expect(q.costs.spreadPips).toBe(3.5)
+    expect(q.approximate).toBe(true)
+    // 1 pip on 0.01 lot = 0.0001 × 1,000 NZD × 0.70 USD.
+    expect(q.pipValue).toBe(0.07)
   })
 })
