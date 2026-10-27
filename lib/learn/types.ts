@@ -2,7 +2,7 @@
 // components/learn/lesson-blocks.tsx, so real copy and sources can replace
 // the drafts without touching any UI.
 
-export type TrackId = "dasar" | "chart" | "risiko" | "crypto" | "psikologi"
+export type TrackId = "dasar" | "chart" | "risiko" | "forex" | "psikologi"
 
 /** Title and description: learn.tracks.<id> in the catalogue. */
 export type Track = {
@@ -27,7 +27,7 @@ export type Block =
   | { kind: "heading"; text: string }
   | { kind: "points"; title?: string; items: string[] }
   | { kind: "callout"; tone: "tip" | "warning" | "example"; title: string; text: string }
-  | { kind: "diagram"; name: "candle-anatomy" | "trend-shapes" | "risk-reward" | "leverage" }
+  | { kind: "diagram"; name: "candle-anatomy" | "trend-shapes" | "risk-reward" | "leverage" | "pair-quote" | "sessions" }
   | { kind: "chart"; pick: ChartPick; caption: string; reveal?: boolean }
   | { kind: "quiz"; question: string; options: string[]; answer: number; explain: string }
 

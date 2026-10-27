@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { getTranslations } from "next-intl/server"
 import Link from "next/link"
-import { ArrowRight, BookA, BookOpen, Bitcoin, Brain, CandlestickChart, Clock, ShieldCheck } from "lucide-react"
+import { ArrowLeftRight, ArrowRight, BookA, BookOpen, Brain, CandlestickChart, Clock, ShieldCheck } from "lucide-react"
 import { Card } from "@/components/card"
 import { DraftNote } from "@/components/learn/draft-note"
 import { LearnProgressRing, LessonStatus } from "@/components/learn/lesson-done"
@@ -18,7 +18,7 @@ const TRACK_ICONS: Record<TrackId, React.ElementType> = {
   dasar: BookOpen,
   chart: CandlestickChart,
   risiko: ShieldCheck,
-  crypto: Bitcoin,
+  forex: ArrowLeftRight,
   psikologi: Brain,
 }
 
@@ -33,7 +33,7 @@ export default async function LearnPage() {
             <h1 className="enter-focus mt-3 text-3xl font-extrabold sm:text-4xl">{t("hub.heading")}</h1>
             <p className="mt-3 max-w-xl text-muted-foreground">{t("hub.body")}</p>
             <div className="mt-5">
-              <LearnProgressRing total={LESSONS.length} />
+              <LearnProgressRing total={LESSONS.length} slugs={LESSONS.map((l) => l.slug)} />
             </div>
           </div>
           <RexArt size={180} mood="explain" priority className="float hidden sm:block" />

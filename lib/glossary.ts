@@ -11,9 +11,9 @@ import type { Locale } from "@/lib/i18n/locale"
 // gathered. Nothing here is investment advice; keep claims definitional and
 // never add statistics without a source.
 
-export type GlossaryCategory = "dasar" | "chart" | "risiko" | "crypto" | "psikologi"
+export type GlossaryCategory = "dasar" | "chart" | "risiko" | "forex" | "psikologi"
 
-export const CATEGORIES: GlossaryCategory[] = ["dasar", "chart", "risiko", "crypto", "psikologi"]
+export const CATEGORIES: GlossaryCategory[] = ["dasar", "chart", "risiko", "forex", "psikologi"]
 
 export type GlossaryEntry = {
   slug: string
@@ -61,17 +61,24 @@ export const GLOSSARY: GlossaryEntry[] = [
   { slug: "take-profit", category: "risiko", aliases: { id: ["take profit", "tp"], en: ["take profit", "tp"] }, lesson: "stop-loss-take-profit" },
   { slug: "risk-reward", category: "risiko", aliases: { id: ["risk-reward", "risk reward", "rasio risiko"], en: ["risk-reward", "risk reward", "reward:risk"] }, lesson: "risk-reward" },
   { slug: "leverage", category: "risiko", aliases: { id: ["leverage", "daya ungkit"], en: ["leverage"] }, lesson: "leverage" },
-  { slug: "margin", category: "risiko", aliases: { id: ["margin"], en: ["margin"] }, lesson: "leverage" },
+  { slug: "margin", category: "risiko", aliases: { id: ["margin"], en: ["margin"] }, lesson: "margin-dan-margin-call" },
   { slug: "diversifikasi", category: "risiko", aliases: { id: ["diversifikasi"], en: ["diversification"] } },
-  // Crypto
-  { slug: "crypto", category: "crypto", aliases: { id: ["crypto", "kripto", "cryptocurrency", "aset kripto"], en: ["crypto", "cryptocurrency"] }, lesson: "apa-itu-crypto" },
-  { slug: "blockchain", category: "crypto", aliases: { id: ["blockchain"], en: ["blockchain"] }, lesson: "apa-itu-crypto" },
-  { slug: "bitcoin", category: "crypto", aliases: { id: ["bitcoin", "btc"], en: ["bitcoin", "btc"] }, lesson: "bitcoin-altcoin-stablecoin" },
-  { slug: "altcoin", category: "crypto", aliases: { id: ["altcoin", "altcoins"], en: ["altcoin", "altcoins"] }, lesson: "bitcoin-altcoin-stablecoin" },
-  { slug: "stablecoin", category: "crypto", aliases: { id: ["stablecoin"], en: ["stablecoin", "stablecoins"] }, lesson: "bitcoin-altcoin-stablecoin" },
-  { slug: "wallet", category: "crypto", aliases: { id: ["wallet", "dompet kripto"], en: ["wallet", "crypto wallet"] }, lesson: "keamanan-crypto" },
-  { slug: "seed-phrase", category: "crypto", aliases: { id: ["seed phrase", "frasa pemulihan"], en: ["seed phrase", "recovery phrase"] }, lesson: "keamanan-crypto" },
-  { slug: "exchange", category: "crypto", aliases: { id: ["exchange", "bursa kripto"], en: ["exchange", "crypto exchange"] }, lesson: "keamanan-crypto" },
+  // Forex
+  { slug: "base-currency", category: "forex", aliases: { id: ["base currency", "mata uang base"], en: ["base currency"] }, lesson: "apa-itu-forex" },
+  { slug: "quote-currency", category: "forex", aliases: { id: ["quote currency", "mata uang quote"], en: ["quote currency"] }, lesson: "apa-itu-forex" },
+  { slug: "major-pair", category: "forex", aliases: { id: ["major pair", "pair major"], en: ["major pair", "major pairs"] }, lesson: "major-minor-cross" },
+  { slug: "cross-pair", category: "forex", aliases: { id: ["cross pair", "pair cross"], en: ["cross pair", "cross pairs"] }, lesson: "major-minor-cross" },
+  { slug: "lot", category: "forex", aliases: { id: ["lot"], en: ["lot size", "standard lot", "mini lot", "micro lot"] }, example: true, lesson: "pip-lot-nilai-pip" },
+  { slug: "pipette", category: "forex", aliases: { id: ["pipette"], en: ["pipette", "pipettes"] }, lesson: "pip-lot-nilai-pip" },
+  { slug: "bid", category: "forex", aliases: { id: ["bid", "harga bid"], en: ["bid price"] }, lesson: "bid-ask-spread-swap" },
+  { slug: "ask", category: "forex", aliases: { id: ["ask", "harga ask"], en: ["ask price"] }, lesson: "bid-ask-spread-swap" },
+  { slug: "swap", category: "forex", aliases: { id: ["swap", "rollover"], en: ["swap", "rollover"] }, lesson: "bid-ask-spread-swap" },
+  { slug: "pending-order", category: "forex", aliases: { id: ["pending order", "buy limit", "sell limit", "buy stop", "sell stop"], en: ["pending order", "buy limit", "sell limit", "buy stop", "sell stop"] }, lesson: "jenis-order" },
+  { slug: "slippage", category: "forex", aliases: { id: ["slippage"], en: ["slippage"] }, lesson: "jenis-order" },
+  { slug: "sesi-pasar", category: "forex", aliases: { id: ["sesi pasar", "sesi trading"], en: ["trading session", "market session"] }, lesson: "sesi-pasar-forex" },
+  { slug: "margin-call", category: "forex", aliases: { id: ["margin call"], en: ["margin call"] }, lesson: "margin-dan-margin-call" },
+  { slug: "stop-out", category: "forex", aliases: { id: ["stop out"], en: ["stop out"] }, lesson: "margin-dan-margin-call" },
+  { slug: "kalender-ekonomi", category: "forex", aliases: { id: ["kalender ekonomi"], en: ["economic calendar"] }, lesson: "berita-dan-fundamental" },
   // Psikologi
   { slug: "fomo", category: "psikologi", aliases: { id: ["fomo"], en: ["fomo"] }, lesson: "fomo-overtrading" },
   { slug: "overtrading", category: "psikologi", aliases: { id: ["overtrading"], en: ["overtrading"] }, lesson: "fomo-overtrading" },
