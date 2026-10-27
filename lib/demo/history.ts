@@ -92,6 +92,12 @@ export async function loadJournal(userId: string, accountId: string): Promise<Jo
 
   const rows: JournalRow[] = []
   for (const t of trades) {
+    // A live-chart trade stores real times itself.
+    if (t.sessionId === null) {
+      const row = journalRow(t, { entry: t.entryIndex, exit: t.exitIndex })
+      if (row) rows.push(row)
+      continue
+    }
     const segment = segmentOf.get(t.sessionId)
     const bars = segment ? candlesOf(segment) : null
     const row = journalRow(t, { entry: timeAt(bars, t.entryIndex), exit: timeAt(bars, t.exitIndex) })

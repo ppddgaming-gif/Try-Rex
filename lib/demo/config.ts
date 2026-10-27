@@ -39,6 +39,8 @@ export const COSTS = {
     EURJPY: 2.0,
     EURAUD: 2.5,
     GBPCAD: 3.0,
+    // GBPNZD: an estimate the owner approved (crosses with NZD usually trade wider than GBPCAD).
+    GBPNZD: 3.5,
   } as Record<string, number>,
   /** Per 1.00 lot, per trade. */
   COMMISSION_PER_LOT: 0,
@@ -91,22 +93,29 @@ export const LINES = { MAX_PER_SEGMENT: 10 } as const
 /** "Apakah kamu mengikuti rencanamu?" Self-reported, never scored. */
 export const REVIEW = { NOTE_MAX_CHARS: 120 } as const
 
+/**
+ * Every live-chart pair is open from the first stage (the owner's choice);
+ * stages limit lot size, open trades and SL/TP rules instead. The same nine as
+ * LIVE_PAIRS in lib/live/config.ts.
+ */
+const ALL_PAIRS = ["EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "USDCAD", "EURJPY", "GBPCAD", "EURAUD", "GBPNZD"]
+
 /** Stages belong to the player and survive a new account. */
 export const STAGES = {
   1: {
-    pairs: ["EURUSD", "GBPUSD", "AUDUSD", "USDJPY", "USDCAD"],
+    pairs: ALL_PAIRS,
     fixedLot: 0.01 as number | null,
     maxOpenTrades: 1,
     slTpRequired: true,
   },
   2: {
-    pairs: ["EURUSD", "GBPUSD", "AUDUSD", "USDJPY", "USDCAD", "EURJPY", "EURAUD", "GBPCAD"],
+    pairs: ALL_PAIRS,
     fixedLot: null as number | null,
     maxOpenTrades: 1,
     slTpRequired: false,
   },
   3: {
-    pairs: ["EURUSD", "GBPUSD", "AUDUSD", "USDJPY", "USDCAD", "EURJPY", "EURAUD", "GBPCAD"],
+    pairs: ALL_PAIRS,
     fixedLot: null as number | null,
     maxOpenTrades: 3,
     slTpRequired: false,
@@ -191,6 +200,8 @@ export const APPROX_USD_RATE: Record<string, number> = {
   AUD: 0.9,
   CAD: 0.97,
   JPY: 1 / 85,
+  // The median of GBPUSD ÷ GBPNZD over the live data's daily closes (0.7035), rounded.
+  NZD: 0.7,
 }
 
 // The screen line every Akun Latihan page carries: demo.disclaimer in the

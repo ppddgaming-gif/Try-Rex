@@ -36,13 +36,18 @@ export type SessionRow = {
 export type TradeRow = {
   id: string
   number: number
-  sessionId: string
+  /** The replay chart it was opened on; null for a live-chart trade. */
+  sessionId: string | null
   pair: string
   side: Side
   lot: number
   stage: StageNumber
   reasons: ReasonId[]
   entryPrice: number
+  /**
+   * Replay: the candle index it opened at. Live chart: real unix seconds of
+   * the fill. Clocks: candles played (replay) or real M15 candles (live).
+   */
   entryIndex: number
   openedClock: number
   slInitial: number | null
@@ -61,6 +66,7 @@ export type TradeRow = {
   swap: number
   status: "open" | "closed"
   exitPrice: number | null
+  /** Replay: the candle index it closed at. Live chart: real unix seconds of the candle it closed in. */
   exitIndex: number | null
   closedClock: number | null
   exitReason: ExitReason | null

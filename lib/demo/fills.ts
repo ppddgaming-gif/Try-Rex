@@ -7,7 +7,8 @@ import { accountFigures, grossPnl, pipsBetween, roundMoney, roundPrice, swapPerN
 
 export type Bar = { t: number; o: number; h: number; l: number; c: number }
 
-export type ExitReason = "sl" | "tp" | "manual" | "stop_out" | "segment_end"
+/** `market_close`: the live chart closed it at the last candle before the market closed. */
+export type ExitReason = "sl" | "tp" | "manual" | "stop_out" | "segment_end" | "market_close"
 
 export type OpenTrade = {
   id: string

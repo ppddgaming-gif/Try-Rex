@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest"
+import { STAGES } from "@/lib/demo/config"
 import { pickSegment, segmentPool, segmentsOf, type Segment } from "@/lib/demo/segments"
 import { gameDatasets } from "@/lib/game-data"
 
@@ -20,16 +21,22 @@ describe("segmentsOf", () => {
 describe("segmentPool on the real data", () => {
   const sources = gameDatasets.map((d) => ({ id: d.id, pair: d.pair, length: d.candles.length }))
 
-  it("Stage 1 holds the USD-quoted pairs only", () => {
+  // Akun Demo's pairs: the live chart's nine. The game data has eight of them
+  // (its GBPNZD files are empty).
+  const open = new Set<string>(STAGES[1].pairs)
+  const expected = sources.filter((s) => open.has(s.pair))
+
+  it("Stage 1 holds every pair the data has (all nine are open from the start)", () => {
     const pool = segmentPool(1, sources)
-    expect(new Set(pool.map((s) => s.pair))).toEqual(new Set(["EURUSD", "GBPUSD", "AUDUSD", "USDJPY", "USDCAD"]))
-    expect(pool).toHaveLength(25)
+    expect(new Set(pool.map((s) => s.pair))).toEqual(new Set(sources.map((s) => s.pair)))
+    expect(pool).toHaveLength(expected.length)
+    expect(pool.some((s) => s.pair === "EURAUD") && pool.some((s) => s.pair === "GBPCAD")).toBe(true)
   })
 
-  it("Stage 2 adds the crosses", () => {
+  it("Stage 2 has the same pairs, EURJPY included", () => {
     const pool = segmentPool(2, sources)
     expect(pool.some((s) => s.pair === "EURJPY")).toBe(true)
-    expect(pool).toHaveLength(39)
+    expect(pool).toHaveLength(expected.length)
   })
 
   it("every segment can play at least 10 candles", () => {

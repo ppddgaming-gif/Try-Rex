@@ -16,6 +16,7 @@ import { getAccess, loadDemoState, loadLedger } from "@/lib/demo/server"
 import { accountReview, accountStats } from "@/lib/demo/stats"
 import { loadTrading } from "@/lib/demo/trading"
 import { buildView } from "@/lib/demo/view"
+import { liveView, syncLive } from "@/lib/live/engine"
 
 /**
  * One route, in order: sign in → finish 3 game sessions → create Akun #1 →
@@ -58,14 +59,22 @@ export default async function AkunLatihanPage() {
   }
 
   const account = state.account
+  // Reading the account replays the live chart first (SL/TP hit while away,
+  // market close), so the numbers below include it. Before the live engine's
+  // migration has run, the replay view still works.
+  const synced = await syncLive(user.id).catch((e) => {
+    console.error("Akun Latihan: live sync failed", e)
+    return "not-ready" as const
+  })
+  const live = synced && synced !== "not-ready" ? synced : null
   const [trading, trades, balances, ledger] = await Promise.all([
-    loadTrading(user.id),
+    live ? null : loadTrading(user.id),
     loadClosedTrades(user.id, account.id),
     loadBalances(account.id),
     loadLedger(account.id),
   ])
-  if (!trading) return <NotReadyCard />
-  const view = buildView(trading.state)
+  const view = live ? await liveView(live, []) : trading ? buildView(trading.state) : null
+  if (!view) return <NotReadyCard />
 
   return (
     <div className="flex flex-col gap-5">
