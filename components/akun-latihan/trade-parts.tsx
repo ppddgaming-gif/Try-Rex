@@ -1,6 +1,6 @@
 import { Check, X } from "lucide-react"
 import { useTranslations } from "next-intl"
-import { Rex } from "@/components/rex-mascot"
+import { RexArt } from "@/components/rex-mascot"
 import { CHECK_IDS, checkLabel, type Checks } from "@/lib/demo/disiplin"
 import type { ExitReason } from "@/lib/demo/fills"
 import { rexCommentText, type RexComment } from "@/lib/demo/rex-comments"
@@ -45,7 +45,7 @@ export function RexComments({ comments }: { comments: RexComment[] }) {
   const good = comments.every((c) => c.tone === "good")
   return (
     <div className="flex items-start gap-3 rounded-xl border border-primary/30 bg-primary/10 p-3">
-      <Rex size={32} mood={good ? "happy" : "thinking"} className="shrink-0" />
+      <RexArt size={44} mood={good ? "happy" : "thinking"} className="shrink-0" />
       <div className="min-w-0 flex-1">
         <p className="text-xs font-semibold text-primary">{t("rexTitle")}</p>
         <ul className="mt-1 flex flex-col gap-1.5 text-sm leading-relaxed">

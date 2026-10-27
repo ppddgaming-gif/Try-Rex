@@ -58,7 +58,7 @@ export function Explanation({
         </p>
       </div>
 
-      <RexMascot mood={correct ? "happy" : "grimace"} className="absolute -bottom-2 right-0 opacity-90" />
+      <RexMascot mood={correct ? "happy" : "sad"} className="absolute -bottom-2 right-0 opacity-90" />
     </Card>
   )
 }

@@ -1,18 +1,20 @@
 import type { ReactNode } from "react"
-import type { LucideIcon } from "lucide-react"
+import { RexArt, type RexArtMood } from "@/components/rex-mascot"
 
 /**
  * The one empty-state layout, used by every card that has nothing to show
- * yet: icon in a circle, a title, one line of text, at most one action.
+ * yet: Rex (tired by default: nothing has happened here yet), a title, one
+ * line of text, at most one action.
  */
 export function EmptyState({
-  icon: Icon,
+  mood = "tired",
   title,
   body,
   action,
   children,
 }: {
-  icon: LucideIcon
+  /** Rex's expression; "thinking" suits "nothing matches your search". */
+  mood?: RexArtMood
   title: string
   body: string
   /** At most one button or link. */
@@ -22,10 +24,8 @@ export function EmptyState({
 }) {
   return (
     <div className="flex flex-col items-center py-8 text-center">
-      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-        <Icon className="h-6 w-6 text-muted-foreground" aria-hidden="true" />
-      </span>
-      <p className="mt-3 text-sm font-semibold">{title}</p>
+      <RexArt mood={mood} size={88} />
+      <p className="mt-2 text-sm font-semibold">{title}</p>
       <p className="mt-1 max-w-xs text-sm text-muted-foreground">{body}</p>
       {children}
       {action && <div className="mt-4">{action}</div>}

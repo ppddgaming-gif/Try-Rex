@@ -137,38 +137,6 @@
       "term": "Diversifikasi",
       "short": "Menyebar risiko ke beberapa aset atau ide agar satu kesalahan tidak menghabiskan semuanya."
     },
-    "crypto": {
-      "term": "Crypto",
-      "short": "Aset digital yang dicatat di blockchain, bukan diterbitkan bank sentral. Contoh: Bitcoin dan Ethereum."
-    },
-    "blockchain": {
-      "term": "Blockchain",
-      "short": "Buku catatan transaksi yang disalin di banyak komputer sekaligus, sehingga sulit diubah diam-diam."
-    },
-    "bitcoin": {
-      "term": "Bitcoin",
-      "short": "Crypto pertama (2009), dengan jumlah maksimum 21 juta koin yang ditetapkan dalam aturan jaringannya."
-    },
-    "altcoin": {
-      "term": "Altcoin",
-      "short": "Sebutan untuk crypto selain Bitcoin. Umumnya lebih volatil dan lebih berisiko."
-    },
-    "stablecoin": {
-      "term": "Stablecoin",
-      "short": "Crypto yang dirancang mengikuti nilai aset lain, biasanya dolar AS. Stabilnya bergantung pada cadangan penerbitnya."
-    },
-    "wallet": {
-      "term": "Wallet",
-      "short": "Tempat menyimpan kunci akses ke crypto-mu. Siapa pun yang memegang kunci (seed phrase) menguasai asetnya."
-    },
-    "seed-phrase": {
-      "term": "Seed phrase",
-      "short": "Rangkaian 12 atau 24 kata untuk memulihkan wallet. Jangan pernah dibagikan ke siapa pun, termasuk “admin”."
-    },
-    "exchange": {
-      "term": "Exchange",
-      "short": "Platform jual beli crypto. Pilih yang terdaftar resmi di negaramu."
-    },
     "fomo": {
       "term": "FOMO",
       "short": "Fear of missing out: takut ketinggalan, jadi masuk terburu-buru setelah harga sudah lari jauh."
@@ -180,13 +148,74 @@
     "jurnal-trading": {
       "term": "Jurnal trading",
       "short": "Catatan setiap keputusan: alasan masuk, hasil, dan pelajarannya. Cara paling sederhana untuk berhenti mengulang kesalahan."
+    },
+    "base-currency": {
+      "term": "Base currency",
+      "short": "Mata uang pertama dalam pair. Kurs menunjukkan harga satu unitnya dalam mata uang kedua."
+    },
+    "quote-currency": {
+      "term": "Quote currency",
+      "short": "Mata uang kedua dalam pair: satuan harga, dan mata uang tempat untung atau rugi dihitung."
+    },
+    "major-pair": {
+      "term": "Major pair",
+      "short": "Pair yang memuat dolar AS dan satu mata uang utama lain, misalnya EURUSD atau USDJPY."
+    },
+    "cross-pair": {
+      "term": "Cross pair",
+      "short": "Pair dua mata uang utama tanpa dolar AS, misalnya EURJPY atau GBPCAD."
+    },
+    "lot": {
+      "term": "Lot",
+      "short": "Ukuran posisi. 1 lot standard = 100.000 unit mata uang base; 0.01 lot = 1.000 unit.",
+      "example": "0.01 lot EURUSD bernilai sekitar $0.10 per pip."
+    },
+    "pipette": {
+      "term": "Pipette",
+      "short": "Sepersepuluh pip: angka terakhir pada kurs lima desimal (atau tiga desimal untuk pair yen)."
+    },
+    "bid": {
+      "term": "Bid",
+      "short": "Harga saat kamu menjual. Posisi BUY ditutup di harga ini."
+    },
+    "ask": {
+      "term": "Ask",
+      "short": "Harga saat kamu membeli. Selalu sedikit di atas bid; selisihnya adalah spread."
+    },
+    "swap": {
+      "term": "Swap",
+      "short": "Biaya atau pemasukan untuk posisi yang dibiarkan terbuka melewati pergantian hari."
+    },
+    "pending-order": {
+      "term": "Pending order",
+      "short": "Order yang menunggu harga mencapai level tertentu: buy limit, sell limit, buy stop, sell stop."
+    },
+    "slippage": {
+      "term": "Slippage",
+      "short": "Selisih antara harga yang diminta dan harga yang benar-benar terisi, biasa terjadi saat harga bergerak cepat."
+    },
+    "sesi-pasar": {
+      "term": "Sesi pasar",
+      "short": "Rentang jam saat pusat keuangan tertentu (Sydney, Tokyo, London, New York) aktif berdagang."
+    },
+    "margin-call": {
+      "term": "Margin call",
+      "short": "Peringatan saat margin level turun ke batas tertentu: dana jaminan hampir tidak cukup."
+    },
+    "stop-out": {
+      "term": "Stop out",
+      "short": "Penutupan paksa posisi saat margin level jatuh ke batas terendah, supaya saldo tidak minus."
+    },
+    "kalender-ekonomi": {
+      "term": "Kalender ekonomi",
+      "short": "Jadwal rilis data ekonomi dan pengumuman bank sentral yang bisa menggerakkan kurs."
     }
   },
   "categories": {
     "dasar": "Dasar",
     "chart": "Membaca chart",
     "risiko": "Manajemen risiko",
-    "crypto": "Crypto",
+    "forex": "Forex",
     "psikologi": "Psikologi"
   },
   "seeMeaning": "{term}: lihat arti",

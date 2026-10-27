@@ -76,10 +76,16 @@ export function quoteOrder(input: {
   tpPips: number | null
   balance: number
   freeMargin: number
+  /**
+   * The live chart fills BUY at the ask (bid + spread) and closes SELL on the
+   * ask, so the spread is already in the prices: no separate spread cost.
+   */
+  spreadInPrice?: boolean
 }): OrderQuote {
   const { pair, side, entry, balance } = input
   const lot = normalizeLot(input.lot)
-  const costs = openingCosts(pair, lot, entry)
+  const opening = openingCosts(pair, lot, entry)
+  const costs = input.spreadInPrice ? { ...opening, spread: 0, total: opening.commission } : opening
   const margin = marginFor(pair, lot, entry)
   const sl = input.slPips === null ? null : levelPrice(pair, side, entry, "sl", input.slPips)
   const tp = input.tpPips === null ? null : levelPrice(pair, side, entry, "tp", input.tpPips)
@@ -132,6 +138,8 @@ export type OrderContext = {
   openTrades: number
   /** Candles left to play in the segment. */
   candlesLeft: number
+  /** SL and TP required whatever the stage says (the trading screen's rule). */
+  requireSlTp?: boolean
 }
 
 export type OrderProblem = {
@@ -168,13 +176,14 @@ export function orderProblems(input: OrderInput, ctx: OrderContext, quote: Order
     add("lot", "lotRange", { min: ACCOUNT.MIN_LOT.toFixed(2), max: ACCOUNT.MAX_LOT.toFixed(2), step: ACCOUNT.LOT_STEP })
   }
 
+  const slTpRequired = ctx.requireSlTp || stage.slTpRequired
   if (input.slPips === null) {
-    if (stage.slTpRequired) add("sl", "needSl")
+    if (slTpRequired) add("sl", "needSl")
   } else if (!isValidDistance(input.slPips)) {
     add("sl", "slRange", { max: PLAN.MAX_DISTANCE_PIPS })
   }
   if (input.tpPips === null) {
-    if (stage.slTpRequired) add("tp", "needTp")
+    if (slTpRequired) add("tp", "needTp")
   } else if (!isValidDistance(input.tpPips)) {
     add("tp", "tpRange", { max: PLAN.MAX_DISTANCE_PIPS })
   }

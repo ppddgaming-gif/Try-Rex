@@ -12,9 +12,9 @@
       "title": "Manajemen Risiko",
       "description": "Cara bertahan cukup lama untuk belajar: stop loss, rasio risiko, dan leverage."
     },
-    "crypto": {
-      "title": "Crypto 101",
-      "description": "Blockchain, Bitcoin, stablecoin, dan cara menjaga aset digital tetap milikmu."
+    "forex": {
+      "title": "Forex 101",
+      "description": "Pasar mata uang dari dekat: pair, pip, lot, spread, sesi pasar, margin, dan berita yang menggerakkan harga."
     },
     "psikologi": {
       "title": "Psikologi Trading",
@@ -28,7 +28,7 @@
     },
     "pasar-dan-instrumen": {
       "title": "Pasar dan instrumen",
-      "summary": "Forex, saham, komoditas, dan crypto: apa yang diperdagangkan dan bagaimana pair dibaca."
+      "summary": "Forex, saham, dan komoditas: apa yang diperdagangkan dan bagaimana pair dibaca."
     },
     "buy-sell-wait": {
       "title": "BUY, SELL, dan WAIT",
@@ -62,17 +62,37 @@
       "title": "Leverage: pedang bermata dua",
       "summary": "Leverage memperbesar untung dan rugi dengan kelipatan yang sama. Pahami sebelum tergoda."
     },
-    "apa-itu-crypto": {
-      "title": "Apa itu crypto dan blockchain?",
-      "summary": "Uang digital tanpa bank sentral, dicatat di buku besar yang disalin di banyak komputer."
+    "apa-itu-forex": {
+      "title": "Apa itu forex?",
+      "summary": "Pasar tempat mata uang ditukar, dan cara membaca sebuah pair."
     },
-    "bitcoin-altcoin-stablecoin": {
-      "title": "Bitcoin, altcoin, dan stablecoin",
-      "summary": "Tidak semua crypto sama. Kenali tiga kelompok besar dan risikonya masing-masing."
+    "major-minor-cross": {
+      "title": "Major, cross, dan exotic",
+      "summary": "Tiga kelompok pair dan kenapa masing-masing terasa berbeda."
     },
-    "keamanan-crypto": {
-      "title": "Keamanan: wallet dan exchange",
-      "summary": "Siapa yang memegang kunci, memegang asetnya. Cara menghindari penipuan paling umum."
+    "pip-lot-nilai-pip": {
+      "title": "Pip, lot, dan nilai pip",
+      "summary": "Satuan gerak harga, ukuran posisi, dan berapa dolar satu pip itu."
+    },
+    "bid-ask-spread-swap": {
+      "title": "Bid, ask, spread, dan swap",
+      "summary": "Dua harga di setiap pair, biaya masuk, dan biaya menginap."
+    },
+    "jenis-order": {
+      "title": "Jenis order",
+      "summary": "Market, limit, dan stop: kapan order dijalankan."
+    },
+    "sesi-pasar-forex": {
+      "title": "Sesi pasar forex",
+      "summary": "Sydney, Tokyo, London, New York dalam jam WIB, dan kenapa akhir pekan tutup."
+    },
+    "margin-dan-margin-call": {
+      "title": "Margin dan margin call",
+      "summary": "Dana jaminan, margin level, dan kapan posisi ditutup paksa."
+    },
+    "berita-dan-fundamental": {
+      "title": "Berita dan fundamental",
+      "summary": "Suku bunga, inflasi, dan kalender ekonomi: kenapa harga bisa melompat."
     },
     "fomo-overtrading": {
       "title": "FOMO dan overtrading",
@@ -95,7 +115,7 @@
     "title": "Belajar 101",
     "eyebrow": "Belajar 101",
     "heading": "Semua dasar trading, satu tempat.",
-    "body": "Dari cara membaca candle sampai menjaga aset crypto. Materi singkat, contoh dari chart asli, dan satu pertanyaan di akhir tiap bab.",
+    "body": "Dari cara membaca candle sampai seluk-beluk pasar forex. Materi singkat, contoh dari chart asli, dan satu pertanyaan di akhir tiap bab.",
     "kamus": "Kamus Trading",
     "kamusBody": "<num>{n}</num> istilah, dijelaskan dalam satu atau dua kalimat. Istilah yang sama bisa diketuk di Trading Game.",
     "chapter": "Bab {n}",
@@ -178,6 +198,14 @@
     "capitalValue": "Rp1 juta",
     "size": "Ukuran posisi",
     "sizeValue": "Rp100 juta",
-    "against": "1% melawanmu = −Rp1 juta"
+    "against": "1% melawanmu = −Rp1 juta",
+    "pairTitle": "Satu kurs, dua harga",
+    "base": "base",
+    "quote": "quote",
+    "bidLabel": "Bid · harga jual",
+    "askLabel": "Ask · harga beli",
+    "spreadLabel": "Spread 1 pip",
+    "sessionsTitle": "Sesi pasar forex dalam jam WIB (perkiraan)",
+    "overlap": "London dan New York tumpang tindih"
   }
 }

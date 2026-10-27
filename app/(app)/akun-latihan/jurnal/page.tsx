@@ -2,7 +2,6 @@ import type { Metadata } from "next"
 import { getLocale, getTranslations } from "next-intl/server"
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { NotebookPen } from "lucide-react"
 import { Card } from "@/components/card"
 import { DemoTabs } from "@/components/akun-latihan/demo-tabs"
 import { JournalList, type JournalItem } from "@/components/akun-latihan/journal-list"
@@ -17,15 +16,16 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: (await getTranslations("demo.ui.meta"))("jurnal") }
 }
 
-// Candle times are historical and in UTC, like the chart's data.
-const candleFormat = (locale: Locale) =>
+// Replay trades: historical candle times, in UTC like the chart's data.
+// Live-chart trades: real times, in WIB (never the data's period).
+const candleFormat = (locale: Locale, timeZone: string) =>
   new Intl.DateTimeFormat(INTL_LOCALE[locale], {
     day: "numeric",
     month: "short",
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-    timeZone: "UTC",
+    timeZone,
   })
 
 /**
@@ -40,13 +40,19 @@ export default async function JurnalPage({ searchParams }: { searchParams: Promi
 
   const { akun } = await searchParams
   const [t, root, locale] = await Promise.all([getTranslations("demo.ui.journal"), getTranslations(), getLocale()])
-  const candleFmt = candleFormat(locale as Locale)
-  const candleLabel = (s: number | null) => (s === null ? null : t("utc", { time: candleFmt.format(new Date(s * 1000)) }))
+  const utcFmt = candleFormat(locale as Locale, "UTC")
+  const wibFmt = candleFormat(locale as Locale, "Asia/Jakarta")
+  const candleLabel = (s: number | null, real: boolean) =>
+    s === null
+      ? null
+      : real
+        ? t("wib", { time: wibFmt.format(new Date(s * 1000)) })
+        : t("utc", { time: utcFmt.format(new Date(s * 1000)) })
   const account = state.accounts.find((a) => String(a.number) === akun) ?? state.account ?? state.accounts[0]
   const rows: JournalItem[] = (await loadJournal(user.id, account.id)).map((r) => ({
     ...r,
-    entryLabel: candleLabel(r.entryTime),
-    exitLabel: candleLabel(r.exitTime),
+    entryLabel: candleLabel(r.entryTime, r.realTime),
+    exitLabel: candleLabel(r.exitTime, r.realTime),
   }))
 
   return (
@@ -80,7 +86,6 @@ export default async function JurnalPage({ searchParams }: { searchParams: Promi
       {rows.length === 0 ? (
         <Card>
           <EmptyState
-            icon={NotebookPen}
             title={t("emptyTitle")}
             body={account.status === "active" ? t("emptyActive") : t("emptyClosed", { n: account.number })}
           />

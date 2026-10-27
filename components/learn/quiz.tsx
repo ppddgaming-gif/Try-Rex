@@ -4,7 +4,7 @@ import { useState } from "react"
 import { CheckCircle2, HelpCircle, RotateCcw, XCircle } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { Confetti } from "@/components/confetti"
-import { Rex } from "@/components/rex-mascot"
+import { RexArt } from "@/components/rex-mascot"
 
 /**
  * A one-question check at the end of a lesson. Nothing is recorded: it is
@@ -68,7 +68,7 @@ export function Quiz({
 
       {done && (
         <div role="status" className="enter mt-4 flex items-start gap-3 rounded-xl bg-inset p-4">
-          <Rex size={36} mood={right ? "happy" : "thinking"} />
+          <RexArt size={48} mood={right ? "happy" : "thinking"} />
           <div className="min-w-0 flex-1 text-sm leading-relaxed">
             <p className="font-semibold">{right ? t("correct") : t("wrong")}</p>
             <p className="mt-0.5 text-muted-foreground">{explain}</p>

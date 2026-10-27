@@ -2,6 +2,7 @@ import type { CSSProperties } from "react"
 import Link from "next/link"
 import { ArrowDown, ArrowUpRight } from "lucide-react"
 import { useTranslations } from "next-intl"
+import { RexArt } from "@/components/rex-mascot"
 import { GlowPanel, HeroShowcase } from "./showcase"
 
 // The hero builds in on load, top to bottom, each line a beat after the last.
@@ -13,7 +14,15 @@ export function Hero() {
     <section className="relative isolate mx-auto max-w-7xl px-5 pt-20 pb-10 lg:px-8 lg:pt-28">
       {/* Slow-drifting warm light behind the headline. */}
       <div className="aurora" aria-hidden="true" />
+      {/* Rex beside the headline where there's room; `enter` and `float` sit on separate elements so their transforms don't fight. */}
+      <div className="enter absolute top-24 right-4 hidden xl:block 2xl:right-12" style={delay(200)}>
+        <RexArt size={220} mood="explain" priority className="float" />
+      </div>
       <div className="mx-auto max-w-3xl text-center">
+        {/* Narrower screens: a smaller Rex above the badge. */}
+        <div className="enter mb-5 flex justify-center xl:hidden" style={delay(0)}>
+          <RexArt size={104} mood="explain" priority className="float" />
+        </div>
         <span
           className="enter glass-card inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium text-muted-foreground"
           style={delay(0)}

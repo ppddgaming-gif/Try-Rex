@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react"
 import Link from "next/link"
-import { ArrowRight, Inbox } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { recentAttempts, totalChallenges } from "@/lib/progress/derive"
 import { COMPETENCIES } from "@/lib/progress/types"
@@ -131,7 +131,6 @@ export function DashboardView({
             </div>
           ) : (
             <EmptyState
-              icon={Inbox}
               title={t("noActivity")}
               body={t("noActivityBody")}
               action={

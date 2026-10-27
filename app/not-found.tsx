@@ -4,7 +4,7 @@ import { getTranslations } from "next-intl/server"
 import Link from "next/link"
 import { ArrowLeft, LineChart } from "lucide-react"
 import { BrandMark } from "@/components/brand-mark"
-import { Rex } from "@/components/rex-mascot"
+import { RexArt } from "@/components/rex-mascot"
 
 export async function generateMetadata(): Promise<Metadata> {
   return { title: (await getTranslations("landing.notFound"))("title") }
@@ -17,7 +17,7 @@ export default function NotFound() {
     <main className="flex min-h-dvh flex-col items-center px-5 py-10">
       <BrandMark size="lg" />
       <div className="flex flex-1 flex-col items-center justify-center py-16 text-center">
-        <Rex size={96} mood="grimace" className="enter" />
+        <RexArt size={128} mood="dizzy" priority className="enter" />
         <p className="eyebrow mt-6 font-mono">404</p>
         <h1 className="mt-2 text-3xl font-extrabold sm:text-4xl">{t("heading")}</h1>
         <p className="mt-3 max-w-sm text-muted-foreground">{t("body")}</p>

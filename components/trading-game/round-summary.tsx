@@ -1,7 +1,7 @@
 import { Clock, Star, Target } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { Confetti } from "@/components/confetti"
-import { Rex } from "@/components/rex-mascot"
+import { RexArt } from "@/components/rex-mascot"
 
 function clock(seconds: number) {
   const m = Math.floor(seconds / 60)
@@ -35,7 +35,7 @@ export function RoundSummary({
     >
       {good && <Confetti />}
       <div className="flex items-center gap-3">
-        <Rex size={44} mood={good ? "happy" : "thinking"} className={good ? "pop-in" : "float"} />
+        <RexArt size={56} mood={good ? "happy" : "thinking"} className={good ? "pop-in" : "float"} />
         <div className="min-w-0 leading-tight">
           <p className="eyebrow">{t("eyebrow")}</p>
           <p className="mt-1 text-sm font-semibold">

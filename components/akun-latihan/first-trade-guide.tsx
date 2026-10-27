@@ -1,6 +1,6 @@
 import { Check } from "lucide-react"
 import { useTranslations } from "next-intl"
-import { Rex } from "@/components/rex-mascot"
+import { RexArt } from "@/components/rex-mascot"
 import { DISIPLIN, PLAN } from "@/lib/demo/config"
 
 export type GuideProgress = {
@@ -27,7 +27,7 @@ export function FirstTradeGuide({ progress }: { progress: GuideProgress }) {
   return (
     <section aria-labelledby="guide-title" className="glass-card rounded-2xl border-primary/40 p-4 sm:p-5">
       <div className="flex items-center gap-3">
-        <Rex size={36} mood="thinking" className="shrink-0" />
+        <RexArt size={48} mood="explain" className="shrink-0" />
         <div>
           <p className="eyebrow">{t("eyebrow")}</p>
           <h2 id="guide-title" className="font-display font-bold leading-tight">

@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Lightbulb, X } from "lucide-react"
 import { useTranslations } from "next-intl"
-import { Rex } from "@/components/rex-mascot"
+import { RexArt } from "@/components/rex-mascot"
 import { usePostJson } from "@/components/akun-latihan/post-json"
 import { TIP_VALUES, tipById, tipParagraphs, type TipId } from "@/lib/demo/tips"
 
@@ -49,7 +49,7 @@ export function RexTipCard({ id, onDismiss, compact = false }: { id: TipId; onDi
       className="glass-card glass-strong pop-in relative rounded-2xl border-primary/40 p-4"
     >
       <div className="flex items-start gap-3">
-        <Rex size={compact ? 32 : 40} mood="thinking" className="shrink-0" />
+        <RexArt size={compact ? 44 : 56} mood={tip.id === "revenge-trading" ? "angry" : "explain"} className="shrink-0" />
         <div className="min-w-0 flex-1">
           <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-primary">
             <Lightbulb className="h-3.5 w-3.5" aria-hidden="true" /> {t("eyebrow")}

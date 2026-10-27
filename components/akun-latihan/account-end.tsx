@@ -3,7 +3,7 @@ import { useTranslations } from "next-intl"
 import { ArrowRight, BookOpen, Wallet } from "lucide-react"
 import { Card } from "@/components/card"
 import { Disclosure } from "@/components/disclosure"
-import { Rex } from "@/components/rex-mascot"
+import { RexArt } from "@/components/rex-mascot"
 import { AccountActionButton } from "@/components/akun-latihan/account-actions"
 import { RequiredLesson } from "@/components/akun-latihan/intro-lesson"
 import { DISIPLIN } from "@/lib/demo/config"
@@ -53,7 +53,7 @@ export function AccountEnd({
     <div className="flex flex-col gap-5">
       <Card className="glow-card sm:p-8">
         <div className="flex items-start gap-4">
-          <Rex size={64} mood="thinking" className="hidden shrink-0 sm:block" />
+          <RexArt size={84} mood="sad" className="hidden shrink-0 sm:block" />
           <div className="min-w-0 flex-1">
             <p className="eyebrow">{t("eyebrow")}</p>
             <h2 className="mt-2 text-2xl font-bold">{title}</h2>
@@ -115,7 +115,7 @@ export function AccountEnd({
               </Item>
             </dl>
             <div className="mt-4 flex items-start gap-3 rounded-xl border border-primary/30 bg-primary/10 p-4">
-              <Rex size={36} mood="neutral" className="shrink-0" />
+              <RexArt size={48} mood="explain" className="shrink-0" />
               <p className="text-sm leading-relaxed">{reviewAdvice(review.failed[0]?.id ?? null, root)}</p>
             </div>
           </>
@@ -144,7 +144,7 @@ export function AccountEnd({
       {step === "open" && (
         <>
           <Card className="flex flex-col items-center py-10 text-center sm:p-10">
-            <Rex size={80} mood="happy" className="float" />
+            <RexArt size={104} mood="happy" className="float" />
             <h2 className="mt-4 text-2xl font-bold">{t("readyTitle", { next })}</h2>
             <p className="mt-2 max-w-md text-muted-foreground">{t("readyBody", { balance: startingBalance, n: number })}</p>
             <div className="mt-6">
