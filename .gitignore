@@ -6,3 +6,6 @@ next-env.d.ts
 
 # Output of scripts/build-live-data.mjs (uploaded to Supabase Storage, not committed)
 live-data-out/
+# Local-only: oh-my-claudecode tool state and the live-chart test harness
+.omc/
+app/zz-harness/
