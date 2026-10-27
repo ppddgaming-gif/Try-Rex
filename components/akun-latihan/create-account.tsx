@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { LoaderCircle, Wallet } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { Card } from "@/components/card"
-import { Rex } from "@/components/rex-mascot"
+import { RexArt } from "@/components/rex-mascot"
 import { usePostJson } from "@/components/akun-latihan/post-json"
 
 /**
@@ -34,7 +34,7 @@ export function CreateAccount({ startingBalance, leverage }: { startingBalance: 
 
   return (
     <Card className="glow-card flex flex-col items-center py-12 text-center sm:p-12">
-      <Rex size={96} mood="happy" className="float" />
+      <RexArt size={128} mood="happy" priority className="float" />
       <h2 className="mt-5 text-2xl font-bold">{t("title")}</h2>
       <p className="mt-3 max-w-lg text-muted-foreground">
         {t.rich("body", {

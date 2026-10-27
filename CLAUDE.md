@@ -246,7 +246,11 @@ Buttons use the `btn` utility defined in `globals.css`. It draws a solid 4px bot
 
 Radii: 8, 12 for controls (`rounded-xl` / `rounded-lg`), and 18 for cards (`rounded-2xl` is overridden to 18px), plus full.
 
-**No emoji anywhere in the UI.** The mascot is `components/rex-mascot.tsx`: `<Rex>` is the SVG (colored from `--primary` and the `--rex-*` tokens), and `<RexMascot>` is the large decorative corner figure. Rex has four moods and should react to results rather than sit there as a static logo: `neutral` for chrome and idle screens, `happy` for a good score, `grimace` for a risky or wrong call, and `thinking` while an answer or an evaluation is pending.
+**No emoji anywhere in the UI.** The mascot lives in `components/rex-mascot.tsx`, in two forms:
+
+- `<Rex>` is the small SVG (coloured from `--primary` and the `--rex-*` tokens), for the logo and anything under ~40px: brand mark, sidebar, nav, footer, the guest avatar.
+- `<RexArt mood size>` is the illustration (`public/maskot/rexy-*.webp` through `next/image`, a fixed square box), for every place Rex reacts. The drawing leaves room around the body, so it needs about a third more size than the SVG. `fluid` lets `className` set responsive sizes; `priority` for above-the-fold. `<RexMascot>` (the large corner figure) and `EmptyState` use it too.
+- Moods (`RexArtMood`): `happy` (rexy-senang) for a right answer, a good score, a new account, a stage up; `sad` (rexy-sedih) for a wrong answer and a run-out account; `thinking` (rexy-berpikir) while pending, a quiz miss, locked cards; `explain` (rexy-menjelaskan, also `neutral`) for Rex's tips, guides and comments; `dizzy` (rexy-pusing, also `grimace`) for the 404; `tired` (rexy-lelah) as `EmptyState`'s default; `angry` (rexy-marah) only on the revenge-trading tip. Rex reacts to the process, never cheers a lucky outcome.
 
 ### Motion
 
@@ -292,7 +296,7 @@ All motion is CSS plus React's built-in `<ViewTransition>`, with no animation li
 
 ### Images
 
-`next.config.mjs` whitelists exactly one remote host for `next/image`: `hebbkx1anhila5yf.public.blob.vercel-storage.com` (Vercel Blob). Any new remote image domain must be added to `images.remotePatterns` or the build will reject it. There is no `public/` directory.
+`next.config.mjs` whitelists exactly one remote host for `next/image`: `hebbkx1anhila5yf.public.blob.vercel-storage.com` (Vercel Blob). Any new remote image domain must be added to `images.remotePatterns` or the build will reject it. `public/` holds only `maskot/`: Rex's illustrated expressions as 600×600 transparent WebP (`rexy-senang`, `rexy-sedih`, `rexy-marah`, `rexy-berpikir`, `rexy-pusing`, `rexy-lelah`, `rexy-menjelaskan`), rendered by `RexArt` (see Styling).
 
 <!-- BEGIN:nextjs-agent-rules -->
 

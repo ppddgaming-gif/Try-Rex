@@ -2,7 +2,6 @@ import type { Metadata } from "next"
 import { getLocale, getTranslations } from "next-intl/server"
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { NotebookPen } from "lucide-react"
 import { Card } from "@/components/card"
 import { DemoTabs } from "@/components/akun-latihan/demo-tabs"
 import { JournalList, type JournalItem } from "@/components/akun-latihan/journal-list"
@@ -80,7 +79,6 @@ export default async function JurnalPage({ searchParams }: { searchParams: Promi
       {rows.length === 0 ? (
         <Card>
           <EmptyState
-            icon={NotebookPen}
             title={t("emptyTitle")}
             body={account.status === "active" ? t("emptyActive") : t("emptyClosed", { n: account.number })}
           />

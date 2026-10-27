@@ -1,4 +1,63 @@
+import Image from "next/image"
+
+/** The four faces the small SVG Rex can draw (logo and chrome). */
 export type RexMood = "neutral" | "happy" | "grimace" | "thinking"
+
+/**
+ * Rex's illustrated expressions (public/maskot/rexy-*.webp, 600×600,
+ * transparent). Used wherever Rex reacts; the SVG `Rex` stays for the logo
+ * and anything under ~40px, where a full-body drawing can't be read.
+ */
+export type RexArtMood = RexMood | "sad" | "angry" | "dizzy" | "tired" | "explain"
+
+const ART: Record<RexArtMood, string> = {
+  happy: "rexy-senang",
+  sad: "rexy-sedih",
+  angry: "rexy-marah",
+  thinking: "rexy-berpikir",
+  dizzy: "rexy-pusing",
+  grimace: "rexy-pusing",
+  tired: "rexy-lelah",
+  explain: "rexy-menjelaskan",
+  neutral: "rexy-menjelaskan",
+}
+
+/**
+ * Rex as an illustration, in a fixed square box (no layout shift while it
+ * loads). Decorative unless `label` is given. The drawing leaves room around
+ * the body, so pick a size about a third larger than the SVG would need.
+ */
+export function RexArt({
+  mood = "neutral",
+  size = 96,
+  label,
+  className = "",
+  priority = false,
+  fluid = false,
+}: {
+  mood?: RexArtMood
+  size?: number
+  label?: string
+  className?: string
+  /** Above the fold on its page: load it right away. */
+  priority?: boolean
+  /** The box size comes from `className` (responsive sizes); `size` is only the largest it gets. */
+  fluid?: boolean
+}) {
+  return (
+    <Image
+      src={`/maskot/${ART[mood]}.webp`}
+      width={size}
+      height={size}
+      alt={label ?? ""}
+      aria-hidden={label ? undefined : true}
+      priority={priority}
+      draggable={false}
+      className={`shrink-0 select-none object-contain ${className}`}
+      style={fluid ? undefined : { width: size, height: size }}
+    />
+  )
+}
 
 // Paths are taken as-is from the design's component sheet on a 72-unit grid.
 // Rex reacts to results rather than sitting there as a static logo: neutral
@@ -86,10 +145,10 @@ export function Rex({
 }
 
 /** Rex as a large decorative figure tucked into the corner of a card. */
-export function RexMascot({ mood = "neutral", className = "" }: { mood?: RexMood; className?: string }) {
+export function RexMascot({ mood = "neutral", className = "" }: { mood?: RexArtMood; className?: string }) {
   return (
     <div className={`pointer-events-none select-none ${className}`}>
-      <Rex mood={mood} size={104} />
+      <RexArt mood={mood} size={136} />
     </div>
   )
 }

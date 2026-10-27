@@ -5,7 +5,7 @@ import { redirect } from "next/navigation"
 import { ArrowRight, Check, Info } from "lucide-react"
 import { Card } from "@/components/card"
 import { Confetti } from "@/components/confetti"
-import { Rex } from "@/components/rex-mascot"
+import { RexArt } from "@/components/rex-mascot"
 import { DemoTabs } from "@/components/akun-latihan/demo-tabs"
 import { getCurrentUser } from "@/lib/auth"
 import { DISIPLIN, GRADUATION } from "@/lib/demo/config"
@@ -56,7 +56,7 @@ export default async function LulusPage() {
       <DemoTabs />
       <Card className="glow-card relative overflow-hidden text-center sm:p-10">
         <Confetti />
-        <Rex size={96} mood="happy" className="float mx-auto" />
+        <RexArt size={128} mood="happy" className="float mx-auto" />
         <p className="eyebrow mt-4">{g("eyebrow")}</p>
         <h2 className="mt-2 text-3xl font-bold">{g("heading")}</h2>
         <p className="mx-auto mt-3 max-w-xl text-muted-foreground">

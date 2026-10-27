@@ -2,7 +2,7 @@ import Link from "next/link"
 import { Lock, LineChart } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { Card } from "@/components/card"
-import { Rex } from "@/components/rex-mascot"
+import { RexArt } from "@/components/rex-mascot"
 import type { Unlock } from "@/lib/demo/access"
 
 /** Guests: sign in first. */
@@ -34,7 +34,7 @@ export function SessionsLockedCard({ unlock }: { unlock: Unlock }) {
   const counts = { sessions: unlock.sessions, needed: unlock.needed }
   return (
     <Card className="glow-card flex flex-col items-center py-12 text-center sm:p-12">
-      <Rex size={84} mood="thinking" className="float" />
+      <RexArt size={108} mood="thinking" className="float" />
       <h2 className="mt-5 text-xl font-bold">{t("sessionsTitle")}</h2>
       <p className="mt-2 max-w-md text-sm text-muted-foreground">{td("unlock.hint", counts)}</p>
 

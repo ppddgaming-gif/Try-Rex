@@ -11,7 +11,7 @@ import {
 } from "lucide-react"
 import { useLocale, useTranslations } from "next-intl"
 import { CandlestickChart } from "@/components/candlestick-chart"
-import { Rex } from "@/components/rex-mascot"
+import { Rex, RexArt } from "@/components/rex-mascot"
 import { challengeText } from "@/lib/challenge-text"
 import type { Locale } from "@/lib/i18n/locale"
 import { challenges, decisionLabels, frameOf, type Challenge } from "@/lib/mock-data"
@@ -158,7 +158,7 @@ export function HeroShowcase() {
 
       {/* Rex reads the chart out loud: under it on phones, beside it from lg. */}
       <div className="glass-card flex items-start gap-3 rounded-2xl p-4 text-left lg:mt-12 lg:w-64 lg:flex-col">
-        <Rex size={36} mood="thinking" />
+        <RexArt size={44} mood="thinking" />
         <p className="text-xs leading-relaxed text-muted-foreground">
           <span className="font-semibold text-foreground">{t("situation")}</span>
           {text.situation} {t("pick")}

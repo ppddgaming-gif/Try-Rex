@@ -8,7 +8,7 @@ import { useTranslations } from "next-intl"
 import { AvatarUploader } from "@/components/account/avatar-uploader"
 import { ProfileForm } from "@/components/account/account-forms"
 import { BrandMark } from "@/components/brand-mark"
-import { Rex } from "@/components/rex-mascot"
+import { Rex, RexArt } from "@/components/rex-mascot"
 import {
   ONBOARDING_VERSION,
   QUESTIONS,
@@ -377,7 +377,7 @@ function ResultStep({
 
   return (
     <div className="step-forward">
-      <Rex size={84} mood="happy" className="pop-in" />
+      <RexArt size={108} mood="happy" className="pop-in" />
       <p className="eyebrow mt-6 font-mono">{skipped ? t("result.defaultEyebrow") : t("result.readyEyebrow")}</p>
       <h1 className="mt-3 text-[32px] font-extrabold leading-[1.1] sm:text-[42px]">
         {skipped ? t("result.defaultTitle") : t("result.readyTitle")}

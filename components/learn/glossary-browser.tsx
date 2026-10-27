@@ -84,7 +84,7 @@ export function GlossaryBrowser() {
       </p>
 
       {shown.length === 0 ? (
-        <EmptyState icon={Search} title={t("noneTitle")} body={t("noneBody", { query })} />
+        <EmptyState mood="thinking" title={t("noneTitle")} body={t("noneBody", { query })} />
       ) : (
         <dl className="mt-3 grid gap-3 sm:grid-cols-2">
           {shown.map((e) => (

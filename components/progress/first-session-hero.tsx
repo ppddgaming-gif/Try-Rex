@@ -2,7 +2,7 @@ import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { Card } from "@/components/card"
-import { Rex } from "@/components/rex-mascot"
+import { RexArt } from "@/components/rex-mascot"
 import { isMotivation } from "@/lib/onboarding"
 
 /**
@@ -25,7 +25,7 @@ export function FirstSessionHero({ motivation }: { motivation?: string | null })
         </Link>
       </div>
       {/* 80px on mobile, 120px from lg; CSS size overrides the SVG attributes. */}
-      <Rex size={120} mood="happy" className="float h-20 w-20 lg:h-[120px] lg:w-[120px]" />
+      <RexArt size={150} mood="happy" priority fluid className="float h-24 w-24 lg:h-[150px] lg:w-[150px]" />
     </Card>
   )
 }

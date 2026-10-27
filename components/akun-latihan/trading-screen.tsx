@@ -16,7 +16,7 @@ import {
   X,
 } from "lucide-react"
 import { Confetti } from "@/components/confetti"
-import { Rex } from "@/components/rex-mascot"
+import { RexArt } from "@/components/rex-mascot"
 import { AccountPanel, StageCard } from "@/components/akun-latihan/account-panel"
 import { FirstTradeGuide, type GuideProgress } from "@/components/akun-latihan/first-trade-guide"
 import { OpenTrades } from "@/components/akun-latihan/open-trades"
@@ -283,7 +283,7 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
           )}
           {bust ? (
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-              <Rex size={44} mood="thinking" className="shrink-0" />
+              <RexArt size={56} mood="sad" className="shrink-0" />
               <div className="min-w-0 flex-1">
                 <p className="font-semibold">{t("bustTitle", { n: view.account.number })}</p>
                 <p className="text-sm text-muted-foreground">
@@ -405,7 +405,7 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
           <section className="glass-card relative order-3 overflow-hidden rounded-2xl border-primary/40 p-4 lg:order-none">
             <Confetti />
             <div className="flex items-center gap-3">
-              <Rex size={40} mood="happy" className="shrink-0" />
+              <RexArt size={52} mood="happy" className="shrink-0" />
               <div className="min-w-0 flex-1">
                 <p className="font-display font-bold">{t("graduatedTitle")}</p>
                 <p className="text-sm text-muted-foreground">{t("graduatedBody", { n: view.stage.current })}</p>
@@ -420,7 +420,7 @@ export function TradingScreen({ initial }: { initial: DemoView }) {
           <section className="glass-card relative order-3 overflow-hidden rounded-2xl border-primary/40 p-4 lg:order-none">
             <Confetti />
             <div className="flex items-center gap-3">
-              <Rex size={40} mood="happy" className="shrink-0" />
+              <RexArt size={52} mood="happy" className="shrink-0" />
               <div className="min-w-0 flex-1">
                 <p className="font-display font-bold">{t("stageUpTitle", { n: stageUp })}</p>
                 <p className="text-sm text-muted-foreground">{t("stageUpBody")}</p>

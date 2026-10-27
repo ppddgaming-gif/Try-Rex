@@ -1,13 +1,13 @@
 "use client"
 
-import { Lock, Sparkles } from "lucide-react"
+import { Sparkles } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { INSIGHT_UNLOCK, insightLine, totalChallenges } from "@/lib/progress/derive"
 import { useProgress } from "@/lib/progress/use-progress"
 import { Card } from "@/components/card"
 import { EmptyState } from "@/components/progress/empty-state"
 import { Skeleton } from "@/components/progress/skeleton"
-import { Rex } from "@/components/rex-mascot"
+import { RexArt } from "@/components/rex-mascot"
 
 /**
  * Locked until INSIGHT_UNLOCK answers. After that, one line counted from the
@@ -35,7 +35,7 @@ export function AiInsight() {
       ) : (
         <div className="mt-4 flex items-center gap-4 rounded-xl border border-border bg-muted/40 p-4">
           <p className="flex-1 text-sm leading-relaxed">{insightLine(progress, t)}</p>
-          <Rex size={48} mood="thinking" />
+          <RexArt size={60} mood="explain" />
         </div>
       )}
     </Card>
@@ -45,7 +45,7 @@ export function AiInsight() {
 function Locked({ done }: { done: number }) {
   const t = useTranslations("progress.insight")
   return (
-    <EmptyState icon={Lock} title={t("lockedTitle")} body={t("lockedBody", { n: INSIGHT_UNLOCK })}>
+    <EmptyState title={t("lockedTitle")} body={t("lockedBody", { n: INSIGHT_UNLOCK })}>
       <div className="mt-4 flex w-40 items-center gap-2">
         <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted" aria-hidden="true">
           <div className="h-full rounded-full bg-primary" style={{ width: `${(done / INSIGHT_UNLOCK) * 100}%` }} />
