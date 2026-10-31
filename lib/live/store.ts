@@ -5,7 +5,7 @@ import { gunzipSync } from "node:zlib"
 import { decodeChunk, monthsBetween, type LiveBar, type Manifest, type RawChunk } from "@/lib/live/chunk"
 import { CHART, M15, MARKET, PAIR_CONFIG, TIMEFRAME_SECONDS, isLivePair, type LivePair, type Timeframe } from "@/lib/live/config"
 import { chartIndicators, type ChartIndicators } from "@/lib/live/indicators"
-import { chartAt, marketStatus } from "@/lib/live/market"
+import { chartAt, historyBefore, marketStatus } from "@/lib/live/market"
 import { toRelative, weekPosition } from "@/lib/live/time"
 import { createAdminClient } from "@/lib/supabase/admin"
 
@@ -68,8 +68,8 @@ export const digitsOf = (pair: string) => (isLivePair(pair) ? PAIR_CONFIG[pair].
 /** Closed candles a chart reads: the ones sent plus the indicators' warm-up. */
 const READ_BARS = CHART.BARS + CHART.WARMUP
 
-/** How far back a chart of `step` reads: its candles plus weekends and holidays. */
-const lookback = (step: number) => Math.ceil(READ_BARS * step * 1.6) + 6 * 86_400
+/** How far back `bars` candles of `step` reach: the candles plus weekends and holidays. */
+const lookback = (step: number, bars = READ_BARS) => Math.ceil(bars * step * 1.6) + 6 * 86_400
 
 export type RelBar = { t: number; o: number; h: number; l: number; c: number }
 
@@ -133,6 +133,35 @@ export async function chartSlice(now: number, real: number, pair: LivePair, time
     forming: forming ? rel(forming) : null,
     closesIn: status.open ? M15 - (((now % M15) + M15) % M15) : null,
     market: status,
+  }
+}
+
+export type HistorySlice = {
+  /** Closed candles, oldest first, all opening before `before`; `t` relative to now. */
+  candles: RelBar[]
+  /** EMA 20, EMA 50 and RSI 14 for those candles, warmed up on CHART.WARMUP candles before them. */
+  indicators: ChartIndicators
+  /** Nothing older can be shown: the floor or the start of the data was reached. */
+  done: boolean
+}
+
+/**
+ * Up to `count` closed candles opening before data time `before` (never
+ * after `now`) and not before `floor`: the older candles a player pans back
+ * to. Only candles that had fully closed by `before` are returned.
+ */
+export async function chartHistory(now: number, before: number, floor: number, pair: LivePair, timeframe: Timeframe, count: number): Promise<HistorySlice> {
+  const step = TIMEFRAME_SECONDS[timeframe]
+  const end = Math.min(before, now)
+  const empty = { candles: [], indicators: chartIndicators([], null, 0), done: true }
+  if (end <= floor) return empty
+  const bars = await m15Between(pair, end - lookback(step, count + CHART.WARMUP), end - 1)
+  const { shown, closes } = historyBefore(bars, end, floor, step, count)
+  if (shown.length === 0) return empty
+  return {
+    candles: shown.map((b) => ({ t: toRelative(b.t, now), o: b.o, h: b.h, l: b.l, c: b.c })),
+    indicators: chartIndicators(closes, null, shown.length),
+    done: shown.length < count,
   }
 }
 

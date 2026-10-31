@@ -60,6 +60,16 @@ export const CHART = {
    * settled by then. Server side only: these candles never reach the browser.
    */
   WARMUP: 300,
+  /** Older candles per history fetch, when the player pans back past the first one. */
+  HISTORY_BATCH: 240,
+  /**
+   * The most closed candles one chart holds, history included (about 3 weeks
+   * of M15, a year of H4). History never goes back past the start of the
+   * account's clean range either (CLEAN_RANGES).
+   */
+  HISTORY_MAX: 2000,
+  /** Fetch older candles once the view's left edge is this close to the first candle. */
+  HISTORY_TRIGGER: 20,
   /** Height of the RSI panel under the chart, in pixels. */
   RSI_HEIGHT: 120,
 } as const

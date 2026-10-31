@@ -601,7 +601,9 @@
       "zoomIn": "Zoom in",
       "zoomOut": "Zoom out",
       "toLatest": "Back to latest",
-      "zoomHint": "Scroll or pinch with two fingers to zoom. Drag the chart (Select mode) to see older candles."
+      "zoomHint": "Scroll or pinch with two fingers to zoom. Drag the chart (Select mode) to the left to see past candles; earlier ones load automatically.",
+      "olderLoading": "Loading earlier candles…",
+      "olderEnd": "Start of the chart history"
     },
     "video": {
       "eyebrow": "Tutorial",

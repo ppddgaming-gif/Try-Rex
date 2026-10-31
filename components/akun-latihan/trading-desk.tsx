@@ -37,8 +37,9 @@ import { instrument } from "@/lib/demo/instruments"
 import type { Side } from "@/lib/demo/money"
 import type { ReviewAnswer } from "@/lib/demo/state"
 import type { DemoView } from "@/lib/demo/view"
-import { DRAWINGS, LIVE, LIVE_PAIRS, TIMEFRAMES, type LivePair, type Timeframe } from "@/lib/live/config"
+import { CHART, DRAWINGS, LIVE, LIVE_PAIRS, TIMEFRAMES, type LivePair, type Timeframe } from "@/lib/live/config"
 import { shiftDrawing, type Drawing } from "@/lib/live/drawings"
+import { emptyPast, mergeChart, oldestTime, prependPast, rollPast, type Past } from "@/lib/live/history"
 import { INDICATORS, type ChartIndicators, type IndicatorId, type Series } from "@/lib/live/indicators"
 import { toggleIndicator, useIndicators } from "@/lib/live/use-indicators"
 import { addServerXp } from "@/lib/progress/use-progress"
@@ -60,6 +61,9 @@ export type DeskQuote = { pair: string; open: boolean; opensIn: number | null; b
 export type DeskState = { pair: LivePair; timeframe: Timeframe; chart: DeskChart | null; drawings: Drawing[]; quote: DeskQuote }
 
 type ChartResponse = { pair: LivePair; timeframe: Timeframe; chart: DeskChart | null; drawings: Drawing[] | null; view: DemoView; quote: DeskQuote }
+type HistoryResponse = { pair: LivePair; timeframe: Timeframe; anchor: number; candles: ChartCandle[]; indicators: ChartIndicators; done: boolean }
+
+const chartKey = (pair: string, timeframe: string) => `${pair}|${timeframe}`
 
 const TOOLS: { id: Tool; icon: React.ElementType }[] = [
   { id: "select", icon: MousePointer2 },
@@ -96,7 +100,8 @@ export function TradingDesk({
   const t = useTranslations("demo.ui.desk")
   const td = useTranslations("demo")
   const postJson = usePostJson()
-  const [desk, setDesk] = useState(initial)
+  // The desk plus the older candles kept in the browser (lib/live/history).
+  const [desk, setDesk] = useState<DeskState & { past: Past }>(() => ({ ...initial, past: emptyPast(chartKey(initial.pair, initial.timeframe)) }))
   const [view, setView] = useState(initialView)
   // Drawings live in the frame of `base` (the anchor they were loaded with).
   const [base, setBase] = useState(initial.chart?.anchor ?? 0)
@@ -117,19 +122,24 @@ export function TradingDesk({
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pending = useRef<{ pair: LivePair; drawings: Drawing[]; anchor: number } | null>(null)
   const polling = useRef(false)
+  const fetchingOlder = useRef(false)
+  const [loadingOlder, setLoadingOlder] = useState(false)
   const tips = useTipQueue(initialView.tipsSeen)
 
   const chart = desk.chart
   const shift = chart ? chart.anchor - base : 0
   const shown = useMemo(() => (shift ? desk.drawings.map((d) => shiftDrawing(d, -shift)) : desk.drawings), [desk.drawings, shift])
-  const candles = useMemo(() => (chart ? (chart.forming ? [...chart.candles, chart.forming] : chart.candles) : []), [chart])
+  // Kept older candles, then the poll's window and the forming candle, with their indicators.
+  const merged = useMemo(() => (chart ? mergeChart(desk.past, chart) : null), [chart, desk.past])
+  const candles = useMemo(() => merged?.candles ?? [], [merged])
+  const olderLeft = !desk.past.done && desk.past.bars.length + (chart?.candles.length ?? 0) < CHART.HISTORY_MAX
   const indicatorsOn = useIndicators()
   const indicators = useMemo(() => {
     const out: Partial<Record<IndicatorId, Series>> = {}
     // Only a series that lines up with the candles is drawn.
-    for (const id of indicatorsOn) if (chart?.indicators?.[id]?.length === candles.length) out[id] = chart.indicators[id]
+    for (const id of indicatorsOn) if (merged?.indicators[id]?.length === candles.length) out[id] = merged.indicators[id]
     return out
-  }, [indicatorsOn, chart, candles.length])
+  }, [indicatorsOn, merged, candles.length])
   const position = view.open[0] ?? null
   const bust = view.account.bust
   const quote = desk.quote
@@ -178,6 +188,8 @@ export function TradingDesk({
       chart: res.chart,
       quote: res.quote,
       drawings: withDrawings && res.drawings ? res.drawings : d.drawings,
+      // What the previous window left behind joins the kept candles; another chart starts over.
+      past: rollPast(d.past, chartKey(res.pair, res.timeframe), d.chart, res.chart),
     }))
     if (withDrawings && res.chart) setBase(res.chart.anchor)
     setElapsed(0)
@@ -219,6 +231,20 @@ export function TradingDesk({
       document.removeEventListener("visibilitychange", onVisible)
     }
   }, [])
+  /** The player panned back to the first candle: fetch the batch before it. */
+  async function loadOlder() {
+    if (!chart || !olderLeft || fetchingOlder.current) return
+    const key = chartKey(desk.pair, desk.timeframe)
+    const before = oldestTime(desk.past, chart)
+    fetchingOlder.current = true
+    setLoadingOlder(true)
+    const res = await postJson<HistoryResponse>("/api/akun-latihan/chart/history", { pair: desk.pair, timeframe: desk.timeframe, before })
+    fetchingOlder.current = false
+    setLoadingOlder(false)
+    if (res.error) return setError(res.error)
+    setDesk((d) => (d.chart ? { ...d, past: prependPast(d.past, key, d.chart, before, res) } : d))
+  }
+
   const tick = useEffectEvent(() => {
     setElapsed((e) => e + 1)
     if (chart?.closesIn != null && chart.closesIn - elapsed <= 0) void poll()
@@ -529,6 +555,10 @@ export function TradingDesk({
                   step={chart.step}
                   nowWeek={chart.nowWeek}
                   candles={candles}
+                  lead={desk.past.lead}
+                  epoch={desk.past.gen}
+                  older={loadingOlder ? "loading" : olderLeft ? "more" : "end"}
+                  onNeedOlder={() => void loadOlder()}
                   levels={levels}
                   indicators={indicators}
                   drawings={shown}

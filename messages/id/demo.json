@@ -601,7 +601,9 @@
       "zoomIn": "Perbesar",
       "zoomOut": "Perkecil",
       "toLatest": "Ke harga terkini",
-      "zoomHint": "Scroll atau cubit dua jari untuk zoom. Geser chart (mode Pilih) untuk melihat candle lama."
+      "zoomHint": "Scroll atau cubit dua jari untuk zoom. Geser chart (mode Pilih) ke kiri untuk melihat candle yang sudah berlalu; candle sebelumnya dimuat otomatis.",
+      "olderLoading": "Memuat candle sebelumnya…",
+      "olderEnd": "Awal riwayat chart"
     },
     "video": {
       "eyebrow": "Tutorial",

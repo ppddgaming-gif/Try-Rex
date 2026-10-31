@@ -90,6 +90,22 @@ export function chartAt(pair: string, m15: readonly Bar[], now: number, step: nu
   return { closed, forming }
 }
 
+/**
+ * Older candles for a player panning back: up to `count` candles of `step`
+ * that had fully closed by `end` and open at or after `floor`. `closes` are
+ * every grouped close up to the last of them (the ones before `shown` only
+ * warm the indicators up; they never reach the browser).
+ */
+export function historyBefore(m15: readonly Bar[], end: number, floor: number, step: number, count: number) {
+  const grouped = aggregate(
+    m15.filter((b) => b.t + M15 <= end),
+    step,
+  ).filter((b) => b.t + step <= end)
+  const firstAllowed = grouped.findIndex((b) => b.t >= floor)
+  const shown = firstAllowed < 0 ? [] : grouped.slice(Math.max(firstAllowed, grouped.length - count))
+  return { shown, closes: grouped.map((b) => b.c) }
+}
+
 /** The market at `now`: open while an M15 candle is forming; otherwise closed, with the seconds until the next candle. */
 export function marketStatus(m15: readonly Bar[], now: number) {
   if (formingBar(m15, now)) return { open: true as const, opensIn: 0 }

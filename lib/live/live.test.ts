@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest"
 import { closedBefore, decodeChunk, monthsBetween, type LiveBar } from "@/lib/live/chunk"
 import { TIMEFRAME_SECONDS } from "@/lib/live/config"
 import { parseDrawing, parseDrawings, positionStats, shiftDrawing, type Drawing } from "@/lib/live/drawings"
+import { historyBefore } from "@/lib/live/market"
 import { dayTimeLabel, indexToTime, timeToIndex, toAbsolute, toRelative, weekPosition } from "@/lib/live/time"
 
 // Monday 2020-03-02 00:00 UTC
@@ -83,6 +84,41 @@ describe("chunks and slices", () => {
     const slice = closedBefore(bars, now, H, 5)
     expect(slice.map((b) => (b.t - MON) / H)).toEqual([5, 6, 7, 8, 9])
     expect(slice.every((b) => b.t + H <= now)).toBe(true)
+  })
+
+  describe("older candles for panning back", () => {
+    // Two weeks of M15 with the weekend between them, as the data has it.
+    const m15: LiveBar[] = [...week(900), ...week(900, MON + 7 * 86_400)].map((t, i) => ({ t, o: i, h: i + 1, l: i - 1, c: i + 0.5 }))
+    const H4 = TIMEFRAME_SECONDS.H4
+
+    it.each([
+      ["an H4 boundary", "H4", MON + 7 * 86_400 + 8 * H, 6],
+      ["the middle of an H4 candle", "H4", MON + 7 * 86_400 + 9 * H + 15 * 60, 6],
+      ["an M15 boundary", "M15", MON + 3 * 86_400 + 5 * H, 40],
+    ] as const)("returns only candles closed by `end` at %s, the newest last", (_, tf, end, count) => {
+      const step = TIMEFRAME_SECONDS[tf]
+      const { shown, closes } = historyBefore(m15, end, 0, step, count)
+      expect(shown).toHaveLength(count)
+      expect(shown.every((b) => b.t + step <= end)).toBe(true)
+      // The newest is the last candle that closed by `end`; the warm-up closes end with it.
+      const next = shown[shown.length - 1].t + step
+      expect(next + step > end || m15.every((b) => b.t < next || b.t >= end)).toBe(true)
+      expect(closes[closes.length - 1]).toBe(shown[shown.length - 1].c)
+      expect(closes.length).toBeGreaterThanOrEqual(shown.length)
+    })
+
+    it("joins the weekend like the chart does: Friday's last H4, then Monday's first", () => {
+      const { shown } = historyBefore(m15, MON + 7 * 86_400 + 8 * H, 0, H4, 4)
+      expect(shown.map((b) => (b.t - MON) / H)).toEqual([4 * 24 + 16, 4 * 24 + 20, 7 * 24, 7 * 24 + 4])
+    })
+
+    it("stops at the floor and says so by returning fewer", () => {
+      const floor = MON + 4 * 86_400
+      const { shown } = historyBefore(m15, MON + 7 * 86_400 + 8 * H, floor, H4, 50)
+      expect(shown[0].t).toBe(floor)
+      expect(shown.length).toBeLessThan(50)
+      expect(historyBefore(m15, floor, floor, H4, 50).shown).toEqual([])
+    })
   })
 
   it("asks for every month a span touches, across New Year", () => {

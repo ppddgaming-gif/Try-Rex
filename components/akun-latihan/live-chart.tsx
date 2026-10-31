@@ -2,7 +2,7 @@
 
 import { useEffect, useEffectEvent, useId, useLayoutEffect, useMemo, useRef, useState } from "react"
 import { useLocale, useTranslations } from "next-intl"
-import { ChevronsRight, ZoomIn, ZoomOut } from "lucide-react"
+import { ChevronsRight, History, LoaderCircle, ZoomIn, ZoomOut } from "lucide-react"
 import { frameOf } from "@/lib/chart-geometry"
 import { instrument } from "@/lib/demo/instruments"
 import type { Locale } from "@/lib/i18n/locale"
@@ -51,6 +51,14 @@ type Props = {
   nowWeek: number
   /** Closed candles, then the forming one last (its close is the current price). */
   candles: ChartCandle[]
+  /** Candles added at the front by history fetches so far: the view shifts by each new batch to stay put. */
+  lead?: number
+  /** Changes when the candles start over (the clock jumped): the view resets. */
+  epoch?: number
+  /** Whether older candles can still be fetched, are on their way, or have run out. */
+  older?: "more" | "loading" | "end"
+  /** The view reached the first candles: fetch the batch before them. */
+  onNeedOlder?: () => void
   /** The open position's entry, SL and TP; placed with the candles' own scale. */
   levels?: ChartLevel[]
   /** The indicators switched on, one value per candle (aligned with `candles`). */
@@ -83,7 +91,25 @@ const newId = () => `d${Date.now().toString(36)}${(uid++).toString(36)}`
  * and every drawing. Drawings are (time, price), so they stay put when the
  * timeframe changes. They are a thinking aid: nothing here scores or advises.
  */
-export function LiveChart({ pair, digits, step, nowWeek, candles, levels = [], indicators = {}, drawings, tool, selected, onSelect, onCommit, onToolDone }: Props) {
+export function LiveChart({
+  pair,
+  digits,
+  step,
+  nowWeek,
+  candles,
+  lead = 0,
+  epoch = 0,
+  older = "end",
+  onNeedOlder,
+  levels = [],
+  indicators = {},
+  drawings,
+  tool,
+  selected,
+  onSelect,
+  onCommit,
+  onToolDone,
+}: Props) {
   const t = useTranslations("demo.ui.desk")
   const locale = useLocale() as Locale
   const box = useRef<HTMLDivElement>(null)
@@ -93,11 +119,19 @@ export function LiveChart({ pair, digits, step, nowWeek, candles, levels = [], i
   // A new tool or chart drops an unfinished drawing (reset during render, React's pattern for this).
   const defaultView: ChartView = { span: CHART.DEFAULT_VISIBLE + CHART.RIGHT_SLOTS, offset: null }
   const [view, setView] = useState<ChartView>(defaultView)
-  const chartKey = `${pair}|${step}`
+  const chartKey = `${pair}|${step}|${epoch}`
   const [viewFor, setViewFor] = useState(chartKey)
   if (viewFor !== chartKey) {
     setViewFor(chartKey)
     setView(defaultView)
+  }
+  // Older candles arrived at the front: every index moved up by as many, so a
+  // held place in history moves with them and stays on screen.
+  const [leadSeen, setLeadSeen] = useState(lead)
+  if (leadSeen !== lead) {
+    setLeadSeen(lead)
+    const added = lead - leadSeen
+    setView((v) => (added > 0 && v.offset !== null ? { ...v, offset: v.offset + added } : v))
   }
   const draftKey = `${tool}|${pair}|${step}`
   const [draftFor, setDraftFor] = useState(draftKey)
@@ -135,6 +169,23 @@ export function LiveChart({ pair, digits, step, nowWeek, candles, levels = [], i
   const pan = useRef<{ x: number; base: ChartView } | null>(null)
   const fingers = useRef(new Map<number, { x: number; y: number }>())
   const pinch = useRef<{ dist: number; base: ChartView; anchor: number } | null>(null)
+  // A pan or pinch in progress started in the old indexes: move its base with the new candles.
+  const leadRef = useRef(lead)
+  useLayoutEffect(() => {
+    const added = lead - leadRef.current
+    leadRef.current = lead
+    if (added <= 0) return
+    const p = pan.current
+    if (p && p.base.offset !== null) pan.current = { ...p, base: { ...p.base, offset: p.base.offset + added } }
+    const q = pinch.current
+    if (q) pinch.current = { ...q, anchor: q.anchor + added, base: q.base.offset !== null ? { ...q.base, offset: q.base.offset + added } : q.base }
+  }, [lead])
+  // Near the first candle: ask for the ones before it.
+  const needOlder = useEffectEvent(() => onNeedOlder?.())
+  const nearStart = win.offset <= CHART.HISTORY_TRIGGER
+  useEffect(() => {
+    if (nearStart && older === "more") needOlder()
+  }, [nearStart, older, candles.length])
 
   const zoomBy = (factor: number, anchor: number) => setView((v) => zoomView(v, candles.length, limits, factor, anchor))
   const centre = () => win.offset + win.span / 2 - 0.5
@@ -404,7 +455,8 @@ export function LiveChart({ pair, digits, step, nowWeek, candles, levels = [], i
   })
 
 
-  const ticks = timeTicks(candles.length, scale.slot).filter((i) => i >= lo && i <= hi)
+  // A label half off the plot is dropped rather than pushed onto its neighbour.
+  const ticks = timeTicks(candles.length, scale.slot).filter((i) => i >= lo && i <= hi && scale.indexToX(i) >= 34 && scale.indexToX(i) <= scale.plotW - 34)
   const last = candles[candles.length - 1]
   const hoverIndex = hover ? Math.round(scale.xToIndex(hover.x)) : null
   const hoverCandle = hoverIndex !== null && hoverIndex >= 0 && hoverIndex < candles.length ? candles[hoverIndex] : null
@@ -452,7 +504,7 @@ export function LiveChart({ pair, digits, step, nowWeek, candles, levels = [], i
             {ticks.map((i) => (
               <text
                 key={i}
-                x={Math.min(Math.max(scale.indexToX(i), 34), scale.plotW - 34)}
+                x={scale.indexToX(i)}
                 y={size.h - 7}
                 textAnchor="middle"
                 fontSize={11}
@@ -640,6 +692,20 @@ export function LiveChart({ pair, digits, step, nowWeek, candles, levels = [], i
             </p>
           )}
         </div>
+      )}
+      {!draft && (older === "loading" || (older === "end" && win.offset < 1)) && (
+        <p
+          role="status"
+          className="glass-card glass-strong pointer-events-none absolute left-2 flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-muted-foreground"
+          style={{ bottom: PAD.bottom + 6 }}
+        >
+          {older === "loading" ? (
+            <LoaderCircle className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+          ) : (
+            <History className="h-3.5 w-3.5" aria-hidden="true" />
+          )}
+          {older === "loading" ? t("olderLoading") : t("olderEnd")}
+        </p>
       )}
       {draft?.mode === "path" && (
         <button
