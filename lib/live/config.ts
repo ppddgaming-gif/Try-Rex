@@ -13,6 +13,26 @@ import type { Locale } from "@/lib/i18n/locale"
 export const LIVE_PAIRS = ["EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "USDCAD", "EURJPY", "GBPCAD", "EURAUD", "GBPNZD"] as const
 export type LivePair = (typeof LIVE_PAIRS)[number]
 
+/**
+ * Per pair, everything that differs between pairs on the chart: the decimals
+ * of its prices. scripts/build-live-data.mjs detects them from the data (the
+ * most decimals among the first 1,000 closes, falling back to 3 for JPY pairs
+ * and 5 for the rest) and stores prices at that precision; the detection gives
+ * exactly these. Used for display only (axis, legend, readout): nothing is
+ * computed at this precision.
+ */
+export const PAIR_CONFIG: Record<LivePair, { digits: number }> = {
+  EURUSD: { digits: 5 },
+  GBPUSD: { digits: 5 },
+  USDJPY: { digits: 3 },
+  AUDUSD: { digits: 5 },
+  USDCAD: { digits: 5 },
+  EURJPY: { digits: 3 },
+  GBPCAD: { digits: 5 },
+  EURAUD: { digits: 5 },
+  GBPNZD: { digits: 5 },
+}
+
 export const TIMEFRAMES = ["M15", "M30", "H1", "H4"] as const
 export type Timeframe = (typeof TIMEFRAMES)[number]
 
@@ -35,6 +55,13 @@ export const CHART = {
   ZOOM_STEP: 1.2,
   /** Empty candle slots kept right of the last candle, room to draw into the future. */
   RIGHT_SLOTS: 14,
+  /**
+   * Closed candles read before the first one sent, so EMA 50 and RSI 14 have
+   * settled by then. Server side only: these candles never reach the browser.
+   */
+  WARMUP: 300,
+  /** Height of the RSI panel under the chart, in pixels. */
+  RSI_HEIGHT: 120,
 } as const
 
 export const DRAWINGS = {

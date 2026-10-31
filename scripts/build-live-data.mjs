@@ -75,7 +75,30 @@ if (!src) {
   process.exit(1)
 }
 
-const digitsOf = (pair) => (pair.endsWith("JPY") ? 3 : 5)
+/** Fallback when the data doesn't say: 3 decimals for JPY pairs, 5 for the rest. */
+const fallbackDigits = (pair) => (pair.endsWith("JPY") ? 3 : 5)
+
+/**
+ * The decimals of a pair's prices, from the data: the most decimals among the
+ * first 1,000 closes. Must match PAIR_CONFIG in lib/live/config.ts, which the
+ * chart formats with.
+ */
+async function detectDigits(file, pair) {
+  let most = -1
+  let rows = 0
+  const lines = createInterface({ input: createReadStream(file, "utf8"), crlfDelay: Infinity })
+  for await (const raw of lines) {
+    const fields = raw.replace(/^﻿/, "").trim().split(",")
+    if (fields.length < 5 || fields[0] === "Datetime") continue
+    // The close is the 4th price: field 5 in MT4 rows ("date,time,o,h,l,c,v"), field 4 in FXCM rows ("datetime,o,h,l,c").
+    const close = (fields[0].includes(" ") ? fields[4] : fields[5])?.trim() ?? ""
+    if (!Number.isFinite(Number(close)) || close === "") continue
+    most = Math.max(most, close.includes(".") ? close.split(".")[1].length : 0)
+    if (++rows >= 1000) break
+  }
+  lines.close()
+  return most >= 0 ? most : fallbackDigits(pair)
+}
 
 /** File for a pair and timeframe: "EURUSD_H4.csv", or with a "_SYNTHETIC" suffix. */
 function findFile(pair, tf) {
@@ -215,13 +238,14 @@ let problems = 0
 const closes = new Map()
 
 for (const pair of PAIRS) {
-  const digits = digitsOf(pair)
   const file = findFile(pair, "M15")
   if (!file) {
     console.log(`MISSING ${pair} M15`)
     problems++
     continue
   }
+  const digits = await detectDigits(file, pair)
+  if (digits !== fallbackDigits(pair)) console.log(`NOTE ${pair}: ${digits} decimals in the data; update PAIR_CONFIG in lib/live/config.ts`)
   const read = await readBars(file, digits)
   const { skipped, duplicates } = read
 

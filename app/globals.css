@@ -94,6 +94,11 @@
   /* WAIT is blue-grey rather than neutral grey so it reads as an equal
      choice, not as "didn't answer". */
   --wait: #8aa0b4;
+  /* Chart indicators: lines only, never a market direction (not green or red)
+     and not amber (drawings and the brand). */
+  --ind-ema20: #6cb8f0;
+  --ind-ema50: #c58df0;
+  --ind-rsi: #c58df0;
   /* Mid-tier scores and XP. The design paints these amber. */
   --warning: #f2a03d;
 
@@ -140,6 +145,9 @@
   --success: #0f8a54;
   --danger: #d03a3a;
   --wait: #52708c;
+  --ind-ema20: #1f6fb2;
+  --ind-ema50: #7a3db8;
+  --ind-rsi: #7a3db8;
   --warning: #c47508;
 
   --rex-shade: #a9620a;

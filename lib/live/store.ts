@@ -3,7 +3,8 @@ import { readFile } from "node:fs/promises"
 import { join } from "node:path"
 import { gunzipSync } from "node:zlib"
 import { decodeChunk, monthsBetween, type LiveBar, type Manifest, type RawChunk } from "@/lib/live/chunk"
-import { CHART, M15, MARKET, TIMEFRAME_SECONDS, type LivePair, type Timeframe } from "@/lib/live/config"
+import { CHART, M15, MARKET, PAIR_CONFIG, TIMEFRAME_SECONDS, isLivePair, type LivePair, type Timeframe } from "@/lib/live/config"
+import { chartIndicators, type ChartIndicators } from "@/lib/live/indicators"
 import { chartAt, marketStatus } from "@/lib/live/market"
 import { toRelative, weekPosition } from "@/lib/live/time"
 import { createAdminClient } from "@/lib/supabase/admin"
@@ -62,10 +63,13 @@ export async function m15Between(pair: string, from: number, to: number): Promis
   return loaded.flatMap((b) => b ?? []).filter((b) => b.t >= from && b.t <= to)
 }
 
-export const digitsOf = (pair: string) => (pair.endsWith("JPY") ? 3 : 5)
+export const digitsOf = (pair: string) => (isLivePair(pair) ? PAIR_CONFIG[pair].digits : pair.endsWith("JPY") ? 3 : 5)
+
+/** Closed candles a chart reads: the ones sent plus the indicators' warm-up. */
+const READ_BARS = CHART.BARS + CHART.WARMUP
 
 /** How far back a chart of `step` reads: its candles plus weekends and holidays. */
-const lookback = (step: number) => Math.ceil(CHART.BARS * step * 1.6) + 6 * 86_400
+const lookback = (step: number) => Math.ceil(READ_BARS * step * 1.6) + 6 * 86_400
 
 export type RelBar = { t: number; o: number; h: number; l: number; c: number }
 
@@ -89,6 +93,12 @@ export type ChartSlice = {
   /** Seconds until the forming M15 candle closes (the countdown); null while the market is closed. */
   closesIn: number | null
   market: { open: boolean; opensIn: number | null }
+  /**
+   * EMA 20, EMA 50 and RSI 14, one value per candle sent (closed, then the
+   * forming one), computed from closes up to now with CHART.WARMUP more closed
+   * candles before the first one sent.
+   */
+  indicators: ChartIndicators
 }
 
 /**
@@ -103,10 +113,16 @@ export async function chartSlice(now: number, real: number, pair: LivePair, time
   const bars = await m15Between(pair, now - lookback(step), now + MARKET.CLOSE_GAP_SECONDS + 4 * 86_400)
   const past = bars.filter((b) => b.t <= now)
   if (past.length === 0) return null
-  const { closed, forming } = chartAt(pair, past, now, step, CHART.BARS, digits)
+  const { closed: read, forming } = chartAt(pair, past, now, step, READ_BARS, digits)
+  const closed = read.slice(-CHART.BARS)
   const status = marketStatus(bars, now)
   const rel = (b: LiveBar): RelBar => ({ t: toRelative(b.t, now), o: b.o, h: b.h, l: b.l, c: b.c })
   return {
+    indicators: chartIndicators(
+      read.map((b) => b.c),
+      forming ? forming.c : null,
+      CHART.BARS,
+    ),
     pair,
     timeframe,
     digits,

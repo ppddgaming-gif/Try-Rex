@@ -6,6 +6,14 @@ import type { Drawing, Point } from "@/lib/live/drawings"
 
 export const PAD = { right: 64, bottom: 24, top: 8 } as const
 
+/**
+ * The RSI panel under the chart: the same right axis, so with the same width,
+ * span and offset its candles sit exactly under the chart's (one indexToX).
+ */
+export const RSI_PAD = { right: PAD.right, bottom: 6, top: 6 } as const
+
+export type Pad = { right: number; bottom: number; top: number }
+
 export type Scale = {
   width: number
   height: number
@@ -31,9 +39,9 @@ export type Scale = {
  * so zooming and panning move this window and nothing else: candles,
  * drawings and position lines all go through the same indexToX / priceToY.
  */
-export function makeScale(width: number, height: number, count: number, min: number, max: number, offset = 0): Scale {
-  const plotW = Math.max(1, width - PAD.right)
-  const plotH = Math.max(1, height - PAD.bottom - PAD.top)
+export function makeScale(width: number, height: number, count: number, min: number, max: number, offset = 0, pad: Pad = PAD): Scale {
+  const plotW = Math.max(1, width - pad.right)
+  const plotH = Math.max(1, height - pad.bottom - pad.top)
   const slot = plotW / Math.max(1, count)
   const span = max - min || 1
   return {
@@ -46,8 +54,8 @@ export function makeScale(width: number, height: number, count: number, min: num
     min,
     max,
     offset,
-    priceToY: (p) => PAD.top + ((max - p) / span) * plotH,
-    yToPrice: (y) => max - ((y - PAD.top) / plotH) * span,
+    priceToY: (p) => pad.top + ((max - p) / span) * plotH,
+    yToPrice: (y) => max - ((y - pad.top) / plotH) * span,
     indexToX: (i) => (i - offset + 0.5) * slot,
     xToIndex: (x) => x / slot - 0.5 + offset,
   }
@@ -183,6 +191,25 @@ export function moveDrawing(d: Drawing, dt: number, dp: number): Drawing {
     default:
       return { ...d, a: mv(d.a), b: mv(d.b) }
   }
+}
+
+/**
+ * SVG path of an indicator line through candles lo..hi. A null value breaks
+ * the line (not enough candles yet), so it never draws a made-up value.
+ */
+export function seriesPath(values: readonly (number | null)[], scale: Scale, lo: number, hi: number) {
+  let d = ""
+  let pen = false
+  for (let i = Math.max(0, lo); i <= Math.min(values.length - 1, hi); i++) {
+    const v = values[i]
+    if (v === null || !Number.isFinite(v)) {
+      pen = false
+      continue
+    }
+    d += `${pen ? "L" : "M"}${scale.indexToX(i).toFixed(2)} ${scale.priceToY(v).toFixed(2)}`
+    pen = true
+  }
+  return d
 }
 
 /** Five to seven candle indexes to label on the time axis, evenly spread over the candles. */

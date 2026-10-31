@@ -560,6 +560,11 @@
         "path": "Path (double-click to finish)"
       },
       "toolsNote": "Drawings are only an aid for your analysis: they aren't scored and give no advice. Saved per account, per pair.",
+      "indicators": "Indicators",
+      "indicatorShow": "Show {name}",
+      "indicatorHide": "Hide {name}",
+      "rsiAria": "RSI 14 panel for {pair}",
+      "indicatorsNote": "EMA and RSI are calculated from the close prices of candles that have already happened, including history before the first candle on screen. Indicators only help you read the chart: they are not scored and give no signals.",
       "finishPath": "Done",
       "secondPoint": "Tap the second point",
       "posTp": "TP {price} · {pips} pips",

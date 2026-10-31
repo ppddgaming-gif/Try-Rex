@@ -560,6 +560,11 @@
         "path": "Path (klik dua kali untuk selesai)"
       },
       "toolsNote": "Gambar hanya alat bantu analisismu: tidak dinilai dan tidak memberi saran. Tersimpan per akun, per pair.",
+      "indicators": "Indikator",
+      "indicatorShow": "Tampilkan {name}",
+      "indicatorHide": "Sembunyikan {name}",
+      "rsiAria": "Panel RSI 14 untuk {pair}",
+      "indicatorsNote": "EMA dan RSI dihitung dari harga close candle yang sudah terjadi, termasuk riwayat sebelum candle pertama di layar. Indikator hanya alat bantu membaca chart: tidak dinilai dan tidak memberi sinyal.",
       "finishPath": "Selesai",
       "secondPoint": "Ketuk titik kedua",
       "posTp": "TP {price} · {pips} pip",

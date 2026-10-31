@@ -8,7 +8,21 @@ import { instrument } from "@/lib/demo/instruments"
 import type { Locale } from "@/lib/i18n/locale"
 import { CHART, DRAWINGS } from "@/lib/live/config"
 import { positionStats, type Drawing, type DrawingKind, type Point } from "@/lib/live/drawings"
-import { PAD, clampView, hitTest, makeScale, moveDrawing, panView, timeTicks, zoomView, type ChartView, type Scale } from "@/lib/live/geometry"
+import {
+  PAD,
+  RSI_PAD,
+  clampView,
+  hitTest,
+  makeScale,
+  moveDrawing,
+  panView,
+  seriesPath,
+  timeTicks,
+  zoomView,
+  type ChartView,
+  type Scale,
+} from "@/lib/live/geometry"
+import type { IndicatorId, Series } from "@/lib/live/indicators"
 import { dayTimeLabel, indexToTime, timeToIndex } from "@/lib/live/time"
 
 /** A candle as the browser has it: `t` in seconds relative to now. */
@@ -20,6 +34,16 @@ export type ChartLevel = { kind: "entry" | "sl" | "tp"; price: number; label: st
 /** "select" or a drawing kind; positions come as buy and sell. */
 export type Tool = "select" | Exclude<DrawingKind, "position"> | "position-buy" | "position-sell"
 
+/** Each indicator's colour token and label. EMAs share the price scale; RSI has its own panel. */
+export const INDICATOR_STYLE: Record<IndicatorId, { color: string; label: string }> = {
+  ema20: { color: "var(--ind-ema20)", label: "EMA 20" },
+  ema50: { color: "var(--ind-ema50)", label: "EMA 50" },
+  rsi14: { color: "var(--ind-rsi)", label: "RSI 14" },
+}
+
+/** The RSI panel's guide lines. */
+const RSI_LEVELS = [70, 50, 30] as const
+
 type Props = {
   pair: string
   digits: number
@@ -29,6 +53,8 @@ type Props = {
   candles: ChartCandle[]
   /** The open position's entry, SL and TP; placed with the candles' own scale. */
   levels?: ChartLevel[]
+  /** The indicators switched on, one value per candle (aligned with `candles`). */
+  indicators?: Partial<Record<IndicatorId, Series>>
   drawings: Drawing[]
   tool: Tool
   selected: string | null
@@ -57,7 +83,7 @@ const newId = () => `d${Date.now().toString(36)}${(uid++).toString(36)}`
  * and every drawing. Drawings are (time, price), so they stay put when the
  * timeframe changes. They are a thinking aid: nothing here scores or advises.
  */
-export function LiveChart({ pair, digits, step, nowWeek, candles, levels = [], drawings, tool, selected, onSelect, onCommit, onToolDone }: Props) {
+export function LiveChart({ pair, digits, step, nowWeek, candles, levels = [], indicators = {}, drawings, tool, selected, onSelect, onCommit, onToolDone }: Props) {
   const t = useTranslations("demo.ui.desk")
   const locale = useLocale() as Locale
   const box = useRef<HTMLDivElement>(null)
@@ -98,11 +124,13 @@ export function LiveChart({ pair, digits, step, nowWeek, candles, levels = [], d
   const lo = Math.max(0, Math.floor(win.offset - 0.5))
   const hi = Math.min(candles.length - 1, Math.ceil(win.offset + win.span))
   const visible = useMemo(() => candles.slice(lo, hi + 1), [candles, lo, hi])
-  const frame = useMemo(
-    () => frameOf(visible.length ? visible : candles, levels.map((l) => l.price)),
-    [visible, candles, levels],
-  )
+  const { ema20, ema50, rsi14 } = indicators
+  // The price axis fits the EMA lines on screen too, so they are never cut off.
+  const emaOnScreen = [ema20, ema50].flatMap((s) => (s ?? []).slice(lo, hi + 1).filter((v): v is number => v !== null))
+  const frame = frameOf(visible.length ? visible : candles, [...levels.map((l) => l.price), ...emaOnScreen])
   const scale: Scale = makeScale(size.w || 1, size.h || 1, win.span, frame.min, frame.max, win.offset)
+  // The RSI panel: same width, span and offset, so its x is the chart's x; y is 0–100.
+  const rsiScale: Scale = makeScale(size.w || 1, CHART.RSI_HEIGHT, win.span, 0, 100, win.offset, RSI_PAD)
   // A pan in progress (one finger or the mouse on empty chart), and the fingers on the chart for a pinch.
   const pan = useRef<{ x: number; base: ChartView } | null>(null)
   const fingers = useRef(new Map<number, { x: number; y: number }>())
@@ -381,11 +409,15 @@ export function LiveChart({ pair, digits, step, nowWeek, candles, levels = [], d
   const hoverIndex = hover ? Math.round(scale.xToIndex(hover.x)) : null
   const hoverCandle = hoverIndex !== null && hoverIndex >= 0 && hoverIndex < candles.length ? candles[hoverIndex] : null
   const readout = hoverCandle ?? last
+  const readoutIndex = hoverCandle ? hoverIndex! : candles.length - 1
+  const valueAt = (s: Series | undefined) => (s ? (s[readoutIndex] ?? null) : undefined)
+  const rsiNow = valueAt(rsi14)
   const fmt = (v: number) => v.toFixed(digits)
   const tickFmt = (v: number) => v.toFixed(Math.max(0, digits - 1))
   const body = Math.max(1, scale.slot * 0.62)
 
   return (
+    <div>
     <div className="relative">
       <div
         ref={box}
@@ -510,6 +542,16 @@ export function LiveChart({ pair, digits, step, nowWeek, candles, levels = [], d
                 ),
             )}
 
+            {/* EMA lines, on the candles' own scale, under the drawings. */}
+            <g clipPath={`url(#plot-${clipId})`} pointerEvents="none">
+              {(["ema50", "ema20"] as const).map((id) => {
+                const s = indicators[id]
+                return s ? (
+                  <path key={id} d={seriesPath(s, scale, lo, hi)} fill="none" stroke={INDICATOR_STYLE[id].color} strokeWidth={1.5} strokeLinejoin="round" />
+                ) : null
+              })}
+            </g>
+
             {/* Drawings, kept inside the plot. */}
             <g clipPath={`url(#plot-${clipId})`}>
               {shown.map((d) => (
@@ -581,9 +623,23 @@ export function LiveChart({ pair, digits, step, nowWeek, candles, levels = [], d
 
       {/* Readout: the candle under the crosshair, or the last one. Weekday and hour only. */}
       {readout && (
-        <p className="pointer-events-none absolute left-2 top-1 rounded-md bg-background/70 px-2 py-0.5 font-mono text-[11px] text-muted-foreground">
-          {dayTimeLabel(readout.t, nowWeek, locale)} · O {fmt(readout.o)} H {fmt(readout.h)} L {fmt(readout.l)} C {fmt(readout.c)}
-        </p>
+        <div className="pointer-events-none absolute left-2 top-1 flex flex-col items-start gap-0.5 font-mono text-[11px] tabular-nums text-muted-foreground">
+          <p className="rounded-md bg-background/70 px-2 py-0.5">
+            {dayTimeLabel(readout.t, nowWeek, locale)} · O {fmt(readout.o)} H {fmt(readout.h)} L {fmt(readout.l)} C {fmt(readout.c)}
+          </p>
+          {(ema20 || ema50) && (
+            <p className="flex gap-3 rounded-md bg-background/70 px-2 py-0.5">
+              {(["ema20", "ema50"] as const).map((id) => {
+                const v = valueAt(indicators[id])
+                return v === undefined ? null : (
+                  <span key={id} style={{ color: INDICATOR_STYLE[id].color }}>
+                    {INDICATOR_STYLE[id].label} {v === null ? "—" : fmt(v)}
+                  </span>
+                )
+              })}
+            </p>
+          )}
+        </div>
       )}
       {draft?.mode === "path" && (
         <button
@@ -597,6 +653,69 @@ export function LiveChart({ pair, digits, step, nowWeek, candles, levels = [], d
       {draft?.mode === "create" && !draft.moved && (
         <p className="pointer-events-none absolute bottom-8 left-2 rounded-md bg-background/80 px-2 py-1 text-xs">{t("secondPoint")}</p>
       )}
+    </div>
+
+    {/* RSI 14 in its own panel: 0–100, guides at 30, 50 and 70, candles under the chart's. */}
+    {rsi14 && size.w > 0 && (
+      <div className="relative mt-1 border-t border-border" style={{ height: CHART.RSI_HEIGHT }}>
+        <svg width={size.w} height={CHART.RSI_HEIGHT} className="block" role="img" aria-label={t("rsiAria", { pair })}>
+          <defs>
+            <clipPath id={`rsi-${clipId}`}>
+              <rect x={0} y={0} width={rsiScale.plotW} height={CHART.RSI_HEIGHT} />
+            </clipPath>
+          </defs>
+          <rect
+            x={0}
+            width={rsiScale.plotW}
+            y={rsiScale.priceToY(70)}
+            height={rsiScale.priceToY(30) - rsiScale.priceToY(70)}
+            fill="var(--ind-rsi)"
+            fillOpacity={0.06}
+          />
+          {RSI_LEVELS.map((v) => (
+            <g key={v}>
+              <line
+                x1={0}
+                x2={rsiScale.plotW}
+                y1={rsiScale.priceToY(v)}
+                y2={rsiScale.priceToY(v)}
+                stroke="var(--muted-foreground)"
+                strokeOpacity={v === 50 ? 0.3 : 0.55}
+                strokeDasharray="3 4"
+              />
+              <text x={rsiScale.plotW + 6} y={rsiScale.priceToY(v) + 4} fontSize={11} fill="var(--muted-foreground)" fontFamily="var(--font-mono)">
+                {v}
+              </text>
+            </g>
+          ))}
+          <line x1={rsiScale.plotW} x2={rsiScale.plotW} y1={0} y2={CHART.RSI_HEIGHT} stroke="var(--border)" />
+          <path
+            d={seriesPath(rsi14, rsiScale, lo, hi)}
+            clipPath={`url(#rsi-${clipId})`}
+            fill="none"
+            stroke={INDICATOR_STYLE.rsi14.color}
+            strokeWidth={1.5}
+            strokeLinejoin="round"
+          />
+          {/* The latest value on the axis, like the last price. */}
+          {rsi14[rsi14.length - 1] != null && (
+            <g>
+              <rect x={rsiScale.plotW} y={rsiScale.priceToY(rsi14[rsi14.length - 1]!) - 9} width={RSI_PAD.right} height={18} fill={INDICATOR_STYLE.rsi14.color} />
+              <text x={rsiScale.plotW + 6} y={rsiScale.priceToY(rsi14[rsi14.length - 1]!) + 4} fontSize={11} fill="var(--background)" fontFamily="var(--font-mono)">
+                {rsi14[rsi14.length - 1]!.toFixed(2)}
+              </text>
+            </g>
+          )}
+          {hover && <line x1={hover.x} x2={hover.x} y1={0} y2={CHART.RSI_HEIGHT} stroke="var(--muted-foreground)" strokeDasharray="3 3" pointerEvents="none" />}
+        </svg>
+        <p
+          className="pointer-events-none absolute left-2 top-1 rounded-md bg-background/70 px-2 py-0.5 font-mono text-[11px] tabular-nums"
+          style={{ color: INDICATOR_STYLE.rsi14.color }}
+        >
+          {INDICATOR_STYLE.rsi14.label} {rsiNow == null ? "—" : rsiNow.toFixed(2)}
+        </p>
+      </div>
+    )}
     </div>
   )
 }

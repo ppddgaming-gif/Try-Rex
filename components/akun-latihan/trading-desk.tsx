@@ -22,7 +22,7 @@ import {
 } from "lucide-react"
 import { AccountPanel, StageCard } from "@/components/akun-latihan/account-panel"
 import { FirstTradeGuide, type GuideProgress } from "@/components/akun-latihan/first-trade-guide"
-import { LiveChart, type ChartCandle, type ChartLevel, type Tool } from "@/components/akun-latihan/live-chart"
+import { INDICATOR_STYLE, LiveChart, type ChartCandle, type ChartLevel, type Tool } from "@/components/akun-latihan/live-chart"
 import { OpenTrades } from "@/components/akun-latihan/open-trades"
 import { OrderPanel, quoteFor, sideStyle, type Draft, type Market } from "@/components/akun-latihan/order-panel"
 import { usePostJson } from "@/components/akun-latihan/post-json"
@@ -39,6 +39,8 @@ import type { ReviewAnswer } from "@/lib/demo/state"
 import type { DemoView } from "@/lib/demo/view"
 import { DRAWINGS, LIVE, LIVE_PAIRS, TIMEFRAMES, type LivePair, type Timeframe } from "@/lib/live/config"
 import { shiftDrawing, type Drawing } from "@/lib/live/drawings"
+import { INDICATORS, type ChartIndicators, type IndicatorId, type Series } from "@/lib/live/indicators"
+import { toggleIndicator, useIndicators } from "@/lib/live/use-indicators"
 import { addServerXp } from "@/lib/progress/use-progress"
 
 export type DeskChart = {
@@ -51,6 +53,8 @@ export type DeskChart = {
   forming: ChartCandle | null
   closesIn: number | null
   market: { open: boolean; opensIn: number | null }
+  /** Computed on the server, one value per candle (closed, then forming). */
+  indicators: ChartIndicators
 }
 export type DeskQuote = { pair: string; open: boolean; opensIn: number | null; bid: number | null; ask: number | null }
 export type DeskState = { pair: LivePair; timeframe: Timeframe; chart: DeskChart | null; drawings: Drawing[]; quote: DeskQuote }
@@ -119,6 +123,13 @@ export function TradingDesk({
   const shift = chart ? chart.anchor - base : 0
   const shown = useMemo(() => (shift ? desk.drawings.map((d) => shiftDrawing(d, -shift)) : desk.drawings), [desk.drawings, shift])
   const candles = useMemo(() => (chart ? (chart.forming ? [...chart.candles, chart.forming] : chart.candles) : []), [chart])
+  const indicatorsOn = useIndicators()
+  const indicators = useMemo(() => {
+    const out: Partial<Record<IndicatorId, Series>> = {}
+    // Only a series that lines up with the candles is drawn.
+    for (const id of indicatorsOn) if (chart?.indicators?.[id]?.length === candles.length) out[id] = chart.indicators[id]
+    return out
+  }, [indicatorsOn, chart, candles.length])
   const position = view.open[0] ?? null
   const bust = view.account.bust
   const quote = desk.quote
@@ -447,6 +458,35 @@ export function TradingDesk({
                   <Eraser className="h-4 w-4" aria-hidden="true" />
                 </button>
               </div>
+
+              {/* Indicators: their own group after the drawing tools. */}
+              <div role="group" aria-label={t("indicators")} className="flex items-center gap-0.5 rounded-xl bg-inset p-0.5">
+                <span className="px-1.5 text-[10px] font-semibold uppercase tracking-wide text-faint">{t("indicators")}</span>
+                <span aria-hidden="true" className="mr-0.5 h-6 w-px bg-border" />
+                {INDICATORS.map((id) => {
+                  const on = indicatorsOn.includes(id)
+                  return (
+                    <button
+                      key={id}
+                      type="button"
+                      aria-pressed={on}
+                      onClick={() => toggleIndicator(id)}
+                      title={t(on ? "indicatorHide" : "indicatorShow", { name: INDICATOR_STYLE[id].label })}
+                      className={[
+                        "flex min-h-11 items-center gap-1.5 rounded-lg px-2 font-mono text-xs font-semibold transition-colors",
+                        on ? "bg-muted text-foreground ring-1 ring-inset ring-primary" : "text-muted-foreground hover:text-foreground",
+                      ].join(" ")}
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="h-2.5 w-2.5 rounded-full border-2"
+                        style={{ borderColor: INDICATOR_STYLE[id].color, background: on ? INDICATOR_STYLE[id].color : "transparent" }}
+                      />
+                      {INDICATOR_STYLE[id].label}
+                    </button>
+                  )
+                })}
+              </div>
             </div>
 
             {confirmClear && (
@@ -490,6 +530,7 @@ export function TradingDesk({
                   nowWeek={chart.nowWeek}
                   candles={candles}
                   levels={levels}
+                  indicators={indicators}
                   drawings={shown}
                   tool={tool}
                   selected={selected}
@@ -504,6 +545,7 @@ export function TradingDesk({
             <p className="mt-2 text-[11px] text-faint">{t("zoomHint")}</p>
             <p className="mt-1 text-[11px] text-faint">{t("liveNote")}</p>
             <p className="mt-1 text-[11px] text-faint">{t("toolsNote")}</p>
+            {indicatorsOn.length > 0 && <p className="mt-1 text-[11px] text-faint">{t("indicatorsNote")}</p>}
           </section>
 
           {notice && (

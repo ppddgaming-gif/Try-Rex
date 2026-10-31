@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { clampView, makeScale, panView, zoomView, type ChartView } from "@/lib/live/geometry"
+import { PAD, RSI_PAD, clampView, makeScale, panView, seriesPath, zoomView, type ChartView } from "@/lib/live/geometry"
 
 // The chart's zoom and pan: one scale whose window moves, so candles,
 // drawings and position lines can't drift apart.
@@ -54,5 +54,42 @@ describe("zoom and pan", () => {
   it("keeps the empty space on the right in proportion to the zoom", () => {
     expect(clampView({ span: 20, offset: null }, n, limits).offset).toBe(n + 2 - 20)
     expect(clampView({ span: 254, offset: null }, n, limits).offset).toBe(n + 14 - 254)
+  })
+})
+
+describe("indicator lines", () => {
+  const chart = makeScale(800, 460, 50, 1.1, 1.2, 10)
+  const rsi = makeScale(800, 120, 50, 0, 100, 10, RSI_PAD)
+
+  it("the RSI panel puts every candle exactly under the chart's", () => {
+    expect(RSI_PAD.right).toBe(PAD.right)
+    for (const i of [10, 25.5, 59]) expect(rsi.indexToX(i)).toBe(chart.indexToX(i))
+  })
+
+  it("the RSI panel's 100 and 0 sit at its padding", () => {
+    expect(rsi.priceToY(100)).toBe(RSI_PAD.top)
+    expect(rsi.priceToY(0)).toBe(120 - RSI_PAD.bottom)
+  })
+
+  it.each([
+    { name: "all values", values: [1.15, 1.16, 1.17], moves: 1, points: 3 },
+    { name: "nulls before the first value are skipped", values: [null, null, 1.15, 1.16], moves: 1, points: 2 },
+    { name: "a null in the middle breaks the line", values: [1.15, null, 1.16, 1.17], moves: 2, points: 3 },
+    { name: "only nulls draw nothing", values: [null, null], moves: 0, points: 0 },
+  ])("$name", ({ values, moves, points }) => {
+    const s = makeScale(800, 460, 10, 1.1, 1.2, 0)
+    const d = seriesPath(values, s, 0, values.length - 1)
+    expect((d.match(/M/g) ?? []).length).toBe(moves)
+    expect((d.match(/[ML]/g) ?? []).length).toBe(points)
+  })
+
+  it("draws with the chart's own priceToY and indexToX", () => {
+    const s = makeScale(800, 460, 10, 1.1, 1.2, 0)
+    expect(seriesPath([1.15], s, 0, 0)).toBe(`M${s.indexToX(0).toFixed(2)} ${s.priceToY(1.15).toFixed(2)}`)
+  })
+
+  it("only the window lo..hi is drawn", () => {
+    const s = makeScale(800, 460, 10, 1.1, 1.2, 0)
+    expect((seriesPath([1.11, 1.12, 1.13, 1.14, 1.15], s, 1, 3).match(/[ML]/g) ?? []).length).toBe(3)
   })
 })
