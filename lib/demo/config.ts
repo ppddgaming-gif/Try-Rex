@@ -94,6 +94,23 @@ export const LINES = { MAX_PER_SEGMENT: 10 } as const
 export const REVIEW = { NOTE_MAX_CHARS: 120 } as const
 
 /**
+ * "Tanya Rex": the AI chat about one closed trade (lib/demo/rex-chat.ts).
+ * Never scored, never adds XP. The limits keep the LLM bill in check and are
+ * counted on the server.
+ */
+export const REX_CHAT = {
+  /** The player's own questions per trade; Rex's opening explanation doesn't count. */
+  QUESTIONS_PER_TRADE: 5,
+  /** LLM calls per player per WIB day, opening explanations included. */
+  CALLS_PER_DAY: 30,
+  QUESTION_MAX_CHARS: 300,
+  /** The reply's cap; reasoning models spend part of it thinking. */
+  REPLY_MAX_TOKENS: 1500,
+  /** The day resets at midnight here (WIB, as everywhere else on the trading screen). */
+  DAY_UTC_OFFSET_HOURS: 7,
+} as const
+
+/**
  * Every live-chart pair is open from the first stage (the owner's choice);
  * stages limit lot size, open trades and SL/TP rules instead. The same nine as
  * LIVE_PAIRS in lib/live/config.ts.

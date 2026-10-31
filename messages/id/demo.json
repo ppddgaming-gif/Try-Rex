@@ -72,7 +72,13 @@
     "pairNotQuoted": "Biaya trading untuk {pair} belum diatur, jadi order di pair ini belum bisa dibuka.",
     "onePosition": "Hanya satu posisi boleh terbuka. Tutup posisi yang ada dulu.",
     "slTpRequiredLive": "SL dan TP wajib ada selama posisi terbuka; geser saja, jangan dihapus.",
-    "liveNotReady": "Mesin chart live belum siap. Coba lagi sebentar lagi."
+    "liveNotReady": "Mesin chart live belum siap. Coba lagi sebentar lagi.",
+    "rexChatOff": "Tanya Rex belum aktif di sini.",
+    "rexChatBusy": "Rex lagi banyak yang tanya. Coba lagi sebentar lagi.",
+    "rexChatFailed": "Rex belum bisa menjawab. Coba lagi.",
+    "rexChatDay": "Batas {max} jawaban Rex hari ini sudah habis. Besok bisa tanya lagi.",
+    "rexChatTrade": "Sudah {max} pertanyaan untuk trade ini. Tanyakan hal lain di trade berikutnya.",
+    "rexChatBadQuestion": "Tulis pertanyaanmu (paling banyak {max} karakter)."
   },
   "problems": {
     "pairClosed": "{pair} belum terbuka di Stage {stage}.",
@@ -611,6 +617,28 @@
       "close": "Tutup",
       "reopen": "Tonton tutorial",
       "watched": "Sudah ditonton"
+    },
+    "rexChat": {
+      "open": "Tanya Rex",
+      "title": "Tanya Rex · Trade #{n}",
+      "subtitle": "Rex menjelaskan proses trade ini. Tanya apa saja soal rencananya.",
+      "close": "Tutup",
+      "reading": "Rex sedang membaca trade-mu…",
+      "thinking": "Rex sedang berpikir…",
+      "you": "Kamu",
+      "rex": "Rex",
+      "placeholder": "Tanya soal trade ini…",
+      "label": "Pertanyaanmu",
+      "send": "Kirim",
+      "retry": "Coba lagi",
+      "left": "Sisa {q} pertanyaan untuk trade ini · {d} jawaban hari ini",
+      "suggestionsLabel": "Contoh pertanyaan",
+      "suggestions": {
+        "fix": "Apa yang paling perlu kuperbaiki?",
+        "failed": "Kenapa ada cek Disiplin yang tidak lolos?",
+        "rr": "Apa maksud reward:risk di trade ini?"
+      },
+      "disclaimer": "Jawaban dibuat AI dan bisa keliru. Tidak memengaruhi skor atau XP, dan bukan saran investasi."
     }
   }
 }

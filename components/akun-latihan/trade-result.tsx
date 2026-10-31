@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useTranslations } from "next-intl"
+import { AskRex } from "@/components/akun-latihan/rex-chat"
 import { CheckList, RexComments } from "@/components/akun-latihan/trade-parts"
 import { ACCOUNT, REVIEW } from "@/lib/demo/config"
 import type { ExitReason } from "@/lib/demo/fills"
@@ -34,11 +35,14 @@ export function ClosedTrades({
   trades,
   pair,
   busy,
+  askRex,
   onReview,
 }: {
   trades: TradeView[]
   pair: string
   busy: boolean
+  /** "Tanya Rex" is switched on (an LLM key is set on the server). */
+  askRex: boolean
   onReview: (id: string, answer: ReviewAnswer, note: string) => Promise<boolean>
 }) {
   const tx = useTranslations("demo.ui.result")
@@ -49,7 +53,7 @@ export function ClosedTrades({
         {tx("title")}
       </h2>
       {trades.map((t) => (
-        <ClosedTrade key={t.id} trade={t} pair={pair} busy={busy} onReview={onReview} />
+        <ClosedTrade key={t.id} trade={t} pair={pair} busy={busy} askRex={askRex} onReview={onReview} />
       ))}
     </section>
   )
@@ -59,11 +63,13 @@ function ClosedTrade({
   trade: t,
   pair,
   busy,
+  askRex,
   onReview,
 }: {
   trade: TradeView
   pair: string
   busy: boolean
+  askRex: boolean
   onReview: (id: string, answer: ReviewAnswer, note: string) => Promise<boolean>
 }) {
   const [answer, setAnswer] = useState<ReviewAnswer | null>(null)
@@ -128,6 +134,11 @@ function ClosedTrade({
       {t.rex && (
         <div className="mt-3">
           <RexComments comments={t.rex} />
+        </div>
+      )}
+      {askRex && (
+        <div className="mt-3 flex">
+          <AskRex tradeId={t.id} number={t.number} />
         </div>
       )}
 

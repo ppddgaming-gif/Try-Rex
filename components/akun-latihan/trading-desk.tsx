@@ -86,12 +86,15 @@ export function TradingDesk({
   initial,
   available,
   videoSeen,
+  askRex,
 }: {
   view: DemoView
   initial: DeskState
   /** Pairs whose data exists. */
   available: string[]
   videoSeen: boolean
+  /** "Tanya Rex" on closed trades (an LLM key is set on the server). */
+  askRex: boolean
 }) {
   const t = useTranslations("demo.ui.desk")
   const td = useTranslations("demo")
@@ -609,6 +612,7 @@ export function TradingDesk({
             trades={view.closed}
             pair={view.closed[0]?.pair ?? desk.pair}
             busy={busy}
+            askRex={askRex}
             onReview={(id, answer: ReviewAnswer, note) => call("review", { trade: id, answer, note: note || null })}
           />
         </div>

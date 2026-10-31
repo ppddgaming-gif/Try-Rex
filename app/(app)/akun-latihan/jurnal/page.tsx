@@ -6,6 +6,7 @@ import { Card } from "@/components/card"
 import { DemoTabs } from "@/components/akun-latihan/demo-tabs"
 import { JournalList, type JournalItem } from "@/components/akun-latihan/journal-list"
 import { EmptyState } from "@/components/progress/empty-state"
+import { llmConfigured } from "@/lib/ai/groq"
 import { getCurrentUser } from "@/lib/auth"
 import { accountStatus } from "@/lib/demo/format"
 import { loadJournal } from "@/lib/demo/history"
@@ -91,7 +92,7 @@ export default async function JurnalPage({ searchParams }: { searchParams: Promi
           />
         </Card>
       ) : (
-        <JournalList rows={rows} />
+        <JournalList rows={rows} askRex={llmConfigured()} />
       )}
     </div>
   )
