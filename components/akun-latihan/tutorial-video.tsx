@@ -1,20 +1,23 @@
 "use client"
 
 import { useState } from "react"
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { CheckCircle2, PlayCircle, X } from "lucide-react"
 import { usePostJson } from "@/components/akun-latihan/post-json"
 import { TUTORIAL_VIDEO } from "@/lib/live/config"
+import type { Locale } from "@/lib/i18n/locale"
 
 /**
  * The drawing tools' tutorial, shown on the trading screen until the player
- * marks it watched (stored in demo_tips_seen as TUTORIAL_VIDEO.id). The video
- * itself isn't made yet: with no `src` the player shows a placeholder.
- * "Tonton tutorial" brings it back afterwards.
+ * marks it watched (stored in demo_tips_seen as TUTORIAL_VIDEO.id), in the
+ * page's language. Without a recording for that language the player shows a
+ * placeholder. "Tonton tutorial" brings it back afterwards.
  */
 export function TutorialVideo({ seen: initialSeen }: { seen: boolean }) {
   const t = useTranslations("demo.ui.video")
   const postJson = usePostJson()
+  const locale = useLocale() as Locale
+  const src = TUTORIAL_VIDEO.src?.[locale] ?? null
   const [seen, setSeen] = useState(initialSeen)
   const [open, setOpen] = useState(!initialSeen)
 
@@ -56,8 +59,9 @@ export function TutorialVideo({ seen: initialSeen }: { seen: boolean }) {
         </button>
       </div>
       <div className="mt-3 aspect-video w-full overflow-hidden rounded-xl border border-border bg-inset">
-        {TUTORIAL_VIDEO.src ? (
-          <video src={TUTORIAL_VIDEO.src} controls playsInline onEnded={markWatched} className="h-full w-full" />
+        {src ? (
+          // Only the first frame and duration load with the page; the rest streams when played.
+          <video key={src} src={src} controls playsInline preload="metadata" onEnded={markWatched} className="h-full w-full" />
         ) : (
           <div className="flex h-full flex-col items-center justify-center gap-2 p-4 text-center text-sm text-muted-foreground">
             <PlayCircle className="h-10 w-10 text-faint" aria-hidden="true" />

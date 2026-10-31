@@ -1,6 +1,8 @@
 // The trading screen's data: which pairs and timeframes exist, how much of
 // each the chart shows, and the limits on drawings. Pure and client-safe.
 
+import type { Locale } from "@/lib/i18n/locale"
+
 /**
  * The pairs on the live chart, in the order the picker lists them. All real
  * historical data: the first six from the MT4 export, EURAUD, GBPCAD and
@@ -48,10 +50,18 @@ export const DRAWINGS = {
 export const WEEK = 7 * 86_400
 
 /**
- * The drawing tools' tutorial video. Not made yet: `src` null shows a
- * placeholder. `id` is stored in demo_tips_seen once watched.
+ * The drawing tools' tutorial video, one recording per language (public/
+ * tutorial/, 1920×1080 H.264, about 9 MB each). A locale missing here, or
+ * `src` null, shows the placeholder. `id` is stored in demo_tips_seen once
+ * watched.
  */
-export const TUTORIAL_VIDEO = { id: "tools-video", src: null as string | null } as const
+export const TUTORIAL_VIDEO = {
+  id: "tools-video",
+  src: {
+    id: "/tutorial/tutorial-tryrex-id.mp4",
+    en: "/tutorial/tutorial-tryrex-en.mp4",
+  } as Partial<Record<Locale, string>> | null,
+} as const
 
 /** Seconds in one M15 candle, the engine's unit: every timeframe is built from these. */
 export const M15 = 900
