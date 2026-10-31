@@ -5,16 +5,20 @@ import { ArrowRight, BookOpen, GraduationCap } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { Card } from "@/components/card"
 import { Skeleton } from "@/components/progress/skeleton"
-import { ORDERED_LESSONS } from "@/lib/learn/content"
 import { useLessonsDone } from "@/lib/learn/progress"
 
-/** Dashboard card: the first Belajar 101 lesson not yet finished on this device. */
-export function NextLesson() {
+export type LessonLink = { slug: string; minutes: number; title: string; summary: string }
+
+/**
+ * Dashboard card: the first Belajar 101 lesson not yet finished on this
+ * device. The list comes from the server in the page's language, so the
+ * lesson bodies never enter this bundle.
+ */
+export function NextLesson({ lessons }: { lessons: LessonLink[] }) {
   const done = useLessonsDone()
-  const next = done ? ORDERED_LESSONS.find((l) => !done.includes(l.slug)) : undefined
-  const count = done ? ORDERED_LESSONS.filter((l) => done.includes(l.slug)).length : 0
+  const next = done ? lessons.find((l) => !done.includes(l.slug)) : undefined
+  const count = done ? lessons.filter((l) => done.includes(l.slug)).length : 0
   const t = useTranslations("learn.next")
-  const tl = useTranslations("learn.lessons")
 
   return (
     <Card className="spotlight flex flex-col">
@@ -29,12 +33,12 @@ export function NextLesson() {
         </>
       ) : next ? (
         <>
-          <p className="mt-4 font-display text-lg font-bold">{tl(`${next.slug}.title`)}</p>
-          <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{tl(`${next.slug}.summary`)}</p>
+          <p className="mt-4 font-display text-lg font-bold">{next.title}</p>
+          <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{next.summary}</p>
           <p className="mt-2 text-xs text-faint">
             {t.rich("count", {
               count,
-              total: ORDERED_LESSONS.length,
+              total: lessons.length,
               minutes: next.minutes,
               num: (c) => <span className="font-mono">{c}</span>,
             })}

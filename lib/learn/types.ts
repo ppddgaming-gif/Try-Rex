@@ -1,46 +1,66 @@
 // The shape of Belajar 101 content. Lessons are data, rendered by
-// components/learn/lesson-blocks.tsx, so real copy and sources can replace
-// the drafts without touching any UI.
+// components/learn/lesson-blocks.tsx. Every lesson is taken from the TRY-REX
+// "Materi Basic" handouts: selected and trimmed for beginners, never
+// rewritten in meaning, and carried in both languages side by side so the
+// page can switch between them.
 
-export type TrackId = "dasar" | "chart" | "risiko" | "forex" | "psikologi"
+export type LevelId = 1 | 2 | 3 | 4 | 5 | 6
 
-/** Title and description: learn.tracks.<id> in the catalogue. */
-export type Track = {
-  id: TrackId
-  /** Lesson slugs in reading order. */
-  lessons: string[]
-}
+/** The same text in both languages. */
+export type Text = { id: string; en: string }
+
+/** A reference the handout itself lists under "Sumber". */
+export type Source = { title: string; publisher: string; url?: string }
 
 /**
- * Where a claim comes from. Every lesson must end up with at least one
- * `added` source before it loses its draft banner.
+ * A real chart from the game data (lib/learn/charts.ts), chosen by what it
+ * shows. Every line or mark on it is computed from the candles, never placed
+ * by hand.
  */
-export type Source =
-  | { status: "needed"; note: string }
-  | { status: "added"; title: string; publisher: string; url: string; accessed: string }
-
-/** A real chart from the game data, chosen by what it shows. */
-export type ChartPick = "uptrend" | "downtrend" | "sideways" | "levels"
+export type ChartPick =
+  | "uptrend"
+  | "downtrend"
+  | "sideways"
+  | "levels"
+  /** A few candles up close: bullish and bearish bodies, wicks. */
+  | "candles"
+  /** The same candles in H4 and grouped into D1. */
+  | "timeframes"
+  /** Swing highs and lows marked on a trending chart. */
+  | "swings"
+  /** A trendline through two rising swing lows, computed. */
+  | "trendline"
+  /** EMA 20 and EMA 50 over the candles. */
+  | "ema"
+  /** RSI 14 under the candles. */
+  | "rsi"
+  /** ATR 14 under the candles. */
+  | "atr"
 
 export type Block =
-  | { kind: "p"; text: string }
-  | { kind: "heading"; text: string }
-  | { kind: "points"; title?: string; items: string[] }
-  | { kind: "callout"; tone: "tip" | "warning" | "example"; title: string; text: string }
+  | { kind: "p"; text: Text }
+  | { kind: "heading"; text: Text }
+  | { kind: "points"; title?: Text; items: Text[] }
+  /** Numbered steps, in order. */
+  | { kind: "steps"; title?: Text; items: Text[] }
+  /** The handouts' DEFINISI / TIPS / AWAS / CATATAN boxes. */
+  | { kind: "callout"; tone: "definition" | "tip" | "warning" | "note"; title: Text; text: Text }
+  /** A worked example ("CONTOH HITUNGAN"), one line per step, in mono. */
+  | { kind: "calc"; title: Text; lines: Text[]; note?: Text }
+  | { kind: "table"; head: Text[]; rows: Text[][]; note?: Text }
   | { kind: "diagram"; name: "candle-anatomy" | "trend-shapes" | "risk-reward" | "leverage" | "pair-quote" | "sessions" }
-  | { kind: "chart"; pick: ChartPick; caption: string; reveal?: boolean }
-  | { kind: "quiz"; question: string; options: string[]; answer: number; explain: string }
+  | { kind: "chart"; pick: ChartPick; caption: Text }
+  /** "Uji pemahaman": answer in your head, then reveal. Never scored. */
+  | { kind: "check"; items: { q: Text; a: Text }[] }
 
-/** Title and summary: learn.lessons.<slug> in the catalogue. */
 export type Lesson = {
   slug: string
-  track: TrackId
+  level: LevelId
   minutes: number
-  level: "pemula" | "menengah"
+  title: Text
+  summary: Text
   blocks: Block[]
+  /** The handout(s) in "Materi Basic" this lesson is taken from. */
+  material: string[]
   sources: Source[]
-  /** Placeholder copy awaiting review against the sources. */
-  draft: boolean
-  /** Where to practise it, if the game covers it. */
-  practice?: { key: "game" | "evaluation"; href: string }
 }

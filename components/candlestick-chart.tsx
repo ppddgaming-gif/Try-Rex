@@ -220,7 +220,7 @@ export function CandlestickChart({
       {/* Bottom time axis */}
       {timeLabels.map((t, i) => {
         const x = (plotW / (timeLabels.length - 1)) * i
-        const tx = Math.min(Math.max(x, 30), plotW - 30)
+        const tx = Math.min(Math.max(x, 40), plotW - 40)
         return (
           <text key={`time-${i}`} x={tx} y={H - 8} fill="var(--muted-foreground)" fontSize={11} textAnchor="middle">
             {t}

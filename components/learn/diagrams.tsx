@@ -99,7 +99,7 @@ export function TrendShapes() {
 export function RiskReward() {
   const t = useTranslations("learn.diagrams")
   return (
-    <Frame title={t("rrTitle")} viewBox="0 0 560 280">
+    <Frame title={t("rrTitle")} viewBox="0 0 560 230">
       <rect x={150} y={30} width={180} height={140} rx={6} fill="var(--success)" opacity={0.16} />
       <rect x={150} y={170} width={180} height={70} rx={6} fill="var(--danger)" opacity={0.16} />
       <line x1={120} x2={360} y1={30} y2={30} stroke="var(--success)" strokeWidth={2} strokeDasharray="6 4" />
@@ -195,7 +195,7 @@ export function PairQuote() {
   )
 }
 
-/** The four sessions on a 24-hour WIB axis (lib/learn/sessions.ts), with the London–New York overlap marked. */
+/** The three sessions on a 24-hour WIB axis (lib/learn/sessions.ts), with the London–New York overlap marked. */
 export function Sessions() {
   const t = useTranslations("learn.diagrams")
   const x0 = 110
@@ -205,8 +205,8 @@ export function Sessions() {
   const london = SESSIONS.find((s) => s.id === "london")!
   const ny = SESSIONS.find((s) => s.id === "newyork")!
   return (
-    <Frame title={t("sessionsTitle")} viewBox="0 0 560 280">
-      <rect x={hx(ny.open)} y={24} width={hx(london.close) - hx(ny.open)} height={186} fill="var(--primary)" opacity={0.1} />
+    <Frame title={t("sessionsTitle")} viewBox="0 0 560 230">
+      <rect x={hx(ny.open)} y={24} width={hx(london.close) - hx(ny.open)} height={144} fill="var(--primary)" opacity={0.1} />
       {rows.map(({ s, y }) => {
         // A session past midnight wraps to the start of the axis.
         const parts = s.close > 24 ? [[s.open, 24], [0, s.close - 24]] : [[s.open, s.close]]
@@ -223,13 +223,13 @@ export function Sessions() {
       })}
       {[0, 6, 12, 18, 24].map((h) => (
         <g key={h}>
-          <line x1={hx(h)} x2={hx(h)} y1={24} y2={214} stroke="var(--border)" strokeDasharray="3 3" />
-          <text x={hx(h)} y={232} textAnchor="middle" {...label}>
+          <line x1={hx(h)} x2={hx(h)} y1={24} y2={172} stroke="var(--border)" strokeDasharray="3 3" />
+          <text x={hx(h)} y={190} textAnchor="middle" {...label}>
             {String(h).padStart(2, "0")}.00
           </text>
         </g>
       ))}
-      <text x={hx(london.close)} y={262} textAnchor="end" {...label} fill="var(--primary)">
+      <text x={hx(london.close)} y={218} textAnchor="end" {...label} fill="var(--primary)">
         {t("overlap")}
       </text>
     </Frame>

@@ -11,7 +11,6 @@ import { Avatar } from "@/components/avatar"
 import { Card } from "@/components/card"
 import { ActivityRows } from "@/components/progress/activity-rows"
 import { DailyGoal } from "@/components/progress/daily-goal"
-import { NextLesson } from "@/components/learn/next-lesson"
 import { AiInsight } from "@/components/progress/ai-insight"
 import { CompetencyMeter } from "@/components/progress/competency-meter"
 import { EmptyState } from "@/components/progress/empty-state"
@@ -35,6 +34,7 @@ export function DashboardView({
   dailyGoal,
   motivation,
   dailyChallenge,
+  nextLesson,
 }: {
   name: string
   avatarUrl: string | null
@@ -42,6 +42,8 @@ export function DashboardView({
   dailyGoal: number | null
   motivation: string | null
   dailyChallenge: ReactNode
+  /** The Belajar 101 card, built on the server so lesson content stays out of this bundle. */
+  nextLesson: ReactNode
 }) {
   const progress = useProgress()
   const started = progress !== null && totalChallenges(progress) > 0
@@ -146,7 +148,7 @@ export function DashboardView({
         <AiInsight />
 
         {/* 6b. Belajar 101 */}
-        <NextLesson />
+        {nextLesson}
 
         {/* 7. */}
         <div className="lg:col-span-2">{dailyChallenge}</div>

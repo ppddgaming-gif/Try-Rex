@@ -1,140 +1,68 @@
 {
-  "tracks": {
-    "dasar": {
-      "title": "Dasar Trading",
-      "description": "Apa itu trading, apa yang diperdagangkan, dan tiga keputusan yang selalu kamu punya."
-    },
-    "chart": {
-      "title": "Membaca Chart",
-      "description": "Candlestick, trend, support dan resistance: bahasa yang dipakai setiap chart."
-    },
-    "risiko": {
-      "title": "Manajemen Risiko",
-      "description": "Cara bertahan cukup lama untuk belajar: stop loss, rasio risiko, dan leverage."
-    },
-    "forex": {
-      "title": "Forex 101",
-      "description": "Pasar mata uang dari dekat: pair, pip, lot, spread, sesi pasar, margin, dan berita yang menggerakkan harga."
-    },
-    "psikologi": {
-      "title": "Psikologi Trading",
-      "description": "Musuh terbesar trader sering bukan pasar, tapi kebiasaannya sendiri."
-    }
-  },
-  "lessons": {
-    "apa-itu-trading": {
-      "title": "Apa itu trading?",
-      "summary": "Membeli dan menjual untuk mengambil untung dari perubahan harga, dan kenapa itu berbeda dari menabung."
-    },
-    "pasar-dan-instrumen": {
-      "title": "Pasar dan instrumen",
-      "summary": "Forex, saham, dan komoditas: apa yang diperdagangkan dan bagaimana pair dibaca."
-    },
-    "buy-sell-wait": {
-      "title": "BUY, SELL, dan WAIT",
-      "summary": "Tiga keputusan dalam setiap soal, dan kenapa tidak trading sering jadi pilihan terbaik."
-    },
-    "anatomi-candlestick": {
-      "title": "Anatomi candlestick",
-      "summary": "Body, sumbu, dan warna: satu candle menceritakan pertarungan pembeli dan penjual."
-    },
-    "trend": {
-      "title": "Trend: naik, turun, menyamping",
-      "summary": "Puncak dan lembah memberitahu arah. Belajar membedakan ketiganya di chart asli."
-    },
-    "support-resistance": {
-      "title": "Support dan resistance",
-      "summary": "Area di mana harga berkali-kali berhenti, dan kenapa area itu penting untuk entry dan stop loss."
-    },
-    "timeframe": {
-      "title": "Timeframe: H4 itu apa?",
-      "summary": "Chart yang sama terlihat berbeda di M15, H4, atau D1. Pilih sesuai gaya latihanmu."
-    },
-    "stop-loss-take-profit": {
-      "title": "Stop loss dan take profit",
-      "summary": "Tentukan pintu keluar sebelum masuk. Dua angka yang memisahkan rencana dari tebakan."
-    },
-    "risk-reward": {
-      "title": "Risk-reward ratio",
-      "summary": "Kenapa kamu bisa benar kurang dari setengah waktu dan tetap bertahan."
-    },
-    "leverage": {
-      "title": "Leverage: pedang bermata dua",
-      "summary": "Leverage memperbesar untung dan rugi dengan kelipatan yang sama. Pahami sebelum tergoda."
-    },
-    "apa-itu-forex": {
-      "title": "Apa itu forex?",
-      "summary": "Pasar tempat mata uang ditukar, dan cara membaca sebuah pair."
-    },
-    "major-minor-cross": {
-      "title": "Major, cross, dan exotic",
-      "summary": "Tiga kelompok pair dan kenapa masing-masing terasa berbeda."
-    },
-    "pip-lot-nilai-pip": {
-      "title": "Pip, lot, dan nilai pip",
-      "summary": "Satuan gerak harga, ukuran posisi, dan berapa dolar satu pip itu."
-    },
-    "bid-ask-spread-swap": {
-      "title": "Bid, ask, spread, dan swap",
-      "summary": "Dua harga di setiap pair, biaya masuk, dan biaya menginap."
-    },
-    "jenis-order": {
-      "title": "Jenis order",
-      "summary": "Market, limit, dan stop: kapan order dijalankan."
-    },
-    "sesi-pasar-forex": {
-      "title": "Sesi pasar forex",
-      "summary": "Sydney, Tokyo, London, New York dalam jam WIB, dan kenapa akhir pekan tutup."
-    },
-    "margin-dan-margin-call": {
-      "title": "Margin dan margin call",
-      "summary": "Dana jaminan, margin level, dan kapan posisi ditutup paksa."
-    },
-    "berita-dan-fundamental": {
-      "title": "Berita dan fundamental",
-      "summary": "Suku bunga, inflasi, dan kalender ekonomi: kenapa harga bisa melompat."
-    },
-    "fomo-overtrading": {
-      "title": "FOMO dan overtrading",
-      "summary": "Takut ketinggalan dan ingin membalas rugi: dua kebiasaan yang menguras akun pelan-pelan."
-    },
-    "jurnal-trading": {
-      "title": "Jurnal trading",
-      "summary": "Catatan sederhana yang mengubah kesalahan jadi pelajaran, bukan pengulangan."
-    }
-  },
-  "practice": {
-    "game": "Latih di Trading Game",
-    "evaluation": "Lihat contoh di AI Evaluation"
-  },
-  "level": {
-    "pemula": "pemula",
-    "menengah": "menengah"
-  },
   "hub": {
     "title": "Belajar 101",
     "eyebrow": "Belajar 101",
     "heading": "Semua dasar trading, satu tempat.",
-    "body": "Dari cara membaca candle sampai seluk-beluk pasar forex. Materi singkat, contoh dari chart asli, dan satu pertanyaan di akhir tiap bab.",
+    "body": "{n} level, dari dasar-dasar forex sampai psikologi dan evaluasi. Setiap level ditutup dengan ujian {q} soal pilihan ganda: jawab benar minimal {pass} untuk membuka level berikutnya.",
     "kamus": "Kamus Trading",
     "kamusBody": "<num>{n}</num> istilah, dijelaskan dalam satu atau dua kalimat. Istilah yang sama bisa diketuk di Trading Game.",
-    "chapter": "Bab {n}",
     "minutes": "{n} menit",
     "practiceTitle": "Teori sudah, saatnya praktik.",
     "practiceBody": "Setiap soal di Trading Game adalah chart asli. Coba baca trend dan levelnya sendiri.",
-    "openGame": "Buka Trading Game"
+    "openGame": "Buka Trading Game",
+    "levelEyebrow": "Level {n}"
   },
   "lesson": {
     "fallbackTitle": "Materi",
     "back": "Belajar 101",
     "readMinutes": "{n} menit baca",
-    "level": "Tingkat {level}",
     "tapHint": "Ketuk kata bergaris untuk melihat artinya.",
     "others": "Materi lain",
     "prev": "Sebelumnya",
-    "next": "Berikutnya",
-    "notTranslated": "Belum tersedia dalam bahasa Inggris",
-    "notTranslatedBody": "Isi materi ini ditampilkan dalam bahasa aslinya, Bahasa Indonesia."
+    "next": "Berikutnya"
+  },
+  "check": {
+    "title": "Cek pemahaman",
+    "hint": "Jawab dalam hati dulu, lalu buka jawabannya.",
+    "show": "Lihat jawaban"
+  },
+  "sources": {
+    "title": "Sumber materi",
+    "material": "Disusun dari materi",
+    "references": "Referensi yang dikutip materi",
+    "disclaimer": "Materi edukasi, bukan saran finansial atau ajakan berinvestasi. Trading forex berisiko tinggi dan sebagian besar trader ritel merugi."
+  },
+  "gate": {
+    "lockedTitle": "Level {level} masih terkunci",
+    "lockedBody": "Lulus ujian Level {prev} dulu untuk membuka materi ini.",
+    "takeExam": "Ujian Level {level}",
+    "lockedShort": "Lulus ujian Level {prev} dulu",
+    "passed": "Lulus · terbaik {best}/{total}",
+    "retake": "Ulangi ujian",
+    "exam": "Ujian · {n} soal"
+  },
+  "exam": {
+    "title": "Ujian Level {level}",
+    "cta": "Ujian Level {level}",
+    "expired": "Kertas ujian ini sudah kedaluwarsa. Mulai kertas baru.",
+    "failed": "Tidak bisa menghubungi server. Coba lagi.",
+    "locked": "Ujian ini terbuka setelah kamu lulus ujian Level {prev}.",
+    "toPrev": "Ke ujian Level {prev}",
+    "intro": "{n} soal pilihan ganda. Jawab benar minimal {pass} untuk membuka level berikutnya.",
+    "introNote": "Soal diambil acak dari bank soal, jadi setiap orang dan setiap percobaan mendapat kertas yang berbeda. Angka dan chart di soal berasal dari data harga asli. Kelulusan disimpan di perangkat ini.",
+    "start": "Mulai ujian",
+    "passTitle": "Lulus",
+    "failTitle": "Belum lulus",
+    "passBody": "Materi Level {next} sudah terbuka.",
+    "passLast": "Semua level Belajar 101 sudah kamu lewati.",
+    "failBody": "Butuh minimal {pass} jawaban benar. Baca penjelasan di bawah, lalu coba kertas baru.",
+    "toNext": "Buka Level {next}",
+    "again": "Kertas baru",
+    "number": "Soal {n} dari {total}",
+    "right": "Jawaban benar",
+    "wrong": "Jawabanmu",
+    "progress": "{done}/{total} dijawab",
+    "submit": "Kumpulkan jawaban"
   },
   "kamusPage": {
     "title": "Kamus Trading",
@@ -143,17 +71,7 @@
   },
   "draft": {
     "title": "Materi contoh.",
-    "body": "Isi ini masih draf dan sedang dicocokkan dengan sumber terpercaya. Gunakan sebagai gambaran, bukan saran finansial.",
-    "sources": "Sumber",
-    "accessed": ", {publisher}. Diakses {date}."
-  },
-  "quiz": {
-    "eyebrow": "Cek pemahaman",
-    "right": "Jawaban benar",
-    "picked": "Pilihanmu",
-    "correct": "Tepat!",
-    "wrong": "Belum tepat, tapi ini bagian dari belajar.",
-    "retry": "Coba lagi"
+    "body": "Isi ini masih draf dan sedang dicocokkan dengan sumber terpercaya. Gunakan sebagai gambaran, bukan saran finansial."
   },
   "done": {
     "finished": "Sudah selesai",

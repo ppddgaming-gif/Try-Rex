@@ -1,8 +1,11 @@
 import type { Metadata } from "next"
-import { getTranslations } from "next-intl/server"
+import { getLocale, getTranslations } from "next-intl/server"
 import { redirect } from "next/navigation"
 import { DailyChallenge } from "@/components/dashboard/daily-challenge"
 import { DashboardView } from "@/components/dashboard/dashboard-view"
+import { NextLesson } from "@/components/learn/next-lesson"
+import type { Locale } from "@/lib/i18n/locale"
+import { LESSONS } from "@/lib/learn/content"
 import { getCurrentUser } from "@/lib/auth"
 import { challenges } from "@/lib/mock-data"
 import { planFrom } from "@/lib/onboarding"
@@ -34,6 +37,7 @@ export default async function DashboardPage() {
   if (!user.onboarding) redirect("/start?next=/dashboard")
 
   const plan = planFrom(user.onboarding)
+  const locale = (await getLocale()) as Locale
 
   // Progress lives in the browser, so the view is a client component. The
   // daily challenge (a server-rendered chart) is handed in as a slot.
@@ -44,6 +48,7 @@ export default async function DashboardPage() {
       dailyGoal={plan.dailyGoal}
       motivation={plan.motivation}
       dailyChallenge={<DailyChallenge challenge={dailyChallenge()} />}
+      nextLesson={<NextLesson lessons={LESSONS.map((l) => ({ slug: l.slug, minutes: l.minutes, title: l.title[locale], summary: l.summary[locale] }))} />}
     />
   )
 }

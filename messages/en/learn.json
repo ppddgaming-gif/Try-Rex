@@ -1,140 +1,68 @@
 {
-  "tracks": {
-    "dasar": {
-      "title": "Trading Basics",
-      "description": "What trading is, what gets traded, and the three decisions you always have."
-    },
-    "chart": {
-      "title": "Reading Charts",
-      "description": "Candlesticks, trends, support and resistance: the language every chart speaks."
-    },
-    "risiko": {
-      "title": "Risk Management",
-      "description": "How to last long enough to learn: stop losses, risk ratios and leverage."
-    },
-    "forex": {
-      "title": "Forex 101",
-      "description": "The currency market up close: pairs, pips, lots, spreads, market sessions, margin, and the news that moves prices."
-    },
-    "psikologi": {
-      "title": "Trading Psychology",
-      "description": "A trader's biggest enemy is often not the market but their own habits."
-    }
-  },
-  "lessons": {
-    "apa-itu-trading": {
-      "title": "What is trading?",
-      "summary": "Buying and selling to profit from price changes, and why that's different from saving."
-    },
-    "pasar-dan-instrumen": {
-      "title": "Markets and instruments",
-      "summary": "Forex, stocks and commodities: what gets traded and how to read a pair."
-    },
-    "buy-sell-wait": {
-      "title": "BUY, SELL and WAIT",
-      "summary": "The three decisions in every question, and why not trading is often the best choice."
-    },
-    "anatomi-candlestick": {
-      "title": "Anatomy of a candlestick",
-      "summary": "Body, wicks and colour: one candle tells the story of a fight between buyers and sellers."
-    },
-    "trend": {
-      "title": "Trends: up, down, sideways",
-      "summary": "Highs and lows tell you the direction. Learn to tell the three apart on real charts."
-    },
-    "support-resistance": {
-      "title": "Support and resistance",
-      "summary": "Areas where price keeps stopping, and why they matter for your entry and stop loss."
-    },
-    "timeframe": {
-      "title": "Timeframes: what is H4?",
-      "summary": "The same chart looks different on M15, H4 or D1. Pick one that suits how you practice."
-    },
-    "stop-loss-take-profit": {
-      "title": "Stop loss and take profit",
-      "summary": "Decide your exits before you get in. Two numbers that separate a plan from a guess."
-    },
-    "risk-reward": {
-      "title": "Risk-reward ratio",
-      "summary": "Why you can be right less than half the time and still stay in the game."
-    },
-    "leverage": {
-      "title": "Leverage: a double-edged sword",
-      "summary": "Leverage grows profits and losses by the same multiple. Understand it before it tempts you."
-    },
-    "apa-itu-forex": {
-      "title": "What is forex?",
-      "summary": "The market where currencies are exchanged, and how to read a pair."
-    },
-    "major-minor-cross": {
-      "title": "Majors, crosses and exotics",
-      "summary": "Three groups of pairs and why each one feels different."
-    },
-    "pip-lot-nilai-pip": {
-      "title": "Pips, lots and pip value",
-      "summary": "The unit of price movement, position size, and what one pip is worth."
-    },
-    "bid-ask-spread-swap": {
-      "title": "Bid, ask, spread and swap",
-      "summary": "Two prices on every pair, the cost of getting in, and the cost of holding overnight."
-    },
-    "jenis-order": {
-      "title": "Order types",
-      "summary": "Market, limit and stop: when an order runs."
-    },
-    "sesi-pasar-forex": {
-      "title": "Forex market sessions",
-      "summary": "Sydney, Tokyo, London and New York in WIB hours, and why weekends are closed."
-    },
-    "margin-dan-margin-call": {
-      "title": "Margin and margin calls",
-      "summary": "The deposit, the margin level, and when positions are closed for you."
-    },
-    "berita-dan-fundamental": {
-      "title": "News and fundamentals",
-      "summary": "Interest rates, inflation and the economic calendar: why prices can jump."
-    },
-    "fomo-overtrading": {
-      "title": "FOMO and overtrading",
-      "summary": "Fear of missing out and wanting to win back losses: two habits that slowly drain an account."
-    },
-    "jurnal-trading": {
-      "title": "Trading journal",
-      "summary": "A simple record that turns mistakes into lessons instead of repeats."
-    }
-  },
-  "practice": {
-    "game": "Practice in the Trading Game",
-    "evaluation": "See an example in AI Evaluation"
-  },
-  "level": {
-    "pemula": "beginner",
-    "menengah": "intermediate"
-  },
   "hub": {
     "title": "Learn 101",
     "eyebrow": "Learn 101",
     "heading": "All the trading basics, in one place.",
-    "body": "From reading a candle to the ins and outs of the forex market. Short lessons, examples from real charts, and one question at the end of each chapter.",
+    "body": "{n, plural, one {# level} other {# levels}}, from forex basics to psychology and review. Each level ends with a {q}-question multiple-choice exam: get at least {pass} right to open the next level.",
     "kamus": "Trading Glossary",
     "kamusBody": "<num>{n}</num> terms, each explained in a sentence or two. The same terms can be tapped in the Trading Game.",
-    "chapter": "Chapter {n}",
     "minutes": "{n} min",
     "practiceTitle": "Theory done, time to practice.",
     "practiceBody": "Every Trading Game question is a real chart. Try reading the trend and levels yourself.",
-    "openGame": "Open the Trading Game"
+    "openGame": "Open the Trading Game",
+    "levelEyebrow": "Level {n}"
   },
   "lesson": {
     "fallbackTitle": "Lesson",
     "back": "Learn 101",
     "readMinutes": "{n} min read",
-    "level": "Level: {level}",
     "tapHint": "Tap an underlined word to see what it means.",
     "others": "More lessons",
     "prev": "Previous",
-    "next": "Next",
-    "notTranslated": "Not yet available in English",
-    "notTranslatedBody": "This lesson's content is shown in its original language, Indonesian."
+    "next": "Next"
+  },
+  "check": {
+    "title": "Check your understanding",
+    "hint": "Answer in your head first, then open the answer.",
+    "show": "Show answer"
+  },
+  "sources": {
+    "title": "Sources",
+    "material": "Compiled from the handouts",
+    "references": "References cited in the handouts",
+    "disclaimer": "Educational material, not financial advice or an invitation to invest. Forex trading is high risk and most retail traders lose money."
+  },
+  "gate": {
+    "lockedTitle": "Level {level} is still locked",
+    "lockedBody": "Pass the Level {prev} exam first to open these lessons.",
+    "takeExam": "Level {level} exam",
+    "lockedShort": "Pass the Level {prev} exam first",
+    "passed": "Passed · best {best}/{total}",
+    "retake": "Retake the exam",
+    "exam": "Exam · {n} questions"
+  },
+  "exam": {
+    "title": "Level {level} exam",
+    "cta": "Level {level} exam",
+    "expired": "This exam paper has expired. Start a new one.",
+    "failed": "Couldn't reach the server. Try again.",
+    "locked": "This exam opens once you pass the Level {prev} exam.",
+    "toPrev": "Go to the Level {prev} exam",
+    "intro": "{n} multiple-choice questions. Get at least {pass} right to open the next level.",
+    "introNote": "Questions are drawn at random from a question bank, so every person and every attempt gets a different paper. The numbers and charts in the questions come from real price data. Passes are saved on this device.",
+    "start": "Start the exam",
+    "passTitle": "Passed",
+    "failTitle": "Not passed yet",
+    "passBody": "The Level {next} lessons are now open.",
+    "passLast": "You've completed every level of Learn 101.",
+    "failBody": "You need at least {pass} right answers. Read the explanations below, then try a new paper.",
+    "toNext": "Open Level {next}",
+    "again": "New paper",
+    "number": "Question {n} of {total}",
+    "right": "Right answer",
+    "wrong": "Your answer",
+    "progress": "{done}/{total} answered",
+    "submit": "Submit answers"
   },
   "kamusPage": {
     "title": "Trading Glossary",
@@ -143,17 +71,7 @@
   },
   "draft": {
     "title": "Sample content.",
-    "body": "This content is still a draft and is being checked against trusted sources. Use it as an overview, not as financial advice.",
-    "sources": "Sources",
-    "accessed": ", {publisher}. Accessed {date}."
-  },
-  "quiz": {
-    "eyebrow": "Check your understanding",
-    "right": "Correct answer",
-    "picked": "Your pick",
-    "correct": "Correct!",
-    "wrong": "Not yet, but that's part of learning.",
-    "retry": "Try again"
+    "body": "This content is still a draft and is being checked against trusted sources. Use it as an overview, not as financial advice."
   },
   "done": {
     "finished": "Finished",

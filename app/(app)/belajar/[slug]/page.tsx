@@ -1,13 +1,14 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { ArrowLeft, ArrowRight, Clock, Languages, LineChart } from "lucide-react"
+import { ArrowLeft, ArrowRight, Clock } from "lucide-react"
 import { getLocale, getTranslations } from "next-intl/server"
-import { DraftNote, SourceList } from "@/components/learn/draft-note"
+import { SourceList } from "@/components/learn/draft-note"
 import { LessonBlocks } from "@/components/learn/lesson-blocks"
 import { LessonDoneButton } from "@/components/learn/lesson-done"
+import { LevelGate } from "@/components/learn/level-gate"
 import type { Locale } from "@/lib/i18n/locale"
-import { LESSONS, bodyAvailableIn, lessonBySlug, neighbours, trackById } from "@/lib/learn/content"
+import { LESSONS, lessonBySlug, levelById, neighbours } from "@/lib/learn/content"
 
 export function generateStaticParams() {
   return LESSONS.map((l) => ({ slug: l.slug }))
@@ -16,8 +17,8 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
   const lesson = lessonBySlug.get(slug)
-  const t = await getTranslations("learn")
-  return { title: lesson ? t(`lessons.${lesson.slug}.title`) : t("lesson.fallbackTitle") }
+  const [t, locale] = await Promise.all([getTranslations("learn"), getLocale() as Promise<Locale>])
+  return { title: lesson ? lesson.title[locale] : t("lesson.fallbackTitle") }
 }
 
 export default async function LessonPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -25,13 +26,10 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
   const lesson = lessonBySlug.get(slug)
   if (!lesson) notFound()
 
-  const track = trackById.get(lesson.track)
+  const level = levelById.get(lesson.level)!
   const { prev, next } = neighbours(slug)
   const [t, locale] = await Promise.all([getTranslations("learn"), getLocale() as Promise<Locale>])
-  // The body is Indonesian until it's translated: shown as is, labelled, and
-  // marked lang="id" so screen readers pronounce it right.
-  const translated = bodyAvailableIn(lesson, locale)
-  const bodyLang: Locale = translated ? locale : "id"
+  const lastOfLevel = level.lessons[level.lessons.length - 1].slug === lesson.slug
 
   return (
     <article className="mx-auto max-w-3xl px-5 py-6 lg:px-8">
@@ -43,54 +41,38 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
       </Link>
 
       <header className="mt-2">
-        <p className="eyebrow enter">{track && t(`tracks.${track.id}.title`)}</p>
-        <h1 className="enter-focus mt-3 text-3xl font-extrabold leading-tight sm:text-[40px]">{t(`lessons.${lesson.slug}.title`)}</h1>
-        <p className="enter mt-3 text-lg text-muted-foreground" style={{ "--enter-delay": "80ms" } as React.CSSProperties}>
-          {t(`lessons.${lesson.slug}.summary`)}
+        <p className="eyebrow enter">
+          {t("hub.levelEyebrow", { n: level.id })} · {level.title[locale]}
         </p>
-        <p className="enter mt-4 flex items-center gap-4 text-sm text-faint" style={{ "--enter-delay": "120ms" } as React.CSSProperties}>
-          <span className="flex items-center gap-1.5">
-            <Clock className="h-4 w-4" aria-hidden="true" /> {t("lesson.readMinutes", { n: lesson.minutes })}
-          </span>
-          <span>{t("lesson.level", { level: t(`level.${lesson.level}`) })}</span>
+        <h1 className="enter-focus mt-3 text-3xl font-extrabold leading-tight sm:text-[40px]">{lesson.title[locale]}</h1>
+        <p className="enter mt-3 text-lg text-muted-foreground" style={{ "--enter-delay": "80ms" } as React.CSSProperties}>
+          {lesson.summary[locale]}
+        </p>
+        <p className="enter mt-4 flex items-center gap-1.5 text-sm text-faint" style={{ "--enter-delay": "120ms" } as React.CSSProperties}>
+          <Clock className="h-4 w-4" aria-hidden="true" /> {t("lesson.readMinutes", { n: lesson.minutes })}
         </p>
       </header>
 
-      {lesson.draft && (
-        <div className="mt-6">
-          <DraftNote />
-        </div>
-      )}
+      <div className="mt-6">
+        <LevelGate level={lesson.level}>
+          <p className="text-xs text-faint">{t("lesson.tapHint")}</p>
+          <div className="mt-3">
+            <LessonBlocks blocks={lesson.blocks} />
+          </div>
 
-      {!translated && (
-        <p
-          role="note"
-          className="mt-6 flex items-start gap-3 rounded-2xl border border-wait/30 bg-wait/10 px-4 py-3 text-sm leading-relaxed"
-        >
-          <Languages className="mt-0.5 h-4 w-4 shrink-0 text-wait" aria-hidden="true" />
-          <span>
-            <strong>{t("lesson.notTranslated")}</strong>{" "}
-            <span className="text-muted-foreground">{t("lesson.notTranslatedBody")}</span>
-          </span>
-        </p>
-      )}
+          <div className="mt-10 flex flex-wrap items-center gap-3">
+            <LessonDoneButton slug={lesson.slug} />
+            {lastOfLevel && (
+              <Link href={`/belajar/ujian/${level.id}`} className="btn btn-ghost">
+                {t("exam.cta", { level: level.id })} <ArrowRight className="h-4 w-4" />
+              </Link>
+            )}
+          </div>
 
-      <p className="mt-6 text-xs text-faint">{t("lesson.tapHint")}</p>
-      <div className="mt-3" lang={bodyLang}>
-        <LessonBlocks blocks={lesson.blocks} lang={bodyLang} />
-      </div>
-
-      <div className="mt-10 flex flex-wrap items-center gap-3">
-        <LessonDoneButton slug={lesson.slug} />
-        {lesson.practice && (
-          <Link href={lesson.practice.href} className="btn btn-ghost">
-            <LineChart className="h-4 w-4" /> {t(`practice.${lesson.practice.key}`)}
-          </Link>
-        )}
-      </div>
-
-      <div className="mt-10">
-        <SourceList sources={lesson.sources} />
+          <div className="mt-10">
+            <SourceList material={lesson.material} sources={lesson.sources} />
+          </div>
+        </LevelGate>
       </div>
 
       <nav aria-label={t("lesson.others")} className="mt-8 grid gap-3 sm:grid-cols-2">
@@ -99,7 +81,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
             <p className="flex items-center gap-1 text-xs text-faint">
               <ArrowLeft className="h-3 w-3" /> {t("lesson.prev")}
             </p>
-            <p className="mt-1 font-semibold">{t(`lessons.${prev.slug}.title`)}</p>
+            <p className="mt-1 font-semibold">{prev.title[locale]}</p>
           </Link>
         ) : (
           <span />
@@ -112,7 +94,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
             <p className="flex items-center justify-end gap-1 text-xs text-faint">
               {t("lesson.next")} <ArrowRight className="h-3 w-3" />
             </p>
-            <p className="mt-1 font-semibold">{t(`lessons.${next.slug}.title`)}</p>
+            <p className="mt-1 font-semibold">{next.title[locale]}</p>
           </Link>
         )}
       </nav>

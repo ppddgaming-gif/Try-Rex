@@ -1,15 +1,14 @@
-// The four forex trading sessions, in WIB (UTC+7), for the "Sesi pasar"
-// lesson and its diagram. Approximate opening hours while Europe and the US
-// are on summer time; in their winter London and New York open one hour
-// later in WIB. DRAFT: to be checked against a cited source before the
-// lesson loses its draft banner.
+// The forex trading sessions in WIB (UTC+7), for the Level 1 "Jam
+// perdagangan dan sesi pasar" lesson and its diagram. From the session table
+// in "14_ATR_Average_True_Range.pdf" (Materi Basic): approximate hours; shift
+// about an hour when the countries concerned are on summer time (DST), which
+// Indonesia doesn't use.
 
-export type Session = { id: "sydney" | "tokyo" | "london" | "newyork"; city: string; open: number; close: number }
+export type Session = { id: "tokyo" | "london" | "newyork"; city: string; open: number; close: number }
 
 /** Hours in WIB, 0–24; `close` past 24 means the next day. */
 export const SESSIONS: Session[] = [
-  { id: "sydney", city: "Sydney", open: 4, close: 13 },
-  { id: "tokyo", city: "Tokyo", open: 6, close: 15 },
+  { id: "tokyo", city: "Tokyo / Asia", open: 7, close: 16 },
   { id: "london", city: "London", open: 14, close: 23 },
   { id: "newyork", city: "New York", open: 19, close: 28 },
 ]
