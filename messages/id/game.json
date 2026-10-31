@@ -16,9 +16,7 @@
   "pick": "Pilih BUY, SELL, atau WAIT",
   "shortcuts": "Pintasan: <k>B</k> <k>S</k> <k>W</k> untuk memilih, <k>Enter</k> untuk kirim",
   "newRound": "Main ronde baru",
-  "reviewLast": "Bedah soal terakhir",
   "next": "Soal Berikutnya",
-  "reviewThis": "Bedah soal ini dulu",
   "decisions": {
     "label": "Keputusan trading",
     "buy": "Harga naik",
@@ -92,5 +90,12 @@
       "waitRight": "Tepat. Harga hanya bergerak {change}, masih di dalam ambang ±0,1%.",
       "waitWrong": "Kurang tepat. Harga bergerak {change} — cukup besar untuk diambil, bukan dilewatkan."
     }
+  },
+  "explanation": {
+    "title": "AI Explanation",
+    "lead": "Kenapa jawabannya begitu, dibaca dari chart soal ini.",
+    "rightBecause": "tepat karena:",
+    "wrongBecause": "kurang tepat karena:",
+    "suggestion": "Saran TRY-REX"
   }
 }

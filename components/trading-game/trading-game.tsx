@@ -1,7 +1,6 @@
 "use client"
 
 import { startTransition, useEffect, useEffectEvent, useMemo, useState, ViewTransition } from "react"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useLocale, useTranslations } from "next-intl"
 import { Card } from "@/components/card"
@@ -9,6 +8,7 @@ import { GlossaryText } from "@/components/glossary/glossary-text"
 import { CandlestickChart } from "@/components/candlestick-chart"
 import { Skeleton } from "@/components/progress/skeleton"
 import { SelectMenu } from "@/components/select-menu"
+import { AiExplanation } from "@/components/trading-game/ai-explanation"
 import { AnswerFeedback } from "@/components/trading-game/answer-feedback"
 import { DecisionButtons } from "@/components/trading-game/decision-buttons"
 import { QuestionProgress } from "@/components/trading-game/question-progress"
@@ -31,7 +31,7 @@ import {
 import { answerLabelKey, planFrom, type OnboardingRecord } from "@/lib/onboarding"
 import { buildRound, newSeed } from "@/lib/round"
 import { useOnboarding } from "@/lib/use-onboarding"
-import { ArrowRight, BrainCircuit, CalendarCheck, RotateCcw, Sparkles, Target } from "lucide-react"
+import { ArrowRight, CalendarCheck, RotateCcw, Sparkles, Target } from "lucide-react"
 
 const ROUND_SIZE = 5
 /** How many recent answers count as "seen" when picking fresh questions. */
@@ -210,7 +210,6 @@ function GameRound({
     return () => window.removeEventListener("keydown", listener)
   }, [])
 
-  const evaluationHref = `/ai-evaluation?c=${encodeURIComponent(challenge.id)}&a=${choice ?? challenge.answer}&t=${seconds}`
   const isFeatured = featuredId === challenge.id
 
   return (
@@ -343,30 +342,26 @@ function GameRound({
                 <RoundSummary correct={results.filter(Boolean).length} total={round.length} xp={xp} seconds={seconds} />
               )}
 
-              <div className="flex flex-col gap-3">
-                {last ? (
-                  <>
-                    <button onClick={() => onNewRound(level)} className="btn w-full">
-                      <RotateCcw className="h-4 w-4" /> {t("newRound")}
-                    </button>
-                    <Link href={evaluationHref} className="btn btn-ghost w-full">
-                      <BrainCircuit className="h-4 w-4" /> {t("reviewLast")}
-                    </Link>
-                  </>
-                ) : (
-                  <>
-                    <button onClick={next} className="btn w-full">
-                      {t("next")} <ArrowRight className="h-4 w-4" />
-                    </button>
-                    <Link href={evaluationHref} className="btn btn-ghost w-full">
-                      <BrainCircuit className="h-4 w-4" /> {t("reviewThis")}
-                    </Link>
-                  </>
-                )}
-              </div>
+              {last ? (
+                <button onClick={() => onNewRound(level)} className="btn w-full">
+                  <RotateCcw className="h-4 w-4" /> {t("newRound")}
+                </button>
+              ) : (
+                <button onClick={next} className="btn w-full">
+                  {t("next")} <ArrowRight className="h-4 w-4" />
+                </button>
+              )}
             </>
           )}
         </div>
+
+        {/* AI Explanation stays on this page: under both columns from lg, after
+            the buttons on phones. */}
+        {submitted && choice && result && (
+          <div className="lg:col-span-2 lg:row-start-3">
+            <AiExplanation decision={choice} correct={result.correct} reasons={text.reasons} suggestion={text.suggestion} />
+          </div>
+        )}
       </div>
     </div>
   )

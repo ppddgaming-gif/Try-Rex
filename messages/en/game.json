@@ -16,9 +16,7 @@
   "pick": "Pick BUY, SELL or WAIT",
   "shortcuts": "Shortcuts: <k>B</k> <k>S</k> <k>W</k> to pick, <k>Enter</k> to submit",
   "newRound": "Play a new round",
-  "reviewLast": "Break down the last question",
   "next": "Next question",
-  "reviewThis": "Break this one down first",
   "decisions": {
     "label": "Trading decision",
     "buy": "Price goes up",
@@ -92,5 +90,12 @@
       "waitRight": "Correct. Price only moved {change}, still inside the ±0.1% threshold.",
       "waitWrong": "Not quite. Price moved {change}, big enough to trade rather than sit out."
     }
+  },
+  "explanation": {
+    "title": "AI Explanation",
+    "lead": "Why the answer is what it is, read from this question's chart.",
+    "rightBecause": "was right because:",
+    "wrongBecause": "wasn't quite right because:",
+    "suggestion": "TRY-REX Suggests"
   }
 }
