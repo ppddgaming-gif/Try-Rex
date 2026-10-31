@@ -1,35 +1,33 @@
 {
   "nav": {
-    "product": "Product",
+    "product": "Produk",
     "how": "Cara Kerja",
     "features": "Fitur",
     "dashboard": "Dashboard",
     "signIn": "Masuk",
     "start": "Mulai Sekarang",
     "openMenu": "Buka menu",
-    "closeMenu": "Tutup menu"
+    "closeMenu": "Tutup menu",
+    "faq": "FAQ"
   },
   "hero": {
     "badge": "AI Trading Mentor untuk trader pemula",
-    "title": "Belajar trading dengan mentor AI yang tak pernah tidur",
-    "body": "TRY-REX mengevaluasi setiap keputusanmu, melatihmu lewat simulasi market nyata, dan membuatmu jadi trader yang konsisten—satu challenge setiap hari.",
+    "title": "Latih keputusan trading di chart forex asli, tanpa uang sungguhan",
+    "body": "TRY-REX adalah tempat belajar trading forex untuk pemula. Pelajari dasarnya lewat materi bertingkat, latih keputusan BUY, SELL, atau WAIT di chart historis lengkap dengan penjelasannya, lalu praktikkan disiplin di akun demo bersaldo virtual.",
     "cta": "Mulai latihan gratis",
     "how": "Lihat cara kerjanya",
-    "note": "Tanpa daftar, tanpa uang sungguhan. Langsung main."
+    "note": "Trading Game dan Belajar 101 bisa langsung dicoba tanpa daftar."
   },
   "showcase": {
-    "aspects": "Pemahaman Berdasarkan Aspek",
-    "example": "Contoh",
     "question": "Soal 1 / 5",
     "situation": "Situasinya begini: ",
     "pick": "Kamu pilih apa?",
     "rightAnswer": "Jawaban yang tepat: <b>{answer}</b>",
-    "chatUser": "Kenapa keputusan SELL aku kurang tepat?",
-    "chatIntro": "Aku cek chart kamu dulu, lalu jelasin alasannya.",
-    "chatStep1": "Menganalisis struktur market",
-    "chatStep2": "Harga masih di area resistance 1.0920",
-    "chatStep3": "Belum ada konfirmasi reversal",
-    "chatAnswer": "Entry terlalu cepat. Tunggu rejection seperti pin bar di resistance dulu, baru ambil SELL."
+    "levelLessons": "{n} materi",
+    "open": "Terbuka",
+    "locked": "Terkunci",
+    "examChip": "Ujian {q} soal di setiap level · lulus dengan {pass} benar",
+    "disiplinTitle": "{n} cek Disiplin di setiap trade"
   },
   "stats": {
     "beta": "Beta terbuka",
@@ -39,80 +37,177 @@
     "first": " — jadi trader pertama yang mencoba.",
     "dash": " — "
   },
+  "about": {
+    "eyebrow": "Tentang TRY-REX",
+    "title": "Tempat latihan, bukan tempat bertaruh",
+    "body": "Sebagian besar trader ritel merugi, dan TRY-REX tidak menjanjikan untung. Yang dilatih di sini adalah cara mengambil keputusan: membaca chart, menyusun rencana sebelum masuk, dan menjaga risiko tetap kecil.",
+    "body2": "Semuanya dibuat untuk pemula: materinya berurutan, istilah yang sulit bisa diketuk untuk melihat artinya, dan setiap jawaban disertai alasannya.",
+    "real": {
+      "title": "Chart asli, bukan rekaan",
+      "body": "Soal Trading Game, contoh chart di materi, dan chart Akun Demo semuanya memakai data harga forex historis. Tidak ada harga yang dikarang."
+    },
+    "virtual": {
+      "title": "Uang virtual",
+      "body": "Trading Game dan Akun Demo memakai saldo virtual. Tidak ada deposit, dan saldonya tidak bisa ditarik atau ditukar."
+    },
+    "process": {
+      "title": "Dinilai dari prosesnya",
+      "body": "Di Akun Demo, setiap trade dinilai dengan {checks} cek Disiplin: stop loss, besar risiko, rasio reward, SL yang tidak dijauhkan, dan bukan revenge trade. Untung atau rugi tidak mengubah nilainya."
+    },
+    "notBroker": {
+      "title": "Bukan broker, bukan sinyal",
+      "body": "TRY-REX tidak menerima order sungguhan, tidak memberi sinyal, dan tidak mengajakmu membuka akun di broker. Semua konten bersifat edukasi."
+    }
+  },
   "surfaces": {
     "eyebrow": "Produk",
-    "title": "Satu mentor, di setiap langkah belajarmu",
-    "body": "Empat ruang yang saling terhubung untuk membentuk kebiasaan trading yang sehat.",
-    "dashboard": {
-      "title": "Dashboard",
-      "body": "Lihat ringkasan pemahaman, akurasi, dan tantangan harianmu dalam satu tempat.",
-      "cta": "Buka Dashboard"
-    },
-    "game": {
-      "title": "Trading Game",
-      "body": "Uji keputusanmu di simulasi market dan kumpulkan XP di setiap soal.",
-      "cta": "Main sekarang"
-    },
-    "evaluation": {
-      "title": "AI Evaluation",
-      "body": "Dapatkan feedback mendetail dari TRY-REX untuk setiap keputusan trading.",
-      "cta": "Lihat evaluasi"
+    "title": "Enam bagian, satu jalur belajar",
+    "body": "Urutannya mengikuti cara pemula belajar: kenali dirimu, pelajari dasarnya, latih keputusan, lalu praktik.",
+    "start": {
+      "title": "Kuis awal",
+      "body": "{quiz} pertanyaan singkat menentukan level soal pertamamu, pair yang jadi fokus, dan target latihan harian. Tidak ada jawaban yang salah.",
+      "cta": "Ikuti kuis"
     },
     "learn": {
       "title": "Belajar 101",
-      "body": "Materi singkat dari dasar sampai forex, dengan kamus istilah yang bisa diketuk langsung dari soal.",
+      "body": "{levels} level dan {lessons} materi, dari dasar forex sampai psikologi trading. Setiap level ditutup ujian {examQuestions} soal; lulus untuk membuka level berikutnya.",
       "cta": "Mulai belajar"
+    },
+    "game": {
+      "title": "Trading Game",
+      "body": "{questions} soal dari chart H4 historis {gamePairs} pair forex. Pilih BUY, SELL, atau WAIT, lalu baca AI Explanation tentang alasannya.",
+      "cta": "Main sekarang"
+    },
+    "demo": {
+      "title": "Akun Demo",
+      "body": "Trading dengan saldo virtual ${balance} di {livePairs} pair dan {timeframes} timeframe, di chart yang berjalan mengikuti jam sungguhan. Terbuka setelah {sessions} sesi Trading Game.",
+      "cta": "Lihat Akun Demo"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "body": "Level, XP, streak, kalender latihan, dan target harian. Semua angka dihitung dari latihanmu sendiri.",
+      "cta": "Buka Dashboard"
+    },
+    "kamus": {
+      "title": "Kamus Trading",
+      "body": "{glossary} istilah, dijelaskan dalam satu atau dua kalimat. Istilah bergaris di soal dan materi bisa diketuk untuk melihat artinya.",
+      "cta": "Buka kamus"
     }
   },
   "features": {
-    "evaluation": {
-      "eyebrow": "AI Evaluation",
-      "title": "Setiap keputusan dievaluasi secara mendalam",
-      "body": "TRY-REX membedah entry, timing, dan manajemen risikomu lalu memberi skor, alasan yang jelas, dan saran konkret—seperti punya mentor pribadi di setiap trade."
+    "eyebrow": "Fitur",
+    "title": "Lihat lebih dekat",
+    "learn": {
+      "eyebrow": "Belajar 101",
+      "title": "Materi bertingkat, dengan ujian di setiap level",
+      "body": "Materinya disusun dari dasar ke lanjutan. Level 1 langsung terbuka; level berikutnya terbuka setelah kamu lulus ujian level sebelumnya.",
+      "points": {
+        "1": "{lessons} materi singkat, dengan contoh chart dari data harga asli.",
+        "2": "Ujian {examQuestions} soal pilihan ganda di setiap level, lulus dengan minimal {examPass} jawaban benar. Soalnya diacak, jadi setiap percobaan berbeda.",
+        "3": "Tersedia dalam Bahasa Indonesia dan Inggris."
+      }
     },
     "game": {
       "eyebrow": "Trading Game",
-      "title": "Latih insting lewat simulasi market nyata",
-      "body": "Setiap soal adalah chart forex historis asli dengan 15 candle berikutnya disembunyikan. Pilih BUY, SELL, atau WAIT, lalu lihat apa yang benar-benar terjadi. 5 soal per sesi, tanpa risiko uang."
+      "title": "Latih keputusan di chart historis asli",
+      "body": "Setiap soal menampilkan {history} candle dan menyembunyikan {future} candle berikutnya. Kamu memilih, lalu chart membuka apa yang sebenarnya terjadi.",
+      "points": {
+        "1": "{questions} soal dari {gamePairs} pair forex, dalam tingkat Mudah, Menengah, dan Sulit.",
+        "2": "{round} soal per sesi, dengan XP untuk setiap jawaban yang tepat.",
+        "3": "Gerak harga sesudahnya hanya satu contoh dari banyak kemungkinan, bukan bukti bahwa sebuah keputusan pasti benar."
+      }
     },
-    "progress": {
-      "eyebrow": "Progress Tracking",
-      "title": "Pantau perkembangan di setiap aspek trading",
-      "body": "Dari trend reading sampai market structure, lihat kekuatan dan kelemahanmu dalam grafik yang mudah dibaca, dan naik level seiring konsistensimu."
+    "explanation": {
+      "eyebrow": "AI Explanation",
+      "title": "Tahu alasannya, bukan cuma benar atau salah",
+      "body": "Setelah kamu menjawab, AI Explanation langsung muncul di halaman yang sama.",
+      "points": {
+        "1": "Trend {history} candle terakhir, support dan resistance terdekat, serta posisi harga di rentangnya.",
+        "2": "Saran yang bisa dipakai di soal berikutnya, termasuk di mana stop loss masuk akal.",
+        "3": "Semuanya dihitung dari candle soal itu sendiri, jadi penjelasannya selalu cocok dengan chart."
+      }
+    },
+    "demo": {
+      "eyebrow": "Akun Demo",
+      "title": "Praktik dengan aturan, bukan dengan feeling",
+      "body": "Setelah {sessions} sesi Trading Game, kamu bisa membuka akun demo dengan saldo virtual ${balance}.",
+      "points": {
+        "1": "Chart berjalan mengikuti jam sungguhan di {livePairs} pair dan {timeframes} timeframe, lengkap dengan EMA 20, EMA 50, RSI 14, dan alat gambar.",
+        "2": "Setiap order wajib punya stop loss dan take profit, dan kalkulator menunjukkan risikonya sebelum kamu masuk.",
+        "3": "Setiap trade dinilai dengan {checks} cek Disiplin dan dicatat di jurnal.",
+        "4": "Stage berikutnya terbuka saat disiplinmu konsisten, bukan saat akunmu untung."
+      }
     }
   },
   "how": {
     "eyebrow": "Cara kerja",
-    "title": "Belajar lewat siklus latihan yang terbukti",
-    "body": "Praktik, feedback, perbaikan—berulang setiap hari sampai jadi kebiasaan.",
+    "title": "Belajar, berlatih, lalu praktik",
+    "body": "Urutan yang disarankan. Kamu bebas melompat, tapi setiap langkah menyiapkan langkah berikutnya.",
     "s1": {
-      "title": "Ambil keputusan",
-      "body": "Hadapi situasi market di Trading Game dan tentukan BUY, SELL, atau WAIT."
+      "title": "Pelajari dasarnya",
+      "body": "Baca materi Belajar 101 dan lulus ujian tiap level untuk membuka level berikutnya."
     },
     "s2": {
-      "title": "Dievaluasi AI",
-      "body": "TRY-REX menilai keputusanmu, memberi skor, dan menjelaskan alasannya."
+      "title": "Latih keputusan",
+      "body": "Jawab soal Trading Game, lalu baca AI Explanation untuk tahu alasannya."
     },
     "s3": {
-      "title": "Naik level",
-      "body": "Perbaiki kelemahan, kumpulkan XP, dan jadi trader yang makin konsisten."
+      "title": "Praktik dengan disiplin",
+      "body": "Setelah {sessions} sesi, buka Akun Demo: pasang SL dan TP, jaga risiko, dan catat setiap trade di jurnal."
+    },
+    "s4": {
+      "title": "Pantau progresmu",
+      "body": "Lihat level, XP, streak, dan kalender latihanmu di Dashboard."
+    }
+  },
+  "faq": {
+    "eyebrow": "FAQ",
+    "title": "Pertanyaan yang sering muncul",
+    "items": {
+      "money": {
+        "q": "Apakah TRY-REX memakai uang sungguhan?",
+        "a": "Tidak. Trading Game dan Akun Demo memakai saldo virtual dan data harga historis. Tidak ada deposit, dan saldo di dalamnya tidak bisa ditarik atau ditukar."
+      },
+      "broker": {
+        "q": "Apakah TRY-REX broker atau pemberi sinyal?",
+        "a": "Bukan. TRY-REX tidak menerima order sungguhan, tidak memberi sinyal trading, dan tidak mengajakmu membuka akun di broker. Semua konten bersifat edukasi, bukan saran finansial."
+      },
+      "data": {
+        "q": "Dari mana data chart-nya?",
+        "a": "Dari data harga forex historis asli. Soal Trading Game memakai candle H4. Akun Demo memutar ulang candle M15 mengikuti jam sungguhan, dengan periode yang dirahasiakan supaya kamu tidak tahu apa yang terjadi selanjutnya."
+      },
+      "account": {
+        "q": "Apakah harus membuat akun?",
+        "a": "Tidak untuk mulai. Trading Game dan Belajar 101 bisa dipakai tanpa akun, dan progresnya tersimpan di perangkatmu. Akun diperlukan untuk Dashboard dan Akun Demo. Saat kamu mendaftar, hasil Trading Game di perangkat ikut pindah ke akunmu."
+      },
+      "demo": {
+        "q": "Kapan Akun Demo bisa dibuka?",
+        "a": "Setelah {sessions} sesi Trading Game ({round} soal per sesi) dan masuk dengan akun. Saat pertama kali membukanya, ada materi singkat yang perlu diselesaikan dulu."
+      },
+      "scoring": {
+        "q": "Bagaimana jawabanku dinilai?",
+        "a": "Di Trading Game, jawabanmu dibandingkan dengan gerak harga pada {future} candle berikutnya, dan AI Explanation menjelaskan alasannya. Di Akun Demo, skor Disiplin hanya melihat proses: stop loss saat entry, risiko maksimal {maxRisk}% saldo, reward minimal {minRr}× risiko, SL tidak dijauhkan, dan bukan revenge trade."
+      },
+      "language": {
+        "q": "Bahasa apa yang tersedia?",
+        "a": "Bahasa Indonesia dan Inggris. Bahasanya bisa diganti kapan saja lewat tombol ID | EN, dan materi Belajar 101 tersedia dalam keduanya."
+      }
     }
   },
   "cta": {
-    "title": "Mulai jadi trader yang konsisten hari ini",
-    "body": "Gratis untuk memulai. Latih satu challenge setiap hari dan biarkan TRY-REX memandumu.",
+    "title": "Mulai dari satu soal hari ini",
+    "body": "Gratis untuk memulai. Jawab satu soal, baca penjelasannya, dan lihat apa yang bisa dipelajari dari chart asli.",
     "start": "Mulai latihan gratis",
     "dashboard": "Buka Dashboard",
     "signUp": "Buat akun gratis"
   },
   "footer": {
-    "tagline": "AI Trading Mentor yang membantumu belajar trading dengan cara yang aman, terukur, dan menyenangkan.",
+    "tagline": "Tempat belajar trading forex untuk pemula: materi bertingkat, soal dari chart asli, dan akun demo dengan uang virtual.",
     "product": "Produk",
     "resources": "Sumber",
     "legal": "Legal",
     "dashboard": "Dashboard",
     "game": "Trading Game",
-    "evaluation": "AI Evaluation",
     "learn": "Belajar 101",
     "glossary": "Kamus Trading",
     "how": "Cara Kerja",
@@ -121,7 +216,9 @@
     "terms": "Syarat & Ketentuan",
     "disclaimer": "Disclaimer",
     "rights": "© {year} TRY-REX. Semua hak dilindungi.",
-    "risk": "Trading mengandung risiko. Konten bersifat edukasi, bukan saran finansial."
+    "risk": "Trading mengandung risiko. Konten bersifat edukasi, bukan saran finansial.",
+    "demo": "Akun Demo",
+    "faq": "FAQ"
   },
   "notFound": {
     "title": "Halaman tidak ditemukan",

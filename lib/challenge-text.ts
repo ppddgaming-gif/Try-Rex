@@ -64,12 +64,12 @@ export function challengeText(c: Challenge, t: T, locale: Locale) {
   const suggestion =
     c.answer === "buy"
       ? s
-        ? t("suggestion.buySl", { change, pips: s.pips })
-        : t("suggestion.buy", { change })
+        ? t("suggestion.buySl", { moved, pips: s.pips })
+        : t("suggestion.buy", { moved })
       : c.answer === "sell"
         ? r
-          ? t("suggestion.sellSl", { change, pips: r.pips })
-          : t("suggestion.sell", { change })
+          ? t("suggestion.sellSl", { moved, pips: r.pips })
+          : t("suggestion.sell", { moved })
         : t("suggestion.wait", { change })
 
   const feedbackFor = (choice: Decision): string => {

@@ -10,8 +10,9 @@ import { Rex } from "@/components/rex-mascot"
 // Labels: landing.nav.<key>.
 const links = [
   { key: "product", href: "/#product" },
-  { key: "how", href: "/#how" },
   { key: "features", href: "/#features" },
+  { key: "how", href: "/#how" },
+  { key: "faq", href: "/#faq" },
 ]
 
 /**

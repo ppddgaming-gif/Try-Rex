@@ -9,7 +9,7 @@ const cols = [
     links: [
       { key: "dashboard", href: "/dashboard" },
       { key: "game", href: "/trading-game" },
-      { key: "evaluation", href: "/ai-evaluation" },
+      { key: "demo", href: "/akun-latihan" },
     ],
   },
   {
@@ -19,6 +19,7 @@ const cols = [
       { key: "glossary", href: "/belajar/kamus" },
       { key: "how", href: "/#how" },
       { key: "features", href: "/#features" },
+      { key: "faq", href: "/#faq" },
     ],
   },
   {

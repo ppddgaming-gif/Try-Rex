@@ -74,10 +74,10 @@
       "result": "Hasilnya: 15 candle berikutnya bergerak {change} dari harga entry."
     },
     "suggestion": {
-      "buy": "Harga naik {change} setelah titik ini, jadi BUY adalah jawabannya. Cari konfirmasi searah trend lebih dulu, dan taruh stop loss di bawah support terdekat.",
-      "buySl": "Harga naik {change} setelah titik ini, jadi BUY adalah jawabannya. Cari konfirmasi searah trend lebih dulu, dan taruh stop loss di bawah support terdekat (sekitar {pips} pip).",
-      "sell": "Harga turun {change} setelah titik ini, jadi SELL adalah jawabannya. Tunggu penolakan di area resistance, dan taruh stop loss di atas resistance terdekat.",
-      "sellSl": "Harga turun {change} setelah titik ini, jadi SELL adalah jawabannya. Tunggu penolakan di area resistance, dan taruh stop loss di atas resistance terdekat (sekitar {pips} pip).",
+      "buy": "Harga naik {moved}% setelah titik ini, jadi BUY adalah jawabannya. Cari konfirmasi searah trend lebih dulu, dan taruh stop loss di bawah support terdekat.",
+      "buySl": "Harga naik {moved}% setelah titik ini, jadi BUY adalah jawabannya. Cari konfirmasi searah trend lebih dulu, dan taruh stop loss di bawah support terdekat (sekitar {pips} pip).",
+      "sell": "Harga turun {moved}% setelah titik ini, jadi SELL adalah jawabannya. Tunggu penolakan di area resistance, dan taruh stop loss di atas resistance terdekat.",
+      "sellSl": "Harga turun {moved}% setelah titik ini, jadi SELL adalah jawabannya. Tunggu penolakan di area resistance, dan taruh stop loss di atas resistance terdekat (sekitar {pips} pip).",
       "wait": "Harga hanya bergerak {change} — di bawah ambang ±0,1% — jadi WAIT adalah jawabannya. Saat market tidak memberi keunggulan arah, tidak mengambil posisi juga sebuah keputusan."
     },
     "feedback": {

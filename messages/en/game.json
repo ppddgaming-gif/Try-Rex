@@ -74,10 +74,10 @@
       "result": "The result: over the next 15 candles price moved {change} from the entry price."
     },
     "suggestion": {
-      "buy": "Price rose {change} after this point, so BUY is the answer. Look for confirmation in the direction of the trend first, and put your stop loss below the nearest support.",
-      "buySl": "Price rose {change} after this point, so BUY is the answer. Look for confirmation in the direction of the trend first, and put your stop loss below the nearest support (about {pips, plural, one {# pip} other {# pips}}).",
-      "sell": "Price fell {change} after this point, so SELL is the answer. Wait for a rejection at resistance, and put your stop loss above the nearest resistance.",
-      "sellSl": "Price fell {change} after this point, so SELL is the answer. Wait for a rejection at resistance, and put your stop loss above the nearest resistance (about {pips, plural, one {# pip} other {# pips}}).",
+      "buy": "Price rose {moved}% after this point, so BUY is the answer. Look for confirmation in the direction of the trend first, and put your stop loss below the nearest support.",
+      "buySl": "Price rose {moved}% after this point, so BUY is the answer. Look for confirmation in the direction of the trend first, and put your stop loss below the nearest support (about {pips, plural, one {# pip} other {# pips}}).",
+      "sell": "Price fell {moved}% after this point, so SELL is the answer. Wait for a rejection at resistance, and put your stop loss above the nearest resistance.",
+      "sellSl": "Price fell {moved}% after this point, so SELL is the answer. Wait for a rejection at resistance, and put your stop loss above the nearest resistance (about {pips, plural, one {# pip} other {# pips}}).",
       "wait": "Price only moved {change}, inside the ±0.1% threshold, so WAIT is the answer. When the market gives no edge in either direction, staying out is a decision too."
     },
     "feedback": {

@@ -1,20 +1,31 @@
 import {
-  TrendingUp,
-  Clock,
-  ShieldCheck,
-  CheckCircle2,
-  XCircle,
-  ArrowUpRight,
   ArrowDownRight,
+  ArrowUpRight,
+  BrainCircuit,
+  CheckCircle2,
+  Lightbulb,
+  ListChecks,
+  Lock,
+  LockOpen,
   Pause,
-  Sparkles,
+  PenLine,
 } from "lucide-react"
 import { useLocale, useTranslations } from "next-intl"
 import { CandlestickChart } from "@/components/candlestick-chart"
-import { Rex, RexArt } from "@/components/rex-mascot"
+import { RexArt } from "@/components/rex-mascot"
 import { challengeText } from "@/lib/challenge-text"
+import { candleX, priceToY } from "@/lib/chart-geometry"
+import { DISIPLIN } from "@/lib/demo/config"
+import { CHECK_IDS } from "@/lib/demo/disiplin"
 import type { Locale } from "@/lib/i18n/locale"
+import { chartFor } from "@/lib/learn/charts"
+import { LEVELS } from "@/lib/learn/content"
+import { EXAM } from "@/lib/learn/exam/engine"
 import { challenges, decisionLabels, frameOf, type Challenge } from "@/lib/mock-data"
+
+// Product shots for the landing page. Each one is built from the app's own
+// data and code (real candles, computed explanations, the real levels and
+// checks), so the pictures can't promise anything the app doesn't do.
 
 /**
  * Soft amber glow panel that hosts app UI mockups. Built from the brand
@@ -36,50 +47,6 @@ export function GlowPanel({
       }}
     >
       <div className="relative flex items-center justify-center">{children}</div>
-    </div>
-  )
-}
-
-/** Mockup: AI evaluation / aspect breakdown list (Dashboard nuance) */
-export function AspectMockup() {
-  const t = useTranslations("landing.showcase")
-  const rows = [
-    { icon: TrendingUp, label: "Trend Reading", val: 72, tone: "text-success" },
-    { icon: Clock, label: "Entry Timing", val: 64, tone: "text-warning" },
-    { icon: ShieldCheck, label: "Risk Management", val: 58, tone: "text-warning" },
-  ]
-  return (
-    <div className="glass-card w-full max-w-md rounded-2xl p-5">
-      <div className="mb-4 flex items-center justify-between">
-        <p className="text-sm font-semibold">{t("aspects")}</p>
-        <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary">
-          {t("example")}
-        </span>
-      </div>
-      <div className="flex flex-col gap-4">
-        {rows.map((r) => {
-          const Icon = r.icon
-          return (
-            <div key={r.label} className="flex items-center gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted">
-                <Icon className={`h-4 w-4 ${r.tone}`} />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-medium">{r.label}</span>
-                  <span className="font-semibold">{r.val}%</span>
-                </div>
-                <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                  <div
-                    className={r.val >= 70 ? "h-full rounded-full bg-success" : "h-full rounded-full bg-warning"}
-                    style={{ width: `${r.val}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-          )
-        })}
-      </div>
     </div>
   )
 }
@@ -111,6 +78,9 @@ function useChallengeText(challenge: Challenge) {
   const tc = useTranslations("game.challenge")
   return challengeText(challenge, tc, useLocale() as Locale)
 }
+
+/** The question the reveal and AI Explanation mockups share: a real SELL answer. */
+const showcaseChallenge = () => challenges.find((c) => c.answer === "sell") ?? challenges[1]
 
 /**
  * Hero product shot: a real question from the game, with Rex quoting that
@@ -168,12 +138,48 @@ export function HeroShowcase() {
   )
 }
 
-/**
- * Mockup: the reveal after answering. A real question with its hidden candles
- * shown, and the answer they decided.
- */
+/** Mockup: Belajar 101's levels as a new player sees them: Level 1 open, the rest behind the exam before them. */
+export function LevelsMockup() {
+  const t = useTranslations("landing.showcase")
+  const locale = useLocale() as Locale
+  return (
+    <div className="glass-card w-full max-w-md rounded-2xl p-4 sm:p-5">
+      <ol className="flex flex-col gap-2">
+        {LEVELS.map((level) => {
+          const open = level.id === 1
+          return (
+            <li key={level.id} className="flex items-center gap-3 rounded-xl border border-border bg-inset px-3 py-2.5">
+              <span
+                className={[
+                  "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg font-mono text-sm font-bold",
+                  open ? "bg-primary/15 text-primary ring-1 ring-primary/30" : "bg-muted text-muted-foreground",
+                ].join(" ")}
+              >
+                {level.id}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className={`truncate text-sm font-semibold ${open ? "" : "text-muted-foreground"}`}>{level.title[locale]}</p>
+                <p className="font-mono text-[11px] text-faint">{t("levelLessons", { n: level.lessons.length })}</p>
+              </div>
+              {open ? (
+                <LockOpen className="h-4 w-4 shrink-0 text-primary" aria-label={t("open")} />
+              ) : (
+                <Lock className="h-4 w-4 shrink-0 text-faint" aria-label={t("locked")} />
+              )}
+            </li>
+          )
+        })}
+      </ol>
+      <p className="mt-3 flex items-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-3 py-2 text-xs font-semibold text-primary">
+        <PenLine className="h-3.5 w-3.5" aria-hidden="true" /> {t("examChip", { q: EXAM.QUESTIONS, pass: EXAM.PASS })}
+      </p>
+    </div>
+  )
+}
+
+/** Mockup: the reveal after answering. A real question with its hidden candles shown, and the answer they decided. */
 export function RevealMockup() {
-  const challenge = challenges.find((c) => c.answer === "sell") ?? challenges[1]
+  const challenge = showcaseChallenge()
   const candles = [...challenge.candles, ...challenge.future]
   const frame = frameOf(candles)
   const up = challenge.changePercent > 0
@@ -216,40 +222,103 @@ export function RevealMockup() {
   )
 }
 
-/** Mockup: TRY-REX AI chat feedback */
-export function ChatMockup() {
-  const t = useTranslations("landing.showcase")
+/**
+ * Mockup: the AI Explanation of the same question as RevealMockup, worded by
+ * the game's own challengeText, so the reasons match that chart.
+ */
+export function ExplanationMockup() {
+  const challenge = showcaseChallenge()
+  const text = useChallengeText(challenge)
+  const t = useTranslations("game.explanation")
   return (
-    <div className="glass-card w-full max-w-md rounded-2xl p-4">
-      {/* user bubble */}
-      <div className="mb-3 flex justify-end">
-        <div className="max-w-[80%] rounded-2xl rounded-br-sm bg-muted px-3.5 py-2 text-xs">
-          {t("chatUser")}
-        </div>
+    <div className="glass-card w-full max-w-md rounded-2xl p-4 sm:p-5">
+      <p className="flex items-center gap-2 text-sm font-semibold">
+        <BrainCircuit className="h-4 w-4 text-primary" aria-hidden="true" /> {t("title")}
+      </p>
+      <div className="mt-3 rounded-xl border border-border bg-muted/40 p-3">
+        <p className="text-xs font-semibold">
+          <span className="text-success">{decisionLabels[challenge.answer]}</span> {t("rightBecause")}
+        </p>
+        <ul className="mt-2 flex flex-col gap-1.5">
+          {text.reasons.slice(0, 3).map((r) => (
+            <li key={r} className="flex gap-2 text-xs leading-relaxed text-muted-foreground">
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-success" />
+              <span>{r}</span>
+            </li>
+          ))}
+        </ul>
       </div>
-      {/* assistant */}
-      <div className="flex items-start gap-2.5">
-        <Rex size={28} />
-        <div className="min-w-0 flex-1">
-          <p className="text-xs leading-relaxed text-muted-foreground">
-            {t("chatIntro")}
-          </p>
-          <div className="mt-2 flex flex-col gap-1.5">
-            <div className="flex items-center gap-2 rounded-lg bg-muted px-3 py-2 text-[11px]">
-              <Sparkles className="h-3.5 w-3.5 text-primary" /> {t("chatStep1")}
-            </div>
-            <div className="flex items-center gap-2 rounded-lg bg-success/10 px-3 py-2 text-[11px] text-success">
-              <CheckCircle2 className="h-3.5 w-3.5" /> {t("chatStep2")}
-            </div>
-            <div className="flex items-center gap-2 rounded-lg bg-danger/10 px-3 py-2 text-[11px] text-danger">
-              <XCircle className="h-3.5 w-3.5" /> {t("chatStep3")}
-            </div>
-          </div>
-          <p className="mt-2 text-xs leading-relaxed">
-            {t("chatAnswer")}
-          </p>
-        </div>
+      <div className="mt-3 rounded-xl border border-primary/30 bg-primary/10 p-3">
+        <p className="flex items-center gap-1.5 text-xs font-semibold text-primary">
+          <Lightbulb className="h-3.5 w-3.5" aria-hidden="true" /> {t("suggestion")}
+        </p>
+        <p className="mt-1.5 text-xs leading-relaxed text-foreground/90">{text.suggestion}</p>
       </div>
+    </div>
+  )
+}
+
+/**
+ * Mockup: Akun Demo. A real H4 chart with EMA 20 and EMA 50 (the trading
+ * screen's own indicator code, via chartFor), and the Disiplin checks every
+ * trade is scored on: rules, not results.
+ */
+export function DemoMockup() {
+  const chart = chartFor("ema")
+  const panel = chart.panels[0]
+  const n = panel.candles.length
+  const frame = frameOf(panel.candles, (chart.lines ?? []).flatMap((l) => l.values.filter((v): v is number => v !== null)))
+  const t = useTranslations("landing.showcase")
+  const tc = useTranslations("demo.checks")
+  const overlay = (
+    <g>
+      {chart.lines?.map((line) => (
+        <polyline
+          key={line.id}
+          points={line.values
+            .map((v, i) => (v === null ? null : `${candleX(i, n).toFixed(1)},${priceToY(v, frame.min, frame.max).toFixed(1)}`))
+            .filter(Boolean)
+            .join(" ")}
+          fill="none"
+          stroke={`var(--ind-${line.id})`}
+          strokeWidth={2.5}
+          vectorEffect="non-scaling-stroke"
+        />
+      ))}
+    </g>
+  )
+  return (
+    <div className="glass-card w-full max-w-md rounded-2xl p-4 sm:p-5">
+      <div className="flex items-center gap-2">
+        <span className="rounded-md border border-border bg-muted/40 px-2 py-1 text-xs font-semibold">
+          {chart.pair.slice(0, 3)}/{chart.pair.slice(3)}
+        </span>
+        <span className="rounded-md border border-border bg-muted/40 px-2 py-1 text-xs font-semibold">{chart.timeframe}</span>
+        <span className="ml-auto flex gap-3 font-mono text-[11px]">
+          <span style={{ color: "var(--ind-ema20)" }}>EMA 20</span>
+          <span style={{ color: "var(--ind-ema50)" }}>EMA 50</span>
+        </span>
+      </div>
+      <div className="mt-3 h-[170px]">
+        <CandlestickChart
+          candles={panel.candles}
+          min={frame.min}
+          max={frame.max}
+          priceTicks={[]}
+          timeLabels={[]}
+          digits={chart.digits}
+          overlay={overlay}
+        />
+      </div>
+      <p className="mt-3 text-xs font-semibold">{t("disiplinTitle", { n: CHECK_IDS.length })}</p>
+      <ul className="mt-2 flex flex-col gap-1.5">
+        {CHECK_IDS.map((id) => (
+          <li key={id} className="flex items-center gap-2 rounded-lg bg-inset px-3 py-1.5 text-[11px] text-muted-foreground">
+            <ListChecks className="h-3.5 w-3.5 shrink-0 text-primary" aria-hidden="true" />
+            {tc(id, { max: DISIPLIN.MAX_RISK_PCT, min: DISIPLIN.MIN_REWARD_RISK })}
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }

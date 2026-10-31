@@ -1,11 +1,13 @@
-import { Gamepad2, ScanSearch, TrendingUp } from "lucide-react"
+import { BookOpen, Gamepad2, LayoutDashboard, Wallet } from "lucide-react"
 import { useTranslations } from "next-intl"
+import { FACTS } from "@/lib/landing-facts"
 
 // Words: landing.how.<key>.title / .body.
 const steps = [
-  { key: "s1", icon: Gamepad2, step: "01" },
-  { key: "s2", icon: ScanSearch, step: "02" },
-  { key: "s3", icon: TrendingUp, step: "03" },
+  { key: "s1", icon: BookOpen, step: "01" },
+  { key: "s2", icon: Gamepad2, step: "02" },
+  { key: "s3", icon: Wallet, step: "03" },
+  { key: "s4", icon: LayoutDashboard, step: "04" },
 ]
 
 export function HowItWorks() {
@@ -23,7 +25,7 @@ export function HowItWorks() {
           </p>
         </div>
 
-        <div className="mt-12 grid gap-5 md:grid-cols-3">
+        <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
           {steps.map((s) => {
             const Icon = s.icon
             return (
@@ -38,7 +40,7 @@ export function HowItWorks() {
                   <span className="text-3xl font-extrabold text-muted">{s.step}</span>
                 </div>
                 <h3 className="mt-5 text-lg font-bold">{t(`${s.key}.title`)}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t(`${s.key}.body`)}</p>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t(`${s.key}.body`, FACTS)}</p>
               </div>
             )
           })}

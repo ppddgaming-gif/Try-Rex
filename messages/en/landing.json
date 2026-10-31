@@ -7,29 +7,27 @@
     "signIn": "Sign in",
     "start": "Get started",
     "openMenu": "Open menu",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "faq": "FAQ"
   },
   "hero": {
     "badge": "An AI trading mentor for beginners",
-    "title": "Learn trading with an AI mentor that never sleeps",
-    "body": "TRY-REX evaluates every decision you make, trains you on real market simulations, and helps you become a consistent trader, one challenge a day.",
+    "title": "Practice trading decisions on real forex charts, without real money",
+    "body": "TRY-REX is a place for beginners to learn forex trading. Learn the basics through levelled lessons, practice BUY, SELL or WAIT decisions on historical charts with the reasons explained, then practice discipline in a demo account with a virtual balance.",
     "cta": "Start practicing free",
     "how": "See how it works",
-    "note": "No sign-up, no real money. Just play."
+    "note": "The Trading Game and Learn 101 work right away, no sign-up needed."
   },
   "showcase": {
-    "aspects": "Understanding by Skill",
-    "example": "Example",
     "question": "Question 1 / 5",
     "situation": "Here's the situation: ",
-    "pick": "What's your call?",
+    "pick": "What would you pick?",
     "rightAnswer": "The right answer: <b>{answer}</b>",
-    "chatUser": "Why wasn't my SELL decision right?",
-    "chatIntro": "Let me check your chart first, then I'll explain why.",
-    "chatStep1": "Analyzing market structure",
-    "chatStep2": "Price is still in the 1.0920 resistance area",
-    "chatStep3": "No reversal confirmation yet",
-    "chatAnswer": "You got in too early. Wait for a rejection, like a pin bar at resistance, before you take the SELL."
+    "levelLessons": "{n, plural, one {# lesson} other {# lessons}}",
+    "open": "Open",
+    "locked": "Locked",
+    "examChip": "A {q}-question exam at every level · pass with {pass} right",
+    "disiplinTitle": "{n} Disiplin checks on every trade"
   },
   "stats": {
     "beta": "Open beta",
@@ -39,80 +37,177 @@
     "first": " — be one of the first to try it.",
     "dash": " — "
   },
+  "about": {
+    "eyebrow": "About TRY-REX",
+    "title": "A place to practice, not a place to bet",
+    "body": "Most retail traders lose money, and TRY-REX doesn't promise profit. What it trains is how you make decisions: reading the chart, planning before you enter, and keeping risk small.",
+    "body2": "It's built for beginners: the lessons come in order, hard terms can be tapped to see what they mean, and every answer comes with its reasons.",
+    "real": {
+      "title": "Real charts, nothing made up",
+      "body": "Trading Game questions, the charts in lessons and the Demo Account chart all use historical forex price data. No price is invented."
+    },
+    "virtual": {
+      "title": "Virtual money",
+      "body": "The Trading Game and the Demo Account use a virtual balance. There's no deposit, and the balance can't be withdrawn or exchanged."
+    },
+    "process": {
+      "title": "Judged on process",
+      "body": "In the Demo Account, every trade is scored on {checks} Disiplin checks: stop loss, risk size, reward ratio, an SL that isn't moved away, and no revenge trading. Profit or loss doesn't change the score."
+    },
+    "notBroker": {
+      "title": "Not a broker, not signals",
+      "body": "TRY-REX takes no real orders, gives no signals and never asks you to open a broker account. Everything is educational."
+    }
+  },
   "surfaces": {
     "eyebrow": "Product",
-    "title": "One mentor, at every step of your learning",
-    "body": "Four connected spaces that build healthy trading habits.",
-    "dashboard": {
-      "title": "Dashboard",
-      "body": "See your understanding, accuracy and daily challenge in one place.",
-      "cta": "Open Dashboard"
-    },
-    "game": {
-      "title": "Trading Game",
-      "body": "Test your decisions in market simulations and earn XP on every question.",
-      "cta": "Play now"
-    },
-    "evaluation": {
-      "title": "AI Evaluation",
-      "body": "Get detailed feedback from TRY-REX on every trading decision.",
-      "cta": "See an evaluation"
+    "title": "Six parts, one learning path",
+    "body": "In the order beginners learn: get to know yourself, learn the basics, practice decisions, then put them to work.",
+    "start": {
+      "title": "Starting quiz",
+      "body": "A short quiz of {quiz, plural, one {# question} other {# questions}} sets your first question level, the pairs you focus on and your daily practice target. There are no wrong answers.",
+      "cta": "Take the quiz"
     },
     "learn": {
       "title": "Learn 101",
-      "body": "Short lessons from the basics to forex, with a glossary you can tap straight from the questions.",
+      "body": "{levels, plural, one {# level} other {# levels}} and {lessons, plural, one {# lesson} other {# lessons}}, from forex basics to trading psychology. Each level ends with a {examQuestions}-question exam; pass it to open the next level.",
       "cta": "Start learning"
+    },
+    "game": {
+      "title": "Trading Game",
+      "body": "{questions, plural, one {# question} other {# questions}} from historical H4 charts of {gamePairs, plural, one {# forex pair} other {# forex pairs}}. Choose BUY, SELL or WAIT, then read the AI Explanation of why.",
+      "cta": "Play now"
+    },
+    "demo": {
+      "title": "Demo Account",
+      "body": "Trade a virtual ${balance} balance on {livePairs, plural, one {# pair} other {# pairs}} and {timeframes, plural, one {# timeframe} other {# timeframes}}, on a chart that runs on real time. Opens after {sessions, plural, one {# Trading Game session} other {# Trading Game sessions}}.",
+      "cta": "See the Demo Account"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "body": "Level, XP, streak, practice calendar and daily target. Every number comes from your own practice.",
+      "cta": "Open Dashboard"
+    },
+    "kamus": {
+      "title": "Trading Glossary",
+      "body": "{glossary, plural, one {# term} other {# terms}}, each explained in a sentence or two. Underlined terms in questions and lessons can be tapped to see what they mean.",
+      "cta": "Open the glossary"
     }
   },
   "features": {
-    "evaluation": {
-      "eyebrow": "AI Evaluation",
-      "title": "Every decision, evaluated in depth",
-      "body": "TRY-REX breaks down your entry, timing and risk management, then gives you a score, clear reasons and concrete advice, like having a personal mentor on every trade."
+    "eyebrow": "Features",
+    "title": "A closer look",
+    "learn": {
+      "eyebrow": "Learn 101",
+      "title": "Levelled lessons, with an exam at every level",
+      "body": "The lessons go from basic to advanced. Level 1 is open from the start; each next level opens once you pass the exam of the level before it.",
+      "points": {
+        "1": "{lessons, plural, one {# short lesson} other {# short lessons}}, with chart examples from real price data.",
+        "2": "A {examQuestions}-question multiple-choice exam at every level; pass with at least {examPass} right. Questions are shuffled, so every attempt is different.",
+        "3": "Available in Indonesian and English."
+      }
     },
     "game": {
       "eyebrow": "Trading Game",
-      "title": "Train your instincts on real market simulations",
-      "body": "Every question is a real historical forex chart with the next 15 candles hidden. Pick BUY, SELL or WAIT, then see what actually happened. 5 questions per session, no money at risk."
+      "title": "Practice decisions on real historical charts",
+      "body": "Each question shows {history} candles and hides the next {future}. You choose, then the chart reveals what actually happened.",
+      "points": {
+        "1": "{questions, plural, one {# question} other {# questions}} from {gamePairs, plural, one {# forex pair} other {# forex pairs}}, at Easy, Medium and Hard levels.",
+        "2": "{round, plural, one {# question} other {# questions}} per session, with XP for every right answer.",
+        "3": "What price did next is one sample out of many possibilities, not proof that a decision was certain to be right."
+      }
     },
-    "progress": {
-      "eyebrow": "Progress Tracking",
-      "title": "Track your progress across every part of trading",
-      "body": "From trend reading to market structure, see your strengths and weaknesses in easy-to-read charts, and level up as you get more consistent."
+    "explanation": {
+      "eyebrow": "AI Explanation",
+      "title": "Know why, not just right or wrong",
+      "body": "After you answer, the AI Explanation appears right on the same page.",
+      "points": {
+        "1": "The trend of the last {history} candles, the nearest support and resistance, and where price sits in its range.",
+        "2": "A suggestion you can use on the next question, including where a stop loss makes sense.",
+        "3": "All of it is computed from that question's own candles, so the explanation always matches the chart."
+      }
+    },
+    "demo": {
+      "eyebrow": "Demo Account",
+      "title": "Practice with rules, not gut feeling",
+      "body": "After {sessions, plural, one {# Trading Game session} other {# Trading Game sessions}}, you can open a demo account with a virtual ${balance} balance.",
+      "points": {
+        "1": "The chart runs on real time across {livePairs, plural, one {# pair} other {# pairs}} and {timeframes, plural, one {# timeframe} other {# timeframes}}, with EMA 20, EMA 50, RSI 14 and drawing tools.",
+        "2": "Every order needs a stop loss and a take profit, and the calculator shows the risk before you enter.",
+        "3": "Every trade is scored on {checks} Disiplin checks and recorded in the journal.",
+        "4": "The next stage opens when your discipline is consistent, not when your account is up."
+      }
     }
   },
   "how": {
     "eyebrow": "How it works",
-    "title": "Learn through a proven practice loop",
-    "body": "Practice, feedback, improvement, repeated every day until it becomes a habit.",
+    "title": "Learn, practice, then put it to work",
+    "body": "The suggested order. You're free to skip ahead, but each step prepares the next.",
     "s1": {
-      "title": "Make a decision",
-      "body": "Face a market situation in the Trading Game and choose BUY, SELL or WAIT."
+      "title": "Learn the basics",
+      "body": "Read the Learn 101 lessons and pass each level's exam to open the next."
     },
     "s2": {
-      "title": "Get evaluated by AI",
-      "body": "TRY-REX scores your decision and explains why."
+      "title": "Practice decisions",
+      "body": "Answer Trading Game questions, then read the AI Explanation to see why."
     },
     "s3": {
-      "title": "Level up",
-      "body": "Work on your weak spots, earn XP, and become a more consistent trader."
+      "title": "Practice with discipline",
+      "body": "After {sessions, plural, one {# session} other {# sessions}}, open the Demo Account: set SL and TP, keep risk in check, and record every trade in the journal."
+    },
+    "s4": {
+      "title": "Track your progress",
+      "body": "See your level, XP, streak and practice calendar on the Dashboard."
+    }
+  },
+  "faq": {
+    "eyebrow": "FAQ",
+    "title": "Frequently asked questions",
+    "items": {
+      "money": {
+        "q": "Does TRY-REX use real money?",
+        "a": "No. The Trading Game and the Demo Account use a virtual balance and historical price data. There's no deposit, and the balance can't be withdrawn or exchanged."
+      },
+      "broker": {
+        "q": "Is TRY-REX a broker or a signal service?",
+        "a": "No. TRY-REX takes no real orders, gives no trading signals and never asks you to open a broker account. Everything is educational, not financial advice."
+      },
+      "data": {
+        "q": "Where does the chart data come from?",
+        "a": "From real historical forex price data. Trading Game questions use H4 candles. The Demo Account replays M15 candles on real time, from a period kept secret so you can't know what happens next."
+      },
+      "account": {
+        "q": "Do I need an account?",
+        "a": "Not to start. The Trading Game and Learn 101 work without an account, and your progress is saved on your device. You need an account for the Dashboard and the Demo Account. When you sign up, your Trading Game results on the device move to your account."
+      },
+      "demo": {
+        "q": "When does the Demo Account open?",
+        "a": "After {sessions, plural, one {# Trading Game session} other {# Trading Game sessions}} ({round} questions per session) while signed in. The first time you open it, there's a short lesson to finish first."
+      },
+      "scoring": {
+        "q": "How are my answers judged?",
+        "a": "In the Trading Game, your answer is compared with how price moved over the next {future} candles, and the AI Explanation explains why. In the Demo Account, the Disiplin score looks only at process: a stop loss at entry, risk at most {maxRisk}% of the balance, reward at least {minRr}× the risk, an SL not moved away, and no revenge trading."
+      },
+      "language": {
+        "q": "Which languages are available?",
+        "a": "Indonesian and English. You can switch any time with the ID | EN button, and the Learn 101 lessons are available in both."
+      }
     }
   },
   "cta": {
-    "title": "Start becoming a consistent trader today",
-    "body": "Free to start. Practice one challenge a day and let TRY-REX guide you.",
+    "title": "Start with one question today",
+    "body": "Free to start. Answer one question, read the explanation, and see what a real chart can teach you.",
     "start": "Start practicing free",
     "dashboard": "Open Dashboard",
     "signUp": "Create a free account"
   },
   "footer": {
-    "tagline": "An AI trading mentor that helps you learn trading in a way that's safe, measurable and fun.",
+    "tagline": "A place for beginners to learn forex trading: levelled lessons, questions from real charts, and a demo account with virtual money.",
     "product": "Product",
     "resources": "Resources",
     "legal": "Legal",
     "dashboard": "Dashboard",
     "game": "Trading Game",
-    "evaluation": "AI Evaluation",
     "learn": "Learn 101",
     "glossary": "Trading Glossary",
     "how": "How it works",
@@ -121,7 +216,9 @@
     "terms": "Terms & Conditions",
     "disclaimer": "Disclaimer",
     "rights": "© {year} TRY-REX. All rights reserved.",
-    "risk": "Trading involves risk. Content is educational, not financial advice."
+    "risk": "Trading involves risk. Content is educational, not financial advice.",
+    "demo": "Demo Account",
+    "faq": "FAQ"
   },
   "notFound": {
     "title": "Page not found",
