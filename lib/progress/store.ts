@@ -82,7 +82,6 @@ function parse(raw: string | null): Progress {
       xp: data.xp,
       attempts: data.attempts,
       streak: { ...base.streak, ...data.streak },
-      competencies: { ...base.competencies, ...data.competencies },
     }
   } catch {
     return emptyProgress()

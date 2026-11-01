@@ -3,9 +3,10 @@ import { useTranslations } from "next-intl"
 
 /**
  * One skill. `null` means it hasn't been tested yet: a dashed empty track and
- * "Belum diuji", never a stand-in number. A number gets a solid bar.
+ * "Belum diuji", never a stand-in number. A number gets a solid bar, and
+ * `caption` says what it was counted from.
  */
-export function CompetencyMeter({ label, value }: { label: string; value: number | null }) {
+export function CompetencyMeter({ label, value, caption }: { label: string; value: number | null; caption?: string }) {
   const t = useTranslations("progress")
   return (
     <div className="flex flex-col gap-2">
@@ -33,6 +34,7 @@ export function CompetencyMeter({ label, value }: { label: string; value: number
           <div className="h-full rounded-full bg-primary" style={{ width: `${Math.max(0, Math.min(100, value))}%` }} />
         </div>
       )}
+      {caption && <p className="text-xs text-muted-foreground">{caption}</p>}
     </div>
   )
 }

@@ -20,7 +20,7 @@ describe("the assessment keys and future candles stay on the server", () => {
     const offenders = files.filter((f) => {
       const src = readFileSync(f, "utf8")
       const client = src.startsWith('"use client"') || f.startsWith("components")
-      return client && /assessment\/(keys|candles)\/|lib\/assessment\/(data|token|runs)/.test(src)
+      return client && /assessment\/(keys|candles)\/|lib\/assessment\/(data|token|runs|skill-results)/.test(src)
     })
     expect(offenders).toEqual([])
   })

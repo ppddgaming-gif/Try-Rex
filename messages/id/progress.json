@@ -74,5 +74,12 @@
     "srDays": "hari berturut-turut. {hint}.",
     "days": "<num>{n}</num> hari berturut-turut",
     "best": "Terbaik: <num>{n}</num> hari"
+  },
+  "skillFrom": "dari {list}",
+  "skillSources": {
+    "game": "{n} jawaban Trading Game",
+    "asesmen": "{n} soal Asesmen",
+    "demo": "{n} trade Akun Demo",
+    "ai": "{n} AI Evaluation"
   }
 }
