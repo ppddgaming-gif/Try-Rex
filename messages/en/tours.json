@@ -1,0 +1,213 @@
+{
+  "ui": {
+    "skip": "Skip",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "stepOf": "{n}/{total}",
+    "stepsLabel": "Step {n} of {total}",
+    "playPageTour": "Play the {title} tour",
+    "pageTour": "Tour of this page",
+    "guide": "Guide",
+    "openGuide": "Open the Guide",
+    "notOnScreen": "The part this tour explains isn't on this page yet.",
+    "busyTrade": "The tour can play once your trade is closed.",
+    "busyDialog": "Close the window that's open first, then try again.",
+    "seen": "Done",
+    "notSeen": "Not yet",
+    "stepCount": "{n, plural, one {# step} other {# steps}}",
+    "signInFirst": "Sign in first",
+    "lockedDemo": "Opens with the Demo Account",
+    "replay": "Play again",
+    "guideTitle": "Guide",
+    "guideLead": "A short tour of each feature. Play one again any time, or tap the ? button on any page."
+  },
+  "welcome": {
+    "title": "Welcome tour",
+    "description": "Every TRY-REX feature in one minute.",
+    "finish": "Start your first session",
+    "steps": {
+      "hello": {
+        "title": "Hi!",
+        "titleNamed": "Hi, {name}!",
+        "text": "This is the Dashboard: your progress, streak and skills all gather here. The tour takes just a minute."
+      },
+      "game": {
+        "title": "Trading Game",
+        "text": "Practise BUY, SELL or WAIT decisions on real historical charts, one round at a time."
+      },
+      "demo": {
+        "title": "Demo Account",
+        "textGuest": "A ${balance, number} virtual account for practising trading on historical data. Sign in first, then finish {sessions} Trading Game sessions.",
+        "textOpen": "A ${balance, number} virtual account for practising trading on historical data. It's already open for you.",
+        "textLocked": "A ${balance, number} virtual account for practising trading on historical data. It opens after {needed} Trading Game sessions ({sessions}/{needed})."
+      },
+      "learn": {
+        "title": "Belajar 101 and the Glossary",
+        "text": "Lessons from forex basics to trading psychology, with charts from real data. Tap any dotted-underlined term, anywhere, to see what it means."
+      },
+      "settings": {
+        "title": "Settings",
+        "text": "Choose the language, theme, an easy-to-read font and the text size. Your profile and password are here too."
+      },
+      "help": {
+        "title": "The ? button",
+        "text": "Tap it any time to replay the tour of the page you're on. Every tour is in the Guide."
+      }
+    }
+  },
+  "trading-game": {
+    "title": "Trading Game",
+    "description": "The chart, the market situation, BUY/SELL/WAIT and XP.",
+    "steps": {
+      "pair": {
+        "title": "Pair and timeframe",
+        "text": "The currency pair you're reading and how much time each candle covers. H4 means one candle is 4 hours."
+      },
+      "chart": {
+        "title": "Chart and zones",
+        "text": "The candles are real price data. The horizontal bands mark support and resistance areas."
+      },
+      "situation": {
+        "title": "Market situation",
+        "text": "The chart summed up in words, worked out from the same candles. Tap an underlined term to see what it means."
+      },
+      "decision": {
+        "title": "BUY, SELL or WAIT",
+        "text": "Pick where you think price will go. WAIT is a real answer too."
+      },
+      "submit": {
+        "title": "Send your answer",
+        "text": "Once you send it, the next {n} candles open: one example of what could happen, not proof your analysis was right or wrong. AI Explanation then explains the reasons from the chart."
+      },
+      "progress": {
+        "title": "Round progress",
+        "text": "These boxes fill in as you answer, with your XP and time. XP raises your level."
+      },
+      "level": {
+        "title": "Difficulty",
+        "text": "Start on Easy, then move up when you're comfortable. Harder levels give more XP."
+      }
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "description": "Your numbers, daily goal, streak, calendar, skills and activity.",
+    "steps": {
+      "stats": {
+        "title": "Your numbers",
+        "text": "Every one is worked out from your own answers. Where there's no data yet, you'll see a —."
+      },
+      "goal": {
+        "title": "Daily goal",
+        "text": "The target from your starting quiz, next to what you've answered today."
+      },
+      "streak": {
+        "title": "Streak",
+        "text": "The days in a row you've practised. One question a day is enough to keep it."
+      },
+      "calendar": {
+        "title": "Practice calendar",
+        "text": "One square for each day. It fills in on the days you practise."
+      },
+      "skills": {
+        "title": "Skills",
+        "text": "Four basic trading skills. Each says “Not tested yet” until questions start testing it."
+      },
+      "activity": {
+        "title": "Recent activity",
+        "text": "Your latest answers, newest first."
+      },
+      "challenge": {
+        "title": "Daily challenge",
+        "text": "One question for today, picked by the date. Its button opens that question in the Trading Game."
+      }
+    }
+  },
+  "belajar": {
+    "title": "Belajar 101",
+    "description": "Levels, lessons, level exams and the Glossary.",
+    "steps": {
+      "level": {
+        "title": "Levels",
+        "text": "The lessons are grouped into levels, from forex basics to trading psychology. Level 1 is open from the start."
+      },
+      "lesson": {
+        "title": "Lessons",
+        "text": "Each lesson has text, worked examples and charts from real data. Mark it done once it makes sense."
+      },
+      "exam": {
+        "title": "Level exam",
+        "text": "Passing the exam opens the next level. You need {pass} right answers out of {q}."
+      },
+      "kamus": {
+        "title": "Glossary",
+        "text": "Every trading term in a sentence or two. The same terms can be tapped right inside the lessons and the Trading Game."
+      }
+    }
+  },
+  "akun-latihan": {
+    "title": "Demo Account",
+    "description": "The Demo Account's tabs. Shows once the Demo Account is open.",
+    "steps": {
+      "akun": {
+        "title": "Account",
+        "text": "Your account's dashboard: balance, Disiplin and Stage progress."
+      },
+      "trading": {
+        "title": "Trading",
+        "text": "A chart that moves in real time over historical price data. BUY or SELL, always with an SL and a TP."
+      },
+      "jurnal": {
+        "title": "Journal",
+        "text": "Every closed trade is recorded here automatically, with Rex's comments. Ask Rex is here too."
+      },
+      "riwayat": {
+        "title": "History",
+        "text": "Your earlier accounts, with their journals."
+      },
+      "kalkulator": {
+        "title": "Calculator",
+        "text": "Work out a position's profit, loss and margin before you open it."
+      },
+      "tips": {
+        "title": "Rex's tips",
+        "text": "Tips you've already seen can be read again here."
+      }
+    }
+  },
+  "pengaturan": {
+    "title": "Settings",
+    "description": "Appearance, Profile, Security and Practice.",
+    "steps": {
+      "language": {
+        "title": "Language",
+        "text": "Indonesian or English. When you're signed in, your choice is saved to your account too."
+      },
+      "theme": {
+        "title": "Theme",
+        "text": "Dark, light, or follow your device. Appearance choices are saved on this device."
+      },
+      "font": {
+        "title": "Font and size",
+        "text": "There's a dyslexia-friendly font and an easy-to-read one. Below them, you can enlarge the text across the whole site."
+      },
+      "motion": {
+        "title": "Motion",
+        "text": "Choose Reduce if animations get in the way."
+      },
+      "profil": {
+        "title": "Profile",
+        "text": "Your photo, display name and username."
+      },
+      "keamanan": {
+        "title": "Security",
+        "text": "Change your email and password."
+      },
+      "latihan": {
+        "title": "Practice",
+        "text": "The training plan from your quiz, retake the quiz, or reset your progress."
+      }
+    }
+  }
+}

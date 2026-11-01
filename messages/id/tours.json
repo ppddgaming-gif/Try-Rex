@@ -1,0 +1,213 @@
+{
+  "ui": {
+    "skip": "Lewati",
+    "back": "Kembali",
+    "next": "Lanjut",
+    "done": "Selesai",
+    "stepOf": "{n}/{total}",
+    "stepsLabel": "Langkah {n} dari {total}",
+    "playPageTour": "Putar tur {title}",
+    "pageTour": "Tur halaman ini",
+    "guide": "Panduan",
+    "openGuide": "Buka Panduan",
+    "notOnScreen": "Bagian yang dijelaskan tur ini belum tampil di halaman ini.",
+    "busyTrade": "Tur bisa diputar setelah trade-mu ditutup.",
+    "busyDialog": "Tutup dulu jendela yang sedang terbuka, lalu coba lagi.",
+    "seen": "Selesai",
+    "notSeen": "Belum",
+    "stepCount": "{n} langkah",
+    "signInFirst": "Masuk dulu",
+    "lockedDemo": "Terbuka bersama Akun Demo",
+    "replay": "Putar ulang",
+    "guideTitle": "Panduan",
+    "guideLead": "Tur singkat untuk tiap fitur. Putar ulang kapan saja, atau ketuk tombol ? di halaman mana pun."
+  },
+  "welcome": {
+    "title": "Tur selamat datang",
+    "description": "Semua fitur TRY-REX dalam satu menit.",
+    "finish": "Mulai sesi pertama",
+    "steps": {
+      "hello": {
+        "title": "Hai!",
+        "titleNamed": "Hai, {name}!",
+        "text": "Ini Dashboard: progres, streak, dan kemampuanmu terkumpul di sini. Turnya cuma satu menit."
+      },
+      "game": {
+        "title": "Trading Game",
+        "text": "Latih keputusan BUY, SELL, atau WAIT di chart historis asli, satu ronde demi satu ronde."
+      },
+      "demo": {
+        "title": "Akun Demo",
+        "textGuest": "Akun virtual ${balance, number} untuk berlatih trading di data historis. Masuk dulu, lalu selesaikan {sessions} sesi Trading Game.",
+        "textOpen": "Akun virtual ${balance, number} untuk berlatih trading di data historis. Sudah terbuka untukmu.",
+        "textLocked": "Akun virtual ${balance, number} untuk berlatih trading di data historis. Terbuka setelah {needed} sesi Trading Game ({sessions}/{needed})."
+      },
+      "learn": {
+        "title": "Belajar 101 dan Kamus",
+        "text": "Materi dari dasar forex sampai psikologi trading, dengan chart dari data asli. Istilah bergaris titik bisa diketuk di mana saja untuk melihat artinya."
+      },
+      "settings": {
+        "title": "Pengaturan",
+        "text": "Atur bahasa, tema, huruf yang mudah dibaca, dan ukuran teks. Profil dan password juga di sini."
+      },
+      "help": {
+        "title": "Tombol ?",
+        "text": "Ketuk ini kapan saja untuk memutar ulang tur halaman yang sedang kamu buka. Semua tur ada di Panduan."
+      }
+    }
+  },
+  "trading-game": {
+    "title": "Trading Game",
+    "description": "Chart, Situasi Market, BUY/SELL/WAIT, dan XP.",
+    "steps": {
+      "pair": {
+        "title": "Pair dan timeframe",
+        "text": "Pasangan mata uang yang kamu baca dan ukuran tiap candle. H4 berarti satu candle mewakili 4 jam."
+      },
+      "chart": {
+        "title": "Chart dan zona",
+        "text": "Candle-nya data harga asli. Pita mendatar menandai area support dan resistance."
+      },
+      "situation": {
+        "title": "Situasi Market",
+        "text": "Ringkasan chart dalam kata-kata, dihitung dari candle yang sama. Ketuk istilah bergaris untuk artinya."
+      },
+      "decision": {
+        "title": "BUY, SELL, atau WAIT",
+        "text": "Pilih ke mana menurutmu harga akan bergerak. WAIT juga jawaban yang sah."
+      },
+      "submit": {
+        "title": "Kirim jawaban",
+        "text": "Setelah dikirim, {n} candle berikutnya dibuka: satu contoh dari yang bisa terjadi, bukan bukti analisismu benar atau salah. AI Explanation lalu menjelaskan alasannya dari chart."
+      },
+      "progress": {
+        "title": "Progres ronde",
+        "text": "Kotak-kotak ini terisi seiring jawabanmu, lengkap dengan XP dan waktu. XP menambah levelmu."
+      },
+      "level": {
+        "title": "Tingkat kesulitan",
+        "text": "Mulai dari Mudah, lalu naik saat sudah nyaman. Tingkat yang lebih sulit memberi XP lebih besar."
+      }
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "description": "Angka-angkamu, target harian, streak, kalender, kemampuan, dan aktivitas.",
+    "steps": {
+      "stats": {
+        "title": "Angka-angkamu",
+        "text": "Semuanya dihitung dari jawabanmu sendiri. Kalau belum ada datanya, yang tampil tanda —."
+      },
+      "goal": {
+        "title": "Target harian",
+        "text": "Target dari kuis awalmu, dibandingkan dengan jawabanmu hari ini."
+      },
+      "streak": {
+        "title": "Streak",
+        "text": "Hari berturut-turut kamu berlatih. Satu soal sehari sudah cukup untuk menjaganya."
+      },
+      "calendar": {
+        "title": "Kalender latihan",
+        "text": "Satu kotak untuk satu hari. Kotaknya terisi di hari kamu berlatih."
+      },
+      "skills": {
+        "title": "Kemampuan",
+        "text": "Empat kemampuan dasar trading. Tertulis “Belum diuji” sampai soal mulai mengujinya satu per satu."
+      },
+      "activity": {
+        "title": "Aktivitas terbaru",
+        "text": "Jawaban-jawaban terakhirmu, yang terbaru di atas."
+      },
+      "challenge": {
+        "title": "Tantangan harian",
+        "text": "Satu soal untuk hari ini, dipilih menurut tanggal. Tombolnya membuka soal itu di Trading Game."
+      }
+    }
+  },
+  "belajar": {
+    "title": "Belajar 101",
+    "description": "Level, materi, ujian level, dan Kamus.",
+    "steps": {
+      "level": {
+        "title": "Level",
+        "text": "Materinya dibagi per level, dari dasar forex sampai psikologi trading. Level 1 langsung terbuka."
+      },
+      "lesson": {
+        "title": "Materi",
+        "text": "Tiap materi berisi teks, contoh hitungan, dan chart dari data asli. Tandai selesai kalau sudah paham."
+      },
+      "exam": {
+        "title": "Ujian level",
+        "text": "Lulus ujian membuka level berikutnya. Butuh {pass} jawaban benar dari {q} soal."
+      },
+      "kamus": {
+        "title": "Kamus",
+        "text": "Semua istilah trading dalam satu atau dua kalimat. Istilah yang sama bisa diketuk langsung di materi dan di Trading Game."
+      }
+    }
+  },
+  "akun-latihan": {
+    "title": "Akun Demo",
+    "description": "Tab-tab Akun Demo. Muncul setelah Akun Demo terbuka.",
+    "steps": {
+      "akun": {
+        "title": "Akun",
+        "text": "Dashboard akunmu: saldo, Disiplin, dan progres Stage."
+      },
+      "trading": {
+        "title": "Trading",
+        "text": "Chart yang berjalan mengikuti waktu sungguhan, di atas data harga historis. BUY atau SELL selalu dengan SL dan TP."
+      },
+      "jurnal": {
+        "title": "Jurnal",
+        "text": "Setiap trade yang ditutup tercatat di sini otomatis, lengkap dengan komentar Rex. Tanya Rex juga ada di sini."
+      },
+      "riwayat": {
+        "title": "Riwayat",
+        "text": "Akun-akunmu sebelumnya, beserta jurnalnya."
+      },
+      "kalkulator": {
+        "title": "Kalkulator",
+        "text": "Hitung profit, rugi, dan margin sebuah posisi sebelum membukanya."
+      },
+      "tips": {
+        "title": "Tips Rex",
+        "text": "Tips yang sudah pernah muncul bisa dibaca lagi di sini."
+      }
+    }
+  },
+  "pengaturan": {
+    "title": "Pengaturan",
+    "description": "Tampilan, Profil, Keamanan, dan Latihan.",
+    "steps": {
+      "language": {
+        "title": "Bahasa",
+        "text": "Indonesia atau English. Kalau kamu masuk, pilihanmu ikut tersimpan di akun."
+      },
+      "theme": {
+        "title": "Tema",
+        "text": "Gelap, terang, atau ikut perangkatmu. Pilihan tampilan tersimpan di perangkat ini."
+      },
+      "font": {
+        "title": "Huruf dan ukuran",
+        "text": "Ada huruf yang ramah disleksia dan huruf yang mudah dibaca. Di bawahnya, teks bisa diperbesar di seluruh situs."
+      },
+      "motion": {
+        "title": "Gerakan",
+        "text": "Pilih Kurangi kalau animasi terasa mengganggu."
+      },
+      "profil": {
+        "title": "Profil",
+        "text": "Foto, nama tampilan, dan username."
+      },
+      "keamanan": {
+        "title": "Keamanan",
+        "text": "Ganti email dan password."
+      },
+      "latihan": {
+        "title": "Latihan",
+        "text": "Jalur latihan dari kuismu, ulangi kuis, atau reset progres."
+      }
+    }
+  }
+}

@@ -7,6 +7,7 @@ import { BrandMark } from "@/components/brand-mark"
 import { LocaleSwitcher } from "@/components/locale-switcher"
 import { NavLinks, type NavLocks } from "@/components/nav-links"
 import { ProfileCard, type ProfileSummary } from "@/components/profile-card"
+import { TourButton } from "@/components/tour/tour-button"
 
 // The sidebar is desktop-only, so this is the sole way to move between app
 // routes below the lg breakpoint.
@@ -21,18 +22,20 @@ export function AppNavMobile({ profile, locks }: { profile: ProfileSummary | nul
         <BrandMark onNavigate={close} />
         <div className="flex items-center gap-2">
           <LocaleSwitcher />
-        <button
-          onClick={() => setOpen((v) => !v)}
-          aria-label={open ? t("closeMenu") : t("openMenu")}
-          aria-expanded={open}
-          aria-controls="app-nav-menu"
-          className="flex h-11 w-11 items-center justify-center rounded-xl border border-border text-muted-foreground transition-colors hover:text-foreground"
-        >
-          {/* Keyed so the new icon mounts and turns in, instead of popping. */}
-          <span key={open ? "close" : "open"} className="icon-swap flex">
-            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </span>
-        </button>
+          <TourButton variant="bar" onNavigate={close} />
+          <button
+            onClick={() => setOpen((v) => !v)}
+            aria-label={open ? t("closeMenu") : t("openMenu")}
+            aria-expanded={open}
+            aria-controls="app-nav-menu"
+            data-tour="nav-menu"
+            className="flex h-11 w-11 items-center justify-center rounded-xl border border-border text-muted-foreground transition-colors hover:text-foreground"
+          >
+            {/* Keyed so the new icon mounts and turns in, instead of popping. */}
+            <span key={open ? "close" : "open"} className="icon-swap flex">
+              {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </span>
+          </button>
         </div>
       </div>
 

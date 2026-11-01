@@ -36,6 +36,7 @@ export default async function LearnPage() {
       <Link
         href="/belajar/kamus"
         className="reveal lift spotlight mt-6 flex items-center gap-4 rounded-2xl border border-border bg-card p-5 hover:border-primary/40"
+        data-tour="learn-kamus"
       >
         <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/30">
           <BookA className="h-6 w-6 text-primary" aria-hidden="true" />
@@ -67,7 +68,7 @@ export default async function LearnPage() {
         {LEVELS.map((level) => (
           <section key={level.id} className="reveal" aria-labelledby={`level-${level.id}`}>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-              <div className="flex items-start gap-4">
+              <div className="flex items-start gap-4" data-tour={level.id === 1 ? "learn-level" : undefined}>
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/15 font-mono text-lg font-bold text-primary ring-1 ring-primary/30">
                   {level.id}
                 </span>
@@ -79,14 +80,17 @@ export default async function LearnPage() {
                   <p className="mt-1 text-sm text-muted-foreground">{level.description[locale]}</p>
                 </div>
               </div>
-              <LevelStatus level={level.id} questions={EXAM.QUESTIONS} />
+              <div data-tour={level.id === 1 ? "learn-exam" : undefined}>
+                <LevelStatus level={level.id} questions={EXAM.QUESTIONS} />
+              </div>
             </div>
 
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              {level.lessons.map((l) => (
+              {level.lessons.map((l, i) => (
                 <Link
                   key={l.slug}
                   href={`/belajar/${l.slug}`}
+                  data-tour={level.id === 1 && i === 0 ? "learn-lesson" : undefined}
                   className="lift spotlight group flex items-start gap-3 rounded-2xl border border-border bg-card p-4 hover:border-primary/40"
                 >
                   <LessonStatus slug={l.slug} />

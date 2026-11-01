@@ -1,6 +1,7 @@
 import { cache } from "react"
 import { parseRecord, type OnboardingRecord } from "@/lib/onboarding"
 import { createClient } from "@/lib/supabase/server"
+import { parseSeen, type TourId } from "@/lib/tours"
 
 export type CurrentUser = {
   id: string
@@ -18,6 +19,8 @@ export type CurrentUser = {
    * explains instead of offering fields that can't be saved.
    */
   profileExtras: boolean
+  /** Guided tours already shown on this account; null when the column doesn't exist yet. */
+  toursSeen: TourId[] | null
 }
 
 type ProfileRow = {
@@ -25,7 +28,16 @@ type ProfileRow = {
   onboarding: unknown
   username?: string | null
   avatar_path?: string | null
+  tours_seen?: unknown
 }
+
+// Newest columns first. Each step back drops the columns a later migration
+// added, so the app keeps working on a database that is a migration behind.
+const SELECTS = [
+  "display_name, onboarding, username, avatar_path, tours_seen",
+  "display_name, onboarding, username, avatar_path",
+  "display_name, onboarding",
+]
 
 /**
  * The signed-in user with their profile, or null for guests. Cached per
@@ -40,22 +52,16 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   } = await supabase.auth.getUser()
   if (!user) return null
 
-  // Ask for the customisation columns, and fall back to the original ones if
-  // the migration that adds them hasn't been applied yet.
   let profile: ProfileRow | null = null
-  let profileExtras = true
-  const full = await supabase
-    .from("profiles")
-    .select("display_name, onboarding, username, avatar_path")
-    .eq("id", user.id)
-    .maybeSingle()
-  if (full.error) {
-    profileExtras = false
-    const basic = await supabase.from("profiles").select("display_name, onboarding").eq("id", user.id).maybeSingle()
-    profile = basic.data
-  } else {
-    profile = full.data
+  let level = 0
+  for (; level < SELECTS.length; level++) {
+    const res = await supabase.from("profiles").select(SELECTS[level]).eq("id", user.id).maybeSingle()
+    if (!res.error) {
+      profile = res.data as ProfileRow | null
+      break
+    }
   }
+  const profileExtras = level <= 1
 
   const displayName =
     profile?.display_name ??
@@ -74,6 +80,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     avatarUrl,
     onboarding: parseRecord(profile?.onboarding),
     profileExtras,
+    toursSeen: level === 0 && profile ? parseSeen(profile.tours_seen) : null,
   }
 })
 

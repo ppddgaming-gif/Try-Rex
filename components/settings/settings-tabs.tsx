@@ -2,8 +2,11 @@
 
 import { useRef, useSyncExternalStore, type ReactNode } from "react"
 
-/** `icon` is a rendered element: components can't cross from server to client. */
-export type SettingsTab = { id: string; label: string; icon: ReactNode; panel: ReactNode }
+/**
+ * `icon` is a rendered element: components can't cross from server to client.
+ * `tour` is the guided tour's target (lib/tours.ts).
+ */
+export type SettingsTab = { id: string; label: string; icon: ReactNode; panel: ReactNode; tour?: string }
 
 function subscribe(onChange: () => void) {
   window.addEventListener("hashchange", onChange)
@@ -52,6 +55,7 @@ export function SettingsTabs({ tabs, label }: { tabs: SettingsTab[]; label: stri
               role="tab"
               aria-selected={selected}
               aria-controls={`panel-${t.id}`}
+              data-tour={t.tour}
               tabIndex={selected ? 0 : -1}
               onClick={() => select(t.id)}
               onKeyDown={(e) => {

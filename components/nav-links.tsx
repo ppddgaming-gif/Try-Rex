@@ -70,6 +70,7 @@ function NavRow({ item, onNavigate, lock }: { item: NavItem; onNavigate?: () => 
           aria-current={active ? "page" : undefined}
           aria-label={lock ? t("locked", { label, reason: lock }) : label}
           data-tip={lock ? t("lockedTip", { label }) : label}
+          data-tour={item.tour}
           className={[rowClass(active), "min-w-0 flex-1", children.length ? "pr-11" : ""].join(" ")}
         >
           {active && <ActiveBar />}
