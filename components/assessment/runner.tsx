@@ -56,7 +56,8 @@ export function AssessmentRunner({ pkg }: { pkg: PublicPackage }) {
             setToken(null)
             setStarted(false)
           }
-          setError(t(`errors.${json.error?.startsWith("problem.") ? "problem" : res.status === 410 ? "expired" : "failed"}`))
+          const known = json.error === "stale" || json.error === "unavailable" ? json.error : "failed"
+          setError(t(`errors.${json.error?.startsWith("problem.") ? "problem" : res.status === 410 ? "expired" : known}`))
           return null
         }
         tokenRef.current = json.token

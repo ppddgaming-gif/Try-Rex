@@ -24,7 +24,9 @@
     "errors": {
       "problem": "The decision is incomplete or not valid. Check what you entered.",
       "expired": "This package's session has expired. Start again from the beginning.",
-      "failed": "Couldn't reach the server. Try again."
+      "failed": "Couldn't reach the server. Try again.",
+      "stale": "This package just moved on in another tab. Reload the page to continue.",
+      "unavailable": "The assessment isn't available right now. Try again later."
     },
     "strip": "Questions",
     "legendScenario": "Scenario",

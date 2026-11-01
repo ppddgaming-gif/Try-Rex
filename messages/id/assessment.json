@@ -24,7 +24,9 @@
     "errors": {
       "problem": "Keputusan belum lengkap atau tidak valid. Periksa lagi isiannya.",
       "expired": "Sesi paket ini sudah kedaluwarsa. Mulai lagi dari awal.",
-      "failed": "Gagal terhubung ke server. Coba lagi."
+      "failed": "Gagal terhubung ke server. Coba lagi.",
+      "stale": "Paket ini baru saja berjalan di tab lain. Muat ulang halaman untuk melanjutkan.",
+      "unavailable": "Asesmen sedang tidak tersedia. Coba lagi nanti."
     },
     "strip": "Daftar soal",
     "legendScenario": "Skenario",
