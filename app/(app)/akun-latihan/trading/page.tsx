@@ -4,6 +4,7 @@ import { redirect } from "next/navigation"
 import { DemoTabs } from "@/components/akun-latihan/demo-tabs"
 import { NotReadyCard } from "@/components/akun-latihan/not-ready"
 import { TradingDesk } from "@/components/akun-latihan/trading-desk"
+import { llmConfigured } from "@/lib/ai/groq"
 import { getCurrentUser } from "@/lib/auth"
 import { getAccess, loadDemoState } from "@/lib/demo/server"
 import { TUTORIAL_VIDEO } from "@/lib/live/config"
@@ -59,6 +60,7 @@ export default async function TradingPage() {
         initial={{ pair: desk.pair, timeframe: desk.timeframe, chart: desk.chart, drawings: desk.drawings ?? [], quote }}
         available={available}
         videoSeen={Boolean(video.data)}
+        askRex={llmConfigured()}
       />
     </div>
   )
