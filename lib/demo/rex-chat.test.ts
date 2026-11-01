@@ -129,7 +129,7 @@ describe("chatMessages", () => {
     expect(systemPrompt(locale)).toContain(locale === "id" ? "Bahasa Indonesia" : "English")
   })
 
-  it.each([/process, never the outcome/i, /never give a signal/i, /never invent statistics/i, /brokers/i])(
+  it.each([/process, never the outcome/i, /never say it won or lost because/i, /never give a signal/i, /never invent statistics/i, /brokers/i])(
     "keeps the non-negotiables in the rules: %s",
     (rule) => expect(systemPrompt("en")).toMatch(rule),
   )
@@ -150,6 +150,14 @@ describe("cleanQuestion / cleanReply", () => {
     ["A\n\n\n\nB", "A\n\nB"],
     ["<think>only thinking</think>", null],
     ["  ok  ", "ok"],
+    ["- **SL dipasang** → aman", "- SL dipasang → aman"],
+    ["__tebal__ dan **juga**", "tebal dan juga"],
+    ["## Ringkasan\nIsi", "Ringkasan\nIsi"],
+    ["Apa yang bagus  \n- SL", "Apa yang bagus\n- SL"],
+    ["2 * 3 = 6, risk 1,5 %", "2 * 3 = 6, risk 1,5 %"],
+    ["mengukur *bagaimana* kamu", "mengukur bagaimana kamu"],
+    ["*apakah* hasilnya, bukan *rencana*.", "apakah hasilnya, bukan rencana."],
+    ["1.5 × risk, 2*3", "1.5 × risk, 2*3"],
   ])("reply %j → %j", (raw, out) => expect(cleanReply(raw)).toBe(out))
 })
 
