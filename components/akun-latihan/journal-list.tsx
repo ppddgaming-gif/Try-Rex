@@ -1,33 +1,59 @@
 "use client"
 
 import { useId, useState } from "react"
-import { ChevronDown, LoaderCircle, PencilLine } from "lucide-react"
-import { useTranslations } from "next-intl"
+import Link from "next/link"
+import { BrainCircuit, ChevronDown, LoaderCircle, PencilLine } from "lucide-react"
+import { useLocale, useTranslations } from "next-intl"
 import { usePostJson } from "@/components/akun-latihan/post-json"
 import { AskRex } from "@/components/akun-latihan/rex-chat"
 import { CheckList, RexComments, useExitLabel } from "@/components/akun-latihan/trade-parts"
 import { REVIEW } from "@/lib/demo/config"
+import { ASPECTS, type EvalText, type Scores } from "@/lib/demo/evaluation"
 import { lot, pct, price, usd } from "@/lib/demo/format"
 import type { JournalRow } from "@/lib/demo/journal"
+import { REVIEW_ANSWERS, type ReviewAnswer } from "@/lib/demo/state"
+import type { Locale } from "@/lib/i18n/locale"
 import type { T } from "@/lib/i18n/translator"
 
+/** A saved AI Evaluation, both languages: switching language only picks the other text. */
+export type JournalEvaluation = { scores: Scores; text: { id: EvalText; en: EvalText } }
+
 /** A journal row with its candle times already formatted on the server (no clock or locale in the browser). */
-export type JournalItem = JournalRow & { entryLabel: string | null; exitLabel: string | null }
+export type JournalItem = JournalRow & { entryLabel: string | null; exitLabel: string | null; evaluation: JournalEvaluation | null }
+
+/** One month's entries (the month the trades closed, WIB). */
+export type JournalGroup = { month: string; label: string; rows: JournalItem[] }
 
 const tone = (v: number) => (v > 0 ? "text-success" : v < 0 ? "text-danger" : "")
 
 /**
- * The Trading Journal: one row per closed trade, newest first. A row opens
- * to the whole plan, the result, the Disiplin checks, Rex's comment and the
- * player's own note ("Tambah catatan").
+ * The Trading Journal: one row per closed trade, newest first, one group per
+ * month. A row opens to the whole plan, the result, the Disiplin checks,
+ * Rex's comment, the player's own answer and note, and the saved AI
+ * Evaluation when there is one.
  */
-export function JournalList({ rows, askRex }: { rows: JournalItem[]; askRex: boolean }) {
+export function JournalList({ groups, askRex }: { groups: JournalGroup[]; askRex: boolean }) {
+  const t = useTranslations("evaluation.journal")
   return (
-    <ol className="flex flex-col gap-2.5">
-      {rows.map((r) => (
-        <JournalEntry key={r.id} row={r} askRex={askRex} />
+    <div className="flex flex-col gap-6">
+      {groups.map((g) => (
+        <section key={g.month} aria-labelledby={`month-${g.month}`}>
+          <div className="mb-2.5 flex flex-wrap items-baseline justify-between gap-2 px-1">
+            <h3 id={`month-${g.month}`} className="font-display text-lg font-bold">
+              {g.label}
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              {t("monthCount", { n: g.rows.length, done: g.rows.filter((r) => r.evaluation).length })}
+            </p>
+          </div>
+          <ol className="flex flex-col gap-2.5">
+            {g.rows.map((r) => (
+              <JournalEntry key={r.id} row={r} askRex={askRex} />
+            ))}
+          </ol>
+        </section>
       ))}
-    </ol>
+    </div>
   )
 }
 
@@ -36,6 +62,7 @@ function JournalEntry({ row: r, askRex }: { row: JournalItem; askRex: boolean })
   const panelId = useId()
   const t = useTranslations("demo.ui.journal")
   const root = useTranslations()
+  const te = useTranslations("evaluation.journal")
   const exitLabel = useExitLabel()
 
   return (
@@ -56,6 +83,15 @@ function JournalEntry({ row: r, askRex }: { row: JournalItem; askRex: boolean })
           </span>
           <span className="block text-xs text-muted-foreground">
             {r.entryLabel ?? t("candleMissing")} · {exitLabel(r.exitReason)}
+          </span>
+          <span
+            className={[
+              "mt-1 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold",
+              r.evaluation ? "border-primary/50 text-primary" : "border-border text-muted-foreground",
+            ].join(" ")}
+          >
+            <BrainCircuit className="h-3 w-3" aria-hidden="true" />
+            {r.evaluation ? te("evaluated") : te("notEvaluated")}
           </span>
         </span>
         <span className="text-right">
@@ -118,18 +154,114 @@ function JournalEntry({ row: r, askRex }: { row: JournalItem; askRex: boolean })
             <RexComments comments={r.rex} />
             {askRex && <AskRex tradeId={r.id} number={r.number} />}
 
-            <div>
-              <p className="text-xs font-semibold text-muted-foreground">{t("followed")}</p>
-              <p className="mt-1 text-sm">
-                {r.review ? root(`demo.ui.review.${r.review}`) : <span className="text-muted-foreground">{t("notAnswered")}</span>}
-              </p>
-            </div>
+            <Review tradeId={r.id} initial={r.review} />
 
             <Note tradeId={r.id} initial={r.note} />
+
+            <EvaluationResult evaluation={r.evaluation} />
           </div>
         </div>
       </div>
     </li>
+  )
+}
+
+/**
+ * "Apakah kamu mengikuti rencanamu?": shown as answered, or, for a trade that
+ * was never reviewed on the trading screen, the same three answers to give it
+ * here (the same route; self-reported, never scored).
+ */
+function Review({ tradeId, initial }: { tradeId: string; initial: ReviewAnswer | null }) {
+  const [answer, setAnswer] = useState(initial)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const postJson = usePostJson()
+  const t = useTranslations("demo.ui.journal")
+  const root = useTranslations()
+
+  async function save(a: ReviewAnswer) {
+    setBusy(true)
+    setError(null)
+    const res = await postJson("/api/akun-latihan/trade/review", { trade: tradeId, answer: a })
+    setBusy(false)
+    if (res.error) return setError(res.error)
+    setAnswer(a)
+  }
+
+  return (
+    <div>
+      <p className="text-xs font-semibold text-muted-foreground">{t("followed")}</p>
+      {answer ? (
+        <p className="mt-1 text-sm">{root(`demo.ui.review.${answer}`)}</p>
+      ) : (
+        <div role="group" aria-label={t("followed")} className="mt-1.5 flex flex-wrap gap-2">
+          {REVIEW_ANSWERS.map((a) => (
+            <button key={a} type="button" disabled={busy} onClick={() => void save(a)} className="btn btn-ghost btn-sm">
+              {root(`demo.ui.review.${a}`)}
+            </button>
+          ))}
+        </div>
+      )}
+      {error && (
+        <p role="alert" className="mt-1 text-sm text-primary">
+          {error}
+        </p>
+      )}
+    </div>
+  )
+}
+
+/** The saved AI Evaluation in the page's language, or "not evaluated yet" with the way there. */
+function EvaluationResult({ evaluation }: { evaluation: JournalEvaluation | null }) {
+  const t = useTranslations("evaluation.journal")
+  const locale = useLocale() as Locale
+  if (!evaluation) {
+    return (
+      <div className="rounded-xl border border-dashed border-border px-3 py-3 text-sm text-muted-foreground">
+        {t("notEvaluatedBody")}{" "}
+        <Link href="/ai-evaluation" className="font-semibold text-primary underline-offset-4 hover:underline">
+          {t("toEvaluation")}
+        </Link>
+      </div>
+    )
+  }
+  const text = evaluation.text[locale] ?? evaluation.text.id
+  return (
+    <section aria-label={t("title")} className="rounded-xl border border-primary/30 bg-inset p-3 sm:p-4">
+      <p className="flex items-center gap-1.5 text-sm font-semibold">
+        <BrainCircuit className="h-4 w-4 text-primary" aria-hidden="true" /> {t("title")}
+      </p>
+      <p className="mt-2 text-sm leading-relaxed">{text.summary}</p>
+      <ul className="mt-3 flex flex-col gap-2.5">
+        {ASPECTS.map((a) => (
+          <li key={a}>
+            <div className="flex items-baseline justify-between gap-3 text-xs font-semibold">
+              <span>{t(`aspects.${a}`)}</span>
+              <span className="font-mono tabular-nums">{evaluation.scores[a]}/100</span>
+            </div>
+            <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-card" aria-hidden="true">
+              <div className="h-full origin-left rounded-full bg-primary" style={{ transform: `scaleX(${evaluation.scores[a] / 100})` }} />
+            </div>
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{text.aspects[a]}</p>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-3 border-t border-border pt-3 text-xs leading-relaxed">
+        <p className="font-semibold">{t("journalHeading")}</p>
+        <p className="mt-0.5 text-muted-foreground">{text.journal}</p>
+        <p className="mt-2 font-semibold">{t("patterns")}</p>
+        <ul className="mt-0.5 list-disc pl-4 text-muted-foreground">
+          {text.patterns.map((p) => (
+            <li key={p}>{p}</li>
+          ))}
+        </ul>
+        <p className="mt-2 font-semibold">{t("practice")}</p>
+        <p className="mt-0.5 text-muted-foreground">{text.practice}</p>
+      </div>
+      <p className="mt-3 text-[11px] text-faint">
+        {t("scoresNote")} {t("disclaimer")}
+      </p>
+    </section>
   )
 }
 

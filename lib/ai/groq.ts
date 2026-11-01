@@ -20,20 +20,25 @@ const TIMEOUT_MS = 25_000
 
 export const llmConfigured = () => Boolean(process.env.GROQ_API_KEY)
 
-export type LlmResult = { ok: true; text: string } | { ok: false; reason: "unconfigured" | "busy" | "failed" }
+/** Token counts as Groq reports them, for logging; null when the reply had none. */
+export type LlmUsage = { prompt: number; completion: number } | null
+
+export type LlmResult =
+  | { ok: true; text: string; model: string; usage: LlmUsage }
+  | { ok: false; reason: "unconfigured" | "busy" | "failed"; model?: string }
 
 /** One reply to `messages`, or why there is none. Never throws. */
-export async function llmReply(messages: LlmMessage[], maxTokens: number): Promise<LlmResult> {
+export async function llmReply(messages: LlmMessage[], maxTokens: number, timeoutMs = TIMEOUT_MS): Promise<LlmResult> {
   const key = process.env.GROQ_API_KEY
   if (!key) return { ok: false, reason: "unconfigured" }
   const primary = process.env.GROQ_MODEL || DEFAULT_MODEL
   const fallback = process.env.GROQ_FALLBACK_MODEL || DEFAULT_FALLBACK
-  const first = await complete(key, primary, messages, maxTokens)
+  const first = await complete(key, primary, messages, maxTokens, timeoutMs)
   if (first.ok || first.reason !== "busy" || fallback === primary) return first
-  return complete(key, fallback, messages, maxTokens)
+  return complete(key, fallback, messages, maxTokens, timeoutMs)
 }
 
-async function complete(key: string, model: string, messages: LlmMessage[], maxTokens: number): Promise<LlmResult> {
+async function complete(key: string, model: string, messages: LlmMessage[], maxTokens: number, timeoutMs: number): Promise<LlmResult> {
   try {
     const res = await fetch(URL, {
       method: "POST",
@@ -46,19 +51,25 @@ async function complete(key: string, model: string, messages: LlmMessage[], maxT
         // The gpt-oss models think before answering; a short explanation needs little of it.
         ...(model.startsWith("openai/gpt-oss") ? { reasoning_effort: "low" } : {}),
       }),
-      signal: AbortSignal.timeout(TIMEOUT_MS),
+      signal: AbortSignal.timeout(timeoutMs),
       cache: "no-store",
     })
-    if (res.status === 429) return { ok: false, reason: "busy" }
+    if (res.status === 429) return { ok: false, reason: "busy", model }
     if (!res.ok) {
       console.error(`Groq ${model}: ${res.status} ${(await res.text().catch(() => "")).slice(0, 300)}`)
-      return { ok: false, reason: "failed" }
+      return { ok: false, reason: "failed", model }
     }
-    const data = (await res.json()) as { choices?: { message?: { content?: unknown } }[] }
+    const data = (await res.json()) as {
+      choices?: { message?: { content?: unknown } }[]
+      usage?: { prompt_tokens?: unknown; completion_tokens?: unknown }
+    }
     const text = data.choices?.[0]?.message?.content
-    return typeof text === "string" && text.trim() ? { ok: true, text } : { ok: false, reason: "failed" }
+    const u = data.usage
+    const usage: LlmUsage =
+      u && typeof u.prompt_tokens === "number" && typeof u.completion_tokens === "number" ? { prompt: u.prompt_tokens, completion: u.completion_tokens } : null
+    return typeof text === "string" && text.trim() ? { ok: true, text, model, usage } : { ok: false, reason: "failed", model }
   } catch (e) {
     console.error(`Groq ${model}: request failed`, e)
-    return { ok: false, reason: "failed" }
+    return { ok: false, reason: "failed", model }
   }
 }

@@ -111,6 +111,22 @@ export const REX_CHAT = {
 } as const
 
 /**
+ * AI Evaluation of journal entries (lib/demo/evaluation.ts). One evaluation
+ * per entry, ever; the scores are a report card only and never touch XP or
+ * Disiplin. Runs are counted on the server; a failed run doesn't count.
+ */
+export const AI_EVAL = {
+  /** Successful Evaluate runs per player per WIB day. */
+  RUNS_PER_DAY: 3,
+  /** Entries in one run (one month); keeps the prompt and the reply within the model's limits. */
+  MAX_PER_RUN: 5,
+  /** The reply's cap: two languages for every entry plus the month's patterns. */
+  REPLY_MAX_TOKENS: 6000,
+  /** The day resets at midnight WIB, like Tanya Rex. */
+  DAY_UTC_OFFSET_HOURS: 7,
+} as const
+
+/**
  * Every live-chart pair is open from the first stage (the owner's choice);
  * stages limit lot size, open trades and SL/TP rules instead. The same nine as
  * LIVE_PAIRS in lib/live/config.ts.

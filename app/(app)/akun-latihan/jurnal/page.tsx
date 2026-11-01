@@ -4,10 +4,12 @@ import Link from "next/link"
 import { redirect } from "next/navigation"
 import { Card } from "@/components/card"
 import { DemoTabs } from "@/components/akun-latihan/demo-tabs"
-import { JournalList, type JournalItem } from "@/components/akun-latihan/journal-list"
+import { JournalList, type JournalGroup, type JournalItem } from "@/components/akun-latihan/journal-list"
 import { EmptyState } from "@/components/progress/empty-state"
 import { llmConfigured } from "@/lib/ai/groq"
 import { getCurrentUser } from "@/lib/auth"
+import { monthLabel } from "@/lib/demo/evaluation"
+import { closedMonths, loadEvaluations } from "@/lib/demo/evaluation-server"
 import { accountStatus } from "@/lib/demo/format"
 import { loadJournal } from "@/lib/demo/history"
 import { sectionState } from "@/lib/demo/server"
@@ -31,7 +33,9 @@ const candleFormat = (locale: Locale, timeZone: string) =>
 
 /**
  * The Trading Journal of one account (`?akun=<n>`; the active or latest one
- * by default). Every closed trade is written here automatically.
+ * by default). Every closed trade is written here automatically, grouped by
+ * the month it closed (WIB). An entry evaluated on /ai-evaluation shows its
+ * saved result in the page's language; the others say they aren't yet.
  */
 export default async function JurnalPage({ searchParams }: { searchParams: Promise<{ akun?: string }> }) {
   const user = await getCurrentUser()
@@ -50,11 +54,24 @@ export default async function JurnalPage({ searchParams }: { searchParams: Promi
         ? t("wib", { time: wibFmt.format(new Date(s * 1000)) })
         : t("utc", { time: utcFmt.format(new Date(s * 1000)) })
   const account = state.accounts.find((a) => String(a.number) === akun) ?? state.account ?? state.accounts[0]
-  const rows: JournalItem[] = (await loadJournal(user.id, account.id)).map((r) => ({
-    ...r,
-    entryLabel: candleLabel(r.entryTime, r.realTime),
-    exitLabel: candleLabel(r.exitTime, r.realTime),
-  }))
+  const [journal, months, evaluations] = await Promise.all([loadJournal(user.id, account.id), closedMonths(user.id, account.id), loadEvaluations(user.id)])
+  const rows: JournalItem[] = journal.map((r) => {
+    const e = evaluations?.get(r.id)
+    return {
+      ...r,
+      entryLabel: candleLabel(r.entryTime, r.realTime),
+      exitLabel: candleLabel(r.exitTime, r.realTime),
+      evaluation: e ? { scores: e.scores, text: e.text } : null,
+    }
+  })
+  // Newest first already, so one month's entries are consecutive.
+  const groups: JournalGroup[] = []
+  for (const r of rows) {
+    const month = months.get(r.id) ?? "—"
+    const last = groups[groups.length - 1]
+    if (last?.month === month) last.rows.push(r)
+    else groups.push({ month, label: month === "—" ? "—" : monthLabel(month, INTL_LOCALE[locale as Locale]), rows: [r] })
+  }
 
   return (
     <div className="flex flex-col gap-5">
@@ -92,7 +109,7 @@ export default async function JurnalPage({ searchParams }: { searchParams: Promi
           />
         </Card>
       ) : (
-        <JournalList rows={rows} askRex={llmConfigured()} />
+        <JournalList groups={groups} askRex={llmConfigured()} />
       )}
     </div>
   )
