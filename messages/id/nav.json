@@ -5,10 +5,13 @@
     "akunLatihan": "Akun Demo",
     "aiEvaluation": "AI Evaluation",
     "belajar": "Belajar 101",
+    "asesmen": "Asesmen",
     "pengaturan": "Pengaturan"
   },
   "locked": "{label}, terkunci. {reason}",
   "lockedTip": "{label} · terkunci",
+  "expandSection": "Tampilkan halaman di bawah {label}",
+  "collapseSection": "Sembunyikan halaman di bawah {label}",
   "signInToOpen": "Masuk untuk membuka",
   "openMenu": "Buka menu",
   "closeMenu": "Tutup menu",

@@ -9,6 +9,7 @@ Lima paket, masing-masing 35 butir: 10 skenario chart, 10 pilihan ganda kompleks
 | `src/P-0X.mjs` | Sumber yang ditulis tangan: skenario (pair, timeframe, waktu mulai, saldo, briefing, keputusan ideal, klaim yang harus dicek) dan soal pilihan ganda |
 | `src/common.mjs` | Mekanik simulasi, daftar alasan, alasan menutup posisi, rubrik 100 poin |
 | `packages/P-0X.json` | Yang boleh dikirim ke browser: soal, opsi (sudah diacak), briefing, referensi jendela data. **Tanpa** kunci, rubrik, atau arah harga |
+| `candles/P-0X.candles.json` | Hanya server: candle setiap jendela skenario (100 konteks + bagian main), waktu UTC. Aplikasi mengirim bagian main satu candle demi satu candle setelah pemain menekan Mulai |
 | `keys/P-0X.keys.json` | Hanya server: kunci, penjelasan per opsi, keputusan ideal, angka acuan (ATR, SL struktur, lot pada 1–2%), umpan balik per aspek, hasil verifikasi data |
 | `scripts/build.mjs` | Membangun `packages/` dan `keys/` dari `src/`, menghitung semua angka dari CSV |
 | `scripts/validate.mjs` | Validasi (lihat di bawah) |

@@ -6,6 +6,8 @@
     "body": "{n} level, dari dasar-dasar forex sampai psikologi dan evaluasi. Setiap level ditutup dengan ujian {q} soal pilihan ganda: jawab benar minimal {pass} untuk membuka level berikutnya.",
     "kamus": "Kamus Trading",
     "kamusBody": "<num>{n}</num> istilah, dijelaskan dalam satu atau dua kalimat. Istilah yang sama bisa diketuk di Trading Game.",
+    "asesmen": "Asesmen",
+    "asesmenBody": "Paket soal: skenario chart dari data historis dan pilihan ganda dari materi Belajar 101.",
     "minutes": "{n} menit",
     "practiceTitle": "Teori sudah, saatnya praktik.",
     "practiceBody": "Setiap soal di Trading Game adalah chart asli. Coba baca trend dan levelnya sendiri.",

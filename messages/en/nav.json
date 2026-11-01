@@ -5,10 +5,13 @@
     "akunLatihan": "Demo Account",
     "aiEvaluation": "AI Evaluation",
     "belajar": "Learn 101",
+    "asesmen": "Assessment",
     "pengaturan": "Settings"
   },
   "locked": "{label}, locked. {reason}",
   "lockedTip": "{label} · locked",
+  "expandSection": "Show the pages under {label}",
+  "collapseSection": "Hide the pages under {label}",
   "signInToOpen": "Sign in to unlock",
   "openMenu": "Open menu",
   "closeMenu": "Close menu",

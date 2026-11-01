@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { getLocale, getTranslations } from "next-intl/server"
 import Link from "next/link"
-import { ArrowRight, BookA, Clock } from "lucide-react"
+import { ArrowRight, BookA, ClipboardList, Clock } from "lucide-react"
 import { Card } from "@/components/card"
 import { LearnProgressRing, LessonStatus } from "@/components/learn/lesson-done"
 import { LevelStatus, LockBadge } from "@/components/learn/level-gate"
@@ -45,6 +45,20 @@ export default async function LearnPage() {
           <p className="text-sm text-muted-foreground">
             {t.rich("hub.kamusBody", { n: GLOSSARY.length, num: (c) => <span className="font-mono">{c}</span> })}
           </p>
+        </div>
+        <ArrowRight className="h-5 w-5 text-primary" aria-hidden="true" />
+      </Link>
+
+      <Link
+        href="/belajar/asesmen"
+        className="reveal lift spotlight mt-3 flex items-center gap-4 rounded-2xl border border-border bg-card p-5 hover:border-primary/40"
+      >
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/30">
+          <ClipboardList className="h-6 w-6 text-primary" aria-hidden="true" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="font-display text-lg font-bold">{t("hub.asesmen")}</p>
+          <p className="text-sm text-muted-foreground">{t("hub.asesmenBody")}</p>
         </div>
         <ArrowRight className="h-5 w-5 text-primary" aria-hidden="true" />
       </Link>

@@ -6,6 +6,8 @@
     "body": "{n, plural, one {# level} other {# levels}}, from forex basics to psychology and review. Each level ends with a {q}-question multiple-choice exam: get at least {pass} right to open the next level.",
     "kamus": "Trading Glossary",
     "kamusBody": "<num>{n}</num> terms, each explained in a sentence or two. The same terms can be tapped in the Trading Game.",
+    "asesmen": "Assessment",
+    "asesmenBody": "Question packages: chart scenarios on historical data and multiple choice from the Learn 101 lessons.",
     "minutes": "{n} min",
     "practiceTitle": "Theory done, time to practice.",
     "practiceBody": "Every Trading Game question is a real chart. Try reading the trend and levels yourself.",
