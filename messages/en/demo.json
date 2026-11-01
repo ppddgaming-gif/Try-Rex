@@ -72,7 +72,13 @@
     "pairNotQuoted": "Trading costs for {pair} aren't set yet, so orders on this pair can't open.",
     "onePosition": "Only one position can be open. Close the current one first.",
     "slTpRequiredLive": "SL and TP stay required while a position is open; move them, don't remove them.",
-    "liveNotReady": "The live chart isn't ready yet. Try again in a moment."
+    "liveNotReady": "The live chart isn't ready yet. Try again in a moment.",
+    "rexChatOff": "Ask Rex isn't switched on here yet.",
+    "rexChatBusy": "Lots of players are asking Rex right now. Try again in a moment.",
+    "rexChatFailed": "Rex couldn't answer that. Try again.",
+    "rexChatDay": "You've used today's {max} answers from Rex. You can ask again tomorrow.",
+    "rexChatTrade": "That's {max} questions for this trade. Save the rest for your next one.",
+    "rexChatBadQuestion": "Write your question (at most {max} characters)."
   },
   "problems": {
     "pairClosed": "{pair} isn't open yet in Stage {stage}.",
@@ -613,6 +619,28 @@
       "close": "Close",
       "reopen": "Watch the tutorial",
       "watched": "Watched"
+    },
+    "rexChat": {
+      "open": "Ask Rex",
+      "title": "Ask Rex · Trade #{n}",
+      "subtitle": "Rex explains how this trade was handled. Ask anything about its plan.",
+      "close": "Close",
+      "reading": "Rex is reading your trade…",
+      "thinking": "Rex is thinking…",
+      "you": "You",
+      "rex": "Rex",
+      "placeholder": "Ask about this trade…",
+      "label": "Your question",
+      "send": "Send",
+      "retry": "Try again",
+      "left": "{q, plural, one {# question} other {# questions}} left for this trade · {d, plural, one {# answer} other {# answers}} left today",
+      "suggestionsLabel": "Example questions",
+      "suggestions": {
+        "fix": "What should I work on most?",
+        "failed": "Why did a Disiplin check fail?",
+        "rr": "What does reward:risk mean for this trade?"
+      },
+      "disclaimer": "Answers are written by AI and can be wrong. They never change your score or XP, and they aren't investment advice."
     }
   }
 }

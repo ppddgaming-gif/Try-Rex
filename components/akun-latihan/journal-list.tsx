@@ -4,6 +4,7 @@ import { useId, useState } from "react"
 import { ChevronDown, LoaderCircle, PencilLine } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { usePostJson } from "@/components/akun-latihan/post-json"
+import { AskRex } from "@/components/akun-latihan/rex-chat"
 import { CheckList, RexComments, useExitLabel } from "@/components/akun-latihan/trade-parts"
 import { REVIEW } from "@/lib/demo/config"
 import { lot, pct, price, usd } from "@/lib/demo/format"
@@ -20,17 +21,17 @@ const tone = (v: number) => (v > 0 ? "text-success" : v < 0 ? "text-danger" : ""
  * to the whole plan, the result, the Disiplin checks, Rex's comment and the
  * player's own note ("Tambah catatan").
  */
-export function JournalList({ rows }: { rows: JournalItem[] }) {
+export function JournalList({ rows, askRex }: { rows: JournalItem[]; askRex: boolean }) {
   return (
     <ol className="flex flex-col gap-2.5">
       {rows.map((r) => (
-        <JournalEntry key={r.id} row={r} />
+        <JournalEntry key={r.id} row={r} askRex={askRex} />
       ))}
     </ol>
   )
 }
 
-function JournalEntry({ row: r }: { row: JournalItem }) {
+function JournalEntry({ row: r, askRex }: { row: JournalItem; askRex: boolean }) {
   const [open, setOpen] = useState(false)
   const panelId = useId()
   const t = useTranslations("demo.ui.journal")
@@ -115,6 +116,7 @@ function JournalEntry({ row: r }: { row: JournalItem }) {
             </div>
 
             <RexComments comments={r.rex} />
+            {askRex && <AskRex tradeId={r.id} number={r.number} />}
 
             <div>
               <p className="text-xs font-semibold text-muted-foreground">{t("followed")}</p>
