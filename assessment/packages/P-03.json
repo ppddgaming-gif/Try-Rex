@@ -1,0 +1,1746 @@
+{
+  "schema_version": 1,
+  "package_id": "P-03",
+  "title": {
+    "id": "Paket Asesmen Pilot P-03",
+    "en": "Pilot Assessment Package P-03"
+  },
+  "show_risk": true,
+  "languages": [
+    "id",
+    "en"
+  ],
+  "review": "end_of_package",
+  "result": {
+    "ranking": false,
+    "report": "per_aspect_and_learn101_level"
+  },
+  "mechanics": {
+    "trades_per_scenario": 1,
+    "actions": [
+      "buy",
+      "sell",
+      "no_trade"
+    ],
+    "order_types": [
+      "market",
+      "pending"
+    ],
+    "sl_tp": "set_by_position_tool_required_fixed_after_entry",
+    "close": "manual_full_only_no_trailing_no_partial",
+    "analysis_tools_scored": false,
+    "autoplay": {
+      "fixed_speed": true,
+      "starts_on": "start_button",
+      "analysis_paused_before_start": true
+    },
+    "auto_close": "last_candle_of_window",
+    "pending_unfilled": "scored_on_decision_only",
+    "lot": {
+      "min": 0.01,
+      "step": 0.01
+    },
+    "account_currency": "USD",
+    "reasons_per_decision": {
+      "min": 1,
+      "max": 3
+    },
+    "note": {
+      "id": "Garis, trend line, rectangle, path, dan indikator hanya alat bantu analisis dan tidak dinilai. SL dan TP dari alat posisi Buy/Sell dinilai dan tidak bisa digeser setelah entry.",
+      "en": "Lines, trend lines, rectangles, paths and indicators are analysis aids and are not scored. The SL and TP set with the Buy/Sell position tool are scored and can't be moved after entry."
+    }
+  },
+  "reasons": {
+    "trend": {
+      "id": "Searah tren di timeframe ini (puncak dan lembah naik, atau turun)",
+      "en": "In line with the trend on this timeframe (rising or falling highs and lows)"
+    },
+    "level": {
+      "id": "Harga berada di area pullback, support, atau resistance yang jelas",
+      "en": "Price is at a clear pullback, support or resistance area"
+    },
+    "structure_sl": {
+      "id": "Ada level struktur yang jelas untuk menaruh stop loss",
+      "en": "There is a clear structure level to place the stop loss"
+    },
+    "rr": {
+      "id": "Target yang masuk akal memberi R:R minimal 1 : 1,5",
+      "en": "A sensible target gives at least 1 : 1.5 R:R"
+    },
+    "fundamental": {
+      "id": "Kondisi fundamental mendukung arah ini",
+      "en": "The fundamental backdrop supports this direction"
+    },
+    "news": {
+      "id": "Ada rilis atau event berdampak tinggi yang terlalu dekat",
+      "en": "A high-impact release or event is too close"
+    },
+    "extreme_vol": {
+      "id": "Volatilitas ekstrem: candle dan ATR jauh di atas normal",
+      "en": "Extreme volatility: candles and ATR far above normal"
+    },
+    "sideways": {
+      "id": "Pasar sideways dan sepi, tidak ada keunggulan arah",
+      "en": "The market is sideways and quiet, with no directional edge"
+    },
+    "daily_limit": {
+      "id": "Batas rugi harian sudah tercapai",
+      "en": "The daily loss limit has been reached"
+    },
+    "feeling": {
+      "id": "Feeling saja: harganya terlihat akan berbalik",
+      "en": "Just a feeling: price looks like it will turn"
+    },
+    "recover": {
+      "id": "Ingin segera menutup kerugian sebelumnya",
+      "en": "I want to win back the earlier losses quickly"
+    },
+    "cheap": {
+      "id": "Harganya sudah terlalu murah atau terlalu mahal",
+      "en": "The price is already too cheap or too expensive"
+    }
+  },
+  "close_reasons": {
+    "structure_broken": {
+      "id": "Struktur berbalik: candle close menembus level yang membatalkan ide",
+      "en": "Structure turned: a candle closed through the level that cancels the idea"
+    },
+    "news_ahead": {
+      "id": "Rilis atau event berdampak tinggi akan segera terjadi",
+      "en": "A high-impact release or event is about to happen"
+    },
+    "target_area": {
+      "id": "Harga sudah di area target yang direncanakan",
+      "en": "Price is at the planned target area"
+    },
+    "fear": {
+      "id": "Takut rugi bertambah",
+      "en": "Afraid the loss will grow"
+    },
+    "small_profit": {
+      "id": "Ambil untung kecil yang sudah ada",
+      "en": "Take the small profit that's there"
+    },
+    "bored": {
+      "id": "Bosan menunggu",
+      "en": "Tired of waiting"
+    }
+  },
+  "items": [
+    {
+      "id": "P-03-S01",
+      "type": "scenario",
+      "order": 1,
+      "title": {
+        "id": "Senin pertama pasar panik COVID-19",
+        "en": "The first panic Monday of COVID-19"
+      },
+      "pair": "AUDUSD",
+      "timeframe": "M15",
+      "balance": 3000,
+      "currency": "USD",
+      "briefing": {
+        "id": "Senin, 9 Maret 2020. COVID-19 menyebar ke banyak negara. Akhir pekan lalu pertemuan OPEC+ gagal mencapai kesepakatan (6 Maret) dan Arab Saudi memangkas harga jual minyaknya, memicu kekhawatiran perang harga. Pasar dibuka pagi ini dengan lompatan harga besar di banyak aset. Saldo $3.000.",
+        "en": "Monday 9 March 2020. COVID-19 is spreading to many countries. Late last week the OPEC+ meeting ended without a deal (6 March) and Saudi Arabia cut its oil selling prices, raising fears of a price war. Markets opened this morning with big price jumps across many assets. Balance $3,000."
+      },
+      "data_window": {
+        "file": "DATA FOR LIVE/AUDUSD/AUDUSD_M15.csv",
+        "clock": "MT4 broker clock (GMT+2/+3, EU summer time); time_utc converted",
+        "context_candles": 100,
+        "play_candles": 150,
+        "context_start": {
+          "index": 180674,
+          "time_broker": "2020-03-06 05:00",
+          "time_utc": "2020-03-06 03:00"
+        },
+        "start": {
+          "index": 180774,
+          "time_broker": "2020-03-09 06:00",
+          "time_utc": "2020-03-09 04:00"
+        },
+        "end": {
+          "index": 180923,
+          "time_broker": "2020-03-10 19:15",
+          "time_utc": "2020-03-10 17:15"
+        }
+      },
+      "reason_options": [
+        "trend",
+        "level",
+        "structure_sl",
+        "rr",
+        "fundamental",
+        "news",
+        "extreme_vol",
+        "sideways",
+        "daily_limit",
+        "feeling",
+        "recover",
+        "cheap"
+      ]
+    },
+    {
+      "id": "P-03-S02",
+      "type": "scenario",
+      "order": 2,
+      "title": {
+        "id": "Setelah SNB melepas batas kurs franc",
+        "en": "After the SNB drops the franc cap"
+      },
+      "pair": "EURJPY",
+      "timeframe": "M15",
+      "balance": 2000,
+      "currency": "USD",
+      "briefing": {
+        "id": "Kamis malam, 15 Januari 2015. Pagi tadi Swiss National Bank secara mengejutkan menghapus batas kurs EUR/CHF 1,20 yang dijaganya sejak 2011, dan pasar mata uang bergejolak hebat. Euro juga tertekan oleh dugaan bahwa ECB akan segera melonggarkan kebijakannya. Saldo $2.000.",
+        "en": "Thursday evening, 15 January 2015. This morning the Swiss National Bank shocked the market by scrapping the EUR/CHF 1.20 floor it had defended since 2011, and currency markets swung wildly. The euro is also under pressure from expectations that the ECB will ease policy soon. Balance $2,000."
+      },
+      "data_window": {
+        "file": "DATA FOR LIVE/EURJPY/EURJPY_M15.csv",
+        "clock": "MT4 broker clock (GMT+2/+3, EU summer time); time_utc converted",
+        "context_candles": 100,
+        "play_candles": 100,
+        "context_start": {
+          "index": 52960,
+          "time_broker": "2015-01-14 19:00",
+          "time_utc": "2015-01-14 17:00"
+        },
+        "start": {
+          "index": 53060,
+          "time_broker": "2015-01-15 20:00",
+          "time_utc": "2015-01-15 18:00"
+        },
+        "end": {
+          "index": 53159,
+          "time_broker": "2015-01-16 20:45",
+          "time_utc": "2015-01-16 18:45"
+        }
+      },
+      "reason_options": [
+        "trend",
+        "level",
+        "structure_sl",
+        "rr",
+        "fundamental",
+        "news",
+        "extreme_vol",
+        "sideways",
+        "daily_limit",
+        "feeling",
+        "recover",
+        "cheap"
+      ]
+    },
+    {
+      "id": "P-03-S03",
+      "type": "scenario",
+      "order": 3,
+      "title": {
+        "id": "Pemilu dini yang diumumkan mendadak",
+        "en": "A snap election called out of the blue"
+      },
+      "pair": "GBPUSD",
+      "timeframe": "M30",
+      "balance": 1200,
+      "currency": "USD",
+      "briefing": {
+        "id": "Rabu, 19 April 2017. Kemarin Perdana Menteri Theresa May secara mengejutkan mengumumkan pemilu dini pada 8 Juni. Pasar menafsirkannya sebagai peluang May memperkuat mayoritasnya sebelum negosiasi Brexit, dan poundsterling melonjak. Saldo $1.200.",
+        "en": "Wednesday 19 April 2017. Yesterday Prime Minister Theresa May surprised everyone by calling an early election for 8 June. The market read it as a chance for May to strengthen her majority before the Brexit talks, and sterling jumped. Balance $1,200."
+      },
+      "data_window": {
+        "file": "DATA FOR LIVE/GBPUSD/GBPUSD_M30.csv",
+        "clock": "MT4 broker clock (GMT+2/+3, EU summer time); time_utc converted",
+        "context_candles": 100,
+        "play_candles": 120,
+        "context_start": {
+          "index": 54487,
+          "time_broker": "2017-04-17 01:00",
+          "time_utc": "2017-04-16 22:00"
+        },
+        "start": {
+          "index": 54587,
+          "time_broker": "2017-04-19 03:00",
+          "time_utc": "2017-04-19 00:00"
+        },
+        "end": {
+          "index": 54706,
+          "time_broker": "2017-04-21 14:30",
+          "time_utc": "2017-04-21 11:30"
+        }
+      },
+      "reason_options": [
+        "trend",
+        "level",
+        "structure_sl",
+        "rr",
+        "fundamental",
+        "news",
+        "extreme_vol",
+        "sideways",
+        "daily_limit",
+        "feeling",
+        "recover",
+        "cheap"
+      ]
+    },
+    {
+      "id": "P-03-S04",
+      "type": "scenario",
+      "order": 4,
+      "title": {
+        "id": "Poundsterling menjelang rapat BoE November 2017",
+        "en": "Sterling ahead of the November 2017 BoE meeting"
+      },
+      "pair": "GBPUSD",
+      "timeframe": "H1",
+      "balance": 8000,
+      "currency": "USD",
+      "briefing": {
+        "id": "Pertengahan Oktober 2017. Sejak September Bank of England memberi sinyal bahwa suku bunga mungkin naik dalam beberapa bulan ke depan, dan pasar memperkirakan kenaikan pada rapat 2 November. Negosiasi Brexit masih berjalan alot. Saldo $8.000.",
+        "en": "Mid-October 2017. Since September the Bank of England has signalled rates may rise in the coming months, and the market expects a hike at the 2 November meeting. The Brexit talks are still difficult. Balance $8,000."
+      },
+      "data_window": {
+        "file": "DATA FOR LIVE/GBPUSD/GBPUSD_H1.csv",
+        "clock": "MT4 broker clock (GMT+2/+3, EU summer time); time_utc converted",
+        "context_candles": 100,
+        "play_candles": 100,
+        "context_start": {
+          "index": 30253,
+          "time_broker": "2017-10-09 20:00",
+          "time_utc": "2017-10-09 17:00"
+        },
+        "start": {
+          "index": 30353,
+          "time_broker": "2017-10-16 00:00",
+          "time_utc": "2017-10-15 21:00"
+        },
+        "end": {
+          "index": 30452,
+          "time_broker": "2017-10-20 03:00",
+          "time_utc": "2017-10-20 00:00"
+        }
+      },
+      "reason_options": [
+        "trend",
+        "level",
+        "structure_sl",
+        "rr",
+        "fundamental",
+        "news",
+        "extreme_vol",
+        "sideways",
+        "daily_limit",
+        "feeling",
+        "recover",
+        "cheap"
+      ]
+    },
+    {
+      "id": "P-03-S05",
+      "type": "scenario",
+      "order": 5,
+      "title": {
+        "id": "Dolar-yen saat imbal hasil AS naik",
+        "en": "Dollar-yen as US yields climb"
+      },
+      "pair": "USDJPY",
+      "timeframe": "H1",
+      "balance": 5000,
+      "currency": "USD",
+      "briefing": {
+        "id": "Awal Maret 2021. Imbal hasil obligasi AS 10 tahun naik tajam sepanjang Februari, didorong optimisme vaksin dan rencana stimulus fiskal AS senilai $1,9 triliun, sementara Bank of Japan menjaga imbal hasil Jepang di dekat nol. Saldo $5.000.",
+        "en": "Early March 2021. US 10-year bond yields climbed sharply through February on vaccine optimism and a planned $1.9 trillion US fiscal package, while the Bank of Japan keeps Japanese yields near zero. Balance $5,000."
+      },
+      "data_window": {
+        "file": "DATA FOR LIVE/USDJPY/USDJPY_H1.csv",
+        "clock": "MT4 broker clock (GMT+2/+3, EU summer time); time_utc converted",
+        "context_candles": 100,
+        "play_candles": 100,
+        "context_start": {
+          "index": 51142,
+          "time_broker": "2021-02-23 02:00",
+          "time_utc": "2021-02-23 00:00"
+        },
+        "start": {
+          "index": 51242,
+          "time_broker": "2021-03-01 06:00",
+          "time_utc": "2021-03-01 04:00"
+        },
+        "end": {
+          "index": 51341,
+          "time_broker": "2021-03-05 09:00",
+          "time_utc": "2021-03-05 07:00"
+        }
+      },
+      "reason_options": [
+        "trend",
+        "level",
+        "structure_sl",
+        "rr",
+        "fundamental",
+        "news",
+        "extreme_vol",
+        "sideways",
+        "daily_limit",
+        "feeling",
+        "recover",
+        "cheap"
+      ]
+    },
+    {
+      "id": "P-03-S06",
+      "type": "scenario",
+      "order": 6,
+      "title": {
+        "id": "Euro-yen di awal Oktober 2018",
+        "en": "Euro-yen in early October 2018"
+      },
+      "pair": "EURJPY",
+      "timeframe": "M30",
+      "balance": 2200,
+      "currency": "USD",
+      "briefing": {
+        "id": "Awal Oktober 2018. Rencana anggaran pemerintah Italia dengan defisit lebih besar memicu ketegangan dengan Uni Eropa dan menekan euro. Imbal hasil obligasi AS 10 tahun berada di level tertinggi sejak 2011 dan pasar saham mulai goyah. Saldo $2.200.",
+        "en": "Early October 2018. The Italian government's budget plan with a bigger deficit has sparked tension with the EU and weighed on the euro. US 10-year yields are at their highest since 2011 and stock markets are starting to wobble. Balance $2,200."
+      },
+      "data_window": {
+        "file": "DATA FOR LIVE/EURJPY/EURJPY_M30.csv",
+        "clock": "MT4 broker clock (GMT+2/+3, EU summer time); time_utc converted",
+        "context_candles": 100,
+        "play_candles": 120,
+        "context_start": {
+          "index": 72779,
+          "time_broker": "2018-10-04 16:00",
+          "time_utc": "2018-10-04 13:00"
+        },
+        "start": {
+          "index": 72879,
+          "time_broker": "2018-10-08 18:00",
+          "time_utc": "2018-10-08 15:00"
+        },
+        "end": {
+          "index": 72998,
+          "time_broker": "2018-10-11 05:30",
+          "time_utc": "2018-10-11 02:30"
+        }
+      },
+      "reason_options": [
+        "trend",
+        "level",
+        "structure_sl",
+        "rr",
+        "fundamental",
+        "news",
+        "extreme_vol",
+        "sideways",
+        "daily_limit",
+        "feeling",
+        "recover",
+        "cheap"
+      ]
+    },
+    {
+      "id": "P-03-S07",
+      "type": "scenario",
+      "order": 7,
+      "title": {
+        "id": "CAD saat minyak memantul",
+        "en": "CAD as oil rebounds"
+      },
+      "pair": "USDCAD",
+      "timeframe": "M30",
+      "balance": 900,
+      "currency": "USD",
+      "briefing": {
+        "id": "Awal Maret 2016. Harga minyak memantul dari titik terendah dalam lebih dari satu dekade yang dicapai pertengahan Februari, dan CAD ikut menguat. Saldo $900.",
+        "en": "Early March 2016. Oil has bounced off the lowest level in more than a decade, reached in mid-February, and CAD has strengthened with it. Balance $900."
+      },
+      "data_window": {
+        "file": "DATA FOR LIVE/USDCAD/USDCAD_M30.csv",
+        "clock": "MT4 broker clock (GMT+2/+3, EU summer time); time_utc converted",
+        "context_candles": 100,
+        "play_candles": 120,
+        "context_start": {
+          "index": 40505,
+          "time_broker": "2016-03-02 22:00",
+          "time_utc": "2016-03-02 20:00"
+        },
+        "start": {
+          "index": 40605,
+          "time_broker": "2016-03-07 00:00",
+          "time_utc": "2016-03-06 22:00"
+        },
+        "end": {
+          "index": 40724,
+          "time_broker": "2016-03-09 11:30",
+          "time_utc": "2016-03-09 09:30"
+        }
+      },
+      "reason_options": [
+        "trend",
+        "level",
+        "structure_sl",
+        "rr",
+        "fundamental",
+        "news",
+        "extreme_vol",
+        "sideways",
+        "daily_limit",
+        "feeling",
+        "recover",
+        "cheap"
+      ]
+    },
+    {
+      "id": "P-03-S08",
+      "type": "scenario",
+      "order": 8,
+      "title": {
+        "id": "EUR/USD yang tenang di November 2019",
+        "en": "A calm EUR/USD in November 2019"
+      },
+      "pair": "EURUSD",
+      "timeframe": "M30",
+      "balance": 1800,
+      "currency": "USD",
+      "briefing": {
+        "id": "Pertengahan November 2019. The Fed memangkas suku bunga untuk ketiga kalinya tahun ini pada 30 Oktober dan memberi sinyal akan berhenti sejenak. Pasar menunggu kabar kesepakatan dagang tahap pertama AS–Tiongkok. EUR/USD bergerak dalam rentang sempit. Saldo $1.800.",
+        "en": "Mid-November 2019. The Fed cut rates for the third time this year on 30 October and signalled a pause. The market is waiting for news on a phase-one US–China trade deal. EUR/USD is moving in a narrow range. Balance $1,800."
+      },
+      "data_window": {
+        "file": "DATA FOR LIVE/EURUSD/EURUSD_M30.csv",
+        "clock": "MT4 broker clock (GMT+2/+3, EU summer time); time_utc converted",
+        "context_candles": 100,
+        "play_candles": 120,
+        "context_start": {
+          "index": 86377,
+          "time_broker": "2019-11-08 02:00",
+          "time_utc": "2019-11-08 00:00"
+        },
+        "start": {
+          "index": 86477,
+          "time_broker": "2019-11-12 04:00",
+          "time_utc": "2019-11-12 02:00"
+        },
+        "end": {
+          "index": 86596,
+          "time_broker": "2019-11-14 15:30",
+          "time_utc": "2019-11-14 13:30"
+        }
+      },
+      "reason_options": [
+        "trend",
+        "level",
+        "structure_sl",
+        "rr",
+        "fundamental",
+        "news",
+        "extreme_vol",
+        "sideways",
+        "daily_limit",
+        "feeling",
+        "recover",
+        "cheap"
+      ]
+    },
+    {
+      "id": "P-03-S09",
+      "type": "scenario",
+      "order": 9,
+      "title": {
+        "id": "Ingin membalas setelah melewati batas",
+        "en": "Wanting to win it back past the limit"
+      },
+      "pair": "AUDUSD",
+      "timeframe": "M30",
+      "balance": 4850,
+      "currency": "USD",
+      "briefing": {
+        "id": "Awal Januari 2017. Harga bijih besi dan batu bara yang tinggi sejak akhir 2016 menopang AUD, dan AUD/USD naik di awal tahun. Namun hari ini kamu sudah rugi dua kali dengan total −3% saldo, melewati batas rugi harian 2% di rencanamu, dan kamu merasa ingin segera mengembalikannya. Saldo sekarang $4.850.",
+        "en": "Early January 2017. High iron ore and coal prices since late 2016 are supporting AUD, and AUD/USD has risen at the start of the year. But today you've already lost twice for −3% of the balance in total, past the 2% daily loss limit in your plan, and you feel like winning it back right away. Your balance is now $4,850."
+      },
+      "data_window": {
+        "file": "DATA FOR LIVE/AUDUSD/AUDUSD_M30.csv",
+        "clock": "MT4 broker clock (GMT+2/+3, EU summer time); time_utc converted",
+        "context_candles": 100,
+        "play_candles": 120,
+        "context_start": {
+          "index": 50888,
+          "time_broker": "2016-12-30 20:00",
+          "time_utc": "2016-12-30 18:00"
+        },
+        "start": {
+          "index": 50988,
+          "time_broker": "2017-01-03 22:00",
+          "time_utc": "2017-01-03 20:00"
+        },
+        "end": {
+          "index": 51107,
+          "time_broker": "2017-01-06 09:30",
+          "time_utc": "2017-01-06 07:30"
+        }
+      },
+      "reason_options": [
+        "trend",
+        "level",
+        "structure_sl",
+        "rr",
+        "fundamental",
+        "news",
+        "extreme_vol",
+        "sideways",
+        "daily_limit",
+        "feeling",
+        "recover",
+        "cheap"
+      ]
+    },
+    {
+      "id": "P-03-S10",
+      "type": "scenario",
+      "order": 10,
+      "title": {
+        "id": "Akun kecil di dolar-yen yang tenang",
+        "en": "A small account on a quiet dollar-yen"
+      },
+      "pair": "USDJPY",
+      "timeframe": "M30",
+      "balance": 250,
+      "currency": "USD",
+      "briefing": {
+        "id": "Agustus 2014. The Fed terus mengurangi pembelian obligasinya dan diperkirakan menghentikannya pada Oktober, sementara Bank of Japan tetap menjalankan pelonggaran besar. USD/JPY bergerak sangat tenang. Rabu (20 Agustus) pukul 18.00 UTC risalah rapat FOMC dirilis. Akunmu kecil: saldo $250, dan lot terkecil 0,01.",
+        "en": "August 2014. The Fed keeps cutting back its bond purchases and is expected to end them in October, while the Bank of Japan keeps up its large-scale easing. USD/JPY is moving very calmly. On Wednesday (20 August) at 18:00 UTC the FOMC minutes come out. Your account is small: a $250 balance, and the smallest lot is 0.01."
+      },
+      "data_window": {
+        "file": "DATA FOR LIVE/USDJPY/USDJPY_M30.csv",
+        "clock": "MT4 broker clock (GMT+2/+3, EU summer time); time_utc converted",
+        "context_candles": 100,
+        "play_candles": 120,
+        "context_start": {
+          "index": 21414,
+          "time_broker": "2014-08-15 01:00",
+          "time_utc": "2014-08-14 23:00"
+        },
+        "start": {
+          "index": 21514,
+          "time_broker": "2014-08-19 04:00",
+          "time_utc": "2014-08-19 02:00"
+        },
+        "end": {
+          "index": 21633,
+          "time_broker": "2014-08-21 15:30",
+          "time_utc": "2014-08-21 13:30"
+        }
+      },
+      "reason_options": [
+        "trend",
+        "level",
+        "structure_sl",
+        "rr",
+        "fundamental",
+        "news",
+        "extreme_vol",
+        "sideways",
+        "daily_limit",
+        "feeling",
+        "recover",
+        "cheap"
+      ]
+    },
+    {
+      "id": "P-03-C01",
+      "type": "mcq_complex",
+      "order": 11,
+      "level": 3,
+      "select": "multiple",
+      "question": {
+        "id": "Akun $5.000, risiko 0,5% per transaksi, rencana sell GBP/USD dengan SL 40 pip (1 pip = $10 per lot). Pernyataan mana saja yang benar?",
+        "en": "A $5,000 account, 0.5% risk per trade, a GBP/USD sell planned with a 40-pip SL (1 pip = $10 per lot). Which statements are true?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "id": "Jika SL harus 50 pip, lot turun menjadi 0,05.",
+            "en": "If the SL has to be 50 pips, the lot drops to 0.05."
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "id": "Lot sebaiknya dihitung dari free margin yang tersedia.",
+            "en": "The lot should be worked out from the free margin available."
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "id": "Bulatkan ke atas menjadi 0,07 agar potensi untung lebih besar.",
+            "en": "Round up to 0.07 for a bigger potential profit."
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "id": "Hasil hitungan lot 0,0625, dibulatkan ke bawah menjadi 0,06.",
+            "en": "The lot works out at 0.0625, rounded down to 0.06."
+          }
+        },
+        {
+          "id": "e",
+          "text": {
+            "id": "Dengan 0,06 lot, risiko sebenarnya $24.",
+            "en": "With 0.06 lot, the actual risk is $24."
+          }
+        }
+      ]
+    },
+    {
+      "id": "P-03-C02",
+      "type": "mcq_complex",
+      "order": 12,
+      "level": 3,
+      "select": "multiple",
+      "question": {
+        "id": "Mana saja sistem yang ekspektasinya positif (sebelum biaya)?",
+        "en": "Which systems have a positive expectancy (before costs)?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "id": "Win rate 45%, RR 1:2.",
+            "en": "45% win rate, 1:2 RR."
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "id": "Win rate 50%, RR 1:1,5.",
+            "en": "50% win rate, 1:1.5 RR."
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "id": "Win rate 30%, RR 1:3.",
+            "en": "30% win rate, 1:3 RR."
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "id": "Win rate 70%, RR 1:0,4.",
+            "en": "70% win rate, 1:0.4 RR."
+          }
+        },
+        {
+          "id": "e",
+          "text": {
+            "id": "Win rate 60%, RR 1:0,5.",
+            "en": "60% win rate, 1:0.5 RR."
+          }
+        }
+      ]
+    },
+    {
+      "id": "P-03-C03",
+      "type": "mcq_complex",
+      "order": 13,
+      "level": 3,
+      "select": "multiple",
+      "question": {
+        "id": "Akun $10.000 mempertaruhkan 2% dari modal saat itu di setiap transaksi, lalu rugi 10 kali berturut-turut. Pernyataan mana saja yang benar (abaikan biaya)?",
+        "en": "A $10,000 account risks 2% of current capital on every trade and then loses 10 times in a row. Which statements are true (ignore costs)?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "id": "Sisa modal sekitar $8.171.",
+            "en": "About $8,171 is left."
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "id": "Dengan risiko 5%, sisa modal setelah 10 rugi tetap di atas 80%.",
+            "en": "At 5% risk, more than 80% would still be left after 10 losses."
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "id": "Penurunannya sekitar 18,3%.",
+            "en": "The drop is about 18.3%."
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "id": "Totalnya tepat 20%, karena 10 × 2%.",
+            "en": "The total is exactly 20%, because 10 × 2%."
+          }
+        },
+        {
+          "id": "e",
+          "text": {
+            "id": "Untuk kembali ke $10.000 dibutuhkan untung sekitar 22,4%.",
+            "en": "Getting back to $10,000 needs a gain of about 22.4%."
+          }
+        }
+      ]
+    },
+    {
+      "id": "P-03-C04",
+      "type": "mcq_complex",
+      "order": 14,
+      "level": 4,
+      "select": "multiple",
+      "question": {
+        "id": "Dalam tren naik yang jelas, penggunaan RSI mana saja yang masuk akal?",
+        "en": "In a clear uptrend, which uses of RSI make sense?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "id": "Sell setiap kali RSI di atas 70.",
+            "en": "Selling every time RSI goes above 70."
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "id": "Menentukan SL dan target dari struktur dan ATR, bukan dari RSI.",
+            "en": "Setting the SL and target from structure and ATR, not from RSI."
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "id": "Mencari pullback ke zona RSI 40–50 lalu naik kembali.",
+            "en": "Looking for a pullback into the RSI 40–50 zone that turns back up."
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "id": "Mengubah rumus RSI untuk pair JPY.",
+            "en": "Changing the RSI formula for JPY pairs."
+          }
+        },
+        {
+          "id": "e",
+          "text": {
+            "id": "Memakai divergence sebagai peringatan, lalu menunggu konfirmasi struktur.",
+            "en": "Treating divergence as a warning, then waiting for structural confirmation."
+          }
+        }
+      ]
+    },
+    {
+      "id": "P-03-C05",
+      "type": "mcq_complex",
+      "order": 15,
+      "level": 4,
+      "select": "multiple",
+      "question": {
+        "id": "Uptrend dengan swing low 1,2400 dan swing high 1,2600. Pernyataan mana saja yang benar?",
+        "en": "An uptrend with a swing low at 1.2400 and a swing high at 1.2600. Which statements are true?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "id": "Level 61,8% sekitar 1,2476.",
+            "en": "The 61.8% level is about 1.2476."
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "id": "Level retracement 50% ada di 1,2500.",
+            "en": "The 50% retracement level is at 1.2500."
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "id": "Harga pasti berbalik naik di 61,8% karena Fibonacci adalah hukum alam.",
+            "en": "Price is sure to turn up at 61.8% because Fibonacci is a law of nature."
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "id": "Pullback yang menembus 1,2400 berarti struktur naik rusak.",
+            "en": "A pullback through 1.2400 means the uptrend structure is broken."
+          }
+        },
+        {
+          "id": "e",
+          "text": {
+            "id": "Pullback yang hanya sampai 38,2% menandakan tren melemah.",
+            "en": "A pullback that only reaches 38.2% shows a weakening trend."
+          }
+        }
+      ]
+    },
+    {
+      "id": "P-03-C06",
+      "type": "mcq_complex",
+      "order": 16,
+      "level": 5,
+      "select": "multiple",
+      "question": {
+        "id": "Seorang teman bertanya apa tugas The Fed dan seberapa sering rapatnya. Jawaban mana saja yang sesuai materi?",
+        "en": "A friend asks what the Fed is for and how often it meets. Which answers match the lesson?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "id": "Empat rapat setahun disertai proyeksi ekonomi dan dot plot.",
+            "en": "Four meetings a year come with economic projections and the dot plot."
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "id": "Tugasnya menjaga harga stabil dan lapangan kerja maksimum (dual mandate).",
+            "en": "Its job is stable prices and maximum employment (the dual mandate)."
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "id": "Target inflasi 2% diukur dengan PCE headline.",
+            "en": "The 2% inflation target is measured with headline PCE."
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "id": "The Fed punya satu angka target untuk tingkat pengangguran.",
+            "en": "The Fed has a single target number for unemployment."
+          }
+        },
+        {
+          "id": "e",
+          "text": {
+            "id": "FOMC rapat dua belas kali setahun.",
+            "en": "The FOMC meets twelve times a year."
+          }
+        }
+      ]
+    },
+    {
+      "id": "P-03-C07",
+      "type": "mcq_complex",
+      "order": 17,
+      "level": 5,
+      "select": "multiple",
+      "question": {
+        "id": "Dalam kondisi apa saja kenaikan suku bunga justru tidak menguatkan mata uang?",
+        "en": "In which situations does a rate hike fail to strengthen the currency?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "id": "Ekonomi diperkirakan resesi, sehingga kenaikan dianggap mencekik ekonomi.",
+            "en": "A recession is expected, so the hike is seen as choking the economy."
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "id": "Bank sentral memberi sinyal masih akan menaikkan bunga lagi.",
+            "en": "The central bank signals more hikes are coming."
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "id": "Kenaikannya lebih besar dari perkiraan pasar.",
+            "en": "The hike is bigger than the market expected."
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "id": "Kenaikannya sudah diperkirakan sejak lama (priced in).",
+            "en": "The hike was expected long ago (priced in)."
+          }
+        },
+        {
+          "id": "e",
+          "text": {
+            "id": "Bunga riil negatif: bunga naik tetapi inflasi lebih tinggi lagi.",
+            "en": "Real rates are negative: rates rise but inflation is higher still."
+          }
+        }
+      ]
+    },
+    {
+      "id": "P-03-C08",
+      "type": "mcq_complex",
+      "order": 18,
+      "level": 5,
+      "select": "multiple",
+      "question": {
+        "id": "Konsensus NFP adalah +150 ribu pekerjaan. Pernyataan mana saja yang sesuai materi?",
+        "en": "The NFP consensus is +150k jobs. Which statements match the lesson?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "id": "Tingkat pengangguran yang lebih tinggi dari dugaan menandakan ekonomi lebih kuat.",
+            "en": "An unemployment rate above forecast signals a stronger economy."
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "id": "Angka positif berapa pun pasti menguatkan dolar.",
+            "en": "Any positive number is sure to strengthen the dollar."
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "id": "Hasil +160 ribu: selisih kecil, reaksi biasanya kecil.",
+            "en": "A +160k print: a small gap, usually a small reaction."
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "id": "Revisi ke bawah untuk bulan-bulan sebelumnya bisa memperburuk kesan angka utama.",
+            "en": "Downward revisions to earlier months can worsen the impression of the headline."
+          }
+        },
+        {
+          "id": "e",
+          "text": {
+            "id": "Hasil +60 ribu: kejutan ke bawah, dolar cenderung melemah.",
+            "en": "A +60k print: a downside surprise, so the dollar tends to weaken."
+          }
+        }
+      ]
+    },
+    {
+      "id": "P-03-C09",
+      "type": "mcq_complex",
+      "order": 19,
+      "level": 6,
+      "select": "multiple",
+      "question": {
+        "id": "Andi: 15 transaksi, total +10R, win rate 73%. Budi: 150 transaksi, total +36R, win rate 41%, max drawdown 10R, kepatuhan 90%. Pernyataan mana saja yang benar?",
+        "en": "Andi: 15 trades, +10R total, 73% win rate. Budi: 150 trades, +36R total, 41% win rate, 10R max drawdown, 90% compliance. Which statements are true?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "id": "Bukti Budi lebih kuat karena sampelnya jauh lebih besar.",
+            "en": "Budi's evidence is stronger because his sample is far bigger."
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "id": "Klaim yang wajar untuk Andi: \"Aku siap menaikkan risiko.\"",
+            "en": "A fair claim for Andi: \"I'm ready to raise my risk.\""
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "id": "15 transaksi baru memberi kesan awal.",
+            "en": "15 trades only give a first impression."
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "id": "Drawdown 10R yang dialami Budi wajar terjadi pada strategi yang tetap untung.",
+            "en": "Budi's 10R drawdown is normal for a strategy that still wins overall."
+          }
+        },
+        {
+          "id": "e",
+          "text": {
+            "id": "Andi pasti lebih hebat karena win rate-nya lebih tinggi.",
+            "en": "Andi must be better because his win rate is higher."
+          }
+        }
+      ]
+    },
+    {
+      "id": "P-03-C10",
+      "type": "mcq_complex",
+      "order": 20,
+      "level": 6,
+      "select": "multiple",
+      "question": {
+        "id": "Mana saja yang termasuk jenis kesalahan perilaku atau emosi?",
+        "en": "Which of these are behaviour or emotion mistakes?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "id": "Menggeser stop menjauh karena takut.",
+            "en": "Moving the stop further away out of fear."
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "id": "Keluar karena takut padahal alasan rencana belum batal.",
+            "en": "Exiting out of fear while the plan's reason still stands."
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "id": "Membuka posisi menjelang rilis berita besar.",
+            "en": "Opening a position just before a big news release."
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "id": "Salah klik tombol sell padahal ingin buy.",
+            "en": "Clicking sell when you meant to buy."
+          }
+        },
+        {
+          "id": "e",
+          "text": {
+            "id": "Masuk lagi dengan lot lebih besar untuk membalas rugi.",
+            "en": "Re-entering with a bigger lot to win back a loss."
+          }
+        }
+      ]
+    },
+    {
+      "id": "P-03-B01",
+      "type": "mcq_basic",
+      "order": 21,
+      "level": 1,
+      "select": "single",
+      "question": {
+        "id": "Mata uang mana yang disebut materi sebagai mata uang komoditas?",
+        "en": "Which currencies does the lesson call commodity currencies?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "id": "JPY, CHF, dan USD",
+            "en": "JPY, CHF and USD"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "id": "USD, EUR, dan JPY",
+            "en": "USD, EUR and JPY"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "id": "AUD, NZD, dan CAD",
+            "en": "AUD, NZD and CAD"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "id": "GBP, CHF, dan EUR",
+            "en": "GBP, CHF and EUR"
+          }
+        }
+      ]
+    },
+    {
+      "id": "P-03-B02",
+      "type": "mcq_basic",
+      "order": 22,
+      "level": 1,
+      "select": "single",
+      "question": {
+        "id": "Spread 1,5 pip pada posisi 0,3 lot EUR/USD. Berapa biaya spread-nya?",
+        "en": "A 1.5-pip spread on a 0.3-lot EUR/USD position. What does the spread cost?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "id": "$45",
+            "en": "$45"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "id": "$4,50",
+            "en": "$4.50"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "id": "$1,50",
+            "en": "$1.50"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "id": "$0,45",
+            "en": "$0.45"
+          }
+        }
+      ]
+    },
+    {
+      "id": "P-03-B03",
+      "type": "mcq_basic",
+      "order": 23,
+      "level": 1,
+      "select": "single",
+      "question": {
+        "id": "EUR/USD turun. Apa artinya?",
+        "en": "EUR/USD falls. What does that mean?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "id": "Spread EUR/USD menyempit",
+            "en": "The EUR/USD spread narrows"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "id": "Euro melemah terhadap dolar AS, atau dolar yang menguat",
+            "en": "The euro weakens against the dollar, or the dollar strengthens"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "id": "Euro menguat terhadap dolar AS",
+            "en": "The euro strengthens against the dollar"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "id": "Kedua mata uang menguat bersamaan",
+            "en": "Both currencies strengthen together"
+          }
+        }
+      ]
+    },
+    {
+      "id": "P-03-B04",
+      "type": "mcq_basic",
+      "order": 24,
+      "level": 2,
+      "select": "single",
+      "question": {
+        "id": "Urutan swing HH, HL, HH, HL menunjukkan apa?",
+        "en": "What does the swing sequence HH, HL, HH, HL show?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "id": "Pembalikan yang sudah pasti",
+            "en": "A confirmed reversal"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "id": "Tren turun",
+            "en": "A downtrend"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "id": "Tren naik",
+            "en": "An uptrend"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "id": "Sideways",
+            "en": "A sideways market"
+          }
+        }
+      ]
+    },
+    {
+      "id": "P-03-B05",
+      "type": "mcq_basic",
+      "order": 25,
+      "level": 2,
+      "select": "single",
+      "question": {
+        "id": "Mengapa support dan resistance lebih baik digambar sebagai zona daripada garis tipis?",
+        "en": "Why are support and resistance better drawn as zones than as thin lines?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "id": "Karena zona tidak perlu diperbarui setelah jebol",
+            "en": "Because zones don't need updating after a break"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "id": "Karena zona selalu memberi sinyal entry yang pasti",
+            "en": "Because zones always give a sure entry signal"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "id": "Karena harga sering menembus sedikit lewat bayangan lalu berbalik",
+            "en": "Because price often pokes through slightly with a wick and then turns"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "id": "Karena garis tipis hanya berlaku di timeframe M1",
+            "en": "Because thin lines only work on M1"
+          }
+        }
+      ]
+    },
+    {
+      "id": "P-03-B06",
+      "type": "mcq_basic",
+      "order": 26,
+      "level": 2,
+      "select": "single",
+      "question": {
+        "id": "Mana yang punya lebih banyak noise: M5 atau H4?",
+        "en": "Which has more noise: M5 or H4?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "id": "M5",
+            "en": "M5"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "id": "H4",
+            "en": "H4"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "id": "Tergantung warna candle",
+            "en": "It depends on the candle colours"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "id": "Sama saja",
+            "en": "They're the same"
+          }
+        }
+      ]
+    },
+    {
+      "id": "P-03-B07",
+      "type": "mcq_basic",
+      "order": 27,
+      "level": 3,
+      "select": "single",
+      "question": {
+        "id": "Equity $900 dan used margin $300. Berapa margin level?",
+        "en": "Equity is $900 and used margin is $300. What is the margin level?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "id": "33%",
+            "en": "33%"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "id": "$600",
+            "en": "$600"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "id": "300%",
+            "en": "300%"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "id": "200%",
+            "en": "200%"
+          }
+        }
+      ]
+    },
+    {
+      "id": "P-03-B08",
+      "type": "mcq_basic",
+      "order": 28,
+      "level": 3,
+      "select": "single",
+      "question": {
+        "id": "Modal turun 25%. Berapa kenaikan yang dibutuhkan untuk kembali ke titik awal?",
+        "en": "Capital falls 25%. What gain is needed to get back to the start?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "id": "50%",
+            "en": "50%"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "id": "Sekitar 33,3%",
+            "en": "About 33.3%"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "id": "25%",
+            "en": "25%"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "id": "12,5%",
+            "en": "12.5%"
+          }
+        }
+      ]
+    },
+    {
+      "id": "P-03-B09",
+      "type": "mcq_basic",
+      "order": 29,
+      "level": 3,
+      "select": "single",
+      "question": {
+        "id": "Mengapa hasil hitungan lot dibulatkan ke bawah, bukan ke atas?",
+        "en": "Why is the calculated lot rounded down rather than up?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "id": "Supaya risiko sebenarnya tidak melampaui batas",
+            "en": "So the actual risk doesn't exceed the limit"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "id": "Karena broker melarang angka genap",
+            "en": "Because brokers forbid round numbers"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "id": "Supaya margin yang dipakai lebih besar",
+            "en": "So more margin is used"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "id": "Supaya potensi untung lebih besar",
+            "en": "For a bigger potential profit"
+          }
+        }
+      ]
+    },
+    {
+      "id": "P-03-B10",
+      "type": "mcq_basic",
+      "order": 30,
+      "level": 4,
+      "select": "single",
+      "question": {
+        "id": "Close sebelumnya 1,2000. Candle berikutnya: high 1,2045, low 1,2025. Berapa True Range?",
+        "en": "The previous close is 1.2000. The next candle: high 1.2045, low 1.2025. What is the True Range?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "id": "25 pip",
+            "en": "25 pips"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "id": "65 pip",
+            "en": "65 pips"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "id": "45 pip",
+            "en": "45 pips"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "id": "20 pip",
+            "en": "20 pips"
+          }
+        }
+      ]
+    },
+    {
+      "id": "P-03-B11",
+      "type": "mcq_basic",
+      "order": 31,
+      "level": 4,
+      "select": "single",
+      "question": {
+        "id": "Kapan pola double top dianggap selesai?",
+        "en": "When is a double top considered complete?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "id": "Setelah harga menutup di bawah neckline (low lembah)",
+            "en": "Once price closes below the neckline (the valley low)"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "id": "Begitu puncak kedua terbentuk",
+            "en": "As soon as the second peak forms"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "id": "Saat harga menyentuh puncak pertama lagi",
+            "en": "When price touches the first peak again"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "id": "Saat RSI di atas 70",
+            "en": "When RSI is above 70"
+          }
+        }
+      ]
+    },
+    {
+      "id": "P-03-B12",
+      "type": "mcq_basic",
+      "order": 32,
+      "level": 5,
+      "select": "single",
+      "question": {
+        "id": "Pernyataan FOMC terbit pukul 14.00 waktu New York saat AS memakai jam musim dingin (EST). Pukul berapa itu dalam WIB?",
+        "en": "The FOMC statement comes out at 14:00 New York time while the US is on winter time (EST). What time is that in WIB?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "id": "14.00 WIB hari yang sama",
+            "en": "14:00 WIB the same day"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "id": "02.00 WIB dini hari berikutnya",
+            "en": "02:00 WIB the next morning"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "id": "01.00 WIB dini hari berikutnya",
+            "en": "01:00 WIB the next morning"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "id": "20.30 WIB hari yang sama",
+            "en": "20:30 WIB the same day"
+          }
+        }
+      ]
+    },
+    {
+      "id": "P-03-B13",
+      "type": "mcq_basic",
+      "order": 33,
+      "level": 5,
+      "select": "single",
+      "question": {
+        "id": "Apa isi kolom \"forecast\" di kalender ekonomi?",
+        "en": "What does the \"forecast\" column in an economic calendar contain?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "id": "Angka periode sebelumnya",
+            "en": "The previous period's number"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "id": "Angka yang baru saja dirilis",
+            "en": "The number just released"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "id": "Konsensus perkiraan ekonom, patokan yang sudah masuk harga",
+            "en": "The economists' consensus estimate, a benchmark already in the price"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "id": "Arah harga yang pasti setelah rilis",
+            "en": "Where price will definitely go after the release"
+          }
+        }
+      ]
+    },
+    {
+      "id": "P-03-B14",
+      "type": "mcq_basic",
+      "order": 34,
+      "level": 6,
+      "select": "single",
+      "question": {
+        "id": "Rencana berbentuk \"Jika situasi X terjadi, maka aku melakukan Y\" disebut …",
+        "en": "A plan in the form \"If situation X happens, then I'll do Y\" is called …"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "id": "implementation intention",
+            "en": "an implementation intention"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "id": "loss aversion",
+            "en": "loss aversion"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "id": "overfitting",
+            "en": "overfitting"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "id": "disposition effect",
+            "en": "the disposition effect"
+          }
+        }
+      ]
+    },
+    {
+      "id": "P-03-B15",
+      "type": "mcq_basic",
+      "order": 35,
+      "level": 6,
+      "select": "single",
+      "question": {
+        "id": "Mengapa 20 transaksi sering tidak cukup untuk menilai sebuah strategi?",
+        "en": "Why are 20 trades often not enough to judge a strategy?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "id": "Karena 20 transaksi selalu menghasilkan win rate 50%",
+            "en": "Because 20 trades always produce a 50% win rate"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "id": "Karena hasil 20 transaksi pasti sama dengan hasil jangka panjang",
+            "en": "Because 20 trades always match the long-run result"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "id": "Karena broker hanya menghitung 100 transaksi pertama",
+            "en": "Because brokers only count the first 100 trades"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "id": "Variasi acak masih besar, sehingga strategi yang untung pun bisa terlihat rugi",
+            "en": "Random variation is still large, so even a winning strategy can look like a loser"
+          }
+        }
+      ]
+    }
+  ]
+}

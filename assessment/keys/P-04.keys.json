@@ -1,0 +1,1642 @@
+{
+  "schema_version": 1,
+  "package_id": "P-04",
+  "confidential": true,
+  "rubric": {
+    "principle": {
+      "id": "Nilai menilai proses, bukan untung atau rugi. Proses yang benar tetap bernilai baik walaupun kena SL; proses yang salah tidak mendapat nilai tambahan karena kebetulan untung.",
+      "en": "The score judges the process, never the profit or loss. A sound process still scores well when it hits the SL; a poor one earns nothing extra for a lucky profit."
+    },
+    "scenario_trade": {
+      "total": 100,
+      "risk": {
+        "max": 25,
+        "measure": "risk_pct = |entry − SL| in pips × pip value per lot (USD) × lot ÷ balance × 100",
+        "bands": [
+          {
+            "from": 0,
+            "to": 0.5,
+            "points": 20
+          },
+          {
+            "from": 0.5,
+            "to": 1,
+            "points": 23
+          },
+          {
+            "from": 1,
+            "to": 2,
+            "points": 25
+          },
+          {
+            "from": 2,
+            "to": 3,
+            "points": 18
+          },
+          {
+            "from": 3,
+            "to": 5,
+            "points": 10
+          },
+          {
+            "from": 5,
+            "to": 10,
+            "points": 4
+          },
+          {
+            "from": 10,
+            "to": null,
+            "points": 0
+          }
+        ]
+      },
+      "sl": {
+        "max": 25,
+        "risk_part": {
+          "max": 12.5,
+          "rule": "risk band points × 0.5"
+        },
+        "volatility_part": {
+          "max": 12.5,
+          "measure": "sl_atr = |entry − SL| ÷ ATR(14) at Start (key: numbers.atr14_pips)",
+          "bands": [
+            {
+              "from": 0,
+              "to": 0.75,
+              "points": 3
+            },
+            {
+              "from": 0.75,
+              "to": 1,
+              "points": 7
+            },
+            {
+              "from": 1,
+              "to": 3,
+              "points": 10,
+              "bonus": {
+                "points": 2.5,
+                "when": "SL beyond numbers.invalidation_level (or no level given)"
+              }
+            },
+            {
+              "from": 3,
+              "to": 4,
+              "points": 7
+            },
+            {
+              "from": 4,
+              "to": null,
+              "points": 4
+            }
+          ]
+        }
+      },
+      "tp": {
+        "max": 15,
+        "measure": "rr = |TP − entry| ÷ |entry − SL|",
+        "bands": [
+          {
+            "from": 1.5,
+            "to": null,
+            "points": 15
+          },
+          {
+            "from": 1.2,
+            "to": 1.5,
+            "points": 10
+          },
+          {
+            "from": 1,
+            "to": 1.2,
+            "points": 7
+          },
+          {
+            "from": 0.5,
+            "to": 1,
+            "points": 3
+          },
+          {
+            "from": 0,
+            "to": 0.5,
+            "points": 0
+          }
+        ]
+      },
+      "decision": {
+        "max": 20,
+        "choice": {
+          "max": 14,
+          "ideal_side_ideal_entry": 14,
+          "ideal_side_other_entry": 11,
+          "acceptable": 8,
+          "wrong": 0
+        },
+        "reasons": {
+          "max": 6,
+          "rule": "6 × (valid reasons chosen ÷ reasons chosen); 0 with no reason"
+        }
+      },
+      "management": {
+        "max": 15,
+        "cases": [
+          {
+            "case": "ran to SL, TP or the window's auto-close",
+            "points": 15
+          },
+          {
+            "case": "manual close with a valid close reason (structure_broken, news_ahead, target_area)",
+            "points": 15
+          },
+          {
+            "case": "manual close before the target without a valid reason (small_profit, bored)",
+            "points": 7
+          },
+          {
+            "case": "panic close near the SL without a new signal (fear)",
+            "points": 5
+          }
+        ]
+      }
+    },
+    "scenario_no_trade": {
+      "total": 100,
+      "rule": "When decision.ideal is no_trade the whole score is decision and reasons.",
+      "decision": {
+        "max": 70,
+        "no_trade": 70,
+        "any_trade": 0
+      },
+      "reasons": {
+        "max": 30,
+        "rule": "30 × (valid reasons chosen ÷ reasons chosen)"
+      }
+    },
+    "pending_unfilled": {
+      "rule": "A pending order that never fills is scored on the decision only: decision points × 5 (out of 100); lot, SL and TP aren't scored."
+    },
+    "mcq_complex": {
+      "rule": "Per option: +1 ÷ k for each right option chosen, −1 ÷ k for each wrong option chosen (k = number of right options); floor 0, max 1."
+    },
+    "mcq_basic": {
+      "rule": "1 for the right option, 0 otherwise."
+    },
+    "report": {
+      "id": "Hasil akhir berupa umpan balik per aspek (risiko, SL, TP/R:R, keputusan, manajemen posisi) dan level Learn 101 yang perlu diulang, dihitung dari soal PG yang salah per level. Tanpa peringkat dan tanpa perbandingan antar pengguna.",
+      "en": "The result is feedback per aspect (risk, SL, TP/R:R, decision, position management) and the Learn 101 levels to revisit, from the wrong answers per level. No ranking and no comparison between users."
+    }
+  },
+  "items": {
+    "P-04-S01": {
+      "id": "P-04-S01",
+      "type": "scenario",
+      "kind": "event",
+      "event": {
+        "name": {
+          "id": "Aksi jual besar pasar global (\"Black Monday\" 2015)",
+          "en": "Global market sell-off (\"Black Monday\" 2015)"
+        },
+        "utc": "2015-08-24T01:00"
+      },
+      "claims_verified": [
+        {
+          "type": "spike",
+          "utc": "2015-08-24T01:00",
+          "minutes": 180,
+          "result": {
+            "ok": true,
+            "pair": "USDJPY",
+            "utc": "2015-08-24T01:00",
+            "broker": "2015-08-24 04:00",
+            "eventPips": 111.7,
+            "ordinaryPips": 25,
+            "ratio": 4.47,
+            "windows": 71
+          },
+          "ok": true
+        }
+      ],
+      "context": {
+        "expected_trend": "mixed",
+        "trend": "mixed",
+        "price": 121.094,
+        "atr_pips": 19.2,
+        "ema20": 121.18,
+        "ema50": 121.547,
+        "slope50_atr": -0.142,
+        "ema_crosses_60": 0,
+        "range_atr": 12.4,
+        "structure": "LH/HL",
+        "last_swing_low": 120.885,
+        "last_swing_high": 121.26,
+        "context_high": 123.107,
+        "context_low": 120.725,
+        "pip_value_usd_per_lot": 8.258
+      },
+      "decision": {
+        "ideal": "no_trade",
+        "entry": null,
+        "acceptable": [],
+        "valid_reasons": [
+          "extreme_vol"
+        ]
+      },
+      "numbers": {
+        "reference_price": 121.094,
+        "entry_reference": 121.094,
+        "atr14_pips": 19.2,
+        "invalidation_level": null,
+        "structure_sl_pips": null,
+        "expected_sl_pips": 28.8,
+        "expected_sl_atr": 1.5,
+        "sl_band_pips": [
+          19.2,
+          57.6
+        ],
+        "pip_value_usd_per_lot": 8.258,
+        "risk_usd_1pct": 60,
+        "risk_usd_2pct": 120,
+        "lot_at_1pct": 0.25,
+        "lot_at_2pct": 0.5,
+        "risk_pct_at_min_lot": 0.04,
+        "min_lot_fits": true,
+        "min_tp_pips": 43.2,
+        "pending_zone": null
+      },
+      "feedback": {
+        "decision": {
+          "id": "ATR M15 jauh di atas normal, harga melompat tajam, dan struktur M15 campuran karena gerak bolak-balik yang besar. SL yang menghormati volatilitas ini menuntut lot sangat kecil, sementara spread dan slippage bisa membesar. Level 3 menyebut volatilitas mendadak sebagai penyebab drawdown tinggi; NO TRADE adalah pilihan yang tepat.",
+          "en": "The M15 ATR is far above normal, price is jumping sharply, and the M15 structure is mixed because of the big back-and-forth swings. An SL that respects this volatility needs a tiny lot, while spreads and slippage can widen. Level 3 names sudden volatility as a cause of high drawdowns; NO TRADE is the right call."
+        },
+        "risk": {
+          "id": "Tidak dinilai: jawaban yang diharapkan adalah NO TRADE.",
+          "en": "Not scored: the expected answer is NO TRADE."
+        },
+        "sl": {
+          "id": "Tidak dinilai: jawaban yang diharapkan adalah NO TRADE.",
+          "en": "Not scored: the expected answer is NO TRADE."
+        },
+        "tp": {
+          "id": "Tidak dinilai: jawaban yang diharapkan adalah NO TRADE.",
+          "en": "Not scored: the expected answer is NO TRADE."
+        },
+        "management": {
+          "id": "Tidak dinilai: jawaban yang diharapkan adalah NO TRADE.",
+          "en": "Not scored: the expected answer is NO TRADE."
+        }
+      }
+    },
+    "P-04-S02": {
+      "id": "P-04-S02",
+      "type": "scenario",
+      "kind": "event",
+      "event": {
+        "name": {
+          "id": "Rusia menginvasi Ukraina",
+          "en": "Russia invades Ukraine"
+        },
+        "utc": "2022-02-24T03:00"
+      },
+      "claims_verified": [
+        {
+          "type": "spike",
+          "utc": "2022-02-24T03:00",
+          "minutes": 180,
+          "result": {
+            "ok": true,
+            "pair": "EURJPY",
+            "utc": "2022-02-24T03:00",
+            "broker": "2022-02-24 05:00",
+            "eventPips": 153,
+            "ordinaryPips": 41.9,
+            "ratio": 3.66,
+            "windows": 73
+          },
+          "ok": true
+        }
+      ],
+      "context": {
+        "expected_trend": "mixed",
+        "trend": "mixed",
+        "price": 129.998,
+        "atr_pips": 9.1,
+        "ema20": 130.149,
+        "ema50": 130.283,
+        "slope50_atr": -0.106,
+        "ema_crosses_60": 2,
+        "range_atr": 8.4,
+        "structure": "HH/LL",
+        "last_swing_low": 129.94,
+        "last_swing_high": 130.664,
+        "context_high": 130.709,
+        "context_low": 129.94,
+        "pip_value_usd_per_lot": 8.6983
+      },
+      "decision": {
+        "ideal": "no_trade",
+        "entry": null,
+        "acceptable": [],
+        "valid_reasons": [
+          "news"
+        ]
+      },
+      "numbers": {
+        "reference_price": 129.998,
+        "entry_reference": 129.998,
+        "atr14_pips": 9.1,
+        "invalidation_level": null,
+        "structure_sl_pips": null,
+        "expected_sl_pips": 13.6,
+        "expected_sl_atr": 1.49,
+        "sl_band_pips": [
+          9.1,
+          27.3
+        ],
+        "pip_value_usd_per_lot": 8.6983,
+        "risk_usd_1pct": 35,
+        "risk_usd_2pct": 70,
+        "lot_at_1pct": 0.29,
+        "lot_at_2pct": 0.59,
+        "risk_pct_at_min_lot": 0.03,
+        "min_lot_fits": true,
+        "min_tp_pips": 20.4,
+        "pending_zone": null
+      },
+      "feedback": {
+        "decision": {
+          "id": "Risiko geopolitik seperti ini tidak ada di kalender dan bisa mengubah sentimen dalam sekejap (Level 5). Struktur M15 campuran, jadi tidak ada keunggulan arah yang jelas, dan EUR/JPY sensitif terhadap kepanikan karena yen dianggap aman. Menahan diri sampai keadaan lebih jelas adalah keputusan yang sah.",
+          "en": "Geopolitical risk like this isn't on any calendar and can flip sentiment in an instant (Level 5). The M15 structure is mixed, so there's no clear directional edge, and EUR/JPY is sensitive to panic because the yen is seen as a safe haven. Holding back until things are clearer is a valid decision."
+        },
+        "risk": {
+          "id": "Tidak dinilai: jawaban yang diharapkan adalah NO TRADE.",
+          "en": "Not scored: the expected answer is NO TRADE."
+        },
+        "sl": {
+          "id": "Tidak dinilai: jawaban yang diharapkan adalah NO TRADE.",
+          "en": "Not scored: the expected answer is NO TRADE."
+        },
+        "tp": {
+          "id": "Tidak dinilai: jawaban yang diharapkan adalah NO TRADE.",
+          "en": "Not scored: the expected answer is NO TRADE."
+        },
+        "management": {
+          "id": "Tidak dinilai: jawaban yang diharapkan adalah NO TRADE.",
+          "en": "Not scored: the expected answer is NO TRADE."
+        }
+      }
+    },
+    "P-04-S03": {
+      "id": "P-04-S03",
+      "type": "scenario",
+      "kind": "event",
+      "event": {
+        "name": {
+          "id": "Bank of England memangkas suku bunga ke 0,25%",
+          "en": "Bank of England cuts rates to 0.25%"
+        },
+        "utc": "2016-08-04T11:00"
+      },
+      "claims_verified": [
+        {
+          "type": "spike",
+          "utc": "2016-08-04T11:00",
+          "minutes": 120,
+          "result": {
+            "ok": true,
+            "pair": "GBPUSD",
+            "utc": "2016-08-04T11:00",
+            "broker": "2016-08-04 14:00",
+            "eventPips": 229.1,
+            "ordinaryPips": 39.6,
+            "ratio": 5.78,
+            "windows": 105
+          },
+          "ok": true
+        },
+        {
+          "type": "spike",
+          "utc": "2016-08-05T12:30",
+          "minutes": 120,
+          "result": {
+            "ok": true,
+            "pair": "GBPUSD",
+            "utc": "2016-08-05T12:30",
+            "broker": "2016-08-05 15:30",
+            "eventPips": 141.6,
+            "ordinaryPips": 39.6,
+            "ratio": 3.57,
+            "windows": 105
+          },
+          "ok": true
+        }
+      ],
+      "context": {
+        "expected_trend": "down",
+        "trend": "down",
+        "price": 1.31395,
+        "atr_pips": 24.4,
+        "ema20": 1.31589,
+        "ema50": 1.32159,
+        "slope50_atr": -0.195,
+        "ema_crosses_60": 1,
+        "range_atr": 9.6,
+        "structure": "LH/LL",
+        "last_swing_low": 1.31116,
+        "last_swing_high": 1.31483,
+        "context_high": 1.33457,
+        "context_low": 1.31104,
+        "pip_value_usd_per_lot": 10
+      },
+      "decision": {
+        "ideal": "sell",
+        "entry": "market",
+        "acceptable": [
+          "no_trade"
+        ],
+        "valid_reasons": [
+          "trend",
+          "fundamental",
+          "structure_sl",
+          "rr"
+        ]
+      },
+      "numbers": {
+        "reference_price": 1.31395,
+        "entry_reference": 1.31395,
+        "atr14_pips": 24.4,
+        "invalidation_level": 1.31605,
+        "structure_sl_pips": 21,
+        "expected_sl_pips": 24.4,
+        "expected_sl_atr": 1,
+        "sl_band_pips": [
+          24.4,
+          73.2
+        ],
+        "pip_value_usd_per_lot": 10,
+        "risk_usd_1pct": 25,
+        "risk_usd_2pct": 50,
+        "lot_at_1pct": 0.1,
+        "lot_at_2pct": 0.2,
+        "risk_pct_at_min_lot": 0.1,
+        "min_lot_fits": true,
+        "min_tp_pips": 36.6,
+        "pending_zone": null
+      },
+      "feedback": {
+        "decision": {
+          "id": "Struktur M15 turun sesudah keputusan BoE yang melonggarkan, sehingga poundsterling cenderung tertekan. Sell searah struktur dengan SL di atas lower high terakhir masuk akal. Karena NFP keluar besok, rencanakan sejak awal: tutup sebelum rilis atau terima risikonya dengan lot kecil. NO TRADE juga bisa diterima.",
+          "en": "The M15 structure is falling after the BoE's easing, so sterling tends to be under pressure. A sell with the structure and an SL above the last lower high makes sense. With NFP out tomorrow, plan it from the start: close before the release or accept the risk with a small lot. NO TRADE is acceptable too."
+        },
+        "risk": {
+          "id": "Saldo $2.500: risiko 1–2% = $25–$50. Dengan SL sekitar 24,4 pip, lot yang sesuai sekitar 0,10–0,20 (1 pip per lot ≈ $10).",
+          "en": "Balance $2,500: 1–2% risk = $25–$50. With an SL of about 24.4 pips, a fitting lot is about 0.10–0.20 (1 pip per lot ≈ $10)."
+        },
+        "sl": {
+          "id": "ATR(14) saat Mulai ≈ 24,4 pip. Level yang membatalkan ide ada di balik swing terakhir, sekitar 1,31605 (termasuk buffer ½ ATR), jadi SL sekitar 24,4 pip. SL di bawah ~1× ATR mudah tersapu noise; di atas ~3× ATR (73,2 pip) lot jadi sangat kecil atau risikonya melewati batas.",
+          "en": "ATR(14) at Start ≈ 24.4 pips. The level that cancels the idea sits beyond the last swing, around 1.31605 (with a ½ ATR buffer), so the SL is about 24.4 pips. An SL under ~1× ATR gets swept by noise; beyond ~3× ATR (73.2 pips) the lot gets very small or the risk breaks the limit."
+        },
+        "tp": {
+          "id": "Target minimal 1 : 1,5 berarti TP sekitar 36,6 pip atau lebih dari entry.",
+          "en": "A 1 : 1.5 minimum means a TP about 36.6 pips or more from entry."
+        },
+        "management": {
+          "id": "Biarkan posisi berjalan sampai SL atau TP, atau tutup manual dengan alasan yang jelas (struktur rusak, rilis besar mendekat). Menutup karena panik dekat SL tanpa sinyal baru, atau mengambil untung kecil jauh sebelum target, mengurangi nilai. Menutup posisi sebelum NFP Jumat pukul 12.30 UTC termasuk alasan yang wajar (rilis besar mendekat).",
+          "en": "Let the position run to the SL or TP, or close it by hand for a clear reason (structure broken, a big release coming). Closing in panic near the SL with no new signal, or banking a small profit long before the target, lowers the score. Closing before Friday's NFP at 12:30 UTC counts as a valid reason (a big release coming)."
+        }
+      }
+    },
+    "P-04-S04": {
+      "id": "P-04-S04",
+      "type": "scenario",
+      "kind": "normal",
+      "event": null,
+      "claims_verified": [
+        {
+          "type": "drift",
+          "days": 7,
+          "sign": -1,
+          "result": {
+            "pips": -173.2,
+            "from": "2018-04-17 02:00",
+            "to": "2018-04-24 02:00"
+          },
+          "ok": true
+        }
+      ],
+      "context": {
+        "expected_trend": "down",
+        "trend": "down",
+        "price": 1.22046,
+        "atr_pips": 9.2,
+        "ema20": 1.22103,
+        "ema50": 1.22314,
+        "slope50_atr": -0.163,
+        "ema_crosses_60": 0,
+        "range_atr": 18.2,
+        "structure": "LH/LL",
+        "last_swing_low": 1.21975,
+        "last_swing_high": 1.22114,
+        "context_high": 1.23529,
+        "context_low": 1.21845,
+        "pip_value_usd_per_lot": 10
+      },
+      "decision": {
+        "ideal": "sell",
+        "entry": "market",
+        "acceptable": [],
+        "valid_reasons": [
+          "trend",
+          "fundamental",
+          "structure_sl",
+          "rr"
+        ]
+      },
+      "numbers": {
+        "reference_price": 1.22046,
+        "entry_reference": 1.22046,
+        "atr14_pips": 9.2,
+        "invalidation_level": 1.2216,
+        "structure_sl_pips": 11.4,
+        "expected_sl_pips": 11.4,
+        "expected_sl_atr": 1.24,
+        "sl_band_pips": [
+          9.2,
+          27.6
+        ],
+        "pip_value_usd_per_lot": 10,
+        "risk_usd_1pct": 150,
+        "risk_usd_2pct": 300,
+        "lot_at_1pct": 1.31,
+        "lot_at_2pct": 2.63,
+        "risk_pct_at_min_lot": 0.01,
+        "min_lot_fits": true,
+        "min_tp_pips": 17.1,
+        "pending_zone": null
+      },
+      "feedback": {
+        "decision": {
+          "id": "Struktur M30 turun, dan imbal hasil AS yang naik dibanding data zona euro yang melemah searah dengan struktur. Sell dengan SL di atas lower high terakhir. Saldo besar tetap memakai risiko 1–2%, dihitung dari jarak SL.",
+          "en": "The M30 structure is falling, and rising US yields against softening eurozone data agree with it. Sell with the SL above the last lower high. A large balance still uses 1–2% risk, worked out from the SL distance."
+        },
+        "risk": {
+          "id": "Saldo $15.000: risiko 1–2% = $150–$300. Dengan SL sekitar 11,4 pip, lot yang sesuai sekitar 1,31–2,63 (1 pip per lot ≈ $10).",
+          "en": "Balance $15,000: 1–2% risk = $150–$300. With an SL of about 11.4 pips, a fitting lot is about 1.31–2.63 (1 pip per lot ≈ $10)."
+        },
+        "sl": {
+          "id": "ATR(14) saat Mulai ≈ 9,2 pip. Level yang membatalkan ide ada di balik swing terakhir, sekitar 1,22160 (termasuk buffer ½ ATR), jadi SL sekitar 11,4 pip. SL di bawah ~1× ATR mudah tersapu noise; di atas ~3× ATR (27,6 pip) lot jadi sangat kecil atau risikonya melewati batas.",
+          "en": "ATR(14) at Start ≈ 9.2 pips. The level that cancels the idea sits beyond the last swing, around 1.22160 (with a ½ ATR buffer), so the SL is about 11.4 pips. An SL under ~1× ATR gets swept by noise; beyond ~3× ATR (27.6 pips) the lot gets very small or the risk breaks the limit."
+        },
+        "tp": {
+          "id": "Target minimal 1 : 1,5 berarti TP sekitar 17,1 pip atau lebih dari entry.",
+          "en": "A 1 : 1.5 minimum means a TP about 17.1 pips or more from entry."
+        },
+        "management": {
+          "id": "Biarkan posisi berjalan sampai SL atau TP, atau tutup manual dengan alasan yang jelas (struktur rusak, rilis besar mendekat). Menutup karena panik dekat SL tanpa sinyal baru, atau mengambil untung kecil jauh sebelum target, mengurangi nilai.",
+          "en": "Let the position run to the SL or TP, or close it by hand for a clear reason (structure broken, a big release coming). Closing in panic near the SL with no new signal, or banking a small profit long before the target, lowers the score."
+        }
+      }
+    },
+    "P-04-S05": {
+      "id": "P-04-S05",
+      "type": "scenario",
+      "kind": "normal",
+      "event": null,
+      "claims_verified": [],
+      "context": {
+        "expected_trend": "down",
+        "trend": "down",
+        "price": 0.76135,
+        "atr_pips": 6.2,
+        "ema20": 0.76215,
+        "ema50": 0.76294,
+        "slope50_atr": -0.077,
+        "ema_crosses_60": 1,
+        "range_atr": 9.4,
+        "structure": "LH/LL",
+        "last_swing_low": 0.7625,
+        "last_swing_high": 0.76206,
+        "context_high": 0.76661,
+        "context_low": 0.76078,
+        "pip_value_usd_per_lot": 10
+      },
+      "decision": {
+        "ideal": "sell",
+        "entry": "pending",
+        "acceptable": [],
+        "valid_reasons": [
+          "trend",
+          "fundamental",
+          "level",
+          "structure_sl",
+          "rr"
+        ]
+      },
+      "numbers": {
+        "reference_price": 0.76135,
+        "entry_reference": 0.76191,
+        "atr14_pips": 6.2,
+        "invalidation_level": 0.76237,
+        "structure_sl_pips": 4.6,
+        "expected_sl_pips": 6.2,
+        "expected_sl_atr": 1,
+        "sl_band_pips": [
+          6.2,
+          18.6
+        ],
+        "pip_value_usd_per_lot": 10,
+        "risk_usd_1pct": 11,
+        "risk_usd_2pct": 22,
+        "lot_at_1pct": 0.17,
+        "lot_at_2pct": 0.35,
+        "risk_pct_at_min_lot": 0.06,
+        "min_lot_fits": true,
+        "min_tp_pips": 9.3,
+        "pending_zone": {
+          "type": "sell_limit",
+          "from": 0.76154,
+          "to": 0.76228
+        }
+      },
+      "feedback": {
+        "decision": {
+          "id": "Struktur M15 turun, bank sentral Australia bernada dovish, dan ketegangan dagang cenderung menekan mata uang yang sensitif risiko seperti AUD. Pending sell limit di area pullback ke resistance memberi SL yang jelas di atas lower high terakhir.",
+          "en": "The M15 structure is falling, Australia's central bank sounds dovish, and trade tensions tend to weigh on risk-sensitive currencies like AUD. A pending sell limit in the pullback to resistance gives a clear SL above the last lower high."
+        },
+        "risk": {
+          "id": "Saldo $1.100: risiko 1–2% = $11–$22. Dengan SL sekitar 6,2 pip, lot yang sesuai sekitar 0,17–0,35 (1 pip per lot ≈ $10).",
+          "en": "Balance $1,100: 1–2% risk = $11–$22. With an SL of about 6.2 pips, a fitting lot is about 0.17–0.35 (1 pip per lot ≈ $10)."
+        },
+        "sl": {
+          "id": "ATR(14) saat Mulai ≈ 6,2 pip. Level yang membatalkan ide ada di balik swing terakhir, sekitar 0,76237 (termasuk buffer ½ ATR), jadi SL sekitar 6,2 pip dari area pending 0,76154–0,76228. SL di bawah ~1× ATR mudah tersapu noise; di atas ~3× ATR (18,6 pip) lot jadi sangat kecil atau risikonya melewati batas.",
+          "en": "ATR(14) at Start ≈ 6.2 pips. The level that cancels the idea sits beyond the last swing, around 0.76237 (with a ½ ATR buffer), so the SL is about 6.2 pips from the pending area 0.76154–0.76228. An SL under ~1× ATR gets swept by noise; beyond ~3× ATR (18.6 pips) the lot gets very small or the risk breaks the limit."
+        },
+        "tp": {
+          "id": "Target minimal 1 : 1,5 berarti TP sekitar 9,3 pip atau lebih dari entry.",
+          "en": "A 1 : 1.5 minimum means a TP about 9.3 pips or more from entry."
+        },
+        "management": {
+          "id": "Biarkan posisi berjalan sampai SL atau TP, atau tutup manual dengan alasan yang jelas (struktur rusak, rilis besar mendekat). Menutup karena panik dekat SL tanpa sinyal baru, atau mengambil untung kecil jauh sebelum target, mengurangi nilai.",
+          "en": "Let the position run to the SL or TP, or close it by hand for a clear reason (structure broken, a big release coming). Closing in panic near the SL with no new signal, or banking a small profit long before the target, lowers the score."
+        }
+      }
+    },
+    "P-04-S06": {
+      "id": "P-04-S06",
+      "type": "scenario",
+      "kind": "normal",
+      "event": null,
+      "claims_verified": [
+        {
+          "type": "drift",
+          "days": 7,
+          "sign": 1,
+          "result": {
+            "pips": 658.9,
+            "from": "2013-04-02 03:00",
+            "to": "2013-04-09 03:00"
+          },
+          "ok": true
+        }
+      ],
+      "context": {
+        "expected_trend": "up",
+        "trend": "up",
+        "price": 99.351,
+        "atr_pips": 17.4,
+        "ema20": 99.274,
+        "ema50": 98.846,
+        "slope50_atr": 0.179,
+        "ema_crosses_60": 0,
+        "range_atr": 22.2,
+        "structure": "HH/HL",
+        "last_swing_low": 99.09,
+        "last_swing_high": 99.66,
+        "context_high": 99.66,
+        "context_low": 95.797,
+        "pip_value_usd_per_lot": 10.0653
+      },
+      "decision": {
+        "ideal": "buy",
+        "entry": "market",
+        "acceptable": [],
+        "valid_reasons": [
+          "trend",
+          "fundamental",
+          "structure_sl",
+          "rr"
+        ]
+      },
+      "numbers": {
+        "reference_price": 99.351,
+        "entry_reference": 99.351,
+        "atr14_pips": 17.4,
+        "invalidation_level": 99.003,
+        "structure_sl_pips": 34.8,
+        "expected_sl_pips": 34.8,
+        "expected_sl_atr": 2,
+        "sl_band_pips": [
+          17.4,
+          52.2
+        ],
+        "pip_value_usd_per_lot": 10.0653,
+        "risk_usd_1pct": 7,
+        "risk_usd_2pct": 14,
+        "lot_at_1pct": 0.01,
+        "lot_at_2pct": 0.03,
+        "risk_pct_at_min_lot": 0.5,
+        "min_lot_fits": true,
+        "min_tp_pips": 52.2,
+        "pending_zone": null
+      },
+      "feedback": {
+        "decision": {
+          "id": "Struktur M30 naik dan pelonggaran besar BoJ melemahkan yen. Buy searah tren dengan SL di bawah higher low terakhir. ATR masih lebar setelah pengumuman, jadi akun $700 hanya memakai lot kecil.",
+          "en": "The M30 structure is rising and the BoJ's huge easing weakens the yen. Buy with the trend, SL below the last higher low. ATR is still wide after the announcement, so a $700 account only uses a small lot."
+        },
+        "risk": {
+          "id": "Saldo $700: risiko 1–2% = $7–$14. Dengan SL sekitar 34,8 pip, lot yang sesuai sekitar 0,01–0,03 (1 pip per lot ≈ $10,07).",
+          "en": "Balance $700: 1–2% risk = $7–$14. With an SL of about 34.8 pips, a fitting lot is about 0.01–0.03 (1 pip per lot ≈ $10.07)."
+        },
+        "sl": {
+          "id": "ATR(14) saat Mulai ≈ 17,4 pip. Level yang membatalkan ide ada di balik swing terakhir, sekitar 99,003 (termasuk buffer ½ ATR), jadi SL sekitar 34,8 pip. SL di bawah ~1× ATR mudah tersapu noise; di atas ~3× ATR (52,2 pip) lot jadi sangat kecil atau risikonya melewati batas.",
+          "en": "ATR(14) at Start ≈ 17.4 pips. The level that cancels the idea sits beyond the last swing, around 99.003 (with a ½ ATR buffer), so the SL is about 34.8 pips. An SL under ~1× ATR gets swept by noise; beyond ~3× ATR (52.2 pips) the lot gets very small or the risk breaks the limit."
+        },
+        "tp": {
+          "id": "Target minimal 1 : 1,5 berarti TP sekitar 52,2 pip atau lebih dari entry.",
+          "en": "A 1 : 1.5 minimum means a TP about 52.2 pips or more from entry."
+        },
+        "management": {
+          "id": "Biarkan posisi berjalan sampai SL atau TP, atau tutup manual dengan alasan yang jelas (struktur rusak, rilis besar mendekat). Menutup karena panik dekat SL tanpa sinyal baru, atau mengambil untung kecil jauh sebelum target, mengurangi nilai.",
+          "en": "Let the position run to the SL or TP, or close it by hand for a clear reason (structure broken, a big release coming). Closing in panic near the SL with no new signal, or banking a small profit long before the target, lowers the score."
+        }
+      }
+    },
+    "P-04-S07": {
+      "id": "P-04-S07",
+      "type": "scenario",
+      "kind": "normal",
+      "event": null,
+      "claims_verified": [
+        {
+          "type": "drift",
+          "days": 14,
+          "sign": 1,
+          "result": {
+            "pips": 231.4,
+            "from": "2014-06-02 01:00",
+            "to": "2014-06-16 01:00"
+          },
+          "ok": true
+        },
+        {
+          "type": "spike",
+          "utc": "2014-06-18T18:00",
+          "minutes": 120,
+          "result": {
+            "ok": true,
+            "pair": "GBPUSD",
+            "utc": "2014-06-18T18:00",
+            "broker": "2014-06-18 20:00",
+            "eventPips": 80.9,
+            "ordinaryPips": 20.4,
+            "ratio": 3.97,
+            "windows": 103
+          },
+          "ok": true
+        }
+      ],
+      "context": {
+        "expected_trend": "up",
+        "trend": "up",
+        "price": 1.698,
+        "atr_pips": 15.2,
+        "ema20": 1.69572,
+        "ema50": 1.69107,
+        "slope50_atr": 0.226,
+        "ema_crosses_60": 1,
+        "range_atr": 16.6,
+        "structure": "HH/HL",
+        "last_swing_low": 1.69563,
+        "last_swing_high": 1.69913,
+        "context_high": 1.69913,
+        "context_low": 1.67378,
+        "pip_value_usd_per_lot": 10
+      },
+      "decision": {
+        "ideal": "buy",
+        "entry": "pending",
+        "acceptable": [],
+        "valid_reasons": [
+          "trend",
+          "fundamental",
+          "level",
+          "structure_sl",
+          "rr"
+        ]
+      },
+      "numbers": {
+        "reference_price": 1.698,
+        "entry_reference": 1.69663,
+        "atr14_pips": 15.2,
+        "invalidation_level": 1.69487,
+        "structure_sl_pips": 17.6,
+        "expected_sl_pips": 17.6,
+        "expected_sl_atr": 1.16,
+        "sl_band_pips": [
+          15.2,
+          45.6
+        ],
+        "pip_value_usd_per_lot": 10,
+        "risk_usd_1pct": 32,
+        "risk_usd_2pct": 64,
+        "lot_at_1pct": 0.18,
+        "lot_at_2pct": 0.36,
+        "risk_pct_at_min_lot": 0.06,
+        "min_lot_fits": true,
+        "min_tp_pips": 26.4,
+        "pending_zone": {
+          "type": "buy_limit",
+          "from": 1.69572,
+          "to": 1.69754
+        }
+      },
+      "feedback": {
+        "decision": {
+          "id": "Tren H1 naik dan sinyal hawkish dari BoE mendukung poundsterling. Pending buy limit di area pullback lebih baik daripada membeli setelah harga naik jauh, dan SL tetap di bawah higher low terakhir.",
+          "en": "The H1 trend is up and the BoE's hawkish signal supports sterling. A pending buy limit in the pullback area beats buying after a long run, with the SL still below the last higher low."
+        },
+        "risk": {
+          "id": "Saldo $3.200: risiko 1–2% = $32–$64. Dengan SL sekitar 17,6 pip, lot yang sesuai sekitar 0,18–0,36 (1 pip per lot ≈ $10).",
+          "en": "Balance $3,200: 1–2% risk = $32–$64. With an SL of about 17.6 pips, a fitting lot is about 0.18–0.36 (1 pip per lot ≈ $10)."
+        },
+        "sl": {
+          "id": "ATR(14) saat Mulai ≈ 15,2 pip. Level yang membatalkan ide ada di balik swing terakhir, sekitar 1,69487 (termasuk buffer ½ ATR), jadi SL sekitar 17,6 pip dari area pending 1,69572–1,69754. SL di bawah ~1× ATR mudah tersapu noise; di atas ~3× ATR (45,6 pip) lot jadi sangat kecil atau risikonya melewati batas.",
+          "en": "ATR(14) at Start ≈ 15.2 pips. The level that cancels the idea sits beyond the last swing, around 1.69487 (with a ½ ATR buffer), so the SL is about 17.6 pips from the pending area 1.69572–1.69754. An SL under ~1× ATR gets swept by noise; beyond ~3× ATR (45.6 pips) the lot gets very small or the risk breaks the limit."
+        },
+        "tp": {
+          "id": "Target minimal 1 : 1,5 berarti TP sekitar 26,4 pip atau lebih dari entry.",
+          "en": "A 1 : 1.5 minimum means a TP about 26.4 pips or more from entry."
+        },
+        "management": {
+          "id": "Biarkan posisi berjalan sampai SL atau TP, atau tutup manual dengan alasan yang jelas (struktur rusak, rilis besar mendekat). Menutup karena panik dekat SL tanpa sinyal baru, atau mengambil untung kecil jauh sebelum target, mengurangi nilai. Menutup posisi sebelum keputusan FOMC hari Rabu termasuk alasan yang wajar.",
+          "en": "Let the position run to the SL or TP, or close it by hand for a clear reason (structure broken, a big release coming). Closing in panic near the SL with no new signal, or banking a small profit long before the target, lowers the score. Closing before Wednesday's FOMC decision counts as a valid reason."
+        }
+      }
+    },
+    "P-04-S08": {
+      "id": "P-04-S08",
+      "type": "scenario",
+      "kind": "normal",
+      "event": null,
+      "claims_verified": [
+        {
+          "type": "drift",
+          "days": 7,
+          "sign": -1,
+          "result": {
+            "pips": -225.1,
+            "from": "2017-06-12 04:00",
+            "to": "2017-06-19 04:00"
+          },
+          "ok": true
+        }
+      ],
+      "context": {
+        "expected_trend": "down",
+        "trend": "down",
+        "price": 1.32182,
+        "atr_pips": 8.6,
+        "ema20": 1.32196,
+        "ema50": 1.32303,
+        "slope50_atr": -0.102,
+        "ema_crosses_60": 1,
+        "range_atr": 12.2,
+        "structure": "LH/LL",
+        "last_swing_low": 1.32032,
+        "last_swing_high": 1.32271,
+        "context_high": 1.33078,
+        "context_low": 1.32032,
+        "pip_value_usd_per_lot": 7.5653
+      },
+      "decision": {
+        "ideal": "sell",
+        "entry": "market",
+        "acceptable": [],
+        "valid_reasons": [
+          "trend",
+          "fundamental",
+          "structure_sl",
+          "rr"
+        ]
+      },
+      "numbers": {
+        "reference_price": 1.32182,
+        "entry_reference": 1.32182,
+        "atr14_pips": 8.6,
+        "invalidation_level": 1.32314,
+        "structure_sl_pips": 13.2,
+        "expected_sl_pips": 13.2,
+        "expected_sl_atr": 1.53,
+        "sl_band_pips": [
+          8.6,
+          25.8
+        ],
+        "pip_value_usd_per_lot": 7.5653,
+        "risk_usd_1pct": 54,
+        "risk_usd_2pct": 108,
+        "lot_at_1pct": 0.54,
+        "lot_at_2pct": 1.08,
+        "risk_pct_at_min_lot": 0.02,
+        "min_lot_fits": true,
+        "min_tp_pips": 19.8,
+        "pending_zone": null
+      },
+      "feedback": {
+        "decision": {
+          "id": "Struktur M30 turun dan nada BoC yang berubah hawkish mendukung CAD, jadi sell searah struktur masuk akal. Ujian sebenarnya ada di ukuran: kemenangan beruntun memicu rasa jago dan dorongan menaikkan lot (Level 6). Risiko tetap 1–2%, tidak naik karena baru menang.",
+          "en": "The M30 structure is falling and the BoC's hawkish turn supports CAD, so a sell with the structure makes sense. The real test is size: a winning streak breeds overconfidence and the urge to raise the lot (Level 6). Risk stays at 1–2%; it doesn't rise because you've been winning."
+        },
+        "risk": {
+          "id": "Saldo $5.400: risiko 1–2% = $54–$108. Dengan SL sekitar 13,2 pip, lot yang sesuai sekitar 0,54–1,08 (1 pip per lot ≈ $7,57).",
+          "en": "Balance $5,400: 1–2% risk = $54–$108. With an SL of about 13.2 pips, a fitting lot is about 0.54–1.08 (1 pip per lot ≈ $7.57)."
+        },
+        "sl": {
+          "id": "ATR(14) saat Mulai ≈ 8,6 pip. Level yang membatalkan ide ada di balik swing terakhir, sekitar 1,32314 (termasuk buffer ½ ATR), jadi SL sekitar 13,2 pip. SL di bawah ~1× ATR mudah tersapu noise; di atas ~3× ATR (25,8 pip) lot jadi sangat kecil atau risikonya melewati batas.",
+          "en": "ATR(14) at Start ≈ 8.6 pips. The level that cancels the idea sits beyond the last swing, around 1.32314 (with a ½ ATR buffer), so the SL is about 13.2 pips. An SL under ~1× ATR gets swept by noise; beyond ~3× ATR (25.8 pips) the lot gets very small or the risk breaks the limit."
+        },
+        "tp": {
+          "id": "Target minimal 1 : 1,5 berarti TP sekitar 19,8 pip atau lebih dari entry.",
+          "en": "A 1 : 1.5 minimum means a TP about 19.8 pips or more from entry."
+        },
+        "management": {
+          "id": "Biarkan posisi berjalan sampai SL atau TP, atau tutup manual dengan alasan yang jelas (struktur rusak, rilis besar mendekat). Menutup karena panik dekat SL tanpa sinyal baru, atau mengambil untung kecil jauh sebelum target, mengurangi nilai.",
+          "en": "Let the position run to the SL or TP, or close it by hand for a clear reason (structure broken, a big release coming). Closing in panic near the SL with no new signal, or banking a small profit long before the target, lowers the score."
+        }
+      }
+    },
+    "P-04-S09": {
+      "id": "P-04-S09",
+      "type": "scenario",
+      "kind": "normal",
+      "event": null,
+      "claims_verified": [],
+      "context": {
+        "expected_trend": "sideways",
+        "trend": "sideways",
+        "price": 1.31119,
+        "atr_pips": 4.3,
+        "ema20": 1.31229,
+        "ema50": 1.31248,
+        "slope50_atr": -0.018,
+        "ema_crosses_60": 1,
+        "range_atr": 13.9,
+        "structure": "HH/LL",
+        "last_swing_low": 1.31253,
+        "last_swing_high": 1.31353,
+        "context_high": 1.31443,
+        "context_low": 1.30846,
+        "pip_value_usd_per_lot": 7.6267
+      },
+      "decision": {
+        "ideal": "no_trade",
+        "entry": null,
+        "acceptable": [],
+        "valid_reasons": [
+          "sideways"
+        ]
+      },
+      "numbers": {
+        "reference_price": 1.31119,
+        "entry_reference": 1.31119,
+        "atr14_pips": 4.3,
+        "invalidation_level": null,
+        "structure_sl_pips": null,
+        "expected_sl_pips": 6.4,
+        "expected_sl_atr": 1.49,
+        "sl_band_pips": [
+          4.3,
+          12.9
+        ],
+        "pip_value_usd_per_lot": 7.6267,
+        "risk_usd_1pct": 13,
+        "risk_usd_2pct": 26,
+        "lot_at_1pct": 0.26,
+        "lot_at_2pct": 0.53,
+        "risk_pct_at_min_lot": 0.04,
+        "min_lot_fits": true,
+        "min_tp_pips": 9.6,
+        "pending_zone": null
+      },
+      "feedback": {
+        "decision": {
+          "id": "EMA mendatar, harga bolak-balik di dalam rentang sempit, dan ATR M15 kecil. Tidak ada keunggulan arah, dan sinyal crossover di kondisi seperti ini cenderung palsu (whipsaw). NO TRADE adalah pilihan yang tepat.",
+          "en": "The EMAs are flat, price is swinging inside a narrow range and the M15 ATR is small. There's no directional edge, and crossover signals in this kind of market tend to be false (whipsaw). NO TRADE is the right call."
+        },
+        "risk": {
+          "id": "Tidak dinilai: jawaban yang diharapkan adalah NO TRADE.",
+          "en": "Not scored: the expected answer is NO TRADE."
+        },
+        "sl": {
+          "id": "Tidak dinilai: jawaban yang diharapkan adalah NO TRADE.",
+          "en": "Not scored: the expected answer is NO TRADE."
+        },
+        "tp": {
+          "id": "Tidak dinilai: jawaban yang diharapkan adalah NO TRADE.",
+          "en": "Not scored: the expected answer is NO TRADE."
+        },
+        "management": {
+          "id": "Tidak dinilai: jawaban yang diharapkan adalah NO TRADE.",
+          "en": "Not scored: the expected answer is NO TRADE."
+        }
+      }
+    },
+    "P-04-S10": {
+      "id": "P-04-S10",
+      "type": "scenario",
+      "kind": "normal",
+      "event": null,
+      "claims_verified": [
+        {
+          "type": "drift",
+          "days": 5,
+          "sign": -1,
+          "result": {
+            "pips": -222.1,
+            "from": "2015-10-22 04:00",
+            "to": "2015-10-27 05:00"
+          },
+          "ok": true
+        }
+      ],
+      "context": {
+        "expected_trend": "down",
+        "trend": "down",
+        "price": 133.386,
+        "atr_pips": 7.1,
+        "ema20": 133.472,
+        "ema50": 133.552,
+        "slope50_atr": -0.098,
+        "ema_crosses_60": 2,
+        "range_atr": 10.6,
+        "structure": "LH/LL",
+        "last_swing_low": 133.306,
+        "last_swing_high": 133.48,
+        "context_high": 133.898,
+        "context_low": 133.141,
+        "pip_value_usd_per_lot": 8.2947
+      },
+      "decision": {
+        "ideal": "sell",
+        "entry": "market",
+        "acceptable": [
+          "no_trade"
+        ],
+        "valid_reasons": [
+          "trend",
+          "fundamental",
+          "structure_sl",
+          "rr"
+        ]
+      },
+      "numbers": {
+        "reference_price": 133.386,
+        "entry_reference": 133.386,
+        "atr14_pips": 7.1,
+        "invalidation_level": 133.516,
+        "structure_sl_pips": 13,
+        "expected_sl_pips": 13,
+        "expected_sl_atr": 1.83,
+        "sl_band_pips": [
+          7.1,
+          21.3
+        ],
+        "pip_value_usd_per_lot": 8.2947,
+        "risk_usd_1pct": 2,
+        "risk_usd_2pct": 4,
+        "lot_at_1pct": 0.01,
+        "lot_at_2pct": 0.03,
+        "risk_pct_at_min_lot": 0.54,
+        "min_lot_fits": true,
+        "min_tp_pips": 19.5,
+        "pending_zone": null
+      },
+      "feedback": {
+        "decision": {
+          "id": "Struktur M15 turun dan isyarat pelonggaran ECB menekan euro. Untuk akun $200, ujiannya adalah ukuran: 1 pip pada 0,01 lot EUR/JPY hanya bernilai sekitar $0,08, jadi lot harus dihitung dari jarak SL dan dibulatkan ke bawah agar risikonya tetap 1–2% ($2–$4). Melewatkan trade juga benar jika SL-mu jauh lebih lebar dari struktur.",
+          "en": "The M15 structure is falling and the ECB's easing hint weighs on the euro. For a $200 account, the test is size: 1 pip on 0.01 lot of EUR/JPY is only worth about $0.08, so the lot has to come from the SL distance, rounded down, to keep the risk at 1–2% ($2–$4). Skipping is right too if your SL is much wider than the structure."
+        },
+        "risk": {
+          "id": "Saldo $200: risiko 1–2% = $2–$4. Dengan SL sekitar 13 pip, lot yang sesuai sekitar 0,01–0,03 (1 pip per lot ≈ $8,29).",
+          "en": "Balance $200: 1–2% risk = $2–$4. With an SL of about 13 pips, a fitting lot is about 0.01–0.03 (1 pip per lot ≈ $8.29)."
+        },
+        "sl": {
+          "id": "ATR(14) saat Mulai ≈ 7,1 pip. Level yang membatalkan ide ada di balik swing terakhir, sekitar 133,516 (termasuk buffer ½ ATR), jadi SL sekitar 13 pip. SL di bawah ~1× ATR mudah tersapu noise; di atas ~3× ATR (21,3 pip) lot jadi sangat kecil atau risikonya melewati batas.",
+          "en": "ATR(14) at Start ≈ 7.1 pips. The level that cancels the idea sits beyond the last swing, around 133.516 (with a ½ ATR buffer), so the SL is about 13 pips. An SL under ~1× ATR gets swept by noise; beyond ~3× ATR (21.3 pips) the lot gets very small or the risk breaks the limit."
+        },
+        "tp": {
+          "id": "Target minimal 1 : 1,5 berarti TP sekitar 19,5 pip atau lebih dari entry.",
+          "en": "A 1 : 1.5 minimum means a TP about 19.5 pips or more from entry."
+        },
+        "management": {
+          "id": "Biarkan posisi berjalan sampai SL atau TP, atau tutup manual dengan alasan yang jelas (struktur rusak, rilis besar mendekat). Menutup karena panik dekat SL tanpa sinyal baru, atau mengambil untung kecil jauh sebelum target, mengurangi nilai.",
+          "en": "Let the position run to the SL or TP, or close it by hand for a clear reason (structure broken, a big release coming). Closing in panic near the SL with no new signal, or banking a small profit long before the target, lowers the score."
+        }
+      }
+    },
+    "P-04-C01": {
+      "id": "P-04-C01",
+      "type": "mcq_complex",
+      "level": 3,
+      "source": "stop-loss-take-profit",
+      "correct": [
+        "b",
+        "d",
+        "e"
+      ],
+      "explanations": {
+        "a": {
+          "id": "Angka tetap mengabaikan kondisi chart; kurang disarankan.",
+          "en": "A fixed number ignores the chart; it's not recommended."
+        },
+        "b": {
+          "id": "Metode paling umum, menjawab \"di mana ide ini salah?\"",
+          "en": "The most common method; it answers \"where is this idea wrong?\""
+        },
+        "c": {
+          "id": "SL ditentukan oleh analisis; lot yang disesuaikan dengan risiko.",
+          "en": "The SL comes from the analysis; the lot is what adjusts to the risk."
+        },
+        "d": {
+          "id": "Harga sering menyapu level yang jelas sebentar sebelum berbalik.",
+          "en": "Price often sweeps obvious levels briefly before turning."
+        },
+        "e": {
+          "id": "Menyesuaikan dengan kondisi pasar.",
+          "en": "It adapts to market conditions."
+        }
+      }
+    },
+    "P-04-C02": {
+      "id": "P-04-C02",
+      "type": "mcq_complex",
+      "level": 3,
+      "source": "leverage-margin",
+      "correct": [
+        "a",
+        "c",
+        "d"
+      ],
+      "explanations": {
+        "a": {
+          "id": "50% × $1.270 = $635.",
+          "en": "50% × $1,270 = $635."
+        },
+        "b": {
+          "id": "Stop out adalah keputusan broker; stop loss keputusanmu.",
+          "en": "A stop out is the broker's decision; a stop loss is yours."
+        },
+        "c": {
+          "id": "Margin call biasanya hanya notifikasi sebelum stop out.",
+          "en": "A margin call is usually just a notice before the stop out."
+        },
+        "d": {
+          "id": "(4.000 − 635) ÷ $10 = 336,5 pip.",
+          "en": "(4,000 − 635) ÷ $10 = 336.5 pips."
+        },
+        "e": {
+          "id": "Leverage hanya mengubah margin, bukan nilai pip.",
+          "en": "Leverage only changes the margin, not the pip value."
+        }
+      }
+    },
+    "P-04-C03": {
+      "id": "P-04-C03",
+      "type": "mcq_complex",
+      "level": 3,
+      "source": "risiko-kerugian",
+      "correct": [
+        "b",
+        "c",
+        "e"
+      ],
+      "explanations": {
+        "a": {
+          "id": "Taruhan kecil hanya membuat kerugian datang lebih lambat.",
+          "en": "Small stakes only make the losses arrive more slowly."
+        },
+        "b": {
+          "id": "2% × $8.000 = $160.",
+          "en": "2% × $8,000 = $160."
+        },
+        "c": {
+          "id": "Prinsip money management di materi.",
+          "en": "The money management principle in the lesson."
+        },
+        "d": {
+          "id": "Dengan RR yang baik, win-loss 1:1 masih bisa untung.",
+          "en": "With a good RR, a 1:1 win-loss ratio can still profit."
+        },
+        "e": {
+          "id": "2% × $7.840 = $156,80.",
+          "en": "2% × $7,840 = $156.80."
+        }
+      }
+    },
+    "P-04-C04": {
+      "id": "P-04-C04",
+      "type": "mcq_complex",
+      "level": 4,
+      "source": "trendline-channel",
+      "correct": [
+        "b",
+        "c",
+        "e"
+      ],
+      "explanations": {
+        "a": {
+          "id": "Sering kali tren hanya beralih ke kemiringan yang lebih landai.",
+          "en": "Often the trend just shifts to a gentler slope."
+        },
+        "b": {
+          "id": "Aturan menggambar di materi.",
+          "en": "A drawing rule from the lesson."
+        },
+        "c": {
+          "id": "Tandai swing, bukan sembarang titik.",
+          "en": "Mark swings, not random points."
+        },
+        "d": {
+          "id": "Di range yang relevan adalah batas horizontal.",
+          "en": "In a range, the horizontal edges are what matter."
+        },
+        "e": {
+          "id": "Satu bayangan yang menembus belum penembusan.",
+          "en": "One wick through the line isn't a break."
+        }
+      }
+    },
+    "P-04-C05": {
+      "id": "P-04-C05",
+      "type": "mcq_complex",
+      "level": 4,
+      "source": "pola-harga",
+      "correct": [
+        "a",
+        "b",
+        "d"
+      ],
+      "explanations": {
+        "a": {
+          "id": "Double top di tengah range bukan sinyal pembalikan tren.",
+          "en": "A double top in the middle of a range isn't a reversal signal."
+        },
+        "b": {
+          "id": "Tidak setiap pola layak dimainkan.",
+          "en": "Not every pattern is worth trading."
+        },
+        "c": {
+          "id": "Klaim akurasi pola jarang bisa diverifikasi; ukur sendiri lewat jurnal.",
+          "en": "Pattern accuracy claims can rarely be verified; measure it yourself in your journal."
+        },
+        "d": {
+          "id": "Pola baru sah setelah konfirmasi.",
+          "en": "A pattern is only valid after confirmation."
+        },
+        "e": {
+          "id": "Tentukan timeframe dan jangan berganti sampai penilaian selesai.",
+          "en": "Pick a timeframe and stick to it until the assessment is done."
+        }
+      }
+    },
+    "P-04-C06": {
+      "id": "P-04-C06",
+      "type": "mcq_complex",
+      "level": 5,
+      "source": "ekonomi-dan-mata-uang",
+      "correct": [
+        "b",
+        "c",
+        "e"
+      ],
+      "explanations": {
+        "a": {
+          "id": "Suku bunga dan sentimen risiko bisa mendominasi pada periode tertentu.",
+          "en": "Interest rates and risk sentiment can dominate at times."
+        },
+        "b": {
+          "id": "Pendorong CAD di materi.",
+          "en": "The CAD driver in the lesson."
+        },
+        "c": {
+          "id": "Pendorong AUD di materi.",
+          "en": "The AUD drivers in the lesson."
+        },
+        "d": {
+          "id": "JPY tidak disebut sebagai mata uang komoditas.",
+          "en": "The yen isn't listed as a commodity currency."
+        },
+        "e": {
+          "id": "Pendorong NZD di materi.",
+          "en": "The NZD drivers in the lesson."
+        }
+      }
+    },
+    "P-04-C07": {
+      "id": "P-04-C07",
+      "type": "mcq_complex",
+      "level": 5,
+      "source": "the-fed",
+      "correct": [
+        "a",
+        "b",
+        "c"
+      ],
+      "explanations": {
+        "a": {
+          "id": "Kluster terbesar ada di 4,75%.",
+          "en": "The biggest cluster is at 4.75%."
+        },
+        "b": {
+          "id": "Titik berubah ketika data berubah.",
+          "en": "Dots change when the data changes."
+        },
+        "c": {
+          "id": "Pergeseran kluster ke atas = hawkish.",
+          "en": "An upward shift of the cluster = hawkish."
+        },
+        "d": {
+          "id": "Jangan memperlakukan dot plot sebagai jadwal pasti.",
+          "en": "Don't treat the dot plot as a fixed schedule."
+        },
+        "e": {
+          "id": "Titik tunggal yang menyimpang kurang penting dibanding kluster.",
+          "en": "A single outlier matters less than the cluster."
+        }
+      }
+    },
+    "P-04-C08": {
+      "id": "P-04-C08",
+      "type": "mcq_complex",
+      "level": 5,
+      "source": "berita-berdampak-tinggi",
+      "correct": [
+        "b",
+        "d",
+        "e"
+      ],
+      "explanations": {
+        "a": {
+          "id": "Sikap C untuk trader berpengalaman.",
+          "en": "Approach C is for experienced traders."
+        },
+        "b": {
+          "id": "Contoh di materi: risiko 0,5% dan stop 35 pip.",
+          "en": "The lesson's example: 0.5% risk and a 35-pip stop."
+        },
+        "c": {
+          "id": "Whipsaw: harga bisa naik tajam lalu turun tajam dalam hitungan menit.",
+          "en": "Whipsaw: price can spike up and then down within minutes."
+        },
+        "d": {
+          "id": "Tidak membuka posisi baru sekitar rilis dan menutup posisi lama sebelumnya.",
+          "en": "No new positions around the release and closing old ones beforehand."
+        },
+        "e": {
+          "id": "Cocok untuk pemula yang sudah disiplin.",
+          "en": "It suits beginners who are already disciplined."
+        }
+      }
+    },
+    "P-04-C09": {
+      "id": "P-04-C09",
+      "type": "mcq_complex",
+      "level": 6,
+      "source": "disiplin",
+      "correct": [
+        "b",
+        "d",
+        "e"
+      ],
+      "explanations": {
+        "a": {
+          "id": "Pemicunya perasaan dan tindakannya melanggar batas risiko.",
+          "en": "The trigger is a feeling and the action breaks the risk limit."
+        },
+        "b": {
+          "id": "Contoh aturan di materi.",
+          "en": "An example rule from the lesson."
+        },
+        "c": {
+          "id": "Bukan bentuk jika-maka dan tidak terukur.",
+          "en": "It isn't an if-then and it can't be measured."
+        },
+        "d": {
+          "id": "Pemicu jelas, tindakan kecil dan pasti.",
+          "en": "A clear trigger, a small and definite action."
+        },
+        "e": {
+          "id": "Contoh aturan di materi.",
+          "en": "An example rule from the lesson."
+        }
+      }
+    },
+    "P-04-C10": {
+      "id": "P-04-C10",
+      "type": "mcq_complex",
+      "level": 6,
+      "source": "fomo-overtrading",
+      "correct": [
+        "b",
+        "c",
+        "e"
+      ],
+      "explanations": {
+        "a": {
+          "id": "Jumlah ideal ditentukan oleh sinyal.",
+          "en": "The ideal number is set by the signals."
+        },
+        "b": {
+          "id": "15 × 20 × $1 = $300.",
+          "en": "15 × 20 × $1 = $300."
+        },
+        "c": {
+          "id": "5 × 20 × $1 = $100.",
+          "en": "5 × 20 × $1 = $100."
+        },
+        "d": {
+          "id": "Biaya menumpuk seiring jumlah transaksi.",
+          "en": "The costs pile up with the number of trades."
+        },
+        "e": {
+          "id": "Kamu patuh pada rencana.",
+          "en": "You stuck to the plan."
+        }
+      }
+    },
+    "P-04-B01": {
+      "id": "P-04-B01",
+      "type": "mcq_basic",
+      "level": 1,
+      "source": "sesi-pasar",
+      "correct": "a",
+      "explanation": {
+        "id": "Tumpang tindih sesi London dan New York biasanya jendela paling ramai; jamnya bergeser sekitar satu jam saat DST.",
+        "en": "The London–New York overlap is usually the busiest window; the times shift by about an hour with DST."
+      }
+    },
+    "P-04-B02": {
+      "id": "P-04-B02",
+      "type": "mcq_basic",
+      "level": 1,
+      "source": "pip-lot",
+      "correct": "b",
+      "explanation": {
+        "id": "Standard 1,00 lot = 100.000 unit base; mini 0,10 = 10.000; micro 0,01 = 1.000.",
+        "en": "Standard 1.00 lot = 100,000 base units; mini 0.10 = 10,000; micro 0.01 = 1,000."
+      }
+    },
+    "P-04-B03": {
+      "id": "P-04-B03",
+      "type": "mcq_basic",
+      "level": 1,
+      "source": "pip-lot",
+      "correct": "d",
+      "explanation": {
+        "id": "Angka terakhir adalah pipette; yang dihitung 1 pip adalah angka sebelumnya.",
+        "en": "The last digit is the pipette; what counts as 1 pip is the digit before it."
+      }
+    },
+    "P-04-B04": {
+      "id": "P-04-B04",
+      "type": "mcq_basic",
+      "level": 2,
+      "source": "struktur-pasar",
+      "correct": "c",
+      "explanation": {
+        "id": "CHoCH adalah close melewati swing penting berlawanan arah tren; itu peringatan, bukan perintah jual.",
+        "en": "A CHoCH is a close through a key swing against the trend; it's a warning, not an order to sell."
+      }
+    },
+    "P-04-B05": {
+      "id": "P-04-B05",
+      "type": "mcq_basic",
+      "level": 2,
+      "source": "timeframe",
+      "correct": "b",
+      "explanation": {
+        "id": "Kalau dua timeframe bertentangan, timeframe besar menang.",
+        "en": "When two timeframes disagree, the bigger one wins."
+      }
+    },
+    "P-04-B06": {
+      "id": "P-04-B06",
+      "type": "mcq_basic",
+      "level": 2,
+      "source": "bullish-bearish",
+      "correct": "d",
+      "explanation": {
+        "id": "Marubozu memiliki badan penuh dengan sedikit atau tanpa bayangan dan menunjukkan kekuatan yang signifikan.",
+        "en": "A marubozu has a full body with little or no shadow and shows significant strength."
+      }
+    },
+    "P-04-B07": {
+      "id": "P-04-B07",
+      "type": "mcq_basic",
+      "level": 3,
+      "source": "leverage-margin",
+      "correct": "a",
+      "explanation": {
+        "id": "Leverage hanya menurunkan jaminan (margin) yang dibutuhkan.",
+        "en": "Leverage only lowers the collateral (margin) required."
+      }
+    },
+    "P-04-B08": {
+      "id": "P-04-B08",
+      "type": "mcq_basic",
+      "level": 3,
+      "source": "risk-reward",
+      "correct": "c",
+      "explanation": {
+        "id": "0,5 × 2 − 0,5 × 1 = +0,5R.",
+        "en": "0.5 × 2 − 0.5 × 1 = +0.5R."
+      }
+    },
+    "P-04-B09": {
+      "id": "P-04-B09",
+      "type": "mcq_basic",
+      "level": 3,
+      "source": "risiko-kerugian",
+      "correct": "a",
+      "explanation": {
+        "id": "2% × $3.000 = $60. Risiko diukur dalam uang, bukan pip.",
+        "en": "2% × $3,000 = $60. Risk is measured in money, not pips."
+      }
+    },
+    "P-04-B10": {
+      "id": "P-04-B10",
+      "type": "mcq_basic",
+      "level": 4,
+      "source": "moving-average",
+      "correct": "d",
+      "explanation": {
+        "id": "k = 2 ÷ (n + 1) = 2 ÷ 11 ≈ 0,1818.",
+        "en": "k = 2 ÷ (n + 1) = 2 ÷ 11 ≈ 0.1818."
+      }
+    },
+    "P-04-B11": {
+      "id": "P-04-B11",
+      "type": "mcq_basic",
+      "level": 4,
+      "source": "pullback-retest",
+      "correct": "d",
+      "explanation": {
+        "id": "Cek struktur: selama HL terakhir bertahan, penurunan di uptrend masih pullback.",
+        "en": "Check the structure: while the last HL holds, a dip in an uptrend is still a pullback."
+      }
+    },
+    "P-04-B12": {
+      "id": "P-04-B12",
+      "type": "mcq_basic",
+      "level": 5,
+      "source": "suku-bunga",
+      "correct": "c",
+      "explanation": {
+        "id": "2,5% − 4% = −1,5%: bunga tinggi bukan alasan yang cukup.",
+        "en": "2.5% − 4% = −1.5%: a high rate isn't reason enough."
+      }
+    },
+    "P-04-B13": {
+      "id": "P-04-B13",
+      "type": "mcq_basic",
+      "level": 5,
+      "source": "kalender-ekonomi",
+      "correct": "b",
+      "explanation": {
+        "id": "\"Lebih baik\" bergantung pada jenis data: pengangguran lebih tinggi berarti pasar kerja lebih lemah.",
+        "en": "\"Better\" depends on the kind of data: higher unemployment means a weaker job market."
+      }
+    },
+    "P-04-B14": {
+      "id": "P-04-B14",
+      "type": "mcq_basic",
+      "level": 6,
+      "source": "keputusan-impulsif",
+      "correct": "b",
+      "explanation": {
+        "id": "Daftar periksa, jeda, dan batas harian adalah alat untuk memanggil Sistem 2 sebelum uang bergerak.",
+        "en": "Checklists, pauses and daily limits are tools to bring in System 2 before money moves."
+      }
+    },
+    "P-04-B15": {
+      "id": "P-04-B15",
+      "type": "mcq_basic",
+      "level": 6,
+      "source": "jurnal-trading",
+      "correct": "a",
+      "explanation": {
+        "id": "Profit factor = total R menang ÷ total R kalah = 9 ÷ 6 = 1,5.",
+        "en": "Profit factor = total R won ÷ total R lost = 9 ÷ 6 = 1.5."
+      }
+    }
+  }
+}
