@@ -705,15 +705,18 @@ export function TradingDesk({
               </button>
             </p>
           )}
-          <OpenTrades
-            trades={view.open}
-            pair={position?.pair ?? desk.pair}
-            optional={false}
-            busy={busy}
-            suggestedPips={suggestedPips}
-            onClose={(id) => void call("close", { trade: id })}
-            onModify={(id, field, pips) => call("modify", { trade: id, field, pips })}
-          />
+          {/* data-tour-busy: no guided tour starts over an open trade (components/tour/tour-dom.ts). */}
+          <div data-tour-busy={position ? "" : undefined} className="contents">
+            <OpenTrades
+              trades={view.open}
+              pair={position?.pair ?? desk.pair}
+              optional={false}
+              busy={busy}
+              suggestedPips={suggestedPips}
+              onClose={(id) => void call("close", { trade: id })}
+              onModify={(id, field, pips) => call("modify", { trade: id, field, pips })}
+            />
+          </div>
           <AccountPanel view={view} />
           <StageCard view={view} />
         </div>

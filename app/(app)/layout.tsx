@@ -4,6 +4,7 @@ import type { ProfileSummary } from "@/components/profile-card"
 import { LevelUpToast } from "@/components/progress/level-up-toast"
 import { ProgressAccount } from "@/components/progress/progress-account"
 import { Sidebar } from "@/components/sidebar"
+import { TourProvider } from "@/components/tour/tour-provider"
 import { getTranslations } from "next-intl/server"
 import { getCurrentUser } from "@/lib/auth"
 import { getAccess } from "@/lib/demo/server"
@@ -33,15 +34,26 @@ export default async function AppLayout({
         : undefined,
   }
 
+  // Guided tours: a page's tour the first time it opens, the welcome tour
+  // first for accounts, and the "?" button (components/tour/).
   return (
-    <div className="flex min-h-screen">
-      <Sidebar profile={profile} locks={locks} />
-      <main className="app-main flex-1 min-w-0">
-        <AppNavMobile profile={profile} locks={locks} />
-        <PageTransition>{children}</PageTransition>
-      </main>
-      <LevelUpToast />
-      <ProgressAccount userId={user?.id ?? null} />
-    </div>
+    <TourProvider
+      signedIn={Boolean(user)}
+      serverSeen={user?.toursSeen ?? null}
+      context={{
+        name: user?.displayName ?? null,
+        unlock: access ? { sessions: access.unlock.sessions, needed: access.unlock.needed, open: access.open } : null,
+      }}
+    >
+      <div className="flex min-h-screen">
+        <Sidebar profile={profile} locks={locks} />
+        <main className="app-main flex-1 min-w-0">
+          <AppNavMobile profile={profile} locks={locks} />
+          <PageTransition>{children}</PageTransition>
+        </main>
+        <LevelUpToast />
+        <ProgressAccount userId={user?.id ?? null} />
+      </div>
+    </TourProvider>
   )
 }

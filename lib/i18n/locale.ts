@@ -36,4 +36,5 @@ export const NAMESPACES = [
   "onboarding",
   "landing",
   "legal",
+  "tours",
 ] as const

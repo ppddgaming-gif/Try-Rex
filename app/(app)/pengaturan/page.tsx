@@ -39,6 +39,7 @@ export default async function SettingsPage() {
             { id: "tampilan", label: t("tabs.tampilan"), icon: <Palette className={icon} />, panel: <AppearanceSettings /> },
             {
               id: "profil",
+              tour: "settings-tab-profil",
               label: t("tabs.profil"),
               icon: <UserRound className={icon} />,
               panel: user ? (
@@ -55,6 +56,7 @@ export default async function SettingsPage() {
             },
             {
               id: "keamanan",
+              tour: "settings-tab-keamanan",
               label: t("tabs.keamanan"),
               icon: <KeyRound className={icon} />,
               panel: user ? (
@@ -78,6 +80,7 @@ export default async function SettingsPage() {
             },
             {
               id: "latihan",
+              tour: "settings-tab-latihan",
               label: t("tabs.latihan"),
               icon: <Route className={icon} />,
               panel: <TrainingPlan serverRecord={user ? user.onboarding : undefined} />,

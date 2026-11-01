@@ -6,14 +6,14 @@ import { Calculator, CandlestickChart, History, Lightbulb, NotebookPen, Wallet }
 import { useTranslations } from "next-intl"
 
 // Akun Latihan's sections. On a phone the bar scrolls sideways. Labels:
-// demo.ui.tabs.<key>.
+// demo.ui.tabs.<key>. `tour` is the guided tour's target (lib/tours.ts).
 const TABS = [
-  { href: "/akun-latihan", key: "akun", icon: Wallet },
-  { href: "/akun-latihan/trading", key: "trading", icon: CandlestickChart },
-  { href: "/akun-latihan/jurnal", key: "jurnal", icon: NotebookPen },
-  { href: "/akun-latihan/riwayat", key: "riwayat", icon: History },
-  { href: "/akun-latihan/kalkulator", key: "kalkulator", icon: Calculator },
-  { href: "/akun-latihan/tips", key: "tips", icon: Lightbulb },
+  { href: "/akun-latihan", key: "akun", icon: Wallet, tour: "demo-tab-akun" },
+  { href: "/akun-latihan/trading", key: "trading", icon: CandlestickChart, tour: "demo-tab-trading" },
+  { href: "/akun-latihan/jurnal", key: "jurnal", icon: NotebookPen, tour: "demo-tab-jurnal" },
+  { href: "/akun-latihan/riwayat", key: "riwayat", icon: History, tour: "demo-tab-riwayat" },
+  { href: "/akun-latihan/kalkulator", key: "kalkulator", icon: Calculator, tour: "demo-tab-kalkulator" },
+  { href: "/akun-latihan/tips", key: "tips", icon: Lightbulb, tour: "demo-tab-tips" },
 ]
 
 export function DemoTabs() {
@@ -28,6 +28,7 @@ export function DemoTabs() {
             key={tab.href}
             href={tab.href}
             aria-current={active ? "page" : undefined}
+            data-tour={tab.tour}
             className={[
               "relative isolate flex min-h-11 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-xl px-4 text-sm font-semibold transition-colors",
               active ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground",
