@@ -17,7 +17,12 @@ export function McqItem({ item, busy, onAnswer }: { item: PublicMcq; busy: boole
 
   return (
     <section className="rounded-2xl border border-border bg-card p-5 sm:p-6">
-      <p className="eyebrow">{multiple ? t("complex") : t("basic")}</p>
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="rounded-full border border-primary/50 px-2.5 py-1 font-display text-[11px] font-semibold uppercase tracking-wider text-primary">
+          {multiple ? t("complex") : t("basic")}
+        </span>
+        <span className="rounded-full border border-border px-2.5 py-1 font-mono text-[11px] font-semibold text-muted-foreground">{t("level", { n: item.level })}</span>
+      </div>
       <h2 className="mt-2 font-display text-lg font-bold leading-snug sm:text-xl">{item.question[locale]}</h2>
       <p className="mt-1 text-xs text-muted-foreground">{multiple ? t("pickMany") : t("pickOne")}</p>
       <div role={multiple ? "group" : "radiogroup"} aria-label={item.question[locale]} className="mt-4 flex flex-col gap-2">

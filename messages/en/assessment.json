@@ -25,14 +25,19 @@
       "problem": "The decision is incomplete or not valid. Check what you entered.",
       "expired": "This package's session has expired. Start again from the beginning.",
       "failed": "Couldn't reach the server. Try again."
-    }
+    },
+    "strip": "Questions",
+    "legendScenario": "Scenario",
+    "legendMcq": "Multiple choice",
+    "legendDone": "Answered"
   },
   "mcq": {
     "complex": "Complex multiple choice",
     "basic": "Multiple choice",
     "pickMany": "Pick every right answer (there can be more than one).",
     "pickOne": "Pick one answer.",
-    "answer": "Answer"
+    "answer": "Answer",
+    "level": "Level {n}"
   },
   "aspects": {
     "risk": "Risk per trade",
@@ -43,7 +48,7 @@
   },
   "scenario": {
     "balance": "Balance {v}",
-    "chartNote": "Times on the bottom axis are UTC. The amber line marks Start.",
+    "chartNote": "Chart times are UTC (weekday and hour). The amber START line marks your decision point.",
     "startLine": "START",
     "action": "Decision",
     "actions": {
@@ -100,7 +105,11 @@
     "skip": "Skip the remaining candles",
     "skipNote": "If you skip, the position keeps running to its SL, TP or the last candle without being shown.",
     "lineEntry": "ENTRY",
-    "linePending": "PENDING"
+    "linePending": "PENDING",
+    "chip": "Scenario {n} of {total}",
+    "toolsNote": "Lines, trendlines, rectangles, paths and indicators are analysis aids and aren't scored. The SL and TP from the BUY/SELL position tool are scored and lock after Start.",
+    "toolHint": "Enter the SL and TP prices here, or use the BUY/SELL Position tool in the chart toolbar and drag its lines: these fields fill in.",
+    "toolLinked": "Linked to the position tool on the chart: drag its lines or change the numbers here."
   },
   "review": {
     "eyebrow": "Package result",

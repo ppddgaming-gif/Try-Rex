@@ -71,6 +71,10 @@ type Props = {
   onCommit: (next: Drawing[]) => void
   /** The tool finished a drawing; the desk goes back to "select". */
   onToolDone: () => void
+  /** A vertical line at time `t` (relative, like the candles), labelled: the assessment's Start. */
+  marker?: { t: number; label: string }
+  /** The position tool's starting SL/TP distance, in average candle ranges. */
+  positionSize?: number
 }
 
 type Draft =
@@ -109,6 +113,8 @@ export function LiveChart({
   onSelect,
   onCommit,
   onToolDone,
+  marker,
+  positionSize = 1.5,
 }: Props) {
   const t = useTranslations("demo.ui.desk")
   const locale = useLocale() as Locale
@@ -316,7 +322,7 @@ export function LiveChart({
         // Neutral starting size: equal distances to SL and TP, which the player then moves.
         const recent = candles.slice(-14)
         const range = recent.length ? recent.reduce((s, c) => s + c.h - c.l, 0) / recent.length : pt.p * 0.002
-        const d = Number((range * 1.5).toFixed(digits))
+        const d = Number((range * positionSize).toFixed(digits))
         const buy = tool === "position-buy"
         return commitNew({
           id: newId(),
@@ -555,6 +561,22 @@ export function LiveChart({
                 <rect x={0} y={0} width={scale.plotW} height={size.h - PAD.bottom} />
               </clipPath>
             </defs>
+
+            {marker && (
+              <g pointerEvents="none" clipPath={`url(#plot-${clipId})`}>
+                <line
+                  x1={scale.indexToX(timeToIndex(times, step, marker.t)) - scale.slot / 2}
+                  x2={scale.indexToX(timeToIndex(times, step, marker.t)) - scale.slot / 2}
+                  y1={0}
+                  y2={size.h - PAD.bottom}
+                  stroke="var(--primary)"
+                  strokeDasharray="4 4"
+                />
+                <text x={scale.indexToX(timeToIndex(times, step, marker.t)) - scale.slot / 2 + 6} y={14} fontSize={10} fontWeight={700} letterSpacing={1} fill="var(--primary)">
+                  {marker.label}
+                </text>
+              </g>
+            )}
 
             {/* The open position: entry, SL and TP across the plot, prices on the axis. */}
             {levels.map((l) => {

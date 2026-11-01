@@ -25,14 +25,19 @@
       "problem": "Keputusan belum lengkap atau tidak valid. Periksa lagi isiannya.",
       "expired": "Sesi paket ini sudah kedaluwarsa. Mulai lagi dari awal.",
       "failed": "Gagal terhubung ke server. Coba lagi."
-    }
+    },
+    "strip": "Daftar soal",
+    "legendScenario": "Skenario",
+    "legendMcq": "Pilihan ganda",
+    "legendDone": "Sudah dijawab"
   },
   "mcq": {
     "complex": "Pilihan ganda kompleks",
     "basic": "Pilihan ganda",
     "pickMany": "Pilih semua jawaban yang benar (bisa lebih dari satu).",
     "pickOne": "Pilih satu jawaban.",
-    "answer": "Jawab"
+    "answer": "Jawab",
+    "level": "Level {n}"
   },
   "aspects": {
     "risk": "Risiko per transaksi",
@@ -43,7 +48,7 @@
   },
   "scenario": {
     "balance": "Saldo {v}",
-    "chartNote": "Waktu di sumbu bawah dalam UTC. Garis amber menandai titik Mulai.",
+    "chartNote": "Waktu di chart dalam UTC (hari dan jam). Garis amber MULAI menandai titik keputusanmu.",
     "startLine": "MULAI",
     "action": "Keputusan",
     "actions": {
@@ -100,7 +105,11 @@
     "skip": "Lewati sisa candle",
     "skipNote": "Kalau dilewati, posisi tetap berjalan sampai SL, TP, atau candle terakhir tanpa ditampilkan.",
     "lineEntry": "ENTRY",
-    "linePending": "PENDING"
+    "linePending": "PENDING",
+    "chip": "Skenario {n} dari {total}",
+    "toolsNote": "Garis, trendline, rectangle, path, dan indikator hanya alat bantu analisis dan tidak dinilai. SL dan TP dari alat posisi BUY/SELL dinilai dan terkunci setelah Mulai.",
+    "toolHint": "Isi harga SL dan TP di sini, atau pakai alat Posisi BUY/SELL di toolbar chart lalu geser garisnya: kolom ini ikut terisi.",
+    "toolLinked": "Terhubung ke alat posisi di chart: geser garisnya atau ubah angkanya di sini."
   },
   "review": {
     "eyebrow": "Hasil paket",

@@ -178,14 +178,10 @@ export function AssessmentRunner({ pkg }: { pkg: PublicPackage }) {
   }
 
   const item = pkg.items[index]
+  const scenarios = pkg.items.filter((i) => i.type === "scenario").length
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-3">
-        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-inset" aria-hidden="true">
-          <div className="h-full origin-left rounded-full bg-primary transition-transform duration-500" style={{ transform: `scaleX(${index / pkg.items.length})` }} />
-        </div>
-        <p className="font-mono text-xs tabular-nums text-muted-foreground">{t("progress", { n: Math.min(index + 1, pkg.items.length), total: pkg.items.length })}</p>
-      </div>
+      <QuestionStrip pkg={pkg} index={index} />
       {error && (
         <p role="alert" className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-primary/10 px-4 py-3 text-sm text-primary">
           {error}
@@ -204,6 +200,8 @@ export function AssessmentRunner({ pkg }: { pkg: PublicPackage }) {
             key={item.id}
             item={item}
             pkg={pkg}
+            number={pkg.items.slice(0, index + 1).filter((i) => i.type === "scenario").length}
+            of={scenarios}
             view={scenario}
             busy={busy && !playing}
             closing={closing}
@@ -217,5 +215,51 @@ export function AssessmentRunner({ pkg }: { pkg: PublicPackage }) {
         <McqItem key={item.id} item={item} busy={busy} onAnswer={(choice) => act({ action: "answer", choice })} />
       )}
     </div>
+  )
+}
+
+/**
+ * Every item as a numbered cell: answered, current, still to come. Items go
+ * in order and can't be revisited (a scenario's future is shown once), so the
+ * cells are a map, not buttons.
+ */
+function QuestionStrip({ pkg, index }: { pkg: PublicPackage; index: number }) {
+  const t = useTranslations("assessment.runner")
+  return (
+    <section aria-label={t("strip")} className="rounded-2xl border border-border bg-card p-3 sm:p-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="font-mono text-xs font-semibold tabular-nums text-muted-foreground">{t("progress", { n: Math.min(index + 1, pkg.items.length), total: pkg.items.length })}</p>
+        <div className="flex flex-wrap gap-3 text-[11px] text-muted-foreground">
+          <span className="inline-flex items-center gap-1.5">
+            <span aria-hidden="true" className="h-2.5 w-2.5 rounded-sm bg-foreground" /> {t("legendScenario")}
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <span aria-hidden="true" className="h-2.5 w-2.5 rounded-sm bg-faint" /> {t("legendMcq")}
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <span aria-hidden="true" className="h-2.5 w-2.5 rounded-full bg-primary" /> {t("legendDone")}
+          </span>
+        </div>
+      </div>
+      <ol className="mt-3 grid grid-cols-[repeat(auto-fill,minmax(2.25rem,1fr))] gap-1.5">
+        {pkg.items.map((it, i) => {
+          const done = i < index
+          const current = i === index
+          return (
+            <li
+              key={it.id}
+              aria-current={current ? "step" : undefined}
+              className={[
+                "relative flex h-9 items-center justify-center rounded-lg border font-mono text-xs font-semibold tabular-nums",
+                current ? "border-primary bg-primary/15 text-primary" : it.type === "scenario" ? "border-border bg-inset text-foreground" : "border-border bg-inset text-faint",
+              ].join(" ")}
+            >
+              {i + 1}
+              {done && <span aria-label={t("legendDone")} className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-primary" />}
+            </li>
+          )
+        })}
+      </ol>
+    </section>
   )
 }
