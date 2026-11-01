@@ -104,7 +104,19 @@ function buildScenario(pkg, s, order) {
     numbers: n,
     feedback: feedbackFor(s, n),
   }
-  return { pub, key }
+  // The window's candles for the app's server (context, then play), UTC seconds.
+  // Server-only like the keys: the play part is the future until the player commits.
+  const span = bars.slice(w.from, w.e + 1)
+  const candles = {
+    digits: s.pair.endsWith("JPY") ? 3 : 5,
+    context: w.s - w.from,
+    t: span.map((b) => brokerToUtc(b.t)),
+    o: span.map((b) => b.o),
+    h: span.map((b) => b.h),
+    l: span.map((b) => b.l),
+    c: span.map((b) => b.c),
+  }
+  return { pub, key, candles }
 }
 
 function buildMcq(pkg, q, order, kind) {
@@ -132,11 +144,13 @@ export async function buildPackage(pkg) {
   const src = (await import(pathToFileURL(join(ROOT, "src", `${pkg}.mjs`)).href)).default
   const items = []
   const keys = {}
+  const candles = {}
   let order = 1
   for (const s of src.scenarios) {
-    const { pub, key } = buildScenario(pkg, s, order++)
-    items.push(pub)
-    keys[pub.id] = key
+    const built = buildScenario(pkg, s, order++)
+    items.push(built.pub)
+    keys[built.pub.id] = built.key
+    candles[built.pub.id] = built.candles
   }
   for (const q of src.complex) {
     const { pub, key } = buildMcq(pkg, q, order++, "mcq_complex")
@@ -162,17 +176,17 @@ export async function buildPackage(pkg) {
     items,
   }
   const answer = { schema_version: 1, package_id: pkg, confidential: true, rubric: RUBRIC, items: keys }
-  return { questions, answer }
+  return { questions, answer, candles }
 }
 
 async function main() {
-  mkdirSync(join(ROOT, "packages"), { recursive: true })
-  mkdirSync(join(ROOT, "keys"), { recursive: true })
+  for (const dir of ["packages", "keys", "candles"]) mkdirSync(join(ROOT, dir), { recursive: true })
   console.log(`Data: ${DATA_DIR}`)
   for (const pkg of PACKAGES) {
-    const { questions, answer } = await buildPackage(pkg)
+    const { questions, answer, candles } = await buildPackage(pkg)
     writeFileSync(join(ROOT, "packages", `${pkg}.json`), JSON.stringify(questions, null, 2) + "\n")
     writeFileSync(join(ROOT, "keys", `${pkg}.keys.json`), JSON.stringify(answer, null, 2) + "\n")
+    writeFileSync(join(ROOT, "candles", `${pkg}.candles.json`), JSON.stringify(candles) + "\n")
     const failed = Object.values(answer.items).flatMap((k) => (k.claims_verified ?? []).filter((c) => !c.ok))
     console.log(`${pkg}: ${questions.items.length} items, ${failed.length} failed claims`)
   }
