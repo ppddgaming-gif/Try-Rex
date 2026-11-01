@@ -8,7 +8,7 @@ import { usePostJson } from "@/components/akun-latihan/post-json"
 import { AskRex } from "@/components/akun-latihan/rex-chat"
 import { CheckList, RexComments, useExitLabel } from "@/components/akun-latihan/trade-parts"
 import { REVIEW } from "@/lib/demo/config"
-import { ASPECTS, type EvalText, type Scores } from "@/lib/demo/evaluation"
+import { ASPECTS, journalComplete, type EvalText, type Scores } from "@/lib/demo/evaluation"
 import { lot, pct, price, usd } from "@/lib/demo/format"
 import type { JournalRow } from "@/lib/demo/journal"
 import { REVIEW_ANSWERS, type ReviewAnswer } from "@/lib/demo/state"
@@ -30,29 +30,39 @@ const tone = (v: number) => (v > 0 ? "text-success" : v < 0 ? "text-danger" : ""
  * The Trading Journal: one row per closed trade, newest first, one group per
  * month. A row opens to the whole plan, the result, the Disiplin checks,
  * Rex's comment, the player's own answer and note, and the saved AI
- * Evaluation when there is one.
+ * Evaluation when there is one. With `evaluable` (the evaluations table and
+ * the model are both there), a month with written, unevaluated entries links
+ * to AI Evaluation with them picked.
  */
-export function JournalList({ groups, askRex }: { groups: JournalGroup[]; askRex: boolean }) {
+export function JournalList({ groups, askRex, evaluable }: { groups: JournalGroup[]; askRex: boolean; evaluable: boolean }) {
   const t = useTranslations("evaluation.journal")
   return (
     <div className="flex flex-col gap-6">
-      {groups.map((g) => (
-        <section key={g.month} aria-labelledby={`month-${g.month}`}>
-          <div className="mb-2.5 flex flex-wrap items-baseline justify-between gap-2 px-1">
-            <h3 id={`month-${g.month}`} className="font-display text-lg font-bold">
-              {g.label}
-            </h3>
-            <p className="text-xs text-muted-foreground">
-              {t("monthCount", { n: g.rows.length, done: g.rows.filter((r) => r.evaluation).length })}
-            </p>
-          </div>
-          <ol className="flex flex-col gap-2.5">
-            {g.rows.map((r) => (
-              <JournalEntry key={r.id} row={r} askRex={askRex} />
-            ))}
-          </ol>
-        </section>
-      ))}
+      {groups.map((g) => {
+        const ready = g.rows.filter((r) => !r.evaluation && journalComplete(r)).length
+        return (
+          <section key={g.month} aria-labelledby={`month-${g.month}`}>
+            <div className="mb-2.5 flex flex-wrap items-baseline justify-between gap-2 px-1">
+              <h3 id={`month-${g.month}`} className="font-display text-lg font-bold">
+                {g.label}
+              </h3>
+              <p className="flex flex-wrap items-baseline gap-x-3 text-xs text-muted-foreground">
+                {t("monthCount", { n: g.rows.length, done: g.rows.filter((r) => r.evaluation).length })}
+                {evaluable && ready > 0 && g.month !== "—" && (
+                  <Link href={`/ai-evaluation?month=${g.month}`} className="font-semibold text-primary underline-offset-4 hover:underline">
+                    {t("evaluateMonth", { n: ready })}
+                  </Link>
+                )}
+              </p>
+            </div>
+            <ol className="flex flex-col gap-2.5">
+              {g.rows.map((r) => (
+                <JournalEntry key={r.id} row={r} askRex={askRex} />
+              ))}
+            </ol>
+          </section>
+        )
+      })}
     </div>
   )
 }

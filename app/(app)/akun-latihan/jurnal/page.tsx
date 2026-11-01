@@ -109,7 +109,7 @@ export default async function JurnalPage({ searchParams }: { searchParams: Promi
           />
         </Card>
       ) : (
-        <JournalList groups={groups} askRex={llmConfigured()} />
+        <JournalList groups={groups} askRex={llmConfigured()} evaluable={evaluations !== null && llmConfigured()} />
       )}
     </div>
   )

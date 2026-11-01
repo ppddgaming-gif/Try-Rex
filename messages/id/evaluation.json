@@ -64,6 +64,19 @@
     "patterns": "Pola di bulan ini",
     "practice": "Satu hal untuk dilatih",
     "scoresNote": "Skor per aspek hanya rapor: tidak mengubah Disiplin atau XP.",
-    "disclaimer": "Dibuat oleh AI dari data trade dan jurnalmu; bukan saran investasi."
+    "disclaimer": "Dibuat oleh AI dari data trade dan jurnalmu; bukan saran investasi.",
+    "evaluateMonth": "Evaluasi bulan ini ({n} siap)"
+  },
+  "lockedLead": "AI Evaluation menilai jurnal dari trade di Akun Demo. Akun Demo terbuka setelah sesi Trading Game ini:",
+  "unwritten": "{n, plural, other {# entri}} belum lengkap: jawab \"sesuai rencana?\" dan tulis catatan supaya Rex bisa menilainya.",
+  "card": {
+    "title": "AI Evaluation",
+    "ready": "{n, plural, other {# entri jurnal}} siap dievaluasi Rex.",
+    "evaluate": "Evaluasi sekarang",
+    "needNote": "{n, plural, other {# entri}} butuh catatan dulu.",
+    "writeNote": "Lengkapi di Jurnal",
+    "emptyHint": "Tutup trade di Akun Demo dan isi jurnalnya; Rex menilai prosesnya di sini.",
+    "lockedHint": "Terbuka bersama Akun Demo, setelah {needed} sesi Trading Game ({sessions} dari {needed}).",
+    "play": "Main Trading Game"
   }
 }

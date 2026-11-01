@@ -64,6 +64,19 @@
     "patterns": "Patterns this month",
     "practice": "One thing to practise",
     "scoresNote": "The aspect scores are a report card only: they don't change Disiplin or XP.",
-    "disclaimer": "Written by AI from your trade data and journal; not investment advice."
+    "disclaimer": "Written by AI from your trade data and journal; not investment advice.",
+    "evaluateMonth": "Evaluate this month ({n} ready)"
+  },
+  "lockedLead": "AI Evaluation reviews the journal of your Demo Account trades. The Demo Account opens after these Trading Game sessions:",
+  "unwritten": "{n, plural, one {# entry isn't} other {# entries aren't}} complete yet: answer \"followed the plan?\" and write a note so Rex can evaluate {n, plural, one {it} other {them}}.",
+  "card": {
+    "title": "AI Evaluation",
+    "ready": "{n, plural, one {# journal entry is} other {# journal entries are}} ready for Rex.",
+    "evaluate": "Evaluate now",
+    "needNote": "{n, plural, one {# entry needs} other {# entries need}} a note first.",
+    "writeNote": "Finish it in the Journal",
+    "emptyHint": "Close a Demo Account trade and fill in its journal; Rex evaluates the process here.",
+    "lockedHint": "Opens with the Demo Account, after {needed} Trading Game sessions ({sessions} of {needed}).",
+    "play": "Play the Trading Game"
   }
 }

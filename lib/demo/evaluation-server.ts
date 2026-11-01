@@ -22,7 +22,7 @@ import {
 } from "@/lib/demo/evaluation"
 import { commentsFor } from "@/lib/demo/journal"
 import { tradeFacts, type LlmMessage } from "@/lib/demo/rex-chat"
-import type { TradeRow } from "@/lib/demo/state"
+import type { ReviewAnswer, TradeRow } from "@/lib/demo/state"
 import { TRADE_COLUMNS, toTradeRow, type Row } from "@/lib/demo/trading"
 import type { T } from "@/lib/i18n/translator"
 import { createAdminClient } from "@/lib/supabase/admin"
@@ -67,6 +67,25 @@ export async function loadEntries(userId: string): Promise<Entry[] | null> {
       complete: journalComplete({ review: trade.review, note: trade.reviewNote }),
     }
   })
+}
+
+/** For the dashboard: unevaluated entries ready for Rex, and those still missing the self-review or the note; null before the migration. */
+export async function evaluationCounts(userId: string): Promise<{ ready: number; needNote: number } | null> {
+  const supabase = await createClient()
+  const [trades, evals] = await Promise.all([
+    supabase.from("demo_trades").select("id, review, review_note").eq("user_id", userId).eq("status", "closed").limit(MAX_ENTRIES),
+    supabase.from("demo_journal_evaluations").select("journal_id").eq("user_id", userId).limit(MAX_ENTRIES),
+  ])
+  if (trades.error || evals.error) return null
+  const done = new Set((evals.data ?? []).map((e) => String(e.journal_id)))
+  let ready = 0
+  let needNote = 0
+  for (const r of trades.data ?? []) {
+    if (done.has(String(r.id))) continue
+    if (journalComplete({ review: (r.review as ReviewAnswer | null) ?? null, note: (r.review_note as string | null) ?? null })) ready++
+    else needNote++
+  }
+  return { ready, needNote }
 }
 
 export type SavedEvaluation = { month: string; scores: Scores; text: { id: EvalText; en: EvalText }; createdAt: string }
