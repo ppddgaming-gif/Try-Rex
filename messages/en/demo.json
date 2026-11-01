@@ -468,10 +468,13 @@
       "xpFromDisiplin": "+{xp} XP from Disiplin",
       "noScoreEffect": "Profit or loss doesn't change this score.",
       "yourAnswer": "Your answer: <b>{answer}</b>",
-      "noteOptional": "Short note (optional)",
+      "noteLabel": "Short note (Rex needs it for AI Evaluation)",
       "notePlaceholder": "For example: got in too early",
       "saveAnswer": "Save answer",
-      "notScored": "This answer is only for your journal. It isn't scored."
+      "notScored": "This answer doesn't change Disiplin or XP.",
+      "toEvaluation": "Ready for AI Evaluation",
+      "needNote": "Add a note first so Rex can evaluate this trade.",
+      "toJournal": "Write it in the Journal"
     },
     "calc": {
       "title": "Profit Calculator",

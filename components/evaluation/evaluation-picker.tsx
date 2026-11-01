@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { AlertTriangle, BrainCircuit, CheckCircle2, LoaderCircle, RotateCcw } from "lucide-react"
+import { AlertTriangle, BrainCircuit, CheckCircle2, LoaderCircle, PencilLine, RotateCcw } from "lucide-react"
 import { useLocale, useTranslations } from "next-intl"
 import type { ReviewAnswer } from "@/lib/demo/state"
 import { lot } from "@/lib/demo/format"
@@ -28,14 +28,30 @@ type Quota = { left: number; limit: number; resetAt: string; resetLabel: string 
  * The unevaluated journal entries by month. Picking is limited to one month
  * (the other months lock until the pick is cleared) and to `maxPerRun`;
  * entries not written enough can be picked but block Evaluate with "isi
- * jurnal dulu". The server checks all of it again.
+ * jurnal dulu". The server checks all of it again. `initial` arrives picked
+ * (from a closed trade or a Journal month); `unwritten` counts the entries
+ * still missing the self-review or the note.
  */
-export function EvaluationPicker({ months, quota, maxPerRun, aiReady }: { months: PickerMonth[]; quota: Quota | null; maxPerRun: number; aiReady: boolean }) {
+export function EvaluationPicker({
+  months,
+  initial,
+  unwritten,
+  quota,
+  maxPerRun,
+  aiReady,
+}: {
+  months: PickerMonth[]
+  initial: string[]
+  unwritten: number
+  quota: Quota | null
+  maxPerRun: number
+  aiReady: boolean
+}) {
   const t = useTranslations("evaluation")
   const root = useTranslations()
   const locale = useLocale() as Locale
   const router = useRouter()
-  const [picked, setPicked] = useState<string[]>([])
+  const [picked, setPicked] = useState<string[]>(initial)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<{ text: string; retry: boolean } | null>(null)
   const [done, setDone] = useState<number | null>(null)
@@ -94,6 +110,16 @@ export function EvaluationPicker({ months, quota, maxPerRun, aiReady }: { months
           {t("toJournal")}
         </Link>
       </section>
+
+      {unwritten > 0 && (
+        <p className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl border border-border bg-card px-4 py-3 text-sm">
+          <PencilLine className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+          <span className="min-w-0 flex-1">{t("unwritten", { n: unwritten })}</span>
+          <Link href="/akun-latihan/jurnal" className="font-semibold text-primary underline-offset-4 hover:underline">
+            {t("toJournal")}
+          </Link>
+        </p>
+      )}
 
       {!aiReady && <p className="rounded-xl border border-primary/40 bg-primary/10 px-4 py-3 text-sm">{t("errors.unconfigured")}</p>}
 

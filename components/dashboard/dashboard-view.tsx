@@ -25,7 +25,7 @@ import { Streak } from "@/components/progress/streak"
 /**
  * Every number here is derived from the player's own attempts. DOM order is
  * the mobile order (next action, level + streak, calendar, competencies,
- * activity, insight, daily challenge); from lg the cards pair up in two
+ * activity, insight, next lesson, AI Evaluation, daily challenge); from lg the cards pair up in two
  * columns and level + streak move to the sidebar.
  */
 export function DashboardView({
@@ -35,6 +35,7 @@ export function DashboardView({
   motivation,
   dailyChallenge,
   nextLesson,
+  evaluation,
 }: {
   name: string
   avatarUrl: string | null
@@ -44,6 +45,8 @@ export function DashboardView({
   dailyChallenge: ReactNode
   /** The Belajar 101 card, built on the server so lesson content stays out of this bundle. */
   nextLesson: ReactNode
+  /** AI Evaluation's card, counted on the server; null when it isn't switched on. */
+  evaluation: ReactNode
 }) {
   const progress = useProgress()
   const started = progress !== null && totalChallenges(progress) > 0
@@ -151,6 +154,9 @@ export function DashboardView({
 
         {/* 6b. Belajar 101 */}
         {nextLesson}
+
+        {/* 6c. AI Evaluation */}
+        {evaluation}
 
         {/* 7. */}
         <div className="lg:col-span-2" data-tour="dash-challenge">

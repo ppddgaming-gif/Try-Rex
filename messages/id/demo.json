@@ -468,10 +468,13 @@
       "xpFromDisiplin": "+{xp} XP dari Disiplin",
       "noScoreEffect": "Untung atau rugi tidak mengubah skor ini.",
       "yourAnswer": "Jawabanmu: <b>{answer}</b>",
-      "noteOptional": "Catatan singkat (opsional)",
+      "noteLabel": "Catatan singkat (Rex butuh ini untuk AI Evaluation)",
       "notePlaceholder": "Misalnya: masuk terlalu cepat",
       "saveAnswer": "Simpan jawaban",
-      "notScored": "Jawaban ini hanya untuk jurnalmu. Tidak dinilai."
+      "notScored": "Jawaban ini tidak mengubah Disiplin atau XP.",
+      "toEvaluation": "Siap dievaluasi di AI Evaluation",
+      "needNote": "Tambahkan catatan dulu supaya Rex bisa mengevaluasi trade ini.",
+      "toJournal": "Tulis di Jurnal"
     },
     "calc": {
       "title": "Kalkulator Profit",

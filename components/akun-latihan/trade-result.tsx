@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { AskRex } from "@/components/akun-latihan/rex-chat"
 import { CheckList, RexComments } from "@/components/akun-latihan/trade-parts"
@@ -151,7 +152,25 @@ function ClosedTrade({
             {tx.rich("yourAnswer", { answer: tr(t.review.answer), b: (c) => <span className="font-semibold text-foreground">{c}</span> })}
             {t.review.note && <> · &ldquo;{t.review.note}&rdquo;</>}
           </p>
-        ) : (
+        ) : null}
+        {/* AI Evaluation needs the answer and a note; say which step is next. */}
+        {t.review && askRex && (
+          <p className="mt-2 text-sm">
+            {t.review.note ? (
+              <Link href={`/ai-evaluation?trade=${t.id}`} className="font-semibold text-primary underline-offset-4 hover:underline">
+                {tx("toEvaluation")}
+              </Link>
+            ) : (
+              <>
+                <span className="text-muted-foreground">{tx("needNote")}</span>{" "}
+                <Link href="/akun-latihan/jurnal" className="font-semibold text-primary underline-offset-4 hover:underline">
+                  {tx("toJournal")}
+                </Link>
+              </>
+            )}
+          </p>
+        )}
+        {!t.review && (
           <form
             className="mt-2 flex flex-col gap-2"
             onSubmit={async (e) => {
@@ -177,7 +196,7 @@ function ClosedTrade({
               ))}
             </div>
             <label className="text-xs text-muted-foreground" htmlFor={`note-${t.id}`}>
-              {tx("noteOptional")}
+              {tx("noteLabel")}
             </label>
             <input
               id={`note-${t.id}`}
