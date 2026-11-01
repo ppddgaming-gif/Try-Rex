@@ -74,5 +74,12 @@
     "srDays": "days in a row. {hint}.",
     "days": "{n, plural, one {<num>#</num> day in a row} other {<num>#</num> days in a row}}",
     "best": "Best: {n, plural, one {<num>#</num> day} other {<num>#</num> days}}"
+  },
+  "skillFrom": "from {list}",
+  "skillSources": {
+    "game": "{n, plural, one {# Trading Game answer} other {# Trading Game answers}}",
+    "asesmen": "{n, plural, one {# Asesmen question} other {# Asesmen questions}}",
+    "demo": "{n, plural, one {# Demo Account trade} other {# Demo Account trades}}",
+    "ai": "{n, plural, one {# AI Evaluation} other {# AI Evaluations}}"
   }
 }

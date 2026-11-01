@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { contextBars, keyOf, playBars, publicPackage } from "@/lib/assessment/data"
 import { buildReport } from "@/lib/assessment/report"
 import { createRun, loadRun, saveRun, type StoredRun } from "@/lib/assessment/runs"
+import { saveSkillResults } from "@/lib/assessment/skill-results"
 import { closeRun, decisionProblem, finishRun, startRun, stepRun } from "@/lib/assessment/sim"
 import { issueRun, readRun } from "@/lib/assessment/token"
 import { isPackageId, type Action, type Decision, type RunState, type ScenarioKey, type ScenarioRun } from "@/lib/assessment/types"
@@ -106,6 +107,7 @@ async function handle(body: Body) {
       windowOf: (id) => ({ context: contextBars(s.p, id), play: playBars(s.p, id) }),
       lessonTitle: (slug) => lessonBySlug.get(slug)?.title ?? null,
     })
+    await saveSkillResults(stored.id, s.p, report)
     return NextResponse.json({ token, index: s.i, report })
   }
 

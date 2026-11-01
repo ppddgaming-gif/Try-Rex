@@ -9,6 +9,7 @@ import { LESSONS } from "@/lib/learn/content"
 import { getCurrentUser } from "@/lib/auth"
 import { challenges } from "@/lib/mock-data"
 import { planFrom } from "@/lib/onboarding"
+import { loadSkills } from "@/lib/progress/skills-server"
 
 export async function generateMetadata(): Promise<Metadata> {
   return { title: (await getTranslations("dashboard"))("title") }
@@ -37,7 +38,7 @@ export default async function DashboardPage() {
   if (!user.onboarding) redirect("/start?next=/dashboard")
 
   const plan = planFrom(user.onboarding)
-  const locale = (await getLocale()) as Locale
+  const [locale, skills] = await Promise.all([getLocale() as Promise<Locale>, loadSkills(user.id)])
 
   // Progress lives in the browser, so the view is a client component. The
   // daily challenge (a server-rendered chart) is handed in as a slot.
@@ -47,6 +48,7 @@ export default async function DashboardPage() {
       avatarUrl={user.avatarUrl}
       dailyGoal={plan.dailyGoal}
       motivation={plan.motivation}
+      skills={skills}
       dailyChallenge={<DailyChallenge challenge={dailyChallenge()} />}
       nextLesson={<NextLesson lessons={LESSONS.map((l) => ({ slug: l.slug, minutes: l.minutes, title: l.title[locale], summary: l.summary[locale] }))} />}
     />

@@ -5,6 +5,7 @@ import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { recentAttempts, totalChallenges } from "@/lib/progress/derive"
+import { SKILL_SOURCES, type SkillMeter, type SkillMeters } from "@/lib/progress/skills"
 import { COMPETENCIES } from "@/lib/progress/types"
 import { useProgress } from "@/lib/progress/use-progress"
 import { Avatar } from "@/components/avatar"
@@ -33,6 +34,7 @@ export function DashboardView({
   avatarUrl,
   dailyGoal,
   motivation,
+  skills,
   dailyChallenge,
   nextLesson,
 }: {
@@ -41,6 +43,8 @@ export function DashboardView({
   /** From the /start quiz; null when the player chose no target. */
   dailyGoal: number | null
   motivation: string | null
+  /** The four skill meters, counted on the server from the player's own results. */
+  skills: SkillMeters
   dailyChallenge: ReactNode
   /** The Belajar 101 card, built on the server so lesson content stays out of this bundle. */
   nextLesson: ReactNode
@@ -49,6 +53,9 @@ export function DashboardView({
   const started = progress !== null && totalChallenges(progress) > 0
   const t = useTranslations("dashboard")
   const tp = useTranslations("progress")
+  // "dari 12 jawaban Trading Game · 3 soal Asesmen": the counts behind a meter.
+  const from = (m: SkillMeter) =>
+    tp("skillFrom", { list: SKILL_SOURCES.filter((s) => m.sources[s]).map((s) => tp(`skillSources.${s}`, { n: m.sources[s] ?? 0 })).join(" · ") })
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-6 lg:px-8">
@@ -108,7 +115,12 @@ export function DashboardView({
           <p className="mt-1 text-xs text-muted-foreground">{t("skillsHint")}</p>
           <div className="mt-5 flex flex-col gap-5">
             {COMPETENCIES.map((key) => (
-              <CompetencyMeter key={key} label={tp(`competencies.${key}`)} value={progress?.competencies[key] ?? null} />
+              <CompetencyMeter
+                key={key}
+                label={tp(`competencies.${key}`)}
+                value={skills[key]?.value ?? null}
+                caption={skills[key] ? from(skills[key]) : undefined}
+              />
             ))}
           </div>
         </Card>
