@@ -11,6 +11,7 @@ import { AppearanceSettings } from "@/components/settings/appearance-settings"
 import { SettingsTabs } from "@/components/settings/settings-tabs"
 import { TrainingPlan } from "@/components/settings/training-plan"
 import { getCurrentUser } from "@/lib/auth"
+import { PROVIDER_NAMES } from "@/lib/auth-rules"
 
 export async function generateMetadata(): Promise<Metadata> {
   return { title: (await getTranslations("settings"))("title") }
@@ -71,6 +72,19 @@ export default async function SettingsPage() {
                     <h2 className="mb-5 flex items-center gap-2 text-base font-semibold">
                       <KeyRound className="h-4 w-4 text-primary" aria-hidden="true" /> {t("password")}
                     </h2>
+                    {/* The form stays: identities don't show whether a password was set later. */}
+                    {user.providers.length > 0 && (
+                      <p className="mb-5 text-sm text-muted-foreground">
+                        {t.rich("passwordForm.connected", {
+                          providers: user.providers.map((p) => PROVIDER_NAMES[p]).join(", "),
+                          link: (c) => (
+                            <Link href="/lupa-password" className="font-semibold text-primary underline-offset-4 hover:underline">
+                              {c}
+                            </Link>
+                          ),
+                        })}
+                      </p>
+                    )}
                     <PasswordForm />
                   </Card>
                 </>

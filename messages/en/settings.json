@@ -86,7 +86,8 @@
     "repeat": "Repeat new password",
     "saving": "Saving…",
     "submit": "Change password",
-    "saved": "Password changed"
+    "saved": "Password changed",
+    "connected": "You sign in with {providers}. No password yet? Create one on the <link>forgot password page</link>."
   },
   "avatar": {
     "change": "Change profile photo",

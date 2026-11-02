@@ -28,6 +28,10 @@ export default function PrivacyPage() {
             <strong>Nama</strong> yang kamu isi saat mendaftar, untuk menyapamu di aplikasi.
           </li>
           <li>
+            <strong>Nama dan email dari Google atau GitHub</strong>, kalau kamu memilih masuk dengan salah satunya.
+            Kami tidak menerima password akun itu.
+          </li>
+          <li>
             <strong>Jawaban latihan</strong>: keputusan (BUY, SELL, WAIT), alasan yang kamu pilih, waktu menjawab, dan
             skor yang dihasilkan.
           </li>
@@ -62,7 +66,7 @@ export default function PrivacyPage() {
       <Section title="3. Di mana data disimpan">
         <p>
           Akun dan data latihan disimpan di <strong>Supabase</strong> (database dan autentikasi), pada region{" "}
-          <Isi>region server Supabase</Isi>. Situs dijalankan di <strong>Vercel</strong>. Artinya data dapat diproses
+          Seoul, Korea Selatan. Situs dijalankan di <strong>Vercel</strong>. Artinya data dapat diproses
           di luar Indonesia. <Tinjau>ketentuan transfer data ke luar negeri</Tinjau>
         </p>
         <p>

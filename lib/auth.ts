@@ -1,4 +1,5 @@
 import { cache } from "react"
+import { isProvider, type OAuthProvider } from "@/lib/auth-rules"
 import { parseRecord, type OnboardingRecord } from "@/lib/onboarding"
 import { createClient } from "@/lib/supabase/server"
 import { parseSeen, type TourId } from "@/lib/tours"
@@ -21,11 +22,20 @@ export type CurrentUser = {
   profileExtras: boolean
   /** Guided tours already shown on this account; null when the column doesn't exist yet. */
   toursSeen: TourId[] | null
+  /**
+   * False until the privacy policy is accepted: a Google or GitHub account
+   * starts here, because it skips the sign-up form. True when the profile
+   * can't be read, so a database hiccup can't lock anyone out.
+   */
+  consented: boolean
+  /** Social logins connected to this account. */
+  providers: OAuthProvider[]
 }
 
 type ProfileRow = {
   display_name: string | null
   onboarding: unknown
+  privacy_accepted_at: string | null
   username?: string | null
   avatar_path?: string | null
   tours_seen?: unknown
@@ -34,9 +44,9 @@ type ProfileRow = {
 // Newest columns first. Each step back drops the columns a later migration
 // added, so the app keeps working on a database that is a migration behind.
 const SELECTS = [
-  "display_name, onboarding, username, avatar_path, tours_seen",
-  "display_name, onboarding, username, avatar_path",
-  "display_name, onboarding",
+  "display_name, onboarding, privacy_accepted_at, username, avatar_path, tours_seen",
+  "display_name, onboarding, privacy_accepted_at, username, avatar_path",
+  "display_name, onboarding, privacy_accepted_at",
 ]
 
 /**
@@ -81,6 +91,8 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     onboarding: parseRecord(profile?.onboarding),
     profileExtras,
     toursSeen: level === 0 && profile ? parseSeen(profile.tours_seen) : null,
+    consented: !profile || Boolean(profile.privacy_accepted_at),
+    providers: (user.identities ?? []).map((i) => i.provider).filter(isProvider),
   }
 })
 

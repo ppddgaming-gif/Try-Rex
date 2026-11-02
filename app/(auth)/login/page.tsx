@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { getTranslations } from "next-intl/server"
 import Link from "next/link"
 import { LoginForm } from "@/components/auth/login-form"
+import { SocialButtons } from "@/components/auth/social-buttons"
 import { safeNext } from "@/lib/auth-rules"
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -18,7 +19,8 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         <h1 className="text-2xl font-extrabold">{t("title")}</h1>
         <p className="text-sm text-muted-foreground">{t("lead")}</p>
       </div>
-      <LoginForm next={safeNext(next)} initialError={error === "link" ? t("linkError") : undefined} />
+      <SocialButtons next={safeNext(next)} />
+      <LoginForm next={safeNext(next)} initialError={error === "link" ? t("linkError") : error === "oauth" ? t("oauthError") : undefined} />
       <p className="text-center text-sm text-muted-foreground">
         {t("noAccount")}{" "}
         <Link href="/signup" className="inline-flex min-h-11 items-center font-semibold text-primary hover:text-primary-hi">

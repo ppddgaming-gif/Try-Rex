@@ -3,8 +3,9 @@
 import { headers } from "next/headers"
 import { getTranslations } from "next-intl/server"
 import { redirect } from "next/navigation"
-import { MIN_PASSWORD, authErrorKey, safeNext } from "@/lib/auth-rules"
+import { MIN_PASSWORD, authErrorKey, isProvider, oauthCallback, safeNext } from "@/lib/auth-rules"
 import { writeLocaleCookie } from "@/lib/i18n/actions"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { createClient } from "@/lib/supabase/server"
 
 export type FormState = { error?: string; sent?: boolean; email?: string }
@@ -84,6 +85,45 @@ export async function signup(_: FormState, fd: FormData): Promise<FormState> {
   if (data.user && data.user.identities?.length === 0) return { error: e("emailTaken"), email }
 
   return { sent: true, email }
+}
+
+/** Google or GitHub: off to the provider, back through /auth/callback. */
+export async function signInWithProvider(fd: FormData) {
+  const provider = fd.get("provider")
+  if (!isProvider(provider)) redirect("/login?error=oauth")
+
+  const supabase = await createClient()
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider,
+    options: { redirectTo: oauthCallback(await origin(), fd.get("next")) },
+  })
+  if (error || !data.url) redirect("/login?error=oauth")
+  redirect(data.url)
+}
+
+/**
+ * Records consent for an account that didn't come through the sign-up form.
+ * Players can't write this column, so it goes through the service role, and
+ * only ever fills an empty value: the first consent's date stays.
+ */
+export async function acceptPrivacy(_: FormState, fd: FormData): Promise<FormState> {
+  const e = await errors()
+  if (fd.get("agree") !== "on") return { error: e("mustAgree") }
+
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) redirect("/login")
+
+  const { error } = await createAdminClient()
+    .from("profiles")
+    .update({ privacy_accepted_at: new Date().toISOString() })
+    .eq("id", user.id)
+    .is("privacy_accepted_at", null)
+  if (error) return { error: e("generic") }
+
+  redirect(safeNext(fd.get("next")))
 }
 
 export async function requestPasswordReset(_: FormState, fd: FormData): Promise<FormState> {

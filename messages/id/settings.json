@@ -86,7 +86,8 @@
     "repeat": "Ulangi password baru",
     "saving": "Menyimpan…",
     "submit": "Ganti password",
-    "saved": "Password diganti"
+    "saved": "Password diganti",
+    "connected": "Kamu masuk dengan {providers}. Belum punya password? Buat lewat <link>halaman lupa password</link>."
   },
   "avatar": {
     "change": "Ganti foto profil",

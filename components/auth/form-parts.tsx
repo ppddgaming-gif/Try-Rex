@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, type InputHTMLAttributes, type ReactNode } from "react"
+import Link from "next/link"
 import { CircleAlert, Eye, EyeOff, MailCheck } from "lucide-react"
 import { useTranslations } from "next-intl"
 
@@ -57,6 +58,36 @@ export function Field({
         </p>
       )}
     </div>
+  )
+}
+
+/** The agreement with the Privacy Policy and Terms. The whole row is the tap target, not just the 20px box. */
+export function AgreeField({ checked, onChange }: { checked: boolean; onChange: (checked: boolean) => void }) {
+  const t = useTranslations("auth.signup")
+  return (
+    <label className="flex min-h-11 cursor-pointer items-start gap-3 text-sm leading-relaxed text-muted-foreground">
+      <input
+        type="checkbox"
+        name="agree"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+        className="mt-0.5 h-5 w-5 shrink-0 accent-primary"
+      />
+      <span>
+        {t.rich("agree", {
+          privacy: (c) => (
+            <Link href="/privacy" target="_blank" className="font-semibold text-primary underline-offset-2 hover:underline">
+              {c}
+            </Link>
+          ),
+          terms: (c) => (
+            <Link href="/terms" target="_blank" className="font-semibold text-primary underline-offset-2 hover:underline">
+              {c}
+            </Link>
+          ),
+        })}
+      </span>
+    </label>
   )
 }
 

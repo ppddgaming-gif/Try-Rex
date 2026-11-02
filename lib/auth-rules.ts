@@ -18,6 +18,21 @@ export function safeNext(value: FormDataEntryValue | string | null | undefined, 
   return value
 }
 
+/** Social logins, switched on in Supabase (Authentication > Providers). */
+export const OAUTH_PROVIDERS = ["google", "github"] as const
+export type OAuthProvider = (typeof OAUTH_PROVIDERS)[number]
+export const isProvider = (v: unknown): v is OAuthProvider => (OAUTH_PROVIDERS as readonly unknown[]).includes(v)
+
+/** Brand names, the same in every language. */
+export const PROVIDER_NAMES: Record<OAuthProvider, string> = { google: "Google", github: "GitHub" }
+
+/** Where the provider sends the player back to; `flow` tells the callback it isn't an email link. */
+export const oauthCallback = (origin: string, next: FormDataEntryValue | string | null | undefined) =>
+  `${origin}/auth/callback?flow=oauth&next=${encodeURIComponent(safeNext(next))}`
+
+/** The consent step of an account that didn't come through the sign-up form. */
+export const consentPath = (next: FormDataEntryValue | string | null | undefined) => `/persetujuan?next=${encodeURIComponent(safeNext(next))}`
+
 /** Message keys under auth.errors (messages/<locale>/auth.json). */
 export type AuthErrorKey =
   | "invalidCredentials"
