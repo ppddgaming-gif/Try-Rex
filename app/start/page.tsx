@@ -1,8 +1,9 @@
 import type { Metadata } from "next"
 import { getTranslations } from "next-intl/server"
+import { redirect } from "next/navigation"
 import { OnboardingFlow } from "@/components/onboarding/onboarding-flow"
 import { getCurrentUser } from "@/lib/auth"
-import { safeNext } from "@/lib/auth-rules"
+import { consentPath, safeNext } from "@/lib/auth-rules"
 
 export async function generateMetadata(): Promise<Metadata> {
   return { title: (await getTranslations("onboarding"))("title") }
@@ -17,6 +18,7 @@ export default async function StartPage({
 }) {
   const { next, ulang } = await searchParams
   const user = await getCurrentUser()
+  if (user && !user.consented) redirect(consentPath(`/start${next ? `?next=${encodeURIComponent(safeNext(next))}` : ""}`))
 
   return (
     <OnboardingFlow

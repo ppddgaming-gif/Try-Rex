@@ -6,6 +6,7 @@ import { ProgressAccount } from "@/components/progress/progress-account"
 import { Sidebar } from "@/components/sidebar"
 import { TourProvider } from "@/components/tour/tour-provider"
 import { getTranslations } from "next-intl/server"
+import { redirect } from "next/navigation"
 import { getCurrentUser } from "@/lib/auth"
 import { getAccess } from "@/lib/demo/server"
 import type { NavLocks } from "@/components/nav-links"
@@ -18,6 +19,8 @@ export default async function AppLayout({
   // Null for guests: /trading-game and /ai-evaluation are open without an
   // account, and the profile card then shows "Tamu" with sign-in buttons.
   const user = await getCurrentUser()
+  // A Google or GitHub account agrees to the privacy policy first.
+  if (user && !user.consented) redirect("/persetujuan")
   const profile: ProfileSummary | null = user
     ? { name: user.displayName, username: user.username, avatarUrl: user.avatarUrl }
     : null
